@@ -12,6 +12,7 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { rankArticle, auraArticle, prestigeArticle, gettingStartedArticle, legendaryWeaponsArticle, guildWarsArticle } from '@/lib/wiki-data';
 import type { WikiArticle } from '@/lib/types';
+import { Separator } from '@/components/ui/separator';
 
 const world20Data = {
     name: 'World 20 - Grand Elder',
@@ -78,7 +79,6 @@ export default function SeedPage() {
     ranks: false,
     auras: false,
     prestige: false,
-    otherWorlds: false,
   });
 
   const handleLoading = (key: keyof typeof loadingStates, value: boolean) => {
@@ -151,62 +151,74 @@ export default function SeedPage() {
     });
   }
 
+  const worldNumbers = Array.from({ length: 21 }, (_, i) => i + 1);
+
   return (
-    <div className="container mx-auto py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="container mx-auto py-8 space-y-8">
       <Card>
-        <CardHeader><CardTitle>Seed World 20 Data</CardTitle></CardHeader>
-        <CardContent><CardDescription>Populate Firestore with game data for World 20 (powers, etc.).</CardDescription></CardContent>
-        <CardFooter>
-          <Button onClick={handleSeedWorldData} disabled={loadingStates.world20 || !firestore}>
-            {loadingStates.world20 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {loadingStates.world20 ? 'Seeding...' : 'Seed World 20'}
-          </Button>
-        </CardFooter>
-      </Card>
-      
-      <Card>
-        <CardHeader><CardTitle>Seed Rank System</CardTitle></CardHeader>
-        <CardContent><CardDescription>Seed the "Rank System" article to the `wikiContent` collection.</CardDescription></CardContent>
-        <CardFooter>
-          <Button onClick={() => seedArticle(rankArticle, 'ranks', 'Rank System')} disabled={loadingStates.ranks || !firestore}>
-            {loadingStates.ranks ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {loadingStates.ranks ? 'Seeding...' : 'Seed Rank Article'}
-          </Button>
-        </CardFooter>
-      </Card>
-      
-      <Card>
-        <CardHeader><CardTitle>Seed Aura System</CardTitle></CardHeader>
-        <CardContent><CardDescription>Seed the "Aura System" article to the `wikiContent` collection.</CardDescription></CardContent>
-        <CardFooter>
-          <Button onClick={() => seedArticle(auraArticle, 'auras', 'Aura System')} disabled={loadingStates.auras || !firestore}>
-            {loadingStates.auras ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {loadingStates.auras ? 'Seeding...' : 'Seed Aura Article'}
-          </Button>
-        </CardFooter>
-      </Card>
-      
-      <Card>
-        <CardHeader><CardTitle>Seed Prestige System</CardTitle></CardHeader>
-        <CardContent><CardDescription>Seed the "Prestige System" article to the `wikiContent` collection.</CardDescription></CardContent>
-        <CardFooter>
-          <Button onClick={() => seedArticle(prestigeArticle, 'prestige', 'Prestige System')} disabled={loadingStates.prestige || !firestore}>
-            {loadingStates.prestige ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {loadingStates.prestige ? 'Seeding...' : 'Seed Prestige Article'}
-          </Button>
-        </CardFooter>
+        <CardHeader><CardTitle>Seed Wiki Articles</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Seed Rank System</CardTitle></CardHeader>
+            <CardContent><CardDescription>Seed the "Rank System" article to the `wikiContent` collection.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(rankArticle, 'ranks', 'Rank System')} disabled={loadingStates.ranks || !firestore}>
+                {loadingStates.ranks ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.ranks ? 'Seeding...' : 'Seed Rank Article'}
+              </Button>
+            </CardFooter>
+          </Card>
+          
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Seed Aura System</CardTitle></CardHeader>
+            <CardContent><CardDescription>Seed the "Aura System" article to the `wikiContent` collection.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(auraArticle, 'auras', 'Aura System')} disabled={loadingStates.auras || !firestore}>
+                {loadingStates.auras ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.auras ? 'Seeding...' : 'Seed Aura Article'}
+              </Button>
+            </CardFooter>
+          </Card>
+          
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Seed Prestige System</CardTitle></CardHeader>
+            <CardContent><CardDescription>Seed the "Prestige System" article to the `wikiContent` collection.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(prestigeArticle, 'prestige', 'Prestige System')} disabled={loadingStates.prestige || !firestore}>
+                {loadingStates.prestige ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.prestige ? 'Seeding...' : 'Seed Prestige Article'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader><CardTitle>Seed Other Worlds</CardTitle></CardHeader>
-        <CardContent><CardDescription>Seed data for all other worlds (1-19 and 21). Data not yet available.</CardDescription></CardContent>
-        <CardFooter>
-          <Button disabled>
-            Seed Other Worlds
-          </Button>
-        </CardFooter>
-      </Card>
+      <Separator />
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Seed World Game Data</CardTitle>
+          <CardDescription>Populate Firestore with game data for each world individually. Data for worlds other than 20 is not yet available.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
+          {worldNumbers.map(worldNum => (
+            <div key={worldNum}>
+              {worldNum === 20 ? (
+                <Button onClick={handleSeedWorldData} disabled={loadingStates.world20 || !firestore} className="w-full">
+                  {loadingStates.world20 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {loadingStates.world20 ? 'Seeding...' : `Seed World ${worldNum}`}
+                </Button>
+              ) : (
+                <Button disabled className="w-full">
+                  Seed World {worldNum}
+                </Button>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
+    
