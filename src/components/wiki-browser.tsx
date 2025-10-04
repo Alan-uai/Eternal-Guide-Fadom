@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -20,19 +21,40 @@ function WikiArticleContent({ article }: { article: WikiArticle }) {
   const contentHtml = article.content ? micromark(article.content) : '';
   const hasTables = article.tables && Object.keys(article.tables).length > 0;
 
+  // Specific grid rendering for the Rank System article
+  if (article.id === 'rank-system' && article.tables?.ranks) {
+    return (
+      <div>
+        <div
+          className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground/80 prose-headings:text-foreground"
+          dangerouslySetInnerHTML={{ __html: contentHtml }}
+        />
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-2 text-sm">
+          {article.tables.ranks.rows.map((row, index) => (
+            <React.Fragment key={index}>
+              <div className="font-semibold text-foreground">Rank {row.Rank}</div>
+              <div className="text-muted-foreground">{row.Energia}</div>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Standard table rendering for other articles
   return (
     <div>
       <div
         className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground/80 prose-headings:text-foreground"
         dangerouslySetInnerHTML={{ __html: contentHtml }}
       />
-      {hasTables && Object.entries(article.tables!).map(([key, tableData]) => (
-          <div key={key} className="mt-4">
+      {hasTables && Object.entries(article.tables).map(([key, tableData]) => (
+          <div key={key} className="mt-6 overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   {tableData.headers.map((header) => (
-                    <TableHead key={header}>{header}</TableHead>
+                    <TableHead key={header} className="whitespace-nowrap">{header}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -40,7 +62,7 @@ function WikiArticleContent({ article }: { article: WikiArticle }) {
                 {tableData.rows.map((row, rowIndex) => (
                   <TableRow key={rowIndex}>
                     {tableData.headers.map((header, cellIndex) => (
-                      <TableCell key={`${rowIndex}-${cellIndex}`}>{row[header]}</TableCell>
+                      <TableCell key={`${rowIndex}-${cellIndex}`} className="whitespace-nowrap">{row[header]}</TableCell>
                     ))}
                   </TableRow>
                 ))}
@@ -101,7 +123,7 @@ function ArticleCard({ article }: { article: WikiArticle }) {
             </div>
           </DialogDescription>
          </DialogHeader>
-        <ScrollArea className="max-h-[60vh] pr-4 -mr-4">
+        <ScrollArea className="max-h-[70vh] pr-4 -mr-4">
           <WikiArticleContent article={article} />
         </ScrollArea>
       </DialogContent>
