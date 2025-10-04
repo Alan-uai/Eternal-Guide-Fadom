@@ -18,6 +18,12 @@ const worldNameToId: { [key: string]: string } = {
     "World 20": "world-20"
 };
 
+// Helper function to parse multiplier string to a number
+function parseMultiplier(multiplier: string): number {
+    if (typeof multiplier !== 'string') return 0;
+    return parseFloat(multiplier.replace('x', ''));
+}
+
 export async function getGameData(worldName: string, category: string, itemName?: string) {
   const { firestore } = initializeFirebaseServer();
   try {
@@ -58,7 +64,12 @@ export async function getGameData(worldName: string, category: string, itemName?
         const statsCollectionRef = collection(itemDoc.ref, 'stats');
         const statsSnapshot = await getDocs(statsCollectionRef);
         if (!statsSnapshot.empty) {
-            (itemData as any)['stats'] = statsSnapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            const statsData = statsSnapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            
+            // Sort stats by multiplier in ascending order
+            statsData.sort((a, b) => parseMultiplier(a.multiplier) - parseMultiplier(b.multiplier));
+
+            (itemData as any)['stats'] = statsData;
         }
         
         results.push(itemData);

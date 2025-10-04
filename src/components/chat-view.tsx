@@ -21,31 +21,47 @@ const chatSchema = z.object({
 });
 
 function AssistantMessage({ content }: { content: string }) {
-    const parts = content.split('**');
-    return (
-      <div>
-        {parts.map((part, index) => {
-          if (index % 2 === 1) {
-            return <strong key={index}>{part}</strong>;
+  // Split the content into lines to handle multiple lists properly
+  const lines = content.split('\n').filter(line => line.trim() !== '');
+
+  const renderedLines = lines.map((line, index) => {
+    // Check if the line is a list item (starts with * or -)
+    if (line.trim().startsWith('*') || line.trim().startsWith('-')) {
+      // Remove the list marker for display
+      const itemContent = line.trim().substring(1).trim();
+      return <li key={index}>{itemContent}</li>;
+    }
+    // Check if the line is a header (ends with a colon)
+    if (line.trim().endsWith(':')) {
+      return <strong key={index} className="block mt-2">{line}</strong>;
+    }
+    // Otherwise, it's a regular paragraph or sentence
+    return <p key={index}>{line}</p>;
+  });
+
+  return (
+    <div className="space-y-2">
+      {renderedLines.map((line, index, array) => {
+        // Group list items into a <ul>
+        if (line.type === 'li') {
+          // If this is the first `li` in a sequence, start a `ul`
+          if (index === 0 || array[index - 1].type !== 'li') {
+            const listItems = [];
+            for (let i = index; i < array.length && array[i].type === 'li'; i++) {
+              listItems.push(array[i]);
+            }
+            return <ul key={`ul-${index}`} className="list-disc pl-5 space-y-1">{listItems}</ul>;
           }
-          const subParts = part.split('* ');
-          if (subParts.length > 1) {
-            return (
-              <div key={index}>
-                {subParts[0]}
-                <ul className="list-disc pl-5 space-y-1">
-                  {subParts.slice(1).map((item, subIndex) => (
-                    <li key={subIndex}>{item.trim()}</li>
-                  ))}
-                </ul>
-              </div>
-            );
-          }
-          return <span key={index}>{part}</span>;
-        })}
-      </div>
-    );
-  }
+          // If this `li` is already part of a `ul` started by a previous element, return null
+          return null;
+        }
+        // Render other elements directly
+        return line;
+      })}
+    </div>
+  );
+}
+
 
 export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
