@@ -16,6 +16,7 @@ import { accessories, worldNameToId } from '@/lib/accessory-data';
 import { world1Data } from '@/lib/world-1-data';
 import { world2Data } from '@/lib/world-2-data';
 import { world3Data } from '@/lib/world-3-data';
+import { world4Data } from '@/lib/world-4-data';
 
 const world20Data = {
     name: 'World 20 - Grand Elder',
@@ -81,6 +82,7 @@ export default function SeedPage() {
     world1: false,
     world2: false,
     world3: false,
+    world4: false,
     world20: false,
     ranks: false,
     auras: false,
@@ -270,7 +272,7 @@ export default function SeedPage() {
       <Card>
         <CardHeader>
           <CardTitle>Popular Dados de Jogo por Mundo</CardTitle>
-          <CardDescription>Popula o Firestore com dados de jogo para cada mundo individualmente. Dados para mundos diferentes de 1, 2, 3 e 20 ainda não estão disponíveis.</CardDescription>
+          <CardDescription>Popula o Firestore com dados de jogo para cada mundo individualmente. Dados para mundos diferentes de 1, 2, 3, 4 e 20 ainda não estão disponíveis.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
           {worldNumbers.map(worldNum => (
@@ -290,6 +292,11 @@ export default function SeedPage() {
                   {loadingStates.world3 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   {loadingStates.world3 ? 'Populando...' : `Popular Mundo ${worldNum}`}
                 </Button>
+              ) : worldNum === 4 ? (
+                <Button onClick={() => seedWorldGeneric('world-4', world4Data, 'world4')} disabled={loadingStates.world4 || !firestore} className="w-full">
+                  {loadingStates.world4 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {loadingStates.world4 ? 'Populando...' : `Popular Mundo ${worldNum}`}
+                </Button>
               ) : worldNum === 20 ? (
                 <Button onClick={() => seedWorldGeneric('world-20', world20Data, 'world20')} disabled={loadingStates.world20 || !firestore} className="w-full">
                   {loadingStates.world20 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -307,5 +314,3 @@ export default function SeedPage() {
     </div>
   );
 }
-
-    
