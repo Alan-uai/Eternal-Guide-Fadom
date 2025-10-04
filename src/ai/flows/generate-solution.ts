@@ -10,20 +10,22 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getRaceStats } from '@/firebase/firestore/data';
+import { getGameData } from '@/firebase/firestore/data';
 
 
-const getRaceStatsTool = ai.defineTool(
+const getGameDataTool = ai.defineTool(
   {
-    name: 'getRaceStats',
-    description: 'Get the stats for a specific race in the game.',
+    name: 'getGameData',
+    description: 'Get information about game content like powers, NPCs, pets, or dungeons from a specific world.',
     inputSchema: z.object({
-      raceName: z.string().describe('The name of the race to get stats for.'),
+      worldName: z.string().describe('The name of the world to search in (e.g., "World 20").'),
+      category: z.string().describe('The category of information to get (e.g., "powers", "npcs", "pets").'),
+      itemName: z.string().optional().describe('The specific name of the item to look for (e.g., "Grand Elder Power").'),
     }),
     outputSchema: z.unknown(),
   },
-  async ({ raceName }) => {
-    return await getRaceStats(raceName);
+  async ({ worldName, category, itemName }) => {
+    return await getGameData(worldName, category, itemName);
   }
 );
 
@@ -47,8 +49,10 @@ const prompt = ai.definePrompt({
   name: 'generateSolutionPrompt',
   input: {schema: GenerateSolutionInputSchema},
   output: {schema: GenerateSolutionOutputSchema},
-  tools: [getRaceStatsTool],
-  prompt: `You are an expert Anime Eternal game assistant. Your knowledge base is the official game wiki provided below. A player is encountering a problem, and you will generate a potential solution. Use ONLY the information from the wiki to answer the question. If the information is not in the provided wiki context, use the available tools to find the information. If the answer is not in the wiki or available via tools, say that you do not have enough information to answer.
+  tools: [getGameDataTool],
+  prompt: `You are an expert Anime Eternal game assistant. Your knowledge base is the official game wiki provided below. A player is encountering a problem, and you will generate a potential solution. 
+The game has 21 worlds, each with unique content like powers (gacha or progression), NPCs (with ranks and drops), pets (with rarities and energy boosts), and dungeons. 
+Use ONLY the information from the wiki to answer the question. If the information is not in the provided wiki context, use the available tools to find the information from the correct world and category. If the answer is not in the wiki or available via tools, say that you do not have enough information to answer.
 
 START OF WIKI CONTENT
 {{{wikiContext}}}

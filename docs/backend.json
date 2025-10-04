@@ -149,41 +149,65 @@
     "World": {
       "title": "World",
       "type": "object",
-      "description": "Represents a world within the game.",
+      "description": "Represents one of the 21 worlds in the game.",
       "properties": {
-        "name": {
-          "type": "string"
-        }
-      }
+        "name": { "type": "string", "description": "The name of the world (e.g., 'World 20 - Grand Elder')." }
+      },
+       "required": ["name"]
     },
-    "Race": {
-      "title": "Race",
-      "type": "object",
-      "description": "Represents a player race within a world.",
-      "properties": {
-        "name": {
-          "type": "string"
+    "Power": {
+        "title": "Power",
+        "type": "object",
+        "description": "Represents a gacha or progression power within a world.",
+        "properties": {
+            "name": { "type": "string", "description": "Name of the power set (e.g., 'Grand Elder Power')." },
+            "type": { "type": "string", "enum": ["gacha", "progression"], "description": "The type of power."}
         },
-        "description": {
-          "type": "string"
-        }
-      }
+        "required": ["name", "type"]
     },
-    "PowerStats": {
-      "title": "PowerStats",
-      "type": "object",
-      "description": "Represents the stats of a power or ability for a race.",
-      "properties": {
-        "name": {
-          "type": "string"
+    "PowerStat": {
+        "title": "PowerStat",
+        "type": "object",
+        "description": "Represents an individual stat or level for a power.",
+        "properties": {
+            "name": { "type": "string", "description": "Name of the stat level (e.g., 'Sleeping Power', 'Second Form')." },
+            "multiplier": { "type": "string", "description": "The stat multiplier (e.g., '2x', '1.5x')." },
+            "rarity": { "type": "string", "description": "The rarity of the gacha roll (e.g., 'Phantom', 'Supreme')." },
+            "probability": { "type": "number", "description": "The probability of getting this roll."}
         },
-        "value": {
-          "type": "string"
+        "required": ["name", "multiplier"]
+    },
+    "NPC": {
+        "title": "NPC",
+        "type": "object",
+        "description": "Represents a non-player character in a world.",
+        "properties": {
+            "name": { "type": "string" },
+            "rank": { "type": "string", "description": "The rank of the NPC (e.g., 'E', 'SS')." },
+            "drops": { "type": "array", "items": { "type": "string" }, "description": "List of items dropped by the NPC." }
         },
-        "whereToGetIt": {
-          "type": "string"
-        }
-      }
+        "required": ["name", "rank"]
+    },
+    "Pet": {
+        "title": "Pet",
+        "type": "object",
+        "description": "Represents a companion pet in a world.",
+        "properties": {
+            "name": { "type": "string" },
+            "rarity": { "type": "string" },
+            "energy_bonus": { "type": "string", "description": "The energy bonus provided by the pet." }
+        },
+        "required": ["name", "rarity", "energy_bonus"]
+    },
+    "Dungeon": {
+        "title": "Dungeon",
+        "type": "object",
+        "description": "Represents a dungeon within a world.",
+        "properties": {
+            "name": { "type": "string" },
+            "boss": { "type": "string" }
+        },
+        "required": ["name"]
     }
   },
   "auth": {
@@ -198,105 +222,83 @@
         "path": "/users/{userId}",
         "definition": {
           "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Stores user profile information. Top-level collection.  Owned by the user whose ID matches {userId}.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/User" },
+          "description": "Stores user profile information."
         }
       },
       {
         "path": "/users/{userId}/savedAnswers/{savedAnswerId}",
         "definition": {
           "entityName": "SavedAnswer",
-          "schema": {
-            "$ref": "#/backend/entities/SavedAnswer"
-          },
-          "description": "Stores AI-generated answers saved by the user. Organized as a subcollection of the user document. Owned by the. user whose ID matches {userId}.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
-            },
-            {
-              "name": "savedAnswerId",
-              "description": "The unique identifier of the saved answer."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/SavedAnswer" },
+          "description": "Stores AI-generated answers saved by the user."
         }
       },
       {
         "path": "/users/{userId}/contentSuggestions/{contentSuggestionId}",
         "definition": {
           "entityName": "ContentSuggestion",
-          "schema": {
-            "$ref": "#/backend/entities/ContentSuggestion"
-          },
-          "description": "Stores content suggestions made by the user for the Wiki. Organized as a subcollection of the user document. Owned by the user whose ID matches {userId}.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
-            },
-            {
-              "name": "contentSuggestionId",
-              "description": "The unique identifier of the content suggestion."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/ContentSuggestion" },
+          "description": "Stores content suggestions made by the user for the Wiki."
         }
       },
       {
         "path": "/wikiContent/{wikiContentId}",
         "definition": {
           "entityName": "WikiContent",
-          "schema": {
-            "$ref": "#/backend/entities/WikiContent"
-          },
-          "description": "Stores wiki content, either from Fandom or a custom in-app wiki. Top-level collection with global read access.",
-          "params": [
-            {
-              "name": "wikiContentId",
-              "description": "The unique identifier of the wiki content."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/WikiContent" },
+          "description": "Stores general wiki articles. This is for high-level guides, not detailed game data."
         }
       },
       {
         "path": "/worlds/{worldId}",
         "definition": {
           "entityName": "World",
-          "schema": {
-            "$ref": "#/backend/entities/World"
-          },
-          "description": "Stores information about game worlds."
+          "schema": { "$ref": "#/backend/entities/World" },
+          "description": "Top-level collection for each game world."
         }
       },
       {
-        "path": "/worlds/{worldId}/races/{raceId}",
+        "path": "/worlds/{worldId}/powers/{powerId}",
         "definition": {
-          "entityName": "Race",
-          "schema": {
-            "$ref": "#/backend/entities/Race"
-          },
-          "description": "Stores information about races within a world."
+          "entityName": "Power",
+          "schema": { "$ref": "#/backend/entities/Power" },
+          "description": "Sub-collection for powers available in a world."
         }
       },
       {
-        "path": "/worlds/{worldId}/races/{raceId}/Stats/{statId}",
+        "path": "/worlds/{worldId}/powers/{powerId}/stats/{statId}",
         "definition": {
-          "entityName": "PowerStats",
-          "schema": {
-            "$ref": "#/backend/entities/PowerStats"
-          },
-          "description": "Stores stats for a specific race."
+          "entityName": "PowerStat",
+          "schema": { "$ref": "#/backend/entities/PowerStat" },
+          "description": "The individual levels and stats for a specific power."
+        }
+      },
+      {
+        "path": "/worlds/{worldId}/npcs/{npcId}",
+        "definition": {
+          "entityName": "NPC",
+          "schema": { "$ref": "#/backend/entities/NPC" },
+          "description": "Sub-collection for NPCs found in a world."
+        }
+      },
+      {
+        "path": "/worlds/{worldId}/pets/{petId}",
+        "definition": {
+          "entityName": "Pet",
+          "schema": { "$ref": "#/backend/entities/Pet" },
+          "description": "Sub-collection for pets available in a world."
+        }
+      },
+      {
+        "path": "/worlds/{worldId}/dungeons/{dungeonId}",
+        "definition": {
+          "entityName": "Dungeon",
+          "schema": { "$ref": "#/backend/entities/Dungeon" },
+          "description": "Sub-collection for dungeons located in a world."
         }
       }
     ],
-    "reasoning": "This Firestore data structure is designed to support the Eternal Guide application, focusing on a blend of user-specific data and globally accessible wiki content.  It emphasizes Authorization Independence to ensure robust security rules and efficient data access. This is achieved through denormalization. All user-owned data is placed under the `/users/{userId}` path, ensuring clear ownership and simplified security rules. \n\nThe structure implements Structural Segregation by separating user-specific content suggestions from the core wiki content, and by placing user-specific data under their respective user IDs. Access Modeling is employed using path-based ownership for user data (`/users/{userId}/savedAnswers`) and global collections for shared wiki content.  This structure directly addresses the QAPs (Rules are not Filters) requirement, allowing secure `list` operations within user-owned collections and for the globally accessible wiki content, as access control is based on path ownership and clearly defined collection-level rules.\n\nSpecifically, the `savedAnswers` and `contentSuggestions` collections are located under the `/users/{userId}` path, ensuring that only the authenticated user (`request.auth.uid`) can access their own data, thereby eliminating the need for complex `get()` calls to verify ownership.  The `wikiContent` collection is globally accessible, which is appropriate for shared content. The new 'worlds' collection provides a hierarchical structure for game data, allowing for detailed information about races and stats while maintaining clear organization and scalability.  For scaling, consider sharding `wikiContent` based on content category or source if the number of documents becomes exceedingly large."
+    "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', and 'dungeons', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all powers for 'World 1', you query the '/worlds/world1/powers' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
