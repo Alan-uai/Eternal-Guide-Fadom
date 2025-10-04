@@ -10,6 +10,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { wikiArticles as allWikiArticles } from '@/lib/wiki-data';
 
 const world20Data = {
     name: 'World 20 - Grand Elder',
@@ -46,7 +47,7 @@ const world20Data = {
           { name: 'Black Form', multiplier: '12x' },
         ],
       },
-      {
+       {
         id: 'dragon-energy',
         name: 'Dragon Energy',
         type: 'progression',
@@ -68,14 +69,14 @@ const world20Data = {
     dungeons: [],
   };
   
-
 export default function SeedPage() {
   const firestore = useFirestore();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isWorldLoading, setIsWorldLoading] = useState(false);
+  const [isWikiLoading, setIsWikiLoading] = useState(false);
   const { toast } = useToast();
 
-  async function handleSeedData() {
-    setIsLoading(true);
+  async function handleSeedWorldData() {
+    setIsWorldLoading(true);
     
     if (!firestore) {
         toast({
@@ -83,7 +84,7 @@ export default function SeedPage() {
             description: 'Firestore is not initialized.',
             variant: 'destructive',
         });
-        setIsLoading(false);
+        setIsWorldLoading(false);
         return;
     }
 
@@ -117,7 +118,7 @@ export default function SeedPage() {
             title: 'Success!',
             description: 'World 20 data has been successfully seeded to Firestore.',
         });
-        setIsLoading(false);
+        setIsWorldLoading(false);
     }).catch((error) => {
         console.error("Batch commit failed:", error);
         const permissionError = new FirestorePermissionError({
@@ -126,36 +127,99 @@ export default function SeedPage() {
             requestResourceData: allDataForBatch,
         });
         errorEmitter.emit('permission-error', permissionError);
-        setIsLoading(false);
+        setIsWorldLoading(false);
+    });
+  }
+
+  async function handleSeedWikiData() {
+    setIsWikiLoading(true);
+
+    if (!firestore) {
+        toast({
+            title: 'Error',
+            description: 'Firestore is not initialized.',
+            variant: 'destructive',
+        });
+        setIsWikiLoading(false);
+        return;
+    }
+
+    const batch = writeBatch(firestore);
+    const allDataForBatch: Record<string, any> = {};
+
+    for (const article of allWikiArticles) {
+      const articleRef = doc(firestore, 'wikiContent', article.id);
+      batch.set(articleRef, article);
+      allDataForBatch[articleRef.path] = article;
+    }
+
+    batch.commit().then(() => {
+        toast({
+            title: 'Success!',
+            description: 'Wiki articles (including Auras and Prestige) have been seeded.',
+        });
+        setIsWikiLoading(false);
+    }).catch((error) => {
+        console.error("Wiki batch commit failed:", error);
+        const permissionError = new FirestorePermissionError({
+            path: 'wikiContent collection',
+            operation: 'write',
+            requestResourceData: allDataForBatch,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        setIsWikiLoading(false);
     });
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 space-y-8">
       <Card className="max-w-xl mx-auto">
         <CardHeader>
-          <CardTitle>Seed Firestore Database</CardTitle>
+          <CardTitle>Seed World Data</CardTitle>
           <CardDescription>
-            Populate your Firestore database with initial data for World 20.
+            Populate your Firestore database with initial game data for World 20. This includes powers, NPCs, pets, etc.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p>
-            This action will add the data for "World 20 - Grand Elder", including its gacha powers and stats, into your Firestore `worlds` collection.
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Clicking the button will attempt to write the data to Firestore.
+          <p className="text-sm text-muted-foreground">
+            This action will write to the `worlds/world-20` collection and its subcollections.
           </p>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleSeedData} disabled={isLoading || !firestore}>
-            {isLoading ? (
+          <Button onClick={handleSeedWorldData} disabled={isWorldLoading || !firestore}>
+            {isWorldLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Seeding...
+                Seeding World Data...
               </>
             ) : (
               'Seed World 20 Data'
+            )}
+          </Button>
+        </CardFooter>
+      </Card>
+      
+      <Card className="max-w-xl mx-auto">
+        <CardHeader>
+          <CardTitle>Seed Wiki Articles</CardTitle>
+          <CardDescription>
+            Populate the `wikiContent` collection with articles about game systems like Auras and Prestige.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            This action will write documents to the `wikiContent` collection.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <Button onClick={handleSeedWikiData} disabled={isWikiLoading || !firestore}>
+            {isWikiLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Seeding Wiki...
+              </>
+            ) : (
+              'Seed Wiki Articles'
             )}
           </Button>
         </CardFooter>
