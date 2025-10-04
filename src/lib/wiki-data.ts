@@ -23,7 +23,7 @@ Primeiro, você precisa escolher sua classe inicial: Guerreiro, Mago ou Ladino. 
 export const auraArticle: WikiArticle = {
     id: 'aura-system',
     title: 'Sistema de Auras',
-    summary: 'Aprenda sobre Auras de Chefes de Rank-SS, como desbloqueá-las e como elas melhoram suas habilidades.',
+    summary: 'Aprenda sobre Auras de Chefes de Rank-SS, como desbloqueá-las и como elas melhoram suas habilidades.',
     content: `Auras são buffs poderosos dropados por Chefes de Rank-SS em vários mundos. Cada Aura fornece um bônus de status único. Aqui está uma lista de Auras conhecidas e seus status:
 
 *   **Mundo 2 (Shanks):** Aura da Sorte (10% de Sorte de Estrela)
@@ -136,40 +136,45 @@ export const rankArticle: WikiArticle = {
 export const worldBossesArticle: WikiArticle = {
   id: 'world-bosses',
   title: 'Guia de Chefes de Mundo',
-  summary: 'Um guia completo para todos os chefes de mundo, seus status e o DPS recomendado para derrotá-los.',
-  content: `Este guia fornece uma lista completa de todos os chefes de mundo de Rank-SS.`,
+  summary: 'Um guia completo para todos os chefes de mundo, seus status e o HP necessário para derrotá-los.',
+  content: `Este guia fornece uma lista de chefes de Rank-SS e SSS, detalhando o HP necessário para um "one-hit kill".`,
   tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'geral', '1', '2', '3', '4', '5', '6', '7', '8', '10', '11', '13', '15', '16', '17', '19', '20'],
   imageId: 'wiki-7',
   tables: {
-    bosses: {
-      headers: ['Mundo', 'Chefe', 'HP', 'Rank', 'Exp', 'DPS Recom.'],
+    ssBosses: {
+      headers: ['Mundo', 'Chefe (Rank SS)', 'HP para Hit Kill'],
       rows: [
-        { 'Mundo': 'Earth City', 'Chefe': 'Kid Kohan', 'HP': '2.500 - Qd', 'Rank': 'SS', 'Exp': '15.0', 'DPS Recom.': '50 - T' },
-        { 'Mundo': 'Windmill Island', 'Chefe': 'Shanks', 'HP': '5.00 - Sx', 'Rank': 'SS', 'Exp': '30.0', 'DPS Recom.': '100 - QN' },
-        { 'Mundo': 'Soul Society', 'Chefe': 'Eizen', 'HP': '2.5 - Sp', 'Rank': 'SS', 'Exp': '60.0', 'DPS Recom.': '50 - SX' },
-        { 'Mundo': 'Cursed School', 'Chefe': 'Sakuni', 'HP': '120.00 - Sp', 'Rank': 'SS', 'Exp': '120.0', 'DPS Recom.': '2.4 - SP' },
-        { 'Mundo': 'Slayer Village', 'Chefe': 'Rangoki', 'HP': '31.2 - De', 'Rank': 'SS', 'Exp': '240.0', 'DPS Recom.': '624 - N' },
-        { 'Mundo': 'Solo Island', 'Chefe': 'Statue of God', 'HP': '195 - UD', 'Rank': 'SS', 'Exp': '480.0', 'DPS Recom.': '3.90 - UD' },
-        { 'Mundo': 'Clover Village', 'Chefe': 'Novi Chroni', 'HP': '101 - TdD', 'Rank': 'SS', 'Exp': '960.0', 'DPS Recom.': '2 - TDD' },
-        { 'Mundo': 'Leaf Village', 'Chefe': 'Itechi', 'HP': '2.82 - QnD', 'Rank': 'SS', 'Exp': '1.92K', 'DPS Recom.': '56.4 - QDD' },
-        { 'Mundo': 'Leaf Village', 'Chefe': 'Madera', 'HP': '5.64 - QnD', 'Rank': 'SS', 'Exp': '2.88K', 'DPS Recom.': '113 - QDD' },
-        { 'Mundo': 'Spirit Residence', 'Chefe': 'Ken Turbo', 'HP': '494 - SxD', 'Rank': 'SS', 'Exp': '5.76K', 'DPS Recom.': '10 - SXD' },
-        { 'Mundo': 'Magic Hunter City', 'Chefe': 'Killas Godspeed', 'HP': '296 - OcD', 'Rank': 'SS', 'Exp': '11.52K', 'DPS Recom.': '6 - OCD' },
-        { 'Mundo': 'Titan City', 'Chefe': 'Eran', 'HP': '49.4 - VgN', 'Rank': 'SS', 'Exp': '23.04K', 'DPS Recom.': '988 - NVD' },
-        { 'Mundo': 'Village of Sins', 'Chefe': 'Esanor', 'HP': '9.77 - DvG', 'Rank': 'SS', 'Exp': '46.08K', 'DPS Recom.': '195 - UVG' },
-        { 'Mundo': 'Kaiju Base', 'Chefe': 'Number N°8', 'HP': '5.5 - QtV', 'Rank': 'SS', 'Exp': '92.16K', 'DPS Recom.': '111 - TVG' },
-        { 'Mundo': 'Tempest Capital', 'Chefe': 'Valzora', 'HP': '4.79 - SeV', 'Rank': 'SS', 'Exp': '184.32K', 'DPS Recom.': '98 - QNV' },
-        { 'Mundo': 'Virtual City', 'Chefe': 'The Paladin', 'HP': '967 - SpG', 'Rank': 'SS', 'Exp': '368.64K', 'DPS Recom.': '20 - SPG' },
-        { 'Mundo': 'Cairo', 'Chefe': 'Dio', 'HP': '195 - NvG', 'Rank': 'SS', 'Exp': '737.28K', 'DPS Recom.': '3.9 - NVG' },
-        { 'Mundo': 'Ghoul City', 'Chefe': 'Arama', 'HP': '686 - UtG', 'Rank': 'SS', 'Exp': '1.52M', 'DPS Recom.': '15 - UTG' },
-        { 'Mundo': 'Chainsaw City', 'Chefe': 'Mr. Chainsaw', 'HP': '5.09 - TsTG', 'Rank': 'SS', 'Exp': '2.55M', 'DPS Recom.': '105 - DTG' },
-        { 'Mundo': 'Tokyo Empire', 'Chefe': 'Leonardo', 'HP': '1.76 - QnTG', 'Rank': 'SS', 'Exp': '5.14M', 'DPS Recom.': '100 - QTTG' },
-        { 'Mundo': 'Green Planet', 'Chefe': 'Goku SSJ', 'HP': '1.52 - NoTG', 'Rank': 'SS', 'Exp': '16.1M', 'DPS Recom.': '1 - OCTG' },
-        { 'Mundo': 'Hollow Word', 'Chefe': 'Cifer', 'HP': '87.2 - uQDR', 'Rank': 'SS', 'Exp': '40.6M', 'DPS Recom.': '16 - uQDR' },
+        { 'Mundo': 1, 'Chefe (Rank SS)': 'Kid Kohan', 'HP para Hit Kill': '2.5qd' },
+        { 'Mundo': 2, 'Chefe (Rank SS)': 'Shanks', 'HP para Hit Kill': '5sx' },
+        { 'Mundo': 3, 'Chefe (Rank SS)': 'Eizen', 'HP para Hit Kill': '2.5Sp' },
+        { 'Mundo': 4, 'Chefe (Rank SS)': 'Sakuni', 'HP para Hit Kill': '120Sp' },
+        { 'Mundo': 5, 'Chefe (Rank SS)': 'Rangaki', 'HP para Hit Kill': '31.2de' },
+        { 'Mundo': 6, 'Chefe (Rank SS)': 'Statue of God', 'HP para Hit Kill': '195Ud' },
+        { 'Mundo': 7, 'Chefe (Rank SS)': 'Novi Chroni', 'HP para Hit Kill': '101tdD' },
+        { 'Mundo': 8, 'Chefe (Rank SS)': 'Itechi', 'HP para Hit Kill': '2.82QnD' },
+        { 'Mundo': 8, 'Chefe (Rank SS)': 'Madera', 'HP para Hit Kill': '5.64QnD' },
+        { 'Mundo': 9, 'Chefe (Rank SS)': 'Ken Turbo', 'HP para Hit Kill': '494sxD' },
+        { 'Mundo': 10, 'Chefe (Rank SS)': 'Killas Godspeed', 'HP para Hit Kill': '296OcD' },
+        { 'Mundo': 11, 'Chefe (Rank SS)': 'Eran', 'HP para Hit Kill': '49.4Vgn' },
+        { 'Mundo': 12, 'Chefe (Rank SS)': 'Esanor', 'HP para Hit Kill': '9.77DVg' },
+        { 'Mundo': 13, 'Chefe (Rank SS)': 'Number 8', 'HP para Hit Kill': '5.55qtV' },
+        { 'Mundo': 14, 'Chefe (Rank SS)': 'Valzora', 'HP para Hit Kill': '4.79SeV' },
+        { 'Mundo': 15, 'Chefe (Rank SS)': 'The Paladin', 'HP para Hit Kill': '967SPG' },
+        { 'Mundo': 16, 'Chefe (Rank SS)': 'Dio', 'HP para Hit Kill': '195NVG' },
+        { 'Mundo': 17, 'Chefe (Rank SS)': 'Arama', 'HP para Hit Kill': '686UTG' },
+        { 'Mundo': 18, 'Chefe (Rank SS)': 'Mr. Chainsaw', 'HP para Hit Kill': '5.09tsTG' },
+        { 'Mundo': 19, 'Chefe (Rank SS)': 'Hero of Hell', 'HP para Hit Kill': '50.9qTG' },
+        { 'Mundo': 19, 'Chefe (Rank SS)': 'Leonardo', 'HP para Hit Kill': '1.76QnTG' },
+        { 'Mundo': '19', 'Chefe (Rank SS)': 'Bansho', 'HP para Hit Kill': '17.6ssTG' },
+        { 'Mundo': 20, 'Chefe (Rank SS)': 'Koku SSJ', 'HP para Hit Kill': '1.52NoTG' },
+        { 'Mundo': 20, 'Chefe (Rank SSS)': 'Frezi Final Form', 'HP para Hit Kill': '15.2QdDR' },
+        { 'Mundo': 21, 'Chefe (Rank SSS)': 'Cifer', 'HP para Hit Kill': '871uQDR' },
+        { 'Mundo': 21, 'Chefe (Rank SSS)': 'Vasto Ichge', 'HP para Hit Kill': '8.72tQDR' }
       ]
     }
   }
 };
+
 
 export const swordsArticle: WikiArticle = {
   id: 'energy-swords',
@@ -335,6 +340,93 @@ Estas são as gamepasses que você deve ter no endgame.`,
   },
 };
 
+export const scientificNotationArticle: WikiArticle = {
+  id: 'scientific-notation',
+  title: 'Abreviações de Notação Científica',
+  summary: 'Um guia de referência para as abreviações de números grandes usadas no jogo.',
+  content: 'Entender as abreviações para números grandes é crucial para medir seu poder e o HP dos inimigos. Aqui está um guia completo.',
+  tags: ['notação', 'abreviação', 'números', 'guia', 'geral'],
+  imageId: 'wiki-13',
+  tables: {
+    notation1: {
+      headers: ['Abreviação', 'Nome', 'Notação Científica'],
+      rows: [
+        { Abreviação: 'k', Nome: 'Thousand', 'Notação Científica': '1.00E+003' },
+        { Abreviação: 'M', Nome: 'Million', 'Notação Científica': '1.00E+006' },
+        { Abreviação: 'B', Nome: 'Billion', 'Notação Científica': '1.00E+009' },
+        { Abreviação: 'T', Nome: 'Trillion', 'Notação Científica': '1.00E+012' },
+        { Abreviação: 'qd', Nome: 'Quadrillion', 'Notação Científica': '1.00E+015' },
+        { Abreviação: 'Qn', Nome: 'Quintillion', 'Notação Científica': '1.00E+018' },
+        { Abreviação: 'sx', Nome: 'Sextillion', 'Notação Científica': '1.00E+021' },
+        { Abreviação: 'Sp', Nome: 'Septillion', 'Notação Científica': '1.00E+024' },
+        { Abreviação: 'O', Nome: 'Octillion', 'Notação Científica': '1.00E+027' },
+        { Abreviação: 'N', Nome: 'Nonillion', 'Notação Científica': '1.00E+030' },
+      ],
+    },
+    notation2: {
+        headers: ['Abreviação', 'Nome (Decillion)', 'Notação Científica'],
+        rows: [
+            { Abreviação: 'de', Nome: 'Decillion', 'Notação Científica': '1.00E+033' },
+            { Abreviação: 'Ud', Nome: 'Undecillion', 'Notação Científica': '1.00E+036' },
+            { Abreviação: 'dD', Nome: 'Duodecillion', 'Notação Científica': '1.00E+039' },
+            { Abreviação: 'tD', Nome: 'Tredecillion', 'Notação Científica': '1.00E+042' },
+            { Abreviação: 'qdD', Nome: 'Quattuordecillion', 'Notação Científica': '1.00E+045' },
+            { Abreviação: 'QnD', Nome: 'Quindecillion', 'Notação Científica': '1.00E+048' },
+            { Abreviação: 'sxD', Nome: 'Sexdecillion', 'Notação Científica': '1.00E+051' },
+            { Abreviação: 'SpD', Nome: 'Septendecillion', 'Notação Científica': '1.00E+054' },
+            { Abreviação: 'OcD', Nome: 'Octodecillion', 'Notação Científica': '1.00E+057' },
+            { Abreviação: 'NvD', Nome: 'Novemdecillion', 'Notação Científica': '1.00E+060' },
+        ]
+    },
+    notation3: {
+        headers: ['Abreviação', 'Nome (Vigintillion)', 'Notação Científica'],
+        rows: [
+            { Abreviação: 'Vgn', Nome: 'Vigintillion', 'Notação Científica': '1.00E+063' },
+            { Abreviação: 'UVg', Nome: 'Unvigintillion', 'Notação Científica': '1.00E+066' },
+            { Abreviação: 'DVg', Nome: 'Duovigintillion', 'Notação Científica': '1.00E+069' },
+            { Abreviação: 'TVg', Nome: 'Tresvigintillion', 'Notação Científica': '1.00E+072' },
+            { Abreviação: 'qtV', Nome: 'Quattuorvigintillion', 'Notação Científica': '1.00E+075' },
+            { Abreviação: 'QnV', Nome: 'Quinvigintillion', 'Notação Científica': '1.00E+078' },
+            { Abreviação: 'SeV', Nome: 'Sesvigintillion', 'Notação Científica': '1.00E+081' },
+            { Abreviação: 'SPG', Nome: 'Septenvigintillion', 'Notação Científica': '1.00E+084' },
+            { Abreviação: 'OVG', Nome: 'Octovigintillion', 'Notação Científica': '1.00E+087' },
+            { Abreviação: 'NVG', Nome: 'Novemvigintillion', 'Notação Científica': '1.00E+090' },
+        ]
+    },
+    notation4: {
+        headers: ['Abreviação', 'Nome (Trigintillion)', 'Notação Científica'],
+        rows: [
+            { Abreviação: 'TGN', Nome: 'Trigintillion', 'Notação Científica': '1.00E+093' },
+            { Abreviação: 'UTG', Nome: 'Untrigintillion', 'Notação Científica': '1.00E+096' },
+            { Abreviação: 'DTG', Nome: 'Duotrigintillion', 'Notação Científica': '1.00E+099' },
+            { Abreviação: 'tsTG', Nome: 'Trestrigintillion', 'Notação Científica': '1.00E+102' },
+            { Abreviação: 'qTG', Nome: 'Quattuortrigintillion', 'Notação Científica': '1.00E+105' },
+            { Abreviação: 'QnTG', Nome: 'Quintrigintillion', 'Notação Científica': '1.00E+108' },
+            { Abreviação: 'ssTG', Nome: 'Sestrigintillion', 'Notação Científica': '1.00E+111' },
+            { Abreviação: 'SpTG', Nome: 'Septentrigintillion', 'Notação Científica': '1.00E+114' },
+            { Abreviação: 'OcTG', Nome: 'Octotrigintillion', 'Notação Científica': '1.00E+117' },
+            { Abreviação: 'NoTG', Nome: 'Noventrigintillion', 'Notação Científica': '1.00E+120' },
+        ]
+    },
+    notation5: {
+        headers: ['Abreviação', 'Nome (Quadragintillion)', 'Notação Científica'],
+        rows: [
+            { Abreviação: 'QDR', Nome: 'Quadragintillion', 'Notação Científica': '1.00E+123' },
+            { Abreviação: 'uQDR', Nome: 'Unquadragintillion', 'Notação Científica': '1.00E+126' },
+            { Abreviação: 'dQDR', Nome: 'Duoquadragintillion', 'Notação Científica': '1.00E+129' },
+            { Abreviação: 'tQDR', Nome: 'Tresquadragintillion', 'Notação Científica': '1.00E+132' },
+            { Abreviação: 'qdQDR', Nome: 'Quattuorquadragintillion', 'Notação Científica': '1.00E+135' },
+            { Abreviação: 'QnQDR', Nome: 'Quinquadragintillion', 'Notação Científica': '1.00E+138' },
+            { Abreviação: 'sxQDR', Nome: 'Sesquadragintillion', 'Notação Científica': '1.00E+141' },
+            { Abreviação: 'SpQDR', Nome: 'Septenquadragintillion', 'Notação Científica': '1.00E+144' },
+            { Abreviação: 'OQQDR', Nome: 'Octoquadragintillion', 'Notação Científica': '1.00E+147' },
+            { Abreviação: 'NQQDR', Nome: 'Novemquadragintillion', 'Notação Científica': '1.00E+150' },
+        ]
+    }
+  }
+};
+
+
 // A comprehensive list for seeding all articles at once if needed.
 export const allWikiArticles = [
   gettingStartedArticle,
@@ -349,6 +441,9 @@ export const allWikiArticles = [
   world20RaidsArticle,
   raidRequirementsArticle,
   gamepassTierListArticle,
+  scientificNotationArticle,
 ];
+
+    
 
     
