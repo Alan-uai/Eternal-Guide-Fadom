@@ -14,6 +14,44 @@ export const world2Data = {
           { name: 'Yonko', multiplier: '1.4x' },
         ],
       },
+      {
+        id: 'pirate-crew',
+        name: 'Pirate Crew',
+        type: 'gacha',
+        statType: 'energy',
+        stats: [
+            { name: 'Whitebeard Pirates', multiplier: '2x' },
+            { name: 'Cross Guild', multiplier: '3x' },
+            { name: 'Big Mom Pirates', multiplier: '4x' },
+            { name: 'Beast pirates', multiplier: '5x' },
+            { name: 'Blackbeard Pirates', multiplier: '8x' },
+            { name: 'Straw Hat Pirates', multiplier: '10x' },
+            { name: 'Red-Haired Pirates', multiplier: '12x' }
+        ]
+      },
+      {
+        id: 'chef-power',
+        name: 'Chef Power',
+        type: 'gacha',
+        statType: 'damage',
+        stats: [
+            { name: 'Common Chef', multiplier: '1x' },
+            { name: 'Uncommon Chef', multiplier: '1.5x' },
+            { name: 'Rare Chef', multiplier: '2x' },
+            { name: 'Epic Chef', multiplier: '3x' },
+            { name: 'Legendary Chef', multiplier: '5x' },
+            { name: 'Mythical Chef', multiplier: '7x' },
+            { name: 'Phantom Chef', multiplier: '10x' }
+        ]
+      },
+      {
+        id: 'haki-upgrade',
+        name: 'Haki Upgrade',
+        type: 'progression',
+        statType: 'damage',
+        maxLevel: 60,
+        maxBoost: '0.6x Damage'
+      }
     ],
     npcs: [
         {
