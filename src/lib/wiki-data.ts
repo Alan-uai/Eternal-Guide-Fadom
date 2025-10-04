@@ -1,20 +1,19 @@
 
 import type { WikiArticle } from '@/lib/types';
-import { collection, getDocs, getFirestore, doc } from 'firebase/firestore';
-import { initializeFirebase } from '../firebase';
- 
-// This file is now seeded to Firestore and is no longer the source of truth.
+
+// This file now exports individual articles to be seeded separately.
 // It is kept for reference or for re-seeding if needed.
-export const wikiArticles: WikiArticle[] = [
-  {
+
+export const gettingStartedArticle: WikiArticle = {
     id: 'getting-started',
     title: 'Getting Started in Anime Eternal',
     summary: "A beginner's guide to starting your adventure in the world of Anime Eternal.",
     content: "Welcome to Anime Eternal! This guide will walk you through creating your character, understanding the basic controls, and completing your first quest.\n\nFirst, you need to choose your starting class: Warrior, Mage, or Rogue. Each class has unique abilities that cater to different playstyles. Warriors are durable front-liners, Mages control powerful elemental magic from a distance, and Rogues excel at quick, precise strikes and evasion.\n\nYour first quest will be given by the Village Elder in the starting town of Silverwind. Follow the on-screen instructions to learn about movement, combat, and interacting with the world. Good luck, adventurer!",
     tags: ['beginner', 'guide', 'new player', 'class'],
     imageId: 'wiki-1',
-  },
-  {
+};
+
+export const auraArticle: WikiArticle = {
     id: 'aura-system',
     title: 'Aura System',
     summary: 'Learn about Auras from SS-Bosses, how to unlock them, and how they enhance your abilities.',
@@ -34,24 +33,27 @@ export const wikiArticles: WikiArticle[] = [
 *   **World 19:** Fire Captain Aura (1.5x)`,
     tags: ['aura', 'power', 'abilities', 'buffs', 'boss drop'],
     imageId: 'wiki-2',
-  },
-  {
+};
+
+export const legendaryWeaponsArticle: WikiArticle = {
     id: 'legendary-weapons',
     title: 'Crafting Legendary Weapons',
     summary: 'Discover the secrets to forging the most powerful weapons in the game.',
     content: 'Legendary weapons are the pinnacle of equipment in Anime Eternal. Crafting one is a long and arduous journey that requires rare materials, a high crafting level, and a special forge.\n\nThe required materials, known as "Celestial Fragments," are dropped by world bosses and can be found in the deepest dungeons. You will need 100 fragments, along with other rare components, to attempt a craft. The forge is located at the peak of Mount Celestia. Be warned, the path is treacherous.',
     tags: ['crafting', 'weapons', 'legendary', ' endgame'],
     imageId: 'wiki-3',
-  },
-  {
+};
+
+export const guildWarsArticle: WikiArticle = {
     id: 'guild-wars',
     title: 'An Introduction to Guild Wars',
     summary: 'Team up with your guild and battle for supremacy and rare rewards.',
     content: 'Guild Wars are weekly events where guilds compete against each other in large-scale PvP battles. To participate, you must be a member of a guild with at least 10 members.\n\nWars take place every Saturday. The objective is to capture and hold control points on a special map. The guild with the most points at the end of the event wins. Victorious guilds receive exclusive rewards, including rare cosmetics, powerful gear, and a significant amount of in-game currency.',
     tags: ['guild', 'pvp', 'event', 'team'],
     imageId: 'wiki-4',
-  },
-  {
+};
+
+export const prestigeArticle: WikiArticle = {
     id: 'prestige-system',
     title: 'Prestige System',
     summary: 'Understand how to prestige to increase your level cap and gain more power.',
@@ -84,34 +86,23 @@ export const wikiArticles: WikiArticle[] = [
 Each time you prestige, you unlock a higher level cap and receive more stat points per level, allowing for greater character customization and power.`,
     tags: ['prestige', 'leveling', 'endgame', 'stats'],
     imageId: 'wiki-5',
-  },
-  {
+};
+
+export const rankArticle: WikiArticle = {
     id: 'rank-system',
     title: 'Rank System',
     summary: 'A reference for the energy required to achieve each rank in the game.',
     content: `Ranking up is a core part of progressing in Anime Eternal. Each rank requires a certain amount of energy to achieve. Below is a table detailing the energy needed for ranks 81 through 120.\n\n| Rank Up | Stats          |    | Rank Up | Stats    |\n|:--------|:---------------|:---|:--------|:---------|\n| 81      | 124.80 Uvg     |    | 101     | 750 OVG  |\n| 82      | 748.80 Uvg     |    | 102     | 3 NVG    |\n| 83      | 4.79 DVg       |    | 103     | 30 NVG   |\n| 84      | 32.59 DVg      |    | 104     | 250 NVG  |\n| 85      | 234.63 DVg     |    | 105     | 1 TGN    |\n| 86      | 100 TVg        |    | 106     |          |\n| 87      | 1 qtV          |    | 107     |          |\n| 88      | 15 qtV         |    | 108     |          |\n| 89      | 50 qtV         |    | 109     |          |\n| 90      | 250 qtV        |    | 110     |          |\n| 91      | 2 QnV          |    | 111     |          |\n| 92      | 10 QnV         |    | 112     |          |\n| 93      | 50 QnV         |    | 113     |          |\n| 94      | 500 QnV        |    | 114     |          |\n| 95      | 5 SeV          |    | 115     |          |\n| 96      | 500 SeV        |    | 116     |          |\n| 97      | 25 SPG         |    | 117     |          |\n| 98      | 250 SPG        |    | 118     |          |\n| 99      | 2.5 OVG        |    | 119     |          |\n| 100     | 100 OVG        |    | 120     |          |`,
     tags: ['rank', 'progression', 'energy', 'stats'],
     imageId: 'wiki-6',
-  }
+};
+
+// A comprehensive list for seeding all articles at once if needed.
+export const allWikiArticles = [
+  gettingStartedArticle,
+  auraArticle,
+  legendaryWeaponsArticle,
+  guildWarsArticle,
+  prestigeArticle,
+  rankArticle,
 ];
-
-// NOTE: This is a one-time function to seed data. 
-// You would typically run this from a script, not in your app's runtime code.
-// For this environment, we will call it once from a component to seed the data.
-async function seedWikiData() {
-  const { firestore } = initializeFirebase();
-  const { setDocumentNonBlocking } = await import('@/firebase/non-blocking-updates');
-  
-  console.log("Seeding wiki data to Firestore...");
-
-  for (const article of wikiArticles) {
-    const docRef = doc(firestore, 'wikiContent', article.id);
-    // This will create or overwrite the document.
-    setDocumentNonBlocking(docRef, article, {});
-  }
-  console.log("Seeding complete.");
-}
-
-// Call the seed function. In a real app, you might have a separate script for this.
-// For this example, we call it here.
-seedWikiData();
