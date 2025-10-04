@@ -34,6 +34,11 @@ export const world1Data = {
     ],
     npcs: [],
     pets: [],
-    dungeons: [],
+    dungeons: [
+        {
+            id: 'tournemant',
+            name: 'Tournemant'
+        }
+    ],
   };
   

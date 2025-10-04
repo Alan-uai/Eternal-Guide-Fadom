@@ -8,8 +8,20 @@ export const gettingStartedArticle: WikiArticle = {
     id: 'getting-started',
     title: 'Getting Started in Anime Eternal',
     summary: "A beginner's guide to starting your adventure in the world of Anime Eternal.",
-    content: "Welcome to Anime Eternal! This guide will walk you through creating your character, understanding the basic controls, and completing your first quest.\n\nFirst, you need to choose your starting class: Warrior, Mage, or Rogue. Each class has unique abilities that cater to different playstyles. Warriors are durable front-liners, Mages control powerful elemental magic from a distance, and Rogues excel at quick, precise strikes and evasion.\n\nYour first quest will be given by the Village Elder in the starting town of Silverwind. Follow the on-screen instructions to learn about movement, combat, and interacting with the world. Good luck, adventurer!",
-    tags: ['beginner', 'guide', 'new player', 'class'],
+    content: `Welcome to Anime Eternal! This guide will walk you through the key features of World 1, the central hub of the game.
+
+**Character Creation & First Quest**
+First, you need to choose your starting class: Warrior, Mage, or Rogue. Each class has unique abilities. Your first quest will be given by the Village Elder in Silverwind, which will teach you movement, combat, and how to interact with the world.
+
+**Key Activities in World 1:**
+*   **Global Leaderboards:** Check out the top players in the world and see where you stand.
+*   **Rank Up & Avatar Leveling:** World 1 is where you will increase your Rank and level up your avatars.
+*   **Chests & Daily Missions:** Find and collect chests and complete daily missions for valuable rewards.
+*   **Dungeon Lobby:** Access a variety of special dungeons, which are different from the dungeons found within each world.
+*   **World Dungeon - Tournemant:** Your first world-specific dungeon is the Tournemant, which goes up to Room 550.
+
+Good luck, adventurer!`,
+    tags: ['beginner', 'guide', 'new player', 'class', 'world 1'],
     imageId: 'wiki-1',
 };
 
