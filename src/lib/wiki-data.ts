@@ -27,8 +27,8 @@ export const auraArticle: WikiArticle = {
     id: 'aura-system',
     title: 'Aura System',
     summary: 'Learn about Auras from SS-Bosses, how to unlock them, and how they enhance your abilities.',
-    content: `Auras are powerful buffs dropped by SS-Rank Bosses in various worlds. Each Aura provides a unique stat boost. Here is a list of known Auras and their stats:\n\n*   **World 1:** Luck Aura (10% Starluck)
-*   **World 2:** Red Emperor Aura (0.1x)
+    content: `Auras are powerful buffs dropped by SS-Rank Bosses in various worlds. Each Aura provides a unique stat boost. Here is a list of known Auras and their stats:\n\n*   **World 2:** Luck Aura (10% Starluck)
+*   **World 11:** Red Emperor Aura (0.1x)
 *   **World 3:** Purple Traitor Aura (0.25x)
 *   **World 4:** Fire King Aura (25% Drops)
 *   **World 5:** Flaming Aura (0.15x)
@@ -158,3 +158,4 @@ export const allWikiArticles = [
   rankArticle,
   worldBossesArticle,
 ];
+
