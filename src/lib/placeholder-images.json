@@ -23,6 +23,12 @@
       "description": "A crafting table with glowing items.",
       "imageUrl": "https://images.unsplash.com/photo-1620140036708-455ed5c0426a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjcmFmdGluZyUyMG1hZ2ljfGVufDB8fHx8MTc1OTU1NDc1MXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "crafting magic"
+    },
+    {
+      "id": "wiki-5",
+      "description": "A glowing star representing prestige.",
+      "imageUrl": "https://images.unsplash.com/photo-1599305445671-ac291c6aeaaa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsZXZlbCUyMHVwfGVufDB8fHx8MTc1OTYyNzU4OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "level up"
     }
   ]
 }

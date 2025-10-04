@@ -1,5 +1,5 @@
 import type { WikiArticle } from '@/lib/types';
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { collection, getDocs, getFirestore, doc } from 'firebase/firestore';
 import { initializeFirebase } from '../firebase';
  
 // This file is now seeded to Firestore and is no longer the source of truth.
@@ -37,6 +37,40 @@ export const wikiArticles: WikiArticle[] = [
     tags: ['guild', 'pvp', 'event', 'team'],
     imageId: 'wiki-4',
   },
+  {
+    id: 'prestige-system',
+    title: 'Prestige System',
+    summary: 'Understand how to prestige to increase your level cap and gain more power.',
+    content: `The Prestige system allows players to reset their level in exchange for powerful permanent bonuses. Here's how it works:\n\n**Prestige Levels & Requirements:**\n\n*   **Prestige 1:**
+    *   Required Level: 200
+    *   New Level Cap: 210
+    *   Statpoints per level: 2
+    *   Exp Multi: 0.1x\n
+*   **Prestige 2:**
+    *   Required Level: 210
+    *   New Level Cap: 220
+    *   Statpoints per level: 3
+    *   Exp Multi: 0.2x\n
+*   **Prestige 3:**
+    *   Required Level: 220
+    *   New Level Cap: 230
+    *   Statpoints per level: 4
+    *   Exp Multi: 0.3x\n
+*   **Prestige 4:**
+    *   Required Level: 230
+    *   New Level Cap: 250
+    *   Statpoints per level: 5
+    *   Exp Multi: 0.4x\n
+*   **Prestige 5:**
+    *   Required Level: 250
+    *   New Level Cap: 270
+    *   Statpoints per level: 6
+    *   Exp Multi: 0.5x
+
+Each time you prestige, you unlock a higher level cap and receive more stat points per level, allowing for greater character customization and power.`,
+    tags: ['prestige', 'leveling', 'endgame', 'stats'],
+    imageId: 'wiki-5',
+  },
 ];
 
 // NOTE: This is a one-time function to seed data. 
@@ -44,28 +78,18 @@ export const wikiArticles: WikiArticle[] = [
 // For this environment, we will call it once from a component to seed the data.
 async function seedWikiData() {
   const { firestore } = initializeFirebase();
-  const wikiCollectionRef = collection(firestore, 'wikiContent');
-  
-  // Check if data exists to avoid re-seeding
-  const existingDocs = await getDocs(wikiCollectionRef);
-  if (!existingDocs.empty) {
-    console.log("Wiki data already exists in Firestore. Skipping seed.");
-    return;
-  }
+  const { setDocumentNonBlocking } = await import('@/firebase/non-blocking-updates');
   
   console.log("Seeding wiki data to Firestore...");
-  const { setDocumentNonBlocking } = await import('@/firebase/non-blocking-updates');
-  const { doc } = await import('firebase/firestore');
 
   for (const article of wikiArticles) {
     const docRef = doc(firestore, 'wikiContent', article.id);
-    // We are using setDocumentNonBlocking which is a non-blocking write.
-    // This is fine for seeding.
+    // This will create or overwrite the document.
     setDocumentNonBlocking(docRef, article, {});
   }
   console.log("Seeding complete.");
 }
 
 // Call the seed function. In a real app, you might have a separate script for this.
-// For this example, we call it here. It has a check to prevent re-seeding.
+// For this example, we call it here.
 seedWikiData();
