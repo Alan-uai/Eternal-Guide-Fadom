@@ -21,7 +21,7 @@ const getGameDataTool = ai.defineTool(
     inputSchema: z.object({
       worldName: z.string().describe('The name of the world to search in (e.g., "World 1", "Windmill Island").'),
       category: z.string().describe('The category of information to get (e.g., "powers", "npcs", "pets", "accessories", "dungeons").'),
-      itemName: z.string().optional().describe('The specific name of the item to look for (e.g., "Grand Elder Power").'),
+      itemName: z.string().optional().describe('The specific name of the item to look for (e.g., "Grand Elder Power"). Be flexible; if an exact match fails, try a partial name.'),
     }),
     outputSchema: z.unknown(),
   },
@@ -53,7 +53,7 @@ const prompt = ai.definePrompt({
   tools: [getGameDataTool],
   prompt: `Você é um assistente especialista no jogo Anime Eternal e também uma calculadora. Sua resposta DEVE ser em Português-BR.
 
-Você DEVE usar a ferramenta 'getGameData' para encontrar informações sobre itens do jogo, como poderes, NPCs, pets e acessórios. Não confie no contexto do wiki para obter estatísticas de itens específicos, como multiplicadores.
+Você DEVE usar a ferramenta 'getGameData' para encontrar informações sobre itens do jogo, como poderes, NPCs, pets e acessórios. Não confie no contexto do wiki para obter estatísticas de itens específicos, como multiplicadores. Se a busca por um nome exato falhar, tente novamente com um nome parcial ou um sinônimo (ex: "Raid Green" pode ser "Green Planet Raid").
 
 Ao listar poderes, você DEVE especificar qual status eles multiplicam.
 - Para poderes de 'gacha', especifique o status de cada nível (por exemplo, "energia" ou "dano"). Se um nível tiver um bônus de 'energy_crit_bonus', liste-o também.
@@ -93,5 +93,3 @@ const generateSolutionFlow = ai.defineFlow(
     return output;
   }
 );
-
-    
