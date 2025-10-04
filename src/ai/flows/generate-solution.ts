@@ -1,3 +1,4 @@
+
 // src/ai/flows/generate-solution.ts
 'use server';
 /**
@@ -55,7 +56,7 @@ const prompt = ai.definePrompt({
 Você DEVE usar a ferramenta 'getGameData' para encontrar informações sobre itens do jogo, como poderes, NPCs, pets e acessórios. Não confie no contexto do wiki para obter estatísticas de itens específicos, como multiplicadores.
 
 Ao listar poderes, você DEVE especificar qual status eles multiplicam.
-- Para poderes de 'gacha', especifique o status de cada nível (por exemplo, "energia" ou "dano").
+- Para poderes de 'gacha', especifique o status de cada nível (por exemplo, "energia" ou "dano"). Se um nível tiver um bônus de 'energy_crit_bonus', liste-o também.
 - Para poderes de 'progression', se for 'mixed', liste todos os bônus (ex: '1.01x Damage, 1.11x Energy'). Para outros, apenas o 'maxBoost'.
 Formate a resposta como uma lista clara e legível.
 

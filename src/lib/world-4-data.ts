@@ -1,3 +1,4 @@
+
 export const world4Data = {
     name: 'World 4 - Curses',
     powers: [
@@ -39,8 +40,31 @@ export const world4Data = {
         maxLevel: 410,
         maxBoost: '4.10x Damage'
       },
+      {
+        id: 'cursed-power',
+        name: 'Cursed Power',
+        type: 'gacha',
+        statType: 'mixed',
+        stats: [
+            { name: 'Common Curse', multiplier: '0.6x', statType: 'damage' },
+            { name: 'Uncommon Curse', multiplier: '0.8x', statType: 'damage' },
+            { name: 'Rare Curse', multiplier: '1x', statType: 'damage', energy_crit_bonus: '1.00%' },
+            { name: 'Epic Curse', multiplier: '2x', statType: 'damage', energy_crit_bonus: '2.00%' },
+            { name: 'Legendary Curse', multiplier: '3x', statType: 'damage', energy_crit_bonus: '3.00%' },
+            { name: 'Mythical Curse', multiplier: '4x', statType: 'damage', energy_crit_bonus: '4.00%' },
+            { name: 'Phantom Curse', multiplier: '5x', statType: 'damage', energy_crit_bonus: '5.00%' }
+        ]
+      }
     ],
     npcs: [],
     pets: [],
-    dungeons: [],
+    dungeons: [
+        {
+            id: 'cursed-dungeon',
+            name: 'Cursed Dungeon',
+            description: 'The Cursed Raid is located in World 4.'
+        }
+    ],
   };
+
+    

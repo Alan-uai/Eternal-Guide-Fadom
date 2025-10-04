@@ -188,9 +188,10 @@
             "multiplier": { "type": "string", "description": "The stat multiplier (e.g., '2x', '1.5x')." },
             "rarity": { "type": "string", "description": "The rarity of the gacha roll (e.g., 'Phantom', 'Supreme')." },
             "probability": { "type": "number", "description": "The probability of getting this roll."},
-            "statType": { "type": "string", "enum": ["energy", "damage", "coin"], "description": "The stat this specific level affects, for mixed gacha powers." }
+            "statType": { "type": "string", "enum": ["energy", "damage", "coin"], "description": "The stat this specific level affects, for mixed gacha powers." },
+            "energy_crit_bonus": { "type": "string", "description": "The energy critical hit chance bonus (e.g., '1.00%')." }
         },
-        "required": ["name", "multiplier"]
+        "required": ["name"]
     },
     "NPC": {
         "title": "NPC",
