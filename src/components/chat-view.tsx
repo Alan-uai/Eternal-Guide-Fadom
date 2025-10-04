@@ -20,6 +20,33 @@ const chatSchema = z.object({
   prompt: z.string().min(1, 'Message cannot be empty.'),
 });
 
+function AssistantMessage({ content }: { content: string }) {
+    const parts = content.split('**');
+    return (
+      <div>
+        {parts.map((part, index) => {
+          if (index % 2 === 1) {
+            return <strong key={index}>{part}</strong>;
+          }
+          const subParts = part.split('* ');
+          if (subParts.length > 1) {
+            return (
+              <div key={index}>
+                {subParts[0]}
+                <ul className="list-disc pl-5 space-y-1">
+                  {subParts.slice(1).map((item, subIndex) => (
+                    <li key={subIndex}>{item.trim()}</li>
+                  ))}
+                </ul>
+              </div>
+            );
+          }
+          return <span key={index}>{part}</span>;
+        })}
+      </div>
+    );
+  }
+
 export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,13 +134,18 @@ export function ChatView() {
                 )}
                 <div
                   className={cn(
-                    'max-w-xl rounded-lg p-3 text-sm whitespace-pre-wrap',
+                    'max-w-xl rounded-lg p-3 text-sm',
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-card'
                   )}
                 >
-                  <p>{message.content}</p>
+                  {message.role === 'assistant' ? (
+                    <AssistantMessage content={message.content} />
+                  ) : (
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  )}
+
                   {message.role === 'assistant' && (
                      <Button
                         variant="ghost"

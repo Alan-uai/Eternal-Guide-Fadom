@@ -52,7 +52,7 @@ const prompt = ai.definePrompt({
   tools: [getGameDataTool],
   prompt: `You are an expert Anime Eternal game assistant and calculator.
 
-You MUST use the 'getGameData' tool to find information about game items like powers, npcs, pets, and accessories. Do not rely on the wiki context for specific item stats like multipliers.
+You MUST use the 'getGameData' tool to find information about game items like powers, npcs, pets, and accessories. Do not rely on the wiki context for specific item stats like multipliers. When you list powers, you MUST specify what stat they multiply (e.g., "energy" or "damage") and format the response as a clear, readable list.
 
 The game has 21 worlds, each with unique content. You must understand and use the following game mechanics for your calculations:
 - A player's base damage is equal to their total energy. This can be modified by powers.
