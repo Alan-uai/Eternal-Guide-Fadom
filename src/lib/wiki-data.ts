@@ -19,7 +19,7 @@ Primeiro, você precisa escolher sua classe inicial: Guerreiro, Mago ou Ladino. 
 *   **Baús e Missões Diárias:** Encontre e colete baús e complete missões diárias para obter recompensas valiosas.
 *   **Dungeon do Mundo - Torneio:** Sua primeira dungeon específica do mundo é o Torneio, que vai até a Sala 550.
 *   **Lobby de Dungeons:** Acesse uma variedade de dungeons especiais, que são diferentes das dungeons encontradas em cada mundo. As Dungeons do Lobby incluem: Fácil, Média, Difícil, Insana, Louca, Pesadelo e Folha. Outra está chegando em breve!`,
-    tags: ['iniciante', 'guia', 'novo jogador', 'classe', 'mundo 1', 'geral'],
+    tags: ['iniciante', 'guia', 'novo jogador', 'classe', 'mundo 1', 'geral', '1'],
     imageId: 'wiki-1',
 };
 
@@ -177,7 +177,7 @@ export const worldBossesArticle: WikiArticle = {
 | Tokyo Empire | Leonardo | 1.76 - QnTG | SS | 5.14M | 100 - QTTG |
 | Green Planet | Goku SSJ | 1.52 - NoTG | SS | 16.1M | 1 - OCTG |
 | Hollow Word | Cifer | 87.2 - uQDR | SS | 40.6M | 16 - uQDR |`,
-  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'sistema', 'geral'],
+  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'geral', '1', '2', '3', '4', '5', '6', '7', '8', '10', '11', '13', '15', '16', '17', '19', '20'],
   imageId: 'wiki-7',
 };
 

@@ -2,19 +2,18 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Search, Info } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from './ui/scroll-area';
-import { Button } from './ui/button';
 import { useApp } from '@/context/app-provider';
 import { Skeleton } from './ui/skeleton';
 import { micromark } from 'micromark';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { WikiArticle } from '@/lib/types';
+import type { WikiArticle } from '@/lib/types';
 
 function ArticleCard({ article }: { article: WikiArticle }) {
   const placeholder = PlaceHolderImages.find((p) => p.id === article.imageId);
@@ -88,12 +87,11 @@ function LoadingSkeletons() {
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-5/6 mt-2" />
           </CardContent>
-          <CardFooter className="flex-col items-start gap-4">
+          <CardFooter>
              <div className="flex flex-wrap gap-2">
                 <Skeleton className="h-6 w-16" />
                 <Skeleton className="h-6 w-20" />
              </div>
-             <Skeleton className="h-10 w-full mt-2" />
           </CardFooter>
         </Card>
       ))}
@@ -115,21 +113,19 @@ export function WikiBrowser() {
   const [searchTerm, setSearchTerm] = useState('');
   const { wikiArticles, isWikiLoading } = useApp();
 
-  const filteredArticles = (articles: WikiArticle[]) => articles.filter(
+  const filteredArticles = wikiArticles.filter(
     (article) =>
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       article.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (article.tags && article.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
-  const generalArticles = filteredArticles(wikiArticles.filter(a => a.tags.includes('geral')));
-  const worldArticles = filteredArticles(wikiArticles.filter(a => !a.tags.includes('geral')));
-
+  const generalArticles = filteredArticles.filter(a => a.tags.includes('geral'));
+  const worldRelatedArticles = filteredArticles.filter(a => a.tags.some(tag => !isNaN(parseInt(tag))));
+  
   const worldNumbers = [...new Set(
-    worldArticles.flatMap(a => a.tags)
-    .filter(tag => !isNaN(parseInt(tag)))
-  )].sort((a,b) => parseInt(a!) - parseInt(b!));
-
+    worldRelatedArticles.flatMap(a => a.tags).filter(tag => !isNaN(parseInt(tag)))
+  )].sort((a, b) => parseInt(a) - parseInt(b));
 
   return (
     <div className="space-y-6">
@@ -151,8 +147,9 @@ export function WikiBrowser() {
       <Tabs defaultValue="geral" className="w-full">
         <TabsList>
           <TabsTrigger value="geral">Geral</TabsTrigger>
-          <TabsTrigger value="mundos">Mundos</TabsTrigger>
+          <TabsTrigger value="mundos" disabled={worldNumbers.length === 0}>Mundos</TabsTrigger>
         </TabsList>
+
         <TabsContent value="geral" className="mt-6">
             {isWikiLoading ? <LoadingSkeletons /> : (
               generalArticles.length > 0 ? (
@@ -162,9 +159,10 @@ export function WikiBrowser() {
               ) : <NoArticlesFound />
             )}
         </TabsContent>
+
         <TabsContent value="mundos" className="mt-6">
           {isWikiLoading ? <LoadingSkeletons /> : (
-            worldArticles.length > 0 && worldNumbers.length > 0 ? (
+            worldNumbers.length > 0 ? (
               <Tabs defaultValue={worldNumbers[0]} className="w-full">
                 <TabsList className="flex-wrap h-auto justify-start">
                   {worldNumbers.map(worldNum => (
@@ -174,7 +172,7 @@ export function WikiBrowser() {
                 {worldNumbers.map(worldNum => (
                   <TabsContent key={worldNum} value={worldNum!} className="mt-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {worldArticles.filter(a => a.tags.includes(worldNum!)).map((article) => <ArticleCard key={article.id} article={article} />)}
+                      {worldRelatedArticles.filter(a => a.tags.includes(worldNum!)).map((article) => <ArticleCard key={article.id} article={article} />)}
                     </div>
                   </TabsContent>
                 ))}
