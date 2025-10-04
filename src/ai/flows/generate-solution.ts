@@ -18,8 +18,8 @@ const getGameDataTool = ai.defineTool(
     name: 'getGameData',
     description: 'Get information about game content like powers, NPCs, pets, accessories, or dungeons from a specific world.',
     inputSchema: z.object({
-      worldName: z.string().describe('The name of the world to search in (e.g., "World 20").'),
-      category: z.string().describe('The category of information to get (e.g., "powers", "npcs", "pets", "accessories").'),
+      worldName: z.string().describe('The name of the world to search in (e.g., "World 1", "Windmill Island").'),
+      category: z.string().describe('The category of information to get (e.g., "powers", "npcs", "pets", "accessories", "dungeons").'),
       itemName: z.string().optional().describe('The specific name of the item to look for (e.g., "Grand Elder Power").'),
     }),
     outputSchema: z.unknown(),
@@ -50,7 +50,9 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateSolutionInputSchema},
   output: {schema: GenerateSolutionOutputSchema},
   tools: [getGameDataTool],
-  prompt: `You are an expert Anime Eternal game assistant and calculator. Your knowledge base is the official game wiki provided below. A player is encountering a problem or asking a question, and you will generate a potential solution or answer.
+  prompt: `You are an expert Anime Eternal game assistant and calculator.
+
+You MUST use the 'getGameData' tool to find information about game items like powers, npcs, pets, and accessories. Do not rely on the wiki context for specific item stats like multipliers.
 
 The game has 21 worlds, each with unique content. You must understand and use the following game mechanics for your calculations:
 - A player's base damage is equal to their total energy. This can be modified by powers.
@@ -62,7 +64,7 @@ The game has 21 worlds, each with unique content. You must understand and use th
   4. Calculate the time to defeat the boss (Boss HP / Player's DPS).
   5. Explain your calculation to the user.
 
-Use ONLY the information from the wiki context below or the available tools to find the information. If the answer is not in the wiki or available via tools, say that you do not have enough information to answer.
+Use the available tools first to find the information. If the tool does not provide the answer, you can use the information from the wiki context below. If the answer is not in the tools or the wiki, say that you do not have enough information to answer.
 
 START OF WIKI CONTENT
 {{{wikiContext}}}
