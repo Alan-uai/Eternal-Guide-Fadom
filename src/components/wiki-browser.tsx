@@ -14,8 +14,9 @@ import { useApp } from '@/context/app-provider';
 import { Skeleton } from './ui/skeleton';
 import { micromark } from 'micromark';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { WikiArticle } from '@/lib/types';
 
-function ArticleCard({ article }: { article: any }) {
+function ArticleCard({ article }: { article: WikiArticle }) {
   const placeholder = PlaceHolderImages.find((p) => p.id === article.imageId);
   return (
     <Dialog>
@@ -126,7 +127,7 @@ export function WikiBrowser() {
     (article) => !generalArticles.some(a => a.id === article.id)
   );
 
-  const filteredArticles = (articles: any[]) => articles.filter(
+  const filteredArticles = (articles: WikiArticle[]) => articles.filter(
     (article) =>
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       article.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -136,7 +137,7 @@ export function WikiBrowser() {
   const filteredGeneral = filteredArticles(generalArticles);
   const filteredWorlds = filteredArticles(worldArticles);
 
-  const worldNumbers = [...new Set(worldArticles.map(a => a.tags.find(t => t.startsWith('mundo'))).filter(Boolean))].sort((a,b) => parseInt(a!.split(' ')[1]) - parseInt(b!.split(' ')[1]));
+  const worldNumbers = [...new Set(worldArticles.map(a => a.tags.find(t => !isNaN(parseInt(t)))).filter(Boolean))].sort((a,b) => parseInt(a!) - parseInt(b!));
 
 
   return (
@@ -172,11 +173,11 @@ export function WikiBrowser() {
         </TabsContent>
         <TabsContent value="mundos" className="mt-6">
           {isWikiLoading ? <LoadingSkeletons /> : (
-            filteredWorlds.length > 0 ? (
+            filteredWorlds.length > 0 && worldNumbers.length > 0 ? (
               <Tabs defaultValue={worldNumbers[0]} className="w-full">
                 <TabsList className="flex-wrap h-auto">
                   {worldNumbers.map(worldNum => (
-                    <TabsTrigger key={worldNum} value={worldNum!}>{worldNum}</TabsTrigger>
+                    <TabsTrigger key={worldNum} value={worldNum!}>Mundo {worldNum}</TabsTrigger>
                   ))}
                 </TabsList>
                 {worldNumbers.map(worldNum => (
@@ -194,5 +195,3 @@ export function WikiBrowser() {
     </div>
   );
 }
-
-    
