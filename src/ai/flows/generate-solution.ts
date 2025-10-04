@@ -59,7 +59,7 @@ const prompt = ai.definePrompt({
 
 Sua principal estratégia é:
 1.  **Primeiro, use o CONTEÚDO DO WIKI abaixo para entender a pergunta do usuário.** O wiki contém nomes oficiais de itens, raids, mundos, etc. Use os resumos (summary) e o conteúdo dos artigos para encontrar o nome correto de um item antes de usar qualquer ferramenta.
-2.  **Depois de identificar o nome correto**, use a ferramenta 'getGameData' para buscar estatísticas detalhadas e atualizadas sobre esse item. Não confie no wiki para estatísticas de itens específicos (como multiplicadores), pois a ferramenta terá os dados mais precisos. Se a busca por um nome exato falhar, tente novamente com um nome parcial ou um sinônimo (ex: se o usuário perguntar "Raid Green", o wiki te ajudará a descobrir que o nome oficial é "Green Planet Raid" para usar na ferramenta).
+2.  **Depois de identificar o nome correto, use a ferramenta 'getGameData' para buscar estatísticas detalhadas e atualizadas sobre esse item.** Não confie no wiki para estatísticas de itens específicos (como multiplicadores), pois a ferramenta terá os dados mais precisos. Se a busca por um nome exato falhar, tente novamente com um nome parcial ou um sinônimo (ex: se o usuário perguntar "Raid Green", o wiki te ajudará a descobrir que o nome oficial é "Green Planet Raid" para usar na ferramenta). Não pergunte ao usuário se pode usar o nome que encontrou. Apenas use-o.
 3.  **Use o histórico da conversa (history) para entender perguntas de acompanhamento ou pronomes (como "ela" ou "isso").**
 
 Ao listar poderes, você DEVE especificar qual status eles multiplicam:
