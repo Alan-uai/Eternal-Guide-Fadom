@@ -218,6 +218,29 @@ export const swordsArticle: WikiArticle = {
   },
 };
 
+export const damageSwordsArticle: WikiArticle = {
+  id: 'damage-swords',
+  title: 'Espadas de Dano (Evolução)',
+  summary: 'Um guia para as espadas de dano e seus multiplicadores em cada nível de evolução (estrela).',
+  content: 'Espadas de dano aumentam seu poder de ataque. A cada evolução (nível de estrela), o multiplicador de dano aumenta significativamente.',
+  tags: ['espadas', 'dano', 'arma', 'guia', 'geral', 'evolução'],
+  imageId: 'wiki-9',
+  tables: {
+    damageSwords: {
+      headers: ['Espada', 'Stats (Base)', 'Stats (1 Estrela)', 'Stats (2 Estrelas)', 'Stats (3 Estrelas)'],
+      rows: [
+        { 'Espada': 'Bloodthorn', 'Stats (Base)': '0.25x', 'Stats (1 Estrela)': '0.5x', 'Stats (2 Estrelas)': '0.75x', 'Stats (3 Estrelas)': '1.25x' },
+        { 'Espada': 'Eclipse Warden', 'Stats (Base)': '0.45x', 'Stats (1 Estrela)': '0.9x', 'Stats (2 Estrelas)': '1.35x', 'Stats (3 Estrelas)': '2.25x' },
+        { 'Espada': 'Obsidian Reaver', 'Stats (Base)': '0.75x', 'Stats (1 Estrela)': '1.5x', 'Stats (2 Estrelas)': '2.25x', 'Stats (3 Estrelas)': '3.75x' },
+        { 'Espada': 'Aquarius Edge', 'Stats (Base)': '1x', 'Stats (1 Estrela)': '2x', 'Stats (2 Estrelas)': '3x', 'Stats (3 Estrelas)': '5x' },
+        { 'Espada': 'Doomsoul', 'Stats (Base)': '1.25x', 'Stats (1 Estrela)': '2.5x', 'Stats (2 Estrelas)': '3.75x', 'Stats (3 Estrelas)': '6.25x' },
+        { 'Espada': 'Redmourne', 'Stats (Base)': '1.5x', 'Stats (1 Estrela)': '3x', 'Stats (2 Estrelas)': '4.5x', 'Stats (3 Estrelas)': '7.5x' },
+        { 'Espada': 'Venomstrike', 'Stats (Base)': '2x', 'Stats (1 Estrela)': '4x', 'Stats (2 Estrelas)': '6x', 'Stats (3 Estrelas)': '10x' },
+      ],
+    },
+  },
+};
+
 
 // A comprehensive list for seeding all articles at once if needed.
 export const allWikiArticles = [
@@ -229,4 +252,5 @@ export const allWikiArticles = [
   rankArticle,
   worldBossesArticle,
   swordsArticle,
+  damageSwordsArticle,
 ];
