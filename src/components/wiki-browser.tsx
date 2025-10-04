@@ -14,6 +14,44 @@ import { Skeleton } from './ui/skeleton';
 import { micromark } from 'micromark';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { WikiArticle } from '@/lib/types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+function WikiArticleContent({ article }: { article: WikiArticle }) {
+  const contentHtml = article.content ? micromark(article.content) : '';
+  const hasTables = article.tables && Object.keys(article.tables).length > 0;
+
+  return (
+    <div>
+      <div
+        className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground/80 prose-headings:text-foreground"
+        dangerouslySetInnerHTML={{ __html: contentHtml }}
+      />
+      {hasTables && Object.entries(article.tables!).map(([key, tableData]) => (
+          <div key={key} className="mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {tableData.headers.map((header) => (
+                    <TableHead key={header}>{header}</TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tableData.rows.map((row, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {tableData.headers.map((header, cellIndex) => (
+                      <TableCell key={`${rowIndex}-${cellIndex}`}>{row[header]}</TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        ))}
+    </div>
+  );
+}
+
 
 function ArticleCard({ article }: { article: WikiArticle }) {
   const placeholder = PlaceHolderImages.find((p) => p.id === article.imageId);
@@ -50,7 +88,7 @@ function ArticleCard({ article }: { article: WikiArticle }) {
         </Card>
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-4xl">
          <DialogHeader>
           <DialogTitle className="text-2xl font-headline">{article.title}</DialogTitle>
           <DialogDescription asChild>
@@ -64,10 +102,7 @@ function ArticleCard({ article }: { article: WikiArticle }) {
           </DialogDescription>
          </DialogHeader>
         <ScrollArea className="max-h-[60vh] pr-4 -mr-4">
-          <div
-            className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground/80 prose-headings:text-foreground prose-table:w-full prose-tr:border-b prose-tr:border-border prose-th:text-left prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2"
-            dangerouslySetInnerHTML={{ __html: micromark(article.content) }}
-          />
+          <WikiArticleContent article={article} />
         </ScrollArea>
       </DialogContent>
     </Dialog>
@@ -113,14 +148,15 @@ export function WikiBrowser() {
   const [searchTerm, setSearchTerm] = useState('');
   const { wikiArticles, isWikiLoading } = useApp();
 
-  const allArticles = wikiArticles.filter(
+  const filteredArticles = wikiArticles.filter(
     (article) =>
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       article.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (article.tags && article.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
-  const worldRelatedArticles = allArticles.filter(a => a.tags.some(tag => !isNaN(parseInt(tag)) && tag !== 'geral'));
+  const allArticles = filteredArticles;
+  const worldRelatedArticles = filteredArticles.filter(a => a.tags.some(tag => !isNaN(parseInt(tag)) && tag !== 'geral'));
   
   const worldNumbers = [...new Set(
     worldRelatedArticles.flatMap(a => a.tags).filter(tag => !isNaN(parseInt(tag)))

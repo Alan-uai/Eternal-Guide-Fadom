@@ -4,6 +4,11 @@ export interface Message {
   content: string;
 }
 
+export interface WikiArticleTable {
+  headers: string[];
+  rows: Record<string, string | number>[];
+}
+
 export interface WikiArticle {
   id: string;
   title: string;
@@ -11,4 +16,5 @@ export interface WikiArticle {
   content: string;
   tags: string[];
   imageId: string;
+  tables?: Record<string, WikiArticleTable>;
 }
