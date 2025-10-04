@@ -23,11 +23,11 @@ Primeiro, você precisa escolher sua classe inicial: Guerreiro, Mago ou Ladino. 
 export const auraArticle: WikiArticle = {
     id: 'aura-system',
     title: 'Sistema de Auras',
-    summary: 'Aprenda sobre Auras de Chefes de Rank-SS, como desbloqueá-las и como elas melhoram suas habilidades.',
+    summary: 'Aprenda sobre Auras de Chefes de Rank-SS, como desbloqueá-las e como elas melhoram suas habilidades.',
     content: `Auras são buffs poderosos dropados por Chefes de Rank-SS em vários mundos. Cada Aura fornece um bônus de status único. Aqui está uma lista de Auras conhecidas e seus status:
 
-*   **Mundo 2 (Shanks):** Aura da Sorte (10% de Sorte de Estrela)
-*   **Mundo 11 (Eran):** Aura do Imperador Vermelho (0.1x)
+*   **Mundo 1 (Kid Kohan):** Aura da Sorte (10% de Sorte de Estrela)
+*   **Mundo 2 (Shanks):** Aura do Imperador Vermelho (0.1x)
 *   **Mundo 3 (Eizen):** Aura do Traidor Roxo (0.25x)
 *   **Mundo 4 (Sakuni):** Aura do Rei do Fogo (25% de Drops)
 *   **Mundo 5 (Rangoki):** Aura Flamejante (0.15x)
