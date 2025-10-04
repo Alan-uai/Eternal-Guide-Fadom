@@ -69,7 +69,7 @@ function ArticleCard({ article }: { article: any }) {
          </DialogHeader>
         <ScrollArea className="max-h-[60vh] pr-4">
           <div
-            className="prose prose-sm dark:prose-invert prose-p:text-foreground/80 prose-table:w-full prose-th:text-left prose-td:py-2 prose-td:px-3 prose-tr:border-b prose-tr:border-border"
+            className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground/80 prose-headings:text-foreground prose-table:w-full prose-th:text-left prose-td:py-2 prose-td:px-3 prose-tr:border-b prose-tr:border-border"
             dangerouslySetInnerHTML={{ __html: micromark(article.content) }}
           />
         </ScrollArea>
@@ -172,24 +172,27 @@ export function WikiBrowser() {
         </TabsContent>
         <TabsContent value="mundos" className="mt-6">
           {isWikiLoading ? <LoadingSkeletons /> : (
-            <Tabs defaultValue={worldNumbers[0]} className="w-full">
-              <TabsList className="flex-wrap h-auto">
+            filteredWorlds.length > 0 ? (
+              <Tabs defaultValue={worldNumbers[0]} className="w-full">
+                <TabsList className="flex-wrap h-auto">
+                  {worldNumbers.map(worldNum => (
+                    <TabsTrigger key={worldNum} value={worldNum!}>{worldNum}</TabsTrigger>
+                  ))}
+                </TabsList>
                 {worldNumbers.map(worldNum => (
-                  <TabsTrigger key={worldNum} value={worldNum!}>{worldNum}</TabsTrigger>
+                  <TabsContent key={worldNum} value={worldNum!} className="mt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredArticles(worldArticles.filter(a => a.tags.includes(worldNum!))).map((article) => <ArticleCard key={article.id} article={article} />)}
+                    </div>
+                  </TabsContent>
                 ))}
-              </TabsList>
-              {worldNumbers.map(worldNum => (
-                <TabsContent key={worldNum} value={worldNum!} className="mt-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredArticles(worldArticles.filter(a => a.tags.includes(worldNum!))).map((article) => <ArticleCard key={article.id} article={article} />)}
-                  </div>
-                </TabsContent>
-              ))}
-              {filteredWorlds.length === 0 && !isWikiLoading && <NoArticlesFound />}
-            </Tabs>
+              </Tabs>
+            ) : <NoArticlesFound />
           )}
         </TabsContent>
       </Tabs>
     </div>
   );
 }
+
+    

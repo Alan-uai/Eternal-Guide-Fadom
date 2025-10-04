@@ -17,10 +17,12 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'eternal-guide-saved-answers';
+const SAVED_ANSWERS_STORAGE_KEY = 'eternal-guide-saved-answers';
+const WIKI_CACHE_STORAGE_KEY = 'eternal-guide-wiki-cache';
 
 function AppStateProvider({ children }: { children: ReactNode }) {
   const [savedAnswers, setSavedAnswers] = useState<Message[]>([]);
+  const [wikiArticles, setWikiArticles] = useState<WikiArticle[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
 
@@ -30,24 +32,46 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     return firestore ? collection(firestore, 'wikiContent') : null;
   }, [firestore]);
 
-  const { data: wikiArticles, isLoading: isWikiLoading } = useCollection<WikiArticle>(wikiCollectionRef as any);
+  const { data: firestoreWikiArticles, isLoading: isFirestoreWikiLoading } = useCollection<WikiArticle>(wikiCollectionRef as any);
 
   useEffect(() => {
+    // Load from local storage on mount
     try {
-      const item = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (item) {
-        setSavedAnswers(JSON.parse(item));
+      const savedAnswersItem = window.localStorage.getItem(SAVED_ANSWERS_STORAGE_KEY);
+      if (savedAnswersItem) {
+        setSavedAnswers(JSON.parse(savedAnswersItem));
+      }
+      
+      const wikiCacheItem = window.localStorage.getItem(WIKI_CACHE_STORAGE_KEY);
+      if (wikiCacheItem) {
+        setWikiArticles(JSON.parse(wikiCacheItem));
       }
     } catch (error) {
-      console.error("Falha ao carregar respostas salvas do armazenamento local", error);
+      console.error("Falha ao carregar dados do armazenamento local", error);
     }
     setIsMounted(true);
   }, []);
+  
+  useEffect(() => {
+    // When firestore data loads, update state and cache if it's different
+    if (firestoreWikiArticles && firestoreWikiArticles.length > 0) {
+       const hasChanged = JSON.stringify(firestoreWikiArticles) !== JSON.stringify(wikiArticles);
+       if (hasChanged) {
+         setWikiArticles(firestoreWikiArticles);
+         try {
+            window.localStorage.setItem(WIKI_CACHE_STORAGE_KEY, JSON.stringify(firestoreWikiArticles));
+         } catch(error) {
+            console.error("Falha ao salvar wiki no armazenamento local", error);
+         }
+       }
+    }
+  }, [firestoreWikiArticles, wikiArticles]);
 
   useEffect(() => {
+    // Persist saved answers to local storage
     if (isMounted) {
       try {
-        window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(savedAnswers));
+        window.localStorage.setItem(SAVED_ANSWERS_STORAGE_KEY, JSON.stringify(savedAnswers));
       } catch (error) {
         console.error("Falha ao salvar respostas no armazenamento local", error);
       }
@@ -84,7 +108,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     toggleSaveAnswer, 
     isAnswerSaved,
     wikiArticles: wikiArticles || [],
-    isWikiLoading
+    isWikiLoading: isFirestoreWikiLoading && wikiArticles.length === 0, // Only show loading if there's no cache
   };
 
   return (
@@ -109,3 +133,5 @@ export function useApp() {
   }
   return context;
 }
+
+    

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { generateSolution } from '@/ai/flows/generate-solution';
-import { Bot, User, Send, Loader2, Bookmark } from 'lucide-react';
+import { Bot, User, Send, Loader2, Bookmark, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -21,27 +21,22 @@ const chatSchema = z.object({
 });
 
 function AssistantMessage({ content }: { content: string }) {
-  // Split the content into lines to handle multiple lists properly
   const lines = content.split('\n').filter(line => line.trim() !== '');
 
   const renderedLines = lines.map((line, index) => {
-    // Check if the line is a list item (starts with * or -)
     const trimmedLine = line.trim();
     if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
-      // Remove the list marker for display
       const itemContent = trimmedLine.substring(2).trim();
       return <li key={index}>{itemContent}</li>;
     }
-    // Check if the line is a header (ends with a colon)
     if (trimmedLine.endsWith(':') && !trimmedLine.startsWith('*') && !trimmedLine.startsWith('-')) {
         return <strong key={index} className="block mt-2">{trimmedLine}</strong>;
     }
-    // Otherwise, it's a regular paragraph or sentence
-    return <p key={index}>{line}</p>;
+    return <p key={index} className="whitespace-pre-wrap">{line}</p>;
   });
   
   const groupedElements = [];
-  let currentList = [];
+  let currentList: JSX.Element[] = [];
   
   for (let i = 0; i < renderedLines.length; i++) {
       const line = renderedLines[i];
@@ -63,10 +58,12 @@ function AssistantMessage({ content }: { content: string }) {
   return <div className="space-y-2">{groupedElements}</div>;
 }
 
+const CHAT_STORAGE_KEY = 'eternal-guide-chat-history';
 
 export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
   const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading } = useApp();
   const scrollAreaViewport = useRef<HTMLDivElement>(null);
@@ -75,6 +72,28 @@ export function ChatView() {
     resolver: zodResolver(chatSchema),
     defaultValues: { prompt: '' },
   });
+  
+  useEffect(() => {
+    try {
+      const item = window.localStorage.getItem(CHAT_STORAGE_KEY);
+      if (item) {
+        setMessages(JSON.parse(item));
+      }
+    } catch (error) {
+      console.error("Falha ao carregar histórico do chat do armazenamento local", error);
+    }
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      try {
+        window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+      } catch (error) {
+        console.error("Falha ao salvar o histórico do chat no armazenamento local", error);
+      }
+    }
+  }, [messages, isMounted]);
 
   const scrollToBottom = () => {
     if (scrollAreaViewport.current) {
@@ -97,7 +116,6 @@ export function ChatView() {
     form.reset();
 
     try {
-      // Pass the wiki articles as context to the AI
       const wikiContext = wikiArticles.map(article => `Title: ${article.title}\nContent: ${article.content}`).join('\n\n---\n\n');
       const result = await generateSolution({ problemDescription: values.prompt, wikiContext });
       const assistantMessage: Message = {
@@ -113,17 +131,28 @@ export function ChatView() {
         title: 'Erro',
         description: 'Falha ao obter uma resposta da IA. Por favor, tente novamente.',
       });
-      setMessages((prev) => prev.slice(0, -1)); // Remove user message on error
+      const lastMessage = messages[messages.length-1];
+      if (lastMessage && lastMessage.id === userMessage.id) {
+        setMessages((prev) => prev.slice(0, -1));
+      }
     } finally {
       setIsLoading(false);
     }
+  }
+
+  const handleClearChat = () => {
+    setMessages([]);
+    toast({
+        title: "Chat Limpo",
+        description: "Você pode começar uma nova conversa."
+    });
   }
 
   const isSendDisabled = isLoading || isWikiLoading;
 
   return (
     <div className="flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-3.5rem)]">
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         <ScrollArea className="h-full">
           <div className="p-4 md:p-6 space-y-6" ref={scrollAreaViewport}>
             {messages.length === 0 && (
@@ -197,6 +226,19 @@ export function ChatView() {
             )}
           </div>
         </ScrollArea>
+        {messages.length > 0 && (
+            <div className="absolute top-4 right-4">
+                 <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleClearChat}
+                    title="Limpar conversa"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                >
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </div>
+        )}
       </div>
 
       <div className="border-t p-4 bg-background">
@@ -234,3 +276,5 @@ export function ChatView() {
     </div>
   );
 }
+
+    
