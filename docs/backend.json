@@ -208,6 +208,23 @@
             "boss": { "type": "string" }
         },
         "required": ["name"]
+    },
+    "Accessory": {
+        "title": "Accessory",
+        "type": "object",
+        "description": "Represents a wearable accessory dropped by a boss in a specific world.",
+        "properties": {
+            "name": { "type": "string", "description": "The name of the accessory." },
+            "world": { "type": "string", "description": "The name of the world where the accessory drops." },
+            "boss": { "type": "string", "description": "The name of the boss that drops the accessory." },
+            "rarity": { "type": "string", "description": "The rarity of the accessory (e.g., C-Rank, S-Rank, SS-Rank)." },
+            "coins_bonus": { "type": "string", "description": "The coin bonus multiplier (e.g., '0.1', '2.25')." },
+            "energy_bonus": { "type": "string", "description": "The energy bonus multiplier (e.g., '0.01x', '0.75x')." },
+            "exp_bonus": { "type": "string", "description": "The experience bonus percentage (e.g., '1.0%', '7.5%')." },
+            "damage_bonus": { "type": "string", "description": "The damage bonus multiplier (e.g., '0.05x', '1x')." },
+            "movespeed_bonus": { "type": "string", "description": "The movement speed bonus percentage (e.g., '10%', '75%')." }
+        },
+        "required": ["name", "world", "boss"]
     }
   },
   "auth": {
@@ -297,8 +314,19 @@
           "schema": { "$ref": "#/backend/entities/Dungeon" },
           "description": "Sub-collection for dungeons located in a world."
         }
+      },
+      {
+        "path": "/worlds/{worldId}/accessories/{accessoryId}",
+        "definition": {
+          "entityName": "Accessory",
+          "schema": { "$ref": "#/backend/entities/Accessory" },
+          "description": "Sub-collection for accessories available in a world."
+        }
       }
     ],
-    "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', and 'dungeons', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all powers for 'World 1', you query the '/worlds/world1/powers' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
+    "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', and now 'accessories', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all accessories for 'World 1', you query the '/worlds/world1/accessories' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
+
+
+    
