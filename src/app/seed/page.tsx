@@ -9,7 +9,20 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import { rankArticle, auraArticle, prestigeArticle, worldBossesArticle } from '@/lib/wiki-data';
+import { 
+  rankArticle, 
+  auraArticle, 
+  prestigeArticle, 
+  worldBossesArticle,
+  swordsArticle,
+  damageSwordsArticle,
+  world20RaidsArticle,
+  raidRequirementsArticle,
+  gamepassTierListArticle,
+  scientificNotationArticle,
+  scythesArticle,
+  titansArticle
+} from '@/lib/wiki-data';
 import type { WikiArticle } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { accessories, worldNameToId } from '@/lib/accessory-data';
@@ -89,6 +102,15 @@ export default function SeedPage() {
     prestige: false,
     bosses: false,
     accessories: false,
+    swords: false,
+    damageSwords: false,
+    world20Raids: false,
+    raidRequirements: false,
+    gamepass: false,
+    notation: false,
+    scythes: false,
+    titans: false,
+    all: false
   });
 
   const handleLoading = (key: keyof typeof loadingStates, value: boolean) => {
@@ -113,6 +135,7 @@ export default function SeedPage() {
     const seedSubcollection = (subcollectionName: string, items: any[]) => {
       if (items && items.length > 0) {
         for (const item of items) {
+            if (!item.id) continue;
             const itemRef = doc(worldRef, subcollectionName, item.id);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { stats, ...itemData } = item;
@@ -136,7 +159,7 @@ export default function SeedPage() {
     seedSubcollection('pets', worldData.pets);
     seedSubcollection('dungeons', worldData.dungeons);
     
-    batch.commit().then(() => {
+    await batch.commit().then(() => {
         toast({ title: 'Sucesso!', description: `Os dados do ${worldData.name} foram populados com sucesso.` });
     }).catch(() => {
         const permissionError = new FirestorePermissionError({
@@ -159,7 +182,7 @@ export default function SeedPage() {
     const articleRef = doc(firestore, 'wikiContent', article.id);
     batch.set(articleRef, article);
     
-    batch.commit().then(() => {
+    await batch.commit().then(() => {
         toast({ title: 'Sucesso!', description: `O artigo "${articleName}" foi populado.` });
     }).catch(() => {
         const permissionError = new FirestorePermissionError({
@@ -191,7 +214,7 @@ export default function SeedPage() {
       }
     }
 
-    batch.commit().then(() => {
+    await batch.commit().then(() => {
       toast({ title: 'Sucesso!', description: 'Os dados dos acessórios foram populados com sucesso.' });
     }).catch(() => {
       const permissionError = new FirestorePermissionError({
@@ -205,8 +228,56 @@ export default function SeedPage() {
 
   const worldNumbers = Array.from({ length: 21 }, (_, i) => i + 1);
 
+  async function handleSeedAll() {
+    handleLoading('all', true);
+    toast({ title: 'Iniciando...', description: 'Populando todos os dados do jogo. Isso pode levar um momento.' });
+
+    await seedArticle(rankArticle, 'ranks', 'Sistema de Ranks');
+    await seedArticle(auraArticle, 'auras', 'Sistema de Auras');
+    await seedArticle(prestigeArticle, 'prestige', 'Sistema de Prestígio');
+    await seedArticle(worldBossesArticle, 'bosses', 'Guia de Chefes de Mundo');
+    await seedArticle(swordsArticle, 'swords', 'Espadas de Energia');
+    await seedArticle(damageSwordsArticle, 'damageSwords', 'Espadas de Dano');
+    await seedArticle(world20RaidsArticle, 'world20Raids', 'Raids do Mundo 20');
+    await seedArticle(raidRequirementsArticle, 'raidRequirements', 'Requisitos de Raid');
+    await seedArticle(gamepassTierListArticle, 'gamepass', 'Tier List de Gamepasses');
+    await seedArticle(scientificNotationArticle, 'notation', 'Notação Científica');
+    await seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)');
+    await seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)');
+
+    await handleSeedAccessories();
+
+    await seedWorldGeneric('world-1', world1Data, 'world1');
+    await seedWorldGeneric('world-2', world2Data, 'world2');
+    await seedWorldGeneric('world-3', world3Data, 'world3');
+    await seedWorldGeneric('world-4', world4Data, 'world4');
+    await seedWorldGeneric('world-20', world20Data, 'world20');
+
+    toast({ title: 'Concluído!', description: 'Todos os dados foram populados com sucesso.' });
+    handleLoading('all', false);
+  }
+
   return (
     <div className="container mx-auto py-8 space-y-8">
+       <Card>
+        <CardHeader>
+          <CardTitle>Controle Geral</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CardDescription>
+            Use este botão para popular todos os artigos da wiki e dados de todos os mundos disponíveis de uma só vez.
+          </CardDescription>
+        </CardContent>
+        <CardFooter>
+          <Button onClick={handleSeedAll} disabled={loadingStates.all || !firestore}>
+            {loadingStates.all ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {loadingStates.all ? 'Populando Tudo...' : 'Popular Tudo'}
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <Separator />
+
       <Card>
         <CardHeader><CardTitle>Popular Artigos da Wiki e Dados do Jogo</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -253,7 +324,6 @@ export default function SeedPage() {
               </Button>
             </CardFooter>
           </Card>
-
            <Card>
             <CardHeader><CardTitle className="text-lg">Popular Acessórios</CardTitle></CardHeader>
             <CardContent><CardDescription>Popula todos os acessórios do jogo em seus respectivos mundos.</CardDescription></CardContent>
@@ -261,6 +331,86 @@ export default function SeedPage() {
               <Button onClick={handleSeedAccessories} disabled={loadingStates.accessories || !firestore}>
                 {loadingStates.accessories ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loadingStates.accessories ? 'Populando...' : 'Popular Acessórios'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Espadas de Energia</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Espadas de Energia" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(swordsArticle, 'swords', 'Espadas de Energia')} disabled={loadingStates.swords || !firestore}>
+                {loadingStates.swords ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.swords ? 'Populando...' : 'Popular Espadas de Energia'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Espadas de Dano</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Espadas de Dano (Evolução)" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(damageSwordsArticle, 'damageSwords', 'Espadas de Dano')} disabled={loadingStates.damageSwords || !firestore}>
+                {loadingStates.damageSwords ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.damageSwords ? 'Populando...' : 'Popular Espadas de Dano'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Raids do Mundo 20</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Raids do Mundo 20" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(world20RaidsArticle, 'world20Raids', 'Raids do Mundo 20')} disabled={loadingStates.world20Raids || !firestore}>
+                {loadingStates.world20Raids ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.world20Raids ? 'Populando...' : 'Popular Raids Mundo 20'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Requisitos de Raid</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Requisitos de Energia para Raids" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(raidRequirementsArticle, 'raidRequirements', 'Requisitos de Raid')} disabled={loadingStates.raidRequirements || !firestore}>
+                {loadingStates.raidRequirements ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.raidRequirements ? 'Populando...' : 'Popular Requisitos de Raid'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Tier List de Gamepasses</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Tier List de Gamepasses" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(gamepassTierListArticle, 'gamepass', 'Tier List de Gamepasses')} disabled={loadingStates.gamepass || !firestore}>
+                {loadingStates.gamepass ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.gamepass ? 'Populando...' : 'Popular Tier List'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Notação Científica</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Abreviações de Notação Científica" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(scientificNotationArticle, 'notation', 'Notação Científica')} disabled={loadingStates.notation || !firestore}>
+                {loadingStates.notation ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.notation ? 'Populando...' : 'Popular Notação'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Foices (Mundo 21)</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Foices (Mundo 21)" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)')} disabled={loadingStates.scythes || !firestore}>
+                {loadingStates.scythes ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.scythes ? 'Populando...' : 'Popular Foices'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Guia de Titãs (Mundo 11)</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Guia de Titãs (Mundo 11)" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)')} disabled={loadingStates.titans || !firestore}>
+                {loadingStates.titans ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.titans ? 'Populando...' : 'Popular Titãs'}
               </Button>
             </CardFooter>
           </Card>
