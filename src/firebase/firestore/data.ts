@@ -1,11 +1,11 @@
 // src/firebase/firestore/data.ts
 'use server';
 
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebaseServer } from '@/firebase/server';
 import { collection, getDocs, query, where, doc, collectionGroup } from 'firebase/firestore';
 
 export async function getGameData(worldName: string, category: string, itemName?: string) {
-  const { firestore } = initializeFirebase();
+  const { firestore } = initializeFirebaseServer();
   try {
     // Find the world first
     const worldsCollection = collection(firestore, 'worlds');
