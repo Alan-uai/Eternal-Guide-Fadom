@@ -111,13 +111,22 @@ export function ChatView() {
       role: 'user',
       content: values.prompt,
     };
-    setMessages((prev) => [...prev, userMessage]);
+    
+    const currentMessages = [...messages, userMessage];
+    setMessages(currentMessages);
     setIsLoading(true);
     form.reset();
 
     try {
       const wikiContext = wikiArticles.map(article => `Title: ${article.title}\nContent: ${article.content}`).join('\n\n---\n\n');
-      const result = await generateSolution({ problemDescription: values.prompt, wikiContext });
+      const historyForAI = currentMessages.slice(0, -1).map(({ id, ...rest }) => rest);
+      
+      const result = await generateSolution({ 
+        problemDescription: values.prompt, 
+        wikiContext,
+        history: historyForAI
+      });
+      
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
@@ -131,10 +140,8 @@ export function ChatView() {
         title: 'Erro',
         description: 'Falha ao obter uma resposta da IA. Por favor, tente novamente.',
       });
-      const lastMessage = messages[messages.length-1];
-      if (lastMessage && lastMessage.id === userMessage.id) {
-        setMessages((prev) => prev.slice(0, -1));
-      }
+      // Remove the user message that caused the error
+      setMessages((prev) => prev.filter(msg => msg.id !== userMessage.id));
     } finally {
       setIsLoading(false);
     }
@@ -276,5 +283,3 @@ export function ChatView() {
     </div>
   );
 }
-
-    

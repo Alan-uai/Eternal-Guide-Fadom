@@ -1,4 +1,3 @@
-
 // src/ai/flows/generate-solution.ts
 'use server';
 /**
@@ -30,10 +29,15 @@ const getGameDataTool = ai.defineTool(
   }
 );
 
+const MessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+});
 
 const GenerateSolutionInputSchema = z.object({
   problemDescription: z.string().describe('A description of the player is encountering in Anime Eternal.'),
   wikiContext: z.string().describe('The entire content of the game wiki to be used as a knowledge base.'),
+  history: z.array(MessageSchema).optional().describe('The previous messages in the conversation.'),
 });
 export type GenerateSolutionInput = z.infer<typeof GenerateSolutionInputSchema>;
 
@@ -56,6 +60,7 @@ const prompt = ai.definePrompt({
 Sua principal estratégia é:
 1.  **Primeiro, use o CONTEÚDO DO WIKI abaixo para entender a pergunta do usuário.** O wiki contém nomes oficiais de itens, raids, mundos, etc. Use os resumos (summary) e o conteúdo dos artigos para encontrar o nome correto de um item antes de usar qualquer ferramenta.
 2.  **Depois de identificar o nome correto**, use a ferramenta 'getGameData' para buscar estatísticas detalhadas e atualizadas sobre esse item. Não confie no wiki para estatísticas de itens específicos (como multiplicadores), pois a ferramenta terá os dados mais precisos. Se a busca por um nome exato falhar, tente novamente com um nome parcial ou um sinônimo (ex: se o usuário perguntar "Raid Green", o wiki te ajudará a descobrir que o nome oficial é "Green Planet Raid" para usar na ferramenta).
+3.  **Use o histórico da conversa (history) para entender perguntas de acompanhamento ou pronomes (como "ela" ou "isso").**
 
 Ao listar poderes, você DEVE especificar qual status eles multiplicam:
 - Para poderes de 'gacha', especifique o status de cada nível (por exemplo, "energia" ou "dano"). Se um nível tiver um bônus de 'energy_crit_bonus', liste-o também.
@@ -77,6 +82,13 @@ Se a resposta não estiver nas ferramentas ou no wiki, diga que você não tem i
 INÍCIO DO CONTEÚDO DO WIKI
 {{{wikiContext}}}
 FIM DO CONTEÚDO DO WIKI
+
+{{#if history}}
+HISTÓRICO DA CONVERSA:
+{{#each history}}
+- {{role}}: {{content}}
+{{/each}}
+{{/if}}
 
 Descrição do Problema: {{{problemDescription}}}`,
 });
