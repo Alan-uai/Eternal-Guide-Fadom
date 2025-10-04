@@ -17,10 +17,8 @@ First, you need to choose your starting class: Warrior, Mage, or Rogue. Each cla
 *   **Global Leaderboards:** Check out the top players in the world and see where you stand.
 *   **Rank Up & Avatar Leveling:** World 1 is where you will increase your Rank and level up your avatars.
 *   **Chests & Daily Missions:** Find and collect chests and complete daily missions for valuable rewards.
-*   **Dungeon Lobby:** Access a variety of special dungeons, which are different from the dungeons found within each world.
 *   **World Dungeon - Tournemant:** Your first world-specific dungeon is the Tournemant, which goes up to Room 550.
-
-Good luck, adventurer!`,
+*   **Lobby Dungeons:** Access a variety of special dungeons, which are different from the dungeons found within each world. The Lobby Dungeons include: Easy, Medium, Hard, Insane, Crazy, Nightmare, and Leaf. Another is coming soon!`,
     tags: ['beginner', 'guide', 'new player', 'class', 'world 1'],
     imageId: 'wiki-1',
 };
