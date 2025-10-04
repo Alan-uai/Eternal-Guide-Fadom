@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "SavedAnswer": {
@@ -144,6 +145,45 @@
         "email",
         "createdAt"
       ]
+    },
+    "World": {
+      "title": "World",
+      "type": "object",
+      "description": "Represents a world within the game.",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "Race": {
+      "title": "Race",
+      "type": "object",
+      "description": "Represents a player race within a world.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "PowerStats": {
+      "title": "PowerStats",
+      "type": "object",
+      "description": "Represents the stats of a power or ability for a race.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "whereToGetIt": {
+          "type": "string"
+        }
+      }
     }
   },
   "auth": {
@@ -177,7 +217,7 @@
           "schema": {
             "$ref": "#/backend/entities/SavedAnswer"
           },
-          "description": "Stores AI-generated answers saved by the user. Organized as a subcollection of the user document. Owned by the user whose ID matches {userId}.",
+          "description": "Stores AI-generated answers saved by the user. Organized as a subcollection of the user document. Owned by the. user whose ID matches {userId}.",
           "params": [
             {
               "name": "userId",
@@ -225,8 +265,38 @@
             }
           ]
         }
+      },
+      {
+        "path": "/worlds/{worldId}",
+        "definition": {
+          "entityName": "World",
+          "schema": {
+            "$ref": "#/backend/entities/World"
+          },
+          "description": "Stores information about game worlds."
+        }
+      },
+      {
+        "path": "/worlds/{worldId}/races/{raceId}",
+        "definition": {
+          "entityName": "Race",
+          "schema": {
+            "$ref": "#/backend/entities/Race"
+          },
+          "description": "Stores information about races within a world."
+        }
+      },
+      {
+        "path": "/worlds/{worldId}/races/{raceId}/Stats/{statId}",
+        "definition": {
+          "entityName": "PowerStats",
+          "schema": {
+            "$ref": "#/backend/entities/PowerStats"
+          },
+          "description": "Stores stats for a specific race."
+        }
       }
     ],
-    "reasoning": "This Firestore data structure is designed to support the Eternal Guide application, focusing on a blend of user-specific data and globally accessible wiki content.  It emphasizes Authorization Independence to ensure robust security rules and efficient data access. This is achieved through denormalization. All user-owned data is placed under the `/users/{userId}` path, ensuring clear ownership and simplified security rules. \n\nThe structure implements Structural Segregation by separating user-specific content suggestions from the core wiki content, and by placing user-specific data under their respective user IDs. Access Modeling is employed using path-based ownership for user data (`/users/{userId}/savedAnswers`) and global collections for shared wiki content.  This structure directly addresses the QAPs (Rules are not Filters) requirement, allowing secure `list` operations within user-owned collections and for the globally accessible wiki content, as access control is based on path ownership and clearly defined collection-level rules.\n\nSpecifically, the `savedAnswers` and `contentSuggestions` collections are located under the `/users/{userId}` path, ensuring that only the authenticated user (`request.auth.uid`) can access their own data, thereby eliminating the need for complex `get()` calls to verify ownership.  The `wikiContent` collection is globally accessible, which is appropriate for shared content.  For scaling, consider sharding `wikiContent` based on content category or source if the number of documents becomes exceedingly large."
+    "reasoning": "This Firestore data structure is designed to support the Eternal Guide application, focusing on a blend of user-specific data and globally accessible wiki content.  It emphasizes Authorization Independence to ensure robust security rules and efficient data access. This is achieved through denormalization. All user-owned data is placed under the `/users/{userId}` path, ensuring clear ownership and simplified security rules. \n\nThe structure implements Structural Segregation by separating user-specific content suggestions from the core wiki content, and by placing user-specific data under their respective user IDs. Access Modeling is employed using path-based ownership for user data (`/users/{userId}/savedAnswers`) and global collections for shared wiki content.  This structure directly addresses the QAPs (Rules are not Filters) requirement, allowing secure `list` operations within user-owned collections and for the globally accessible wiki content, as access control is based on path ownership and clearly defined collection-level rules.\n\nSpecifically, the `savedAnswers` and `contentSuggestions` collections are located under the `/users/{userId}` path, ensuring that only the authenticated user (`request.auth.uid`) can access their own data, thereby eliminating the need for complex `get()` calls to verify ownership.  The `wikiContent` collection is globally accessible, which is appropriate for shared content. The new 'worlds' collection provides a hierarchical structure for game data, allowing for detailed information about races and stats while maintaining clear organization and scalability.  For scaling, consider sharding `wikiContent` based on content category or source if the number of documents becomes exceedingly large."
   }
 }
