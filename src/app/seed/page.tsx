@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const world20Data = {
     name: 'World 20 - Grand Elder',
@@ -59,54 +61,58 @@ export default function SeedPage() {
   async function handleSeedData() {
     setIsLoading(true);
 
-    try {
-        const worldsCollection = collection(firestore, 'worlds');
-        const q = query(worldsCollection, where('name', '==', world20Data.name));
-        const worldSnapshot = await getDocs(q);
+    const worldsCollection = collection(firestore, 'worlds');
+    const q = query(worldsCollection, where('name', '==', world20Data.name));
+    const worldSnapshot = await getDocs(q);
 
-        if (!worldSnapshot.empty) {
-            toast({
-                title: 'Data Already Exists',
-                description: 'The data for World 20 has already been seeded.',
-                variant: 'default',
-            });
-            setIsLoading(false);
-            return;
+    if (!worldSnapshot.empty) {
+        toast({
+            title: 'Data Already Exists',
+            description: 'The data for World 20 has already been seeded.',
+            variant: 'default',
+        });
+        setIsLoading(false);
+        return;
+    }
+
+    const batch = writeBatch(firestore);
+    const worldRef = doc(firestore, 'worlds', 'world-20');
+    batch.set(worldRef, { name: world20Data.name });
+
+    const allDataForBatch: Record<string, any> = {
+        [worldRef.path]: { name: world20Data.name }
+    };
+
+    for (const power of world20Data.powers) {
+        const powerRef = doc(worldRef, 'powers', power.id);
+        const { stats, ...powerData } = power;
+        batch.set(powerRef, powerData);
+        allDataForBatch[powerRef.path] = powerData;
+
+
+        for (const stat of stats) {
+            const statId = stat.name.toLowerCase().replace(/\s+/g, '-');
+            const statRef = doc(powerRef, 'stats', statId);
+            batch.set(statRef, stat);
+            allDataForBatch[statRef.path] = stat;
         }
-
-        const batch = writeBatch(firestore);
-
-        const worldRef = doc(firestore, 'worlds', 'world-20');
-        batch.set(worldRef, { name: world20Data.name });
-
-        for (const power of world20Data.powers) {
-            const powerRef = doc(worldRef, 'powers', power.id);
-            const { stats, ...powerData } = power;
-            batch.set(powerRef, powerData);
-
-            for (const stat of stats) {
-                const statId = stat.name.toLowerCase().replace(/\s+/g, '-');
-                const statRef = doc(powerRef, 'stats', statId);
-                batch.set(statRef, stat);
-            }
-        }
-        
-        await batch.commit();
-
+    }
+    
+    batch.commit().then(() => {
         toast({
             title: 'Success!',
             description: 'World 20 data has been successfully seeded to Firestore.',
         });
-    } catch (error: any) {
-        console.error('Error seeding data:', error);
-        toast({
-            title: 'Error Seeding Data',
-            description: error.message || 'An unexpected error occurred.',
-            variant: 'destructive',
-        });
-    } finally {
         setIsLoading(false);
-    }
+    }).catch((error) => {
+        const permissionError = new FirestorePermissionError({
+            path: 'batch-write', // path is generic for batch writes
+            operation: 'write',
+            requestResourceData: allDataForBatch,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        setIsLoading(false);
+    });
   }
 
   return (
