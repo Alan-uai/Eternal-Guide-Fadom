@@ -171,6 +171,53 @@ export const worldBossesArticle: WikiArticle = {
   }
 };
 
+export const swordsArticle: WikiArticle = {
+  id: 'energy-swords',
+  title: 'Espadas de Energia',
+  summary: 'Um guia para as espadas que fornecem um multiplicador de energia, onde encontrá-las e seus status.',
+  content: 'Espadas de energia são armas especiais que aumentam sua energia total com base em seu nível. Elas são encontradas em diferentes mundos.',
+  tags: ['espadas', 'energia', 'arma', 'guia', 'geral', '3', '5', '15', '19'],
+  imageId: 'wiki-8',
+  tables: {
+    world3: {
+      headers: ['Espada (Mundo 3 - Ichige)', 'Stats'],
+      rows: [
+        { 'Espada (Mundo 3 - Ichige)': 'Zangetsu', 'Stats': '0.05x' },
+        { 'Espada (Mundo 3 - Ichige)': 'Zangetsu (1 Estrela)', 'Stats': '0.1x' },
+        { 'Espada (Mundo 3 - Ichige)': 'Zangetsu (2 Estrelas)', 'Stats': '0.15x' },
+        { 'Espada (Mundo 3 - Ichige)': 'Zangetsu (3 Estrelas)', 'Stats': '0.25x' },
+      ],
+    },
+    world5: {
+      headers: ['Espada (Mundo 5 - Zentsu)', 'Stats'],
+      rows: [
+        { 'Espada (Mundo 5 - Zentsu)': 'Yellow Nichirin', 'Stats': '0.075x' },
+        { 'Espada (Mundo 5 - Zentsu)': 'Yellow Nichirin (1 Estrela)', 'Stats': '0.15x' },
+        { 'Espada (Mundo 5 - Zentsu)': 'Yellow Nichirin (2 Estrelas)', 'Stats': '0.225x' },
+        { 'Espada (Mundo 5 - Zentsu)': 'Yellow Nichirin (3 Estrelas)', 'Stats': '0.375x' },
+      ],
+    },
+    world15: {
+        headers: ['Espada (Mundo 15 - Beater)', 'Stats'],
+        rows: [
+            { 'Espada (Mundo 15 - Beater)': 'Lucidator', 'Stats': '0.125x' },
+            { 'Espada (Mundo 15 - Beater)': 'Lucidator (1 Estrela)', 'Stats': '0.250x' },
+            { 'Espada (Mundo 15 - Beater)': 'Lucidator (2 Estrelas)', 'Stats': '0.375x' },
+            { 'Espada (Mundo 15 - Beater)': 'Lucidator (3 Estrelas)', 'Stats': '0.625x' },
+        ],
+    },
+    world19: {
+        headers: ['Espada (Mundo 19 - Arter)', 'Stats'],
+        rows: [
+            { 'Espada (Mundo 19 - Arter)': 'Excalibur', 'Stats': '0.2x' },
+            { 'Espada (Mundo 19 - Arter)': 'Excalibur (1 Estrela)', 'Stats': '0.4x' },
+            { 'Espada (Mundo 19 - Arter)': 'Excalibur (2 Estrelas)', 'Stats': '0.6x' },
+            { 'Espada (Mundo 19 - Arter)': 'Excalibur (3 Estrelas)', 'Stats': '1x' },
+        ],
+    }
+  },
+};
+
 
 // A comprehensive list for seeding all articles at once if needed.
 export const allWikiArticles = [
@@ -181,4 +228,5 @@ export const allWikiArticles = [
   prestigeArticle,
   rankArticle,
   worldBossesArticle,
+  swordsArticle,
 ];
