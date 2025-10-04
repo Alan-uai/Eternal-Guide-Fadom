@@ -45,6 +45,28 @@ export const world2Data = {
         ]
       },
       {
+        id: 'demon-fruit',
+        name: 'Demon Fruit',
+        type: 'gacha',
+        // statType is defined on individual stats because it's mixed
+        stats: [
+          { name: 'Bomb Fruit', multiplier: '2x', statType: 'coin' },
+          { name: 'Rubber Fruit', multiplier: '3x', statType: 'energy' },
+          { name: 'Sand Fruit', multiplier: '4x', statType: 'coin' },
+          { name: 'Flame Fruit', multiplier: '5x', statType: 'energy' },
+          { name: 'Smoke Fruit', multiplier: '6x', statType: 'energy' },
+          { name: 'Magma Fruit', multiplier: '7x', statType: 'damage' },
+          { name: 'Revive Fruit', multiplier: '8x', statType: 'energy' },
+          { name: 'String Fruit', multiplier: '9x', statType: 'coin' },
+          { name: 'Human Fruit', multiplier: '10x', statType: 'coin' },
+          { name: 'Dark Fruit', multiplier: '11x', statType: 'coin' },
+          { name_id: 'quake-fruit', name: 'Quake Fruit', multiplier: '12x', statType: 'damage' },
+          { name: 'Money Fruit', multiplier: '1x', statType: 'coin' },
+          { name: 'Phoenix Fruit', multiplier: '15x', statType: 'energy' },
+          { name: 'Dough Fruit', multiplier: '10x', statType: 'energy' },
+        ]
+      },
+      {
         id: 'haki-upgrade',
         name: 'Haki Upgrade',
         type: 'progression',
