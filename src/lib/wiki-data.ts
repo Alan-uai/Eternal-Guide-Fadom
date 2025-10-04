@@ -426,6 +426,30 @@ export const scientificNotationArticle: WikiArticle = {
   }
 };
 
+export const scythesArticle: WikiArticle = {
+  id: 'scythes-world-21',
+  title: 'Foices (Mundo 21)',
+  summary: 'Um guia para as foices do Mundo 21, as armas mais recentes do jogo, e seus multiplicadores de dano.',
+  content: 'As foices são as armas introduzidas no Mundo 21. Elas oferecem multiplicadores de dano significativos que aumentam com a evolução (estrelas).',
+  tags: ['foice', 'arma', 'mundo 21', '21', 'guia', 'geral'],
+  imageId: 'wiki-14',
+  tables: {
+    scythes: {
+      headers: ['Foice', 'Stats (Base)', 'Stats (1 Estrela)', 'Stats (2 Estrelas)', 'Stats (3 Estrelas)'],
+      rows: [
+        { 'Foice': 'Venomleaf', 'Stats (Base)': '0.75x', 'Stats (1 Estrela)': '1.5x', 'Stats (2 Estrelas)': '2.25x', 'Stats (3 Estrelas)': '3.75x' },
+        { 'Foice': 'Cryoscythe', 'Stats (Base)': '1x', 'Stats (1 Estrela)': '2x', 'Stats (2 Estrelas)': '3x', 'Stats (3 Estrelas)': '5x' },
+        { 'Foice': 'Toxinfang', 'Stats (Base)': '1.75x', 'Stats (1 Estrela)': '3.5x', 'Stats (2 Estrelas)': '5.25x', 'Stats (3 Estrelas)': '8.75x' },
+        { 'Foice': 'Crimson Thorn', 'Stats (Base)': '2.2x', 'Stats (1 Estrela)': '4.4x', 'Stats (2 Estrelas)': '6.6x', 'Stats (3 Estrelas)': '11x' },
+        { 'Foice': 'Bonehowl', 'Stats (Base)': '2.75x', 'Stats (1 Estrela)': '5.5x', 'Stats (2 Estrelas)': '8.25x', 'Stats (3 Estrelas)': '13.75x' },
+        { 'Foice': 'Ashfang', 'Stats (Base)': '3.5x', 'Stats (1 Estrela)': '7x', 'Stats (2 Estrelas)': '10.5x', 'Stats (3 Estrelas)': '17.5x' },
+        { 'Foice': 'Phantom Requiem', 'Stats (Base)': '4.25x', 'Stats (1 Estrela)': '8.5x', 'Stats (2 Estrelas)': '12.75x', 'Stats (3 Estrelas)': '21.25x' },
+        { 'Foice': 'Stormreaver', 'Stats (Base)': '5x', 'Stats (1 Estrela)': '10x', 'Stats (2 Estrelas)': '15x', 'Stats (3 Estrelas)': '25x' },
+      ]
+    }
+  }
+};
+
 
 // A comprehensive list for seeding all articles at once if needed.
 export const allWikiArticles = [
@@ -442,8 +466,10 @@ export const allWikiArticles = [
   raidRequirementsArticle,
   gamepassTierListArticle,
   scientificNotationArticle,
+  scythesArticle,
 ];
 
     
 
     
+
