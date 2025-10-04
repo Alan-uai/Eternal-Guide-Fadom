@@ -16,9 +16,22 @@ export const wikiArticles: WikiArticle[] = [
   {
     id: 'aura-system',
     title: 'The Aura System Explained',
-    summary: 'Learn about Auras, how to unlock them, and how they enhance your abilities.',
-    content: 'Auras are powerful buffs that can be unlocked by reaching certain milestones in the game. There are three types of Auras: Offensive, Defensive, and Utility. You can only have one of each type active at a time.\n\nTo unlock new Auras, you must defeat specific bosses or complete legendary quests. For example, defeating the Flame Dragon boss unlocks the "Inferno Soul" offensive aura, which adds fire damage to all your attacks. Experiment with different combinations to find the best setup for your character.',
-    tags: ['aura', 'power', 'abilities', 'buffs'],
+    summary: 'Learn about Auras from SS-Bosses, how to unlock them, and how they enhance your abilities.',
+    content: `Auras are powerful buffs dropped by SS-Rank Bosses in various worlds. Each Aura provides a unique stat boost. Here is a list of known Auras and their stats:\n\n*   **World 1:** Luck Aura (10% Starluck)
+*   **World 2:** Red Emperor Aura (0.1x)
+*   **World 3:** Purple Traitor Aura (0.25x)
+*   **World 4:** Fire King Aura (25% Drops)
+*   **World 5:** Flaming Aura (0.15x)
+*   **World 6:** Statue Aura (0.75x)
+*   **World 8:** Leafy Aura (25% Starluck)
+*   **World 10:** Energetic Aura (1.5x)
+*   **World 11:** Titanic Aura (0.5x)
+*   **World 13:** Monster Aura (2.0x)
+*   **World 15:** Virtual Aura (35% Drops)
+*   **World 16:** Hamon Aura (10% Exp)
+*   **World 17:** Ghoul Aura (1.0x)
+*   **World 19:** Fire Captain Aura (1.5x)`,
+    tags: ['aura', 'power', 'abilities', 'buffs', 'boss drop'],
     imageId: 'wiki-2',
   },
   {
