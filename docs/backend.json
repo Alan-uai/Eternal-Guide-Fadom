@@ -164,6 +164,7 @@
             "type": { "type": "string", "enum": ["gacha", "progression"], "description": "The type of power." },
             "statType": { "type": "string", "enum": ["energy", "damage", "coin", "mixed"], "description": "The primary stat this power affects. 'mixed' indicates multiple types of boosts." },
             "maxLevel": { "type": "number", "description": "The maximum level for a progression power." },
+            "maxBoost": { "type": "string", "description": "The maximum boost for a single-stat progression power." },
             "boosts": {
               "type": "array",
               "description": "An array of boosts for mixed progression powers.",
