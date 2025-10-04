@@ -85,6 +85,14 @@ Each time you prestige, you unlock a higher level cap and receive more stat poin
     tags: ['prestige', 'leveling', 'endgame', 'stats'],
     imageId: 'wiki-5',
   },
+  {
+    id: 'rank-system',
+    title: 'Rank System',
+    summary: 'A reference for the energy required to achieve each rank in the game.',
+    content: `Ranking up is a core part of progressing in Anime Eternal. Each rank requires a certain amount of energy to achieve. Below is a table detailing the energy needed for ranks 81 through 120.\n\n| Rank Up | Stats          |    | Rank Up | Stats    |\n|:--------|:---------------|:---|:--------|:---------|\n| 81      | 124.80 Uvg     |    | 101     | 750 OVG  |\n| 82      | 748.80 Uvg     |    | 102     | 3 NVG    |\n| 83      | 4.79 DVg       |    | 103     | 30 NVG   |\n| 84      | 32.59 DVg      |    | 104     | 250 NVG  |\n| 85      | 234.63 DVg     |    | 105     | 1 TGN    |\n| 86      | 100 TVg        |    | 106     |          |\n| 87      | 1 qtV          |    | 107     |          |\n| 88      | 15 qtV         |    | 108     |          |\n| 89      | 50 qtV         |    | 109     |          |\n| 90      | 250 qtV        |    | 110     |          |\n| 91      | 2 QnV          |    | 111     |          |\n| 92      | 10 QnV         |    | 112     |          |\n| 93      | 50 QnV         |    | 113     |          |\n| 94      | 500 QnV        |    | 114     |          |\n| 95      | 5 SeV          |    | 115     |          |\n| 96      | 500 SeV        |    | 116     |          |\n| 97      | 25 SPG         |    | 117     |          |\n| 98      | 250 SPG        |    | 118     |          |\n| 99      | 2.5 OVG        |    | 119     |          |\n| 100     | 100 OVG        |    | 120     |          |`,
+    tags: ['rank', 'progression', 'energy', 'stats'],
+    imageId: 'wiki-6',
+  }
 ];
 
 // NOTE: This is a one-time function to seed data. 
