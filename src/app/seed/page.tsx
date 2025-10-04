@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -14,6 +13,7 @@ import { rankArticle, auraArticle, prestigeArticle, worldBossesArticle } from '@
 import type { WikiArticle } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { accessories, worldNameToId } from '@/lib/accessory-data';
+import { world1Data } from '@/lib/world-1-data';
 
 const world20Data = {
     name: 'World 20 - Grand Elder',
@@ -76,6 +76,7 @@ export default function SeedPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const [loadingStates, setLoadingStates] = useState({
+    world1: false,
     world20: false,
     ranks: false,
     auras: false,
@@ -88,22 +89,22 @@ export default function SeedPage() {
     setLoadingStates(prev => ({ ...prev, [key]: value }));
   };
 
-  async function handleSeedWorldData() {
-    handleLoading('world20', true);
+  async function seedWorldGeneric(worldId: string, worldData: any, loadingKey: keyof typeof loadingStates) {
+    handleLoading(loadingKey, true);
     
     if (!firestore) {
         toast({ title: 'Error', description: 'Firestore is not initialized.', variant: 'destructive' });
-        handleLoading('world20', false);
+        handleLoading(loadingKey, false);
         return;
     }
 
     const batch = writeBatch(firestore);
-    const worldRef = doc(firestore, 'worlds', 'world-20');
-    batch.set(worldRef, { name: world20Data.name });
+    const worldRef = doc(firestore, 'worlds', worldId);
+    batch.set(worldRef, { name: worldData.name });
 
-    const allDataForBatch: Record<string, any> = { [worldRef.path]: { name: world20Data.name } };
+    const allDataForBatch: Record<string, any> = { [worldRef.path]: { name: worldData.name } };
 
-    for (const power of world20Data.powers) {
+    for (const power of worldData.powers) {
         const powerRef = doc(worldRef, 'powers', power.id);
         const { stats, ...powerData } = power;
         batch.set(powerRef, powerData);
@@ -111,7 +112,7 @@ export default function SeedPage() {
 
         if (stats) {
             for (const stat of stats) {
-                const statId = stat.name.toLowerCase().replace(/\s+/g, '-');
+                const statId = stat.name.toLowerCase().replace(/\s+/g, '-').replace('%', '');
                 const statRef = doc(powerRef, 'stats', statId);
                 batch.set(statRef, stat);
                 allDataForBatch[statRef.path] = stat;
@@ -120,14 +121,14 @@ export default function SeedPage() {
     }
     
     batch.commit().then(() => {
-        toast({ title: 'Success!', description: 'World 20 data has been successfully seeded.' });
+        toast({ title: 'Success!', description: `${worldData.name} data has been successfully seeded.` });
     }).catch(() => {
         const permissionError = new FirestorePermissionError({
-            path: 'worlds/world-20 and subcollections', operation: 'write', requestResourceData: allDataForBatch,
+            path: `worlds/${worldId} and subcollections`, operation: 'write', requestResourceData: allDataForBatch,
         });
         errorEmitter.emit('permission-error', permissionError);
     }).finally(() => {
-        handleLoading('world20', false);
+        handleLoading(loadingKey, false);
     });
   }
 
@@ -255,13 +256,18 @@ export default function SeedPage() {
       <Card>
         <CardHeader>
           <CardTitle>Seed World Game Data</CardTitle>
-          <CardDescription>Populate Firestore with game data for each world individually. Data for worlds other than 20 is not yet available.</CardDescription>
+          <CardDescription>Populate Firestore with game data for each world individually. Data for worlds other than 1 and 20 is not yet available.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
           {worldNumbers.map(worldNum => (
             <div key={worldNum}>
-              {worldNum === 20 ? (
-                <Button onClick={handleSeedWorldData} disabled={loadingStates.world20 || !firestore} className="w-full">
+              {worldNum === 1 ? (
+                 <Button onClick={() => seedWorldGeneric('world-1', world1Data, 'world1')} disabled={loadingStates.world1 || !firestore} className="w-full">
+                    {loadingStates.world1 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {loadingStates.world1 ? 'Seeding...' : `Seed World ${worldNum}`}
+                </Button>
+              ) : worldNum === 20 ? (
+                <Button onClick={() => seedWorldGeneric('world-20', world20Data, 'world20')} disabled={loadingStates.world20 || !firestore} className="w-full">
                   {loadingStates.world20 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   {loadingStates.world20 ? 'Seeding...' : `Seed World ${worldNum}`}
                 </Button>
