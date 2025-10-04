@@ -24,7 +24,7 @@ export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { toggleSaveAnswer, isAnswerSaved } = useApp();
+  const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading } = useApp();
   const scrollAreaViewport = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof chatSchema>>({
@@ -53,7 +53,9 @@ export function ChatView() {
     form.reset();
 
     try {
-      const result = await generateSolution({ problemDescription: values.prompt });
+      // Pass the wiki articles as context to the AI
+      const wikiContext = wikiArticles.map(article => `Title: ${article.title}\nContent: ${article.content}`).join('\n\n---\n\n');
+      const result = await generateSolution({ problemDescription: values.prompt, wikiContext });
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
@@ -73,6 +75,8 @@ export function ChatView() {
     }
   }
 
+  const isSendDisabled = isLoading || isWikiLoading;
+
   return (
     <div className="flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-3.5rem)]">
       <div className="flex-1 overflow-hidden">
@@ -82,7 +86,8 @@ export function ChatView() {
               <div className="text-center text-muted-foreground pt-16">
                 <Bot className="mx-auto h-12 w-12 mb-4" />
                 <h2 className="text-2xl font-semibold">Welcome to Eternal Guide</h2>
-                <p className="mt-2">Ask me anything about Anime Eternal!</p>
+                <p className="mt-2">Ask me anything about Anime Eternal! The wiki is my knowledge base.</p>
+                {isWikiLoading && <p className="mt-2 text-sm flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/> Loading wiki...</p>}
               </div>
             )}
             {messages.map((message) => (
@@ -155,22 +160,22 @@ export function ChatView() {
                 <FormItem className="flex-1">
                   <FormControl>
                     <Textarea
-                      placeholder="e.g., How do I defeat the Shadow Titan?"
+                      placeholder={isWikiLoading ? "Please wait, learning from the wiki..." : "e.g., How do I defeat the Shadow Titan?"}
                       className="resize-none"
                       {...field}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
+                        if (e.key === 'Enter' && !e.shiftKey && !isSendDisabled) {
                           e.preventDefault();
                           form.handleSubmit(onSubmit)();
                         }
                       }}
-                      disabled={isLoading}
+                      disabled={isSendDisabled}
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <Button type="submit" size="icon" disabled={isLoading} className="bg-primary hover:bg-primary/90">
+            <Button type="submit" size="icon" disabled={isSendDisabled} className="bg-primary hover:bg-primary/90">
               <Send className="h-5 w-5" />
               <span className="sr-only">Send</span>
             </Button>

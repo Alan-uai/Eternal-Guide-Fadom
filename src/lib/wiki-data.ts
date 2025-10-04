@@ -1,5 +1,9 @@
 import type { WikiArticle } from '@/lib/types';
-
+import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { initializeFirebase } from '../firebase';
+ 
+// This file is now seeded to Firestore and is no longer the source of truth.
+// It is kept for reference or for re-seeding if needed.
 export const wikiArticles: WikiArticle[] = [
   {
     id: 'getting-started',
@@ -34,3 +38,34 @@ export const wikiArticles: WikiArticle[] = [
     imageId: 'wiki-4',
   },
 ];
+
+// NOTE: This is a one-time function to seed data. 
+// You would typically run this from a script, not in your app's runtime code.
+// For this environment, we will call it once from a component to seed the data.
+async function seedWikiData() {
+  const { firestore } = initializeFirebase();
+  const wikiCollectionRef = collection(firestore, 'wikiContent');
+  
+  // Check if data exists to avoid re-seeding
+  const existingDocs = await getDocs(wikiCollectionRef);
+  if (!existingDocs.empty) {
+    console.log("Wiki data already exists in Firestore. Skipping seed.");
+    return;
+  }
+  
+  console.log("Seeding wiki data to Firestore...");
+  const { setDocumentNonBlocking } = await import('@/firebase/non-blocking-updates');
+  const { doc } = await import('firebase/firestore');
+
+  for (const article of wikiArticles) {
+    const docRef = doc(firestore, 'wikiContent', article.id);
+    // We are using setDocumentNonBlocking which is a non-blocking write.
+    // This is fine for seeding.
+    setDocumentNonBlocking(docRef, article, {});
+  }
+  console.log("Seeding complete.");
+}
+
+// Call the seed function. In a real app, you might have a separate script for this.
+// For this example, we call it here. It has a check to prevent re-seeding.
+seedWikiData();
