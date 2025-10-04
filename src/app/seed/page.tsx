@@ -103,7 +103,7 @@ export default function SeedPage() {
     }).catch((error) => {
         console.error("Batch commit failed:", error);
         const permissionError = new FirestorePermissionError({
-            path: 'batch write to multiple paths',
+            path: 'worlds/world-20 and subcollections',
             operation: 'write',
             requestResourceData: allDataForBatch,
         });
