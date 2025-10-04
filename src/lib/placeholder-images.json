@@ -35,6 +35,12 @@
       "description": "A numbered list representing ranks.",
       "imageUrl": "https://images.unsplash.com/photo-1583324188194-c74b4703a8d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxyYW5rfGVufDB8fHx8MTc1OTYyOTI4Mnww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "rank progression"
+    },
+    {
+      "id": "wiki-7",
+      "description": "A powerful boss monster in a dark environment.",
+      "imageUrl": "https://images.unsplash.com/photo-1604145414583-6a9b4c7c646f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmYW50YXN5JTIwYm9zcyUyMG1vbnN0ZXJ8ZW58MHx8fHwxNzU5NzMxMDUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fantasy boss"
     }
   ]
 }

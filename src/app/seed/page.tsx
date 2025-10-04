@@ -10,7 +10,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import { rankArticle, auraArticle, prestigeArticle, gettingStartedArticle, legendaryWeaponsArticle, guildWarsArticle } from '@/lib/wiki-data';
+import { rankArticle, auraArticle, prestigeArticle, worldBossesArticle } from '@/lib/wiki-data';
 import type { WikiArticle } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 
@@ -79,6 +79,7 @@ export default function SeedPage() {
     ranks: false,
     auras: false,
     prestige: false,
+    bosses: false,
   });
 
   const handleLoading = (key: keyof typeof loadingStates, value: boolean) => {
@@ -190,6 +191,17 @@ export default function SeedPage() {
               </Button>
             </CardFooter>
           </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Seed World Boss Guide</CardTitle></CardHeader>
+            <CardContent><CardDescription>Seed the "World Boss Guide" article to the `wikiContent` collection.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(worldBossesArticle, 'bosses', 'World Boss Guide')} disabled={loadingStates.bosses || !firestore}>
+                {loadingStates.bosses ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.bosses ? 'Seeding...' : 'Seed Boss Guide'}
+              </Button>
+            </CardFooter>
+          </Card>
         </CardContent>
       </Card>
 
@@ -220,5 +232,3 @@ export default function SeedPage() {
     </div>
   );
 }
-
-    

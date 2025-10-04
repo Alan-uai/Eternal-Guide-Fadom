@@ -97,6 +97,16 @@ export const rankArticle: WikiArticle = {
     imageId: 'wiki-6',
 };
 
+export const worldBossesArticle: WikiArticle = {
+  id: 'world-bosses',
+  title: 'World Boss Guide',
+  summary: 'A complete guide to all the world bosses, their stats, and the recommended DPS to defeat them.',
+  content: `This guide provides a comprehensive list of all SS-Rank world bosses.\n\n| World             | Boss Name         | HP          | Rank | Exp      | DPS Recom.   |\n|:------------------|:------------------|:------------|:-----|:---------|:-------------|\n| Earth City        | Kid Kohan         | 2.500 - Qd  | SS   | 15.0     | 50 - T       |\n| Windmill Island   | Shanks            | 5.00 - Sx   | SS   | 30.0     | 100 - QN     |\n| Soul Society      | Eizen             | 2.5 - Sp    | SS   | 60.0     | 50 - SX      |\n| Cursed School     | Sakuni            | 120.00 - Sp | SS   | 120.0    | 2.4 - SP     |\n| Slayer Village    | Rangoki           | 31.2 - De   | SS   | 240.0    | 624 - N      |\n| Solo Island       | Statue of God     | 195 - UD    | SS   | 480.0    | 3.90 - UD    |\n| Clover Village    | Novi Chroni       | 101 - TdD   | SS   | 960.0    | 2 - TDD      |\n| Leaf Village      | Itechi            | 2.82 - QnD  | SS   | 1.92K    | 56.4 - QDD   |\n| Leaf Village      | Madera            | 5.64 - QnD  | SS   | 2.88K    | 113 - QDD    |\n| Spirit Residence  | Ken Turbo         | 494 - SxD   | SS   | 5.76K    | 10 - SXD     |\n| Magic Hunter City | Killas Godspeed   | 296 - OcD   | SS   | 11.52K   | 6 - OCD      |\n| Titan City        | Eran              | 49.4 - VgN  | SS   | 23.04K   | 988 - NVD    |\n| Village of Sins   | Esanor            | 9.77 - DvG  | SS   | 46.08K   | 195 - UVG    |\n| Kaiju Base        | Number N°8        | 5.5 - QtV   | SS   | 92.16K   | 111 - TVG    |\n| Tempest Capital   | Valzora           | 4.79 - SeV  | SS   | 184.32K  | 98 - QNV     |\n| Virtual City      | The Paladin       | 967 - SpG   | SS   | 368.64K  | 20 - SPG     |\n| Cairo             | Dio               | 195 - NvG   | SS   | 737.28K  | 3.9 - NVG    |\n| Ghoul City        | Arama             | 686 - UtG   | SS   | 1.52M    | 15 - UTG     |\n| Chainsaw City     | Mr. Chainsaw      | 5.09 - TsTG | SS   | 2.55M    | 105 - DTG    |\n| Tokyo Empire      | Leonardo          | 1.76 - QnTG | SS   | 5.14M    | 100 - QTTG   |\n| Green Planet      | Goku SSJ          | 1.52 - NoTG | SS   | 16.1M    | 1 - OCTG     |\n| Hollow Word       | Cifer             | 87.2 - uQDR | SS   | 40.6M    | 16 - uQDR    |`,
+  tags: ['bosses', 'guide', 'dps', 'hp', 'rewards'],
+  imageId: 'wiki-7',
+};
+
+
 // A comprehensive list for seeding all articles at once if needed.
 export const allWikiArticles = [
   gettingStartedArticle,
@@ -105,4 +115,5 @@ export const allWikiArticles = [
   guildWarsArticle,
   prestigeArticle,
   rankArticle,
+  worldBossesArticle,
 ];
