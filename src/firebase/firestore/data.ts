@@ -2,22 +2,40 @@
 'use server';
 
 import { initializeFirebaseServer } from '@/firebase/server';
-import { collection, getDocs, query, where, doc, collectionGroup } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
+
+const worldNameToId: { [key: string]: string } = {
+    "World 1": "world-1",
+    "Windmill Island": "world-2",
+    "World 3": "world-3",
+    "World 4": "world-4",
+    "World 7": "world-7",
+    "World 8": "world-8",
+    "World 10": "world-10",
+    "World 11": "world-11",
+    "World 13": "world-13",
+    "World 15": "world-15",
+    "World 20": "world-20"
+};
 
 export async function getGameData(worldName: string, category: string, itemName?: string) {
   const { firestore } = initializeFirebaseServer();
   try {
-    // Find the world first
-    const worldsCollection = collection(firestore, 'worlds');
-    const worldQuery = query(worldsCollection, where('name', '==', worldName));
-    const worldSnapshot = await getDocs(worldQuery);
+    const worldId = Object.keys(worldNameToId).find(key => key.toLowerCase() === worldName.toLowerCase());
+    const finalWorldId = worldId ? worldNameToId[worldId] : worldName.toLowerCase().replace(/\s+/g, '-');
 
-    if (worldSnapshot.empty) {
-      return { error: `World "${worldName}" not found.` };
+    if (!finalWorldId) {
+       return { error: `World "${worldName}" could not be mapped to an ID.` };
     }
 
-    const worldDoc = worldSnapshot.docs[0];
-    const categoryCollectionRef = collection(worldDoc.ref, category);
+    const worldRef = doc(firestore, 'worlds', finalWorldId);
+    const worldSnapshot = await getDoc(worldRef);
+
+    if (!worldSnapshot.exists()) {
+      return { error: `World with ID "${finalWorldId}" not found.` };
+    }
+
+    const categoryCollectionRef = collection(worldRef, category);
     
     let itemQuery;
     if (itemName) {
@@ -36,12 +54,13 @@ export async function getGameData(worldName: string, category: string, itemName?
     for (const itemDoc of itemSnapshot.docs) {
         const itemData = { id: itemDoc.id, ...itemDoc.data() };
         
-        // Let's also fetch sub-collections if they exist, like 'stats' for a power
-        const subcollections = await itemDoc.ref.listCollections();
-        for (const subcollectionRef of subcollections) {
-            const subcollectionSnapshot = await getDocs(subcollectionRef);
-            (itemData as any)[subcollectionRef.id] = subcollectionSnapshot.docs.map(d => ({id: d.id, ...d.data()}));
+        // Fetch sub-collections like 'stats' for a power
+        const statsCollectionRef = collection(itemDoc.ref, 'stats');
+        const statsSnapshot = await getDocs(statsCollectionRef);
+        if (!statsSnapshot.empty) {
+            (itemData as any)['stats'] = statsSnapshot.docs.map(d => ({id: d.id, ...d.data()}));
         }
+        
         results.push(itemData);
     }
     
