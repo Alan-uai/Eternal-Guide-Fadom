@@ -138,7 +138,7 @@ export const worldBossesArticle: WikiArticle = {
   title: 'Guia de Chefes de Mundo',
   summary: 'Um guia completo para todos os chefes de mundo, seus status e o DPS recomendado para derrotá-los.',
   content: `Este guia fornece uma lista completa de todos os chefes de mundo de Rank-SS.`,
-  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'geral'],
+  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'geral', '1', '2', '3', '4', '5', '6', '7', '8', '10', '11', '13', '15', '16', '17', '19', '20'],
   imageId: 'wiki-7',
   tables: {
     bosses: {
@@ -296,6 +296,45 @@ export const raidRequirementsArticle: WikiArticle = {
   }
 };
 
+export const gamepassTierListArticle: WikiArticle = {
+  id: 'gamepass-tier-list',
+  title: 'Tier List de Gamepasses',
+  summary: 'Uma tier list da comunidade para as gamepasses, classificando-as da mais para a menos útil.',
+  content: 'Esta tier list classifica as gamepasses disponíveis no jogo com base em sua utilidade geral e impacto no endgame.',
+  tags: ['gamepass', 'tier list', 'endgame', 'compra', 'guia', 'geral'],
+  imageId: 'wiki-12',
+  tables: {
+    tiers: {
+      headers: ['Tier', 'Gamepass'],
+      rows: [
+        { Tier: 'S', Gamepass: 'Fast Click' },
+        { Tier: 'S', Gamepass: 'Fast Roll' },
+        { Tier: 'S', Gamepass: 'Fast Star' },
+        { Tier: 'S', Gamepass: '2x Energy' },
+        { Tier: 'S', Gamepass: '2x Damage' },
+        { Tier: 'S', Gamepass: 'Triple Weapon Equip' },
+        { Tier: 'S', Gamepass: 'Double Weapon Equip' },
+        { Tier: 'A', Gamepass: '2x EXP' },
+        { Tier: 'A', Gamepass: '+3 Champions Equip' },
+        { Tier: 'A', Gamepass: '+2 Champions Equip' },
+        { Tier: 'A', Gamepass: 'Extra Stand' },
+        { Tier: 'A', Gamepass: 'Extra Titan' },
+        { Tier: 'A', Gamepass: 'Extra Shadow' },
+        { Tier: 'A', Gamepass: '2x Soul' },
+        { Tier: 'B', Gamepass: 'VIP' },
+        { Tier: 'B', Gamepass: '2x Coin' },
+        { Tier: 'B', Gamepass: '+2 Gacha' },
+        { Tier: 'B', Gamepass: '+5 Star Open' },
+        { Tier: 'B', Gamepass: 'Remote Gacha' },
+        { Tier: 'C', Gamepass: 'Lucky' },
+        { Tier: 'C', Gamepass: 'Extra Luck' },
+        { Tier: 'C', Gamepass: 'Super Luck' },
+        { Tier: 'D', Gamepass: '+10 Backpack Space' },
+        { Tier: 'D', Gamepass: '+20 Backpack Space' },
+      ],
+    },
+  },
+};
 
 // A comprehensive list for seeding all articles at once if needed.
 export const allWikiArticles = [
@@ -310,6 +349,5 @@ export const allWikiArticles = [
   damageSwordsArticle,
   world20RaidsArticle,
   raidRequirementsArticle,
+  gamepassTierListArticle,
 ];
-
-
