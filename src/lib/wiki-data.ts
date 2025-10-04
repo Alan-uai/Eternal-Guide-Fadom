@@ -1,3 +1,4 @@
+
 import type { WikiArticle } from '@/lib/types';
 import { collection, getDocs, getFirestore, doc } from 'firebase/firestore';
 import { initializeFirebase } from '../firebase';
@@ -15,7 +16,7 @@ export const wikiArticles: WikiArticle[] = [
   },
   {
     id: 'aura-system',
-    title: 'The Aura System Explained',
+    title: 'Aura System',
     summary: 'Learn about Auras from SS-Bosses, how to unlock them, and how they enhance your abilities.',
     content: `Auras are powerful buffs dropped by SS-Rank Bosses in various worlds. Each Aura provides a unique stat boost. Here is a list of known Auras and their stats:\n\n*   **World 1:** Luck Aura (10% Starluck)
 *   **World 2:** Red Emperor Aura (0.1x)
