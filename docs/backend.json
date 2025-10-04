@@ -1,0 +1,232 @@
+{
+  "entities": {
+    "SavedAnswer": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SavedAnswer",
+      "type": "object",
+      "description": "Represents a saved AI-generated answer for later use.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the saved answer."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who saved this answer. (Relationship: User 1:N SavedAnswer)"
+        },
+        "question": {
+          "type": "string",
+          "description": "The original question asked to the AI."
+        },
+        "answer": {
+          "type": "string",
+          "description": "The AI-generated answer that was saved."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the answer was saved.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "question",
+        "answer",
+        "createdAt"
+      ]
+    },
+    "WikiContent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WikiContent",
+      "type": "object",
+      "description": "Represents a page or article from the Anime Eternal Wiki, either from Fandom or a custom in-app wiki.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the wiki content."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the wiki page."
+        },
+        "content": {
+          "type": "string",
+          "description": "The main content of the wiki page (e.g., text, HTML)."
+        },
+        "source": {
+          "type": "string",
+          "description": "Indicates the source of the wiki content (e.g., 'Fandom', 'In-App')."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "Timestamp indicating when the wiki content was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "source",
+        "lastUpdated"
+      ]
+    },
+    "ContentSuggestion": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ContentSuggestion",
+      "type": "object",
+      "description": "Represents a suggestion made by a user for new or updated content for the Wiki.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the content suggestion."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who made the suggestion. (Relationship: User 1:N ContentSuggestion)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Suggested title for the new/updated content."
+        },
+        "content": {
+          "type": "string",
+          "description": "The suggested content itself (e.g., text, description)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the suggestion (e.g., 'pending', 'approved', 'rejected')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the suggestion was made.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "content",
+        "status",
+        "createdAt"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the Eternal Guide app.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "username": {
+          "type": "string",
+          "description": "The user's chosen username."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "email",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Top-level collection.  Owned by the user whose ID matches {userId}.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/savedAnswers/{savedAnswerId}",
+        "definition": {
+          "entityName": "SavedAnswer",
+          "schema": {
+            "$ref": "#/backend/entities/SavedAnswer"
+          },
+          "description": "Stores AI-generated answers saved by the user. Organized as a subcollection of the user document. Owned by the user whose ID matches {userId}.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "savedAnswerId",
+              "description": "The unique identifier of the saved answer."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/contentSuggestions/{contentSuggestionId}",
+        "definition": {
+          "entityName": "ContentSuggestion",
+          "schema": {
+            "$ref": "#/backend/entities/ContentSuggestion"
+          },
+          "description": "Stores content suggestions made by the user for the Wiki. Organized as a subcollection of the user document. Owned by the user whose ID matches {userId}.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "contentSuggestionId",
+              "description": "The unique identifier of the content suggestion."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/wikiContent/{wikiContentId}",
+        "definition": {
+          "entityName": "WikiContent",
+          "schema": {
+            "$ref": "#/backend/entities/WikiContent"
+          },
+          "description": "Stores wiki content, either from Fandom or a custom in-app wiki. Top-level collection with global read access.",
+          "params": [
+            {
+              "name": "wikiContentId",
+              "description": "The unique identifier of the wiki content."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore data structure is designed to support the Eternal Guide application, focusing on a blend of user-specific data and globally accessible wiki content.  It emphasizes Authorization Independence to ensure robust security rules and efficient data access. This is achieved through denormalization. All user-owned data is placed under the `/users/{userId}` path, ensuring clear ownership and simplified security rules. \n\nThe structure implements Structural Segregation by separating user-specific content suggestions from the core wiki content, and by placing user-specific data under their respective user IDs. Access Modeling is employed using path-based ownership for user data (`/users/{userId}/savedAnswers`) and global collections for shared wiki content.  This structure directly addresses the QAPs (Rules are not Filters) requirement, allowing secure `list` operations within user-owned collections and for the globally accessible wiki content, as access control is based on path ownership and clearly defined collection-level rules.\n\nSpecifically, the `savedAnswers` and `contentSuggestions` collections are located under the `/users/{userId}` path, ensuring that only the authenticated user (`request.auth.uid`) can access their own data, thereby eliminating the need for complex `get()` calls to verify ownership.  The `wikiContent` collection is globally accessible, which is appropriate for shared content.  For scaling, consider sharding `wikiContent` based on content category or source if the number of documents becomes exceedingly large."
+  }
+}
