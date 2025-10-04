@@ -1,12 +1,12 @@
-// src/app/seed/page.tsx
+
 'use client';
 
 import { useState } from 'react';
 import { useFirestore } from '@/firebase';
-import { collection, doc, writeBatch, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc, writeBatch } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -60,16 +60,12 @@ export default function SeedPage() {
 
   async function handleSeedData() {
     setIsLoading(true);
-
-    const worldsCollection = collection(firestore, 'worlds');
-    const q = query(worldsCollection, where('name', '==', world20Data.name));
-    const worldSnapshot = await getDocs(q);
-
-    if (!worldSnapshot.empty) {
+    
+    if (!firestore) {
         toast({
-            title: 'Data Already Exists',
-            description: 'The data for World 20 has already been seeded.',
-            variant: 'default',
+            title: 'Error',
+            description: 'Firestore is not initialized.',
+            variant: 'destructive',
         });
         setIsLoading(false);
         return;
@@ -105,8 +101,9 @@ export default function SeedPage() {
         });
         setIsLoading(false);
     }).catch((error) => {
+        console.error("Batch commit failed:", error);
         const permissionError = new FirestorePermissionError({
-            path: 'batch-write', // path is generic for batch writes
+            path: 'batch write to multiple paths',
             operation: 'write',
             requestResourceData: allDataForBatch,
         });
@@ -129,11 +126,11 @@ export default function SeedPage() {
             This action will add the data for "World 20 - Grand Elder", including its gacha powers and stats, into your Firestore `worlds` collection.
           </p>
           <p className="text-sm text-muted-foreground mt-2">
-            The process will check if the data already exists to prevent duplicates.
+            Clicking the button will attempt to write the data to Firestore.
           </p>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleSeedData} disabled={isLoading}>
+          <Button onClick={handleSeedData} disabled={isLoading || !firestore}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
