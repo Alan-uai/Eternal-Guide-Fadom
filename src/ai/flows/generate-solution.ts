@@ -53,9 +53,11 @@ const prompt = ai.definePrompt({
   tools: [getGameDataTool],
   prompt: `Você é um assistente especialista no jogo Anime Eternal e também uma calculadora. Sua resposta DEVE ser em Português-BR.
 
-Você DEVE usar a ferramenta 'getGameData' para encontrar informações sobre itens do jogo, como poderes, NPCs, pets e acessórios. Não confie no contexto do wiki para obter estatísticas de itens específicos, como multiplicadores. Se a busca por um nome exato falhar, tente novamente com um nome parcial ou um sinônimo (ex: "Raid Green" pode ser "Green Planet Raid").
+Sua principal estratégia é:
+1.  **Primeiro, use o CONTEÚDO DO WIKI abaixo para entender a pergunta do usuário.** O wiki contém nomes oficiais de itens, raids, mundos, etc. Use os resumos (summary) e o conteúdo dos artigos para encontrar o nome correto de um item antes de usar qualquer ferramenta.
+2.  **Depois de identificar o nome correto**, use a ferramenta 'getGameData' para buscar estatísticas detalhadas e atualizadas sobre esse item. Não confie no wiki para estatísticas de itens específicos (como multiplicadores), pois a ferramenta terá os dados mais precisos. Se a busca por um nome exato falhar, tente novamente com um nome parcial ou um sinônimo (ex: se o usuário perguntar "Raid Green", o wiki te ajudará a descobrir que o nome oficial é "Green Planet Raid" para usar na ferramenta).
 
-Ao listar poderes, você DEVE especificar qual status eles multiplicam.
+Ao listar poderes, você DEVE especificar qual status eles multiplicam:
 - Para poderes de 'gacha', especifique o status de cada nível (por exemplo, "energia" ou "dano"). Se um nível tiver um bônus de 'energy_crit_bonus', liste-o também.
 - Para poderes de 'progression', se for 'mixed', liste todos os bônus (ex: '1.01x Damage, 1.11x Energy'). Para outros, apenas o 'maxBoost'.
 Formate a resposta como uma lista clara e legível.
@@ -70,7 +72,7 @@ O jogo tem 21 mundos, cada um com conteúdo exclusivo. Você deve entender e usa
   4. Calcule o tempo para derrotar o chefe (HP do Chefe / DPS do Jogador).
   5. Explique seu cálculo ao usuário.
 
-Use as ferramentas disponíveis primeiro para encontrar as informações. Se a ferramenta não fornecer a resposta, você pode usar as informações do contexto do wiki abaixo. Se a resposta não estiver nas ferramentas ou no wiki, diga que você não tem informações suficientes para responder.
+Se a resposta não estiver nas ferramentas ou no wiki, diga que você não tem informações suficientes para responder.
 
 INÍCIO DO CONTEÚDO DO WIKI
 {{{wikiContext}}}
@@ -93,3 +95,4 @@ const generateSolutionFlow = ai.defineFlow(
     return output;
   }
 );
+
