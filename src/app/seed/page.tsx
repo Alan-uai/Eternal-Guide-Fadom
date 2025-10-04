@@ -14,6 +14,7 @@ import type { WikiArticle } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { accessories, worldNameToId } from '@/lib/accessory-data';
 import { world1Data } from '@/lib/world-1-data';
+import { world2Data } from '@/lib/world-2-data';
 
 const world20Data = {
     name: 'World 20 - Grand Elder',
@@ -77,6 +78,7 @@ export default function SeedPage() {
   const { toast } = useToast();
   const [loadingStates, setLoadingStates] = useState({
     world1: false,
+    world2: false,
     world20: false,
     ranks: false,
     auras: false,
@@ -104,21 +106,30 @@ export default function SeedPage() {
 
     const allDataForBatch: Record<string, any> = { [worldRef.path]: { name: worldData.name } };
 
-    for (const power of worldData.powers) {
-        const powerRef = doc(worldRef, 'powers', power.id);
-        const { stats, ...powerData } = power;
-        batch.set(powerRef, powerData);
-        allDataForBatch[powerRef.path] = powerData;
+    const seedSubcollection = (subcollectionName: string, items: any[]) => {
+      if (items && items.length > 0) {
+        for (const item of items) {
+            const itemRef = doc(worldRef, subcollectionName, item.id);
+            const { stats, ...itemData } = item;
+            batch.set(itemRef, itemData);
+            allDataForBatch[itemRef.path] = itemData;
 
-        if (stats) {
-            for (const stat of stats) {
-                const statId = stat.name.toLowerCase().replace(/\s+/g, '-').replace('%', '');
-                const statRef = doc(powerRef, 'stats', statId);
-                batch.set(statRef, stat);
-                allDataForBatch[statRef.path] = stat;
+            if (stats && stats.length > 0) {
+                for (const stat of stats) {
+                    const statId = stat.name.toLowerCase().replace(/\s+/g, '-').replace(/%/g, '');
+                    const statRef = doc(itemRef, 'stats', statId);
+                    batch.set(statRef, stat);
+                    allDataForBatch[statRef.path] = stat;
+                }
             }
         }
-    }
+      }
+    };
+
+    seedSubcollection('powers', worldData.powers);
+    seedSubcollection('npcs', worldData.npcs);
+    seedSubcollection('pets', worldData.pets);
+    seedSubcollection('dungeons', worldData.dungeons);
     
     batch.commit().then(() => {
         toast({ title: 'Success!', description: `${worldData.name} data has been successfully seeded.` });
@@ -256,7 +267,7 @@ export default function SeedPage() {
       <Card>
         <CardHeader>
           <CardTitle>Seed World Game Data</CardTitle>
-          <CardDescription>Populate Firestore with game data for each world individually. Data for worlds other than 1 and 20 is not yet available.</CardDescription>
+          <CardDescription>Populate Firestore with game data for each world individually. Data for worlds other than 1, 2, and 20 is not yet available.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
           {worldNumbers.map(worldNum => (
@@ -265,6 +276,11 @@ export default function SeedPage() {
                  <Button onClick={() => seedWorldGeneric('world-1', world1Data, 'world1')} disabled={loadingStates.world1 || !firestore} className="w-full">
                     {loadingStates.world1 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     {loadingStates.world1 ? 'Seeding...' : `Seed World ${worldNum}`}
+                </Button>
+              ) : worldNum === 2 ? (
+                <Button onClick={() => seedWorldGeneric('world-2', world2Data, 'world2')} disabled={loadingStates.world2 || !firestore} className="w-full">
+                  {loadingStates.world2 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {loadingStates.world2 ? 'Seeding...' : `Seed World ${worldNum}`}
                 </Button>
               ) : worldNum === 20 ? (
                 <Button onClick={() => seedWorldGeneric('world-20', world20Data, 'world20')} disabled={loadingStates.world20 || !firestore} className="w-full">
