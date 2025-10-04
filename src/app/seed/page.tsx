@@ -46,6 +46,22 @@ const world20Data = {
           { name: 'Black Form', multiplier: '12x' },
         ],
       },
+      {
+        id: 'dragon-energy',
+        name: 'Dragon Energy',
+        type: 'progression',
+        statType: 'energy',
+        maxLevel: 50,
+        maxBoost: '1x Energy'
+      },
+      {
+        id: 'dragon-damage',
+        name: 'Dragon Damage',
+        type: 'progression',
+        statType: 'damage',
+        maxLevel: 500,
+        maxBoost: '10x Damage'
+      }
     ],
     npcs: [],
     pets: [],
@@ -86,11 +102,13 @@ export default function SeedPage() {
         allDataForBatch[powerRef.path] = powerData;
 
 
-        for (const stat of stats) {
-            const statId = stat.name.toLowerCase().replace(/\s+/g, '-');
-            const statRef = doc(powerRef, 'stats', statId);
-            batch.set(statRef, stat);
-            allDataForBatch[statRef.path] = stat;
+        if (stats) {
+            for (const stat of stats) {
+                const statId = stat.name.toLowerCase().replace(/\s+/g, '-');
+                const statRef = doc(powerRef, 'stats', statId);
+                batch.set(statRef, stat);
+                allDataForBatch[statRef.path] = stat;
+            }
         }
     }
     
