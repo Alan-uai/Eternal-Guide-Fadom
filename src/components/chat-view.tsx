@@ -80,8 +80,8 @@ export function ChatView() {
   return (
     <div className="flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-3.5rem)]">
       <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full" viewportRef={scrollAreaViewport}>
-          <div className="p-4 md:p-6 space-y-6">
+        <ScrollArea className="h-full">
+          <div className="p-4 md:p-6 space-y-6" ref={scrollAreaViewport}>
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground pt-16">
                 <Bot className="mx-auto h-12 w-12 mb-4" />
