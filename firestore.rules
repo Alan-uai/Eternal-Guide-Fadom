@@ -1,215 +1,205 @@
 /**
- * @file Firestore Security Rules
- * @description This ruleset is designed for the Anime Eternal Guide app. It enforces a
- * strict user-ownership model for user-generated content and allows public read access
- * to wiki content and game data.
+ * @fileoverview Firestore Security Rules for Eternal Guide App.
+ *
+ * Core Philosophy:
+ * This ruleset prioritizes secure data access based on user roles and content ownership.
+ * Strict access control is enforced for user-specific data, while allowing public read access
+ * to certain collections like wiki content and game worlds.
  *
  * Data Structure:
- * - /users/{userId}: Stores user profiles, accessible only by the user.
- * - /users/{userId}/savedAnswers/{savedAnswerId}: Saved AI answers, accessible only by the user.
- * - /users/{userId}/contentSuggestions/{contentSuggestionId}: User-submitted content suggestions, accessible only by the user.
+ * - /users/{userId}: Stores personal user data, accessible only by the user themselves.
+ * - /users/{userId}/savedAnswers/{savedAnswerId}: User-owned saved AI answers.
+ * - /users/{userId}/contentSuggestions/{contentSuggestionId}: User-submitted wiki suggestions.
  * - /wikiContent/{wikiContentId}: Publicly readable wiki articles.
- * - /worlds/{worldId}: Publicly readable game world data.
- * - /worlds/{worldId}/powers/{powerId}: Publicly readable power data within a world.
- * - /worlds/{worldId}/powers/{powerId}/stats/{statId}: Publicly readable stat data for powers.
- * - /worlds/{worldId}/npcs/{npcId}: Publicly readable NPC data within a world.
- * - /worlds/{worldId}/pets/{petId}: Publicly readable pet data within a world.
- * - /worlds/{worldId}/dungeons/{dungeonId}: Publicly readable dungeon data within a world.
+ * - /worlds/{worldId}: Publicly readable game world data. Contains subcollections for powers, NPCs, etc.
+ * - /worlds/{worldId}/powers/{powerId}: Publicly readable power data for a specific world.
+ * - /worlds/{worldId}/powers/{powerId}/stats/{statId}: Publicly readable stat data for a power.
+ * - /worlds/{worldId}/npcs/{npcId}: Publicly readable NPC data for a specific world.
+ * - /worlds/{worldId}/pets/{petId}: Publicly readable Pet data for a specific world.
+ * - /worlds/{worldId}/dungeons/{dungeonId}: Publicly readable Dungeon data for a specific world.
  *
  * Key Security Decisions:
- * - User-specific data (saved answers, content suggestions) is strictly controlled by the user's ID.
- * - Listing of user documents is allowed for the owner.
- * - Wiki content and game data (worlds, powers, npcs, pets, dungeons) are publicly readable to facilitate easy access to guide information.
- * - No write permissions are globally open.
+ * - User-specific data (under /users/{userId}) is strictly controlled by the owning user.
+ * - World, Power, NPC, Pet, and Dungeon data is publicly readable.
+ * - Writes to world data are currently uncontrolled. This should be updated once a content creation mechanism is implemented.
+ *
+ * Denormalization for Authorization:
+ *  - No explicit denormalization is used in this ruleset.
+ *
+ * Structural Segregation:
+ *  - User-specific private data is stored under the /users/{userId} collection, separate from public data.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secure user profiles, allowing only the owner to read and write.
+     * @description Checks if the request is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user ID matches the provided user ID.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the authenticated user ID matches the resource's user ID, and that the document exists.
+     */
+    function isExistingOwner(userId) {
+        return isOwner(userId) && exists(/databases/$(database)/documents/users/$(userId));
+    }
+
+    /**
+     * @description Defines a batch write.
+     */
+    function isBatchWrite() {
+      return false; // Removed Batch Write Functionality
+    }
+    /**
+     * @description Rules for user profile information.
      * @path /users/{userId}
-     * @allow (create) - Authenticated user can create their own profile.
-     * @allow (get, list, update, delete) - Authenticated user can access their own profile.
-     * @deny (create, get, list, update, delete) - Any other user trying to access this data.
-     * @principle Enforces document ownership for user profiles.
+     * @allow (create) - User with matching ID can create their own profile.
+     * @allow (get, list, update, delete) - User can only access their own profile.
+     * @deny (create) - User cannot create a profile with a different ID.
+     * @deny (update, delete) - User cannot modify or delete someone else's profile.
+     * @principle Enforces document ownership for writes, restricts access to a user's own data.
      */
     match /users/{userId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
       allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
     }
 
     /**
-     * @description Secure saved answers for each user, allowing only the owner to manage them.
+     * @description Rules for saved AI-generated answers.
      * @path /users/{userId}/savedAnswers/{savedAnswerId}
-     * @allow (create) - Authenticated user can create saved answers for themselves.
-     * @allow (get, list, update, delete) - Authenticated user can manage their own saved answers.
-     * @deny (create, get, list, update, delete) - Any other user trying to access this data.
-     * @principle Enforces document ownership for saved answers.
+     * @allow (create) - User can create saved answers under their profile.
+     * @allow (get, list, update, delete) - User can only access their own saved answers.
+     * @deny (create) - User cannot create saved answers for someone else.
+     * @deny (update, delete) - User cannot modify or delete someone else's saved answers.
+     * @principle Enforces document ownership for writes, restricts access to a user's own data.
      */
     match /users/{userId}/savedAnswers/{savedAnswerId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
       allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Secure content suggestions for each user, allowing only the owner to manage them.
-     * @path /users/{userId}/contentSuggestions/{contentSuggestionId}
-     * @allow (create) - Authenticated user can create content suggestions for themselves.
-     * @allow (get, list, update, delete) - Authenticated user can manage their own content suggestions.
-     * @deny (create, get, list, update, delete) - Any other user trying to access this data.
-     * @principle Enforces document ownership for content suggestions.
-     */
-    match /users/{userId}/contentSuggestions/{contentSuggestionId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Allows public read access to wiki content.
-     * @path /wikiContent/{wikiContentId}
-     * @allow (get, list) - Any user can read wiki content.
-     * @deny (create, update, delete) - No user can create, update, or delete wiki content through the client.
-     * @principle Allows public read access for wiki content.
-     */
-    match /wikiContent/{wikiContentId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
-    }
-
-    /**
-     * @description Allows public read access to game world data.
-     * @path /worlds/{worldId}
-     * @allow (get, list) - Any user can read game world data.
-     * @deny (create, update, delete) - No user can create, update, or delete game world data through the client.
-     * @principle Allows public read access for game world data.
-     */
-    match /worlds/{worldId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
-    }
-
-    /**
-     * @description Allows public read access to power data within a world.
-     * @path /worlds/{worldId}/powers/{powerId}
-     * @allow (get, list) - Any user can read power data.
-     * @deny (create, update, delete) - No user can create, update, or delete power data through the client.
-     * @principle Allows public read access for power data.
-     */
-    match /worlds/{worldId}/powers/{powerId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
-    }
-
-    /**
-     * @description Allows public read access to stat data for powers.
-     * @path /worlds/{worldId}/powers/{powerId}/stats/{statId}
-     * @allow (get, list) - Any user can read power stat data.
-     * @deny (create, update, delete) - No user can create, update, or delete power stat data through the client.
-     * @principle Allows public read access for power stat data.
-     */
-    match /worlds/{worldId}/powers/{powerId}/stats/{statId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow list: if false;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
     }
 
         /**
-     * @description Allows public read access to NPC data within a world.
+     * @description Rules for content suggestions made by the user for the Wiki.
+     * @path /users/{userId}/contentSuggestions/{contentSuggestionId}
+     * @allow (create) - User can create content suggestions under their profile.
+     * @allow (get, list, update, delete) - User can only access their own content suggestions.
+     * @deny (create) - User cannot create content suggestions for someone else.
+     * @deny (update, delete) - User cannot modify or delete someone else's content suggestions.
+     * @principle Enforces document ownership for writes, restricts access to a user's own data.
+     */
+    match /users/{userId}/contentSuggestions/{contentSuggestionId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    /**
+     * @description Rules for general wiki articles.
+     * @path /wikiContent/{wikiContentId}
+     * @allow (get, list) - Anyone can read wiki content.
+     * @deny (create, update, delete) - Only admins can modify wiki content (currently disabled).
+     * // TODO: Implement admin role and secure write access.
+     * @principle Public read access with restricted write access.
+     */
+    match /wikiContent/{wikiContentId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role validation once implemented.
+    }
+
+        /**
+     * @description Rules for top-level game world data.
+     * @path /worlds/{worldId}
+     * @allow (get, list) - Anyone can read world data.
+     * @deny (create, update, delete) - Only admins can modify world data (currently disabled).
+     * // TODO: Implement admin role and secure write access.
+     * @principle Public read access with restricted write access.
+     */
+    match /worlds/{worldId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role validation once implemented.
+    }
+
+    /**
+     * @description Rules for powers available in a world.
+     * @path /worlds/{worldId}/powers/{powerId}
+     * @allow (get, list) - Anyone can read power data.
+     * @deny (create, update, delete) - Only admins can modify power data (currently disabled).
+     * // TODO: Implement admin role and secure write access.
+     * @principle Public read access with restricted write access.
+     */
+    match /worlds/{worldId}/powers/{powerId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role validation once implemented.
+    }
+
+    /**
+     * @description Rules for individual levels and stats for a specific power.
+     * @path /worlds/{worldId}/powers/{powerId}/stats/{statId}
+     * @allow (get, list) - Anyone can read power stat data.
+     * @deny (create, update, delete) - Only admins can modify power stat data (currently disabled).
+     * // TODO: Implement admin role and secure write access.
+     * @principle Public read access with restricted write access.
+     */
+    match /worlds/{worldId}/powers/{powerId}/stats/{statId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role validation once implemented.
+    }
+
+    /**
+     * @description Rules for NPCs found in a world.
      * @path /worlds/{worldId}/npcs/{npcId}
-     * @allow (get, list) - Any user can read NPC data.
-     * @deny (create, update, delete) - No user can create, update, or delete NPC data through the client.
+     * @allow (get, list) - Anyone can read NPC data.
+     * @deny (create, update, delete) - Only admins can modify NPC data (currently disabled).
+     * // TODO: Implement admin role and secure write access.
+     * @principle Public read access with restricted write access.
      */
     match /worlds/{worldId}/npcs/{npcId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role validation once implemented.
     }
 
     /**
-     * @description Allows public read access to pet data within a world.
+     * @description Rules for pets available in a world.
      * @path /worlds/{worldId}/pets/{petId}
-     * @allow (get, list) - Any user can read pet data.
-     * @deny (create, update, delete) - No user can create, update, or delete pet data through the client.
+     * @allow (get, list) - Anyone can read pet data.
+     * @deny (create, update, delete) - Only admins can modify pet data (currently disabled).
+     * // TODO: Implement admin role and secure write access.
+     * @principle Public read access with restricted write access.
      */
     match /worlds/{worldId}/pets/{petId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role validation once implemented.
     }
 
     /**
-     * @description Allows public read access to dungeon data within a world.
+     * @description Rules for dungeons located in a world.
      * @path /worlds/{worldId}/dungeons/{dungeonId}
-     * @allow (get, list) - Any user can read dungeon data.
-     * @deny (create, update, delete) - No user can create, update, or delete dungeon data through the client.
+     * @allow (get, list) - Anyone can read dungeon data.
+     * @deny (create, update, delete) - Only admins can modify dungeon data (currently disabled).
+     * // TODO: Implement admin role and secure write access.
+     * @principle Public read access with restricted write access.
      */
     match /worlds/{worldId}/dungeons/{dungeonId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role validation once implemented.
     }
   }
 }
