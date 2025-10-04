@@ -17,7 +17,7 @@ import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
 const chatSchema = z.object({
-  prompt: z.string().min(1, 'Message cannot be empty.'),
+  prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
 });
 
 function AssistantMessage({ content }: { content: string }) {
@@ -26,40 +26,41 @@ function AssistantMessage({ content }: { content: string }) {
 
   const renderedLines = lines.map((line, index) => {
     // Check if the line is a list item (starts with * or -)
-    if (line.trim().startsWith('*') || line.trim().startsWith('-')) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
       // Remove the list marker for display
-      const itemContent = line.trim().substring(1).trim();
+      const itemContent = trimmedLine.substring(2).trim();
       return <li key={index}>{itemContent}</li>;
     }
     // Check if the line is a header (ends with a colon)
-    if (line.trim().endsWith(':')) {
-      return <strong key={index} className="block mt-2">{line}</strong>;
+    if (trimmedLine.endsWith(':') && !trimmedLine.startsWith('*') && !trimmedLine.startsWith('-')) {
+        return <strong key={index} className="block mt-2">{trimmedLine}</strong>;
     }
     // Otherwise, it's a regular paragraph or sentence
     return <p key={index}>{line}</p>;
   });
-
-  return (
-    <div className="space-y-2">
-      {renderedLines.map((line, index, array) => {
-        // Group list items into a <ul>
-        if (line.type === 'li') {
-          // If this is the first `li` in a sequence, start a `ul`
-          if (index === 0 || array[index - 1].type !== 'li') {
-            const listItems = [];
-            for (let i = index; i < array.length && array[i].type === 'li'; i++) {
-              listItems.push(array[i]);
-            }
-            return <ul key={`ul-${index}`} className="list-disc pl-5 space-y-1">{listItems}</ul>;
+  
+  const groupedElements = [];
+  let currentList = [];
+  
+  for (let i = 0; i < renderedLines.length; i++) {
+      const line = renderedLines[i];
+      if (line.type === 'li') {
+          currentList.push(line);
+      } else {
+          if (currentList.length > 0) {
+              groupedElements.push(<ul key={`ul-${i - currentList.length}`} className="list-disc pl-5 space-y-1">{currentList}</ul>);
+              currentList = [];
           }
-          // If this `li` is already part of a `ul` started by a previous element, return null
-          return null;
-        }
-        // Render other elements directly
-        return line;
-      })}
-    </div>
-  );
+          groupedElements.push(line);
+      }
+  }
+
+  if (currentList.length > 0) {
+      groupedElements.push(<ul key={`ul-${renderedLines.length - currentList.length}`} className="list-disc pl-5 space-y-1">{currentList}</ul>);
+  }
+
+  return <div className="space-y-2">{groupedElements}</div>;
 }
 
 
@@ -106,11 +107,11 @@ export function ChatView() {
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error generating solution:', error);
+      console.error('Erro ao gerar solução:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to get a response from the AI. Please try again.',
+        title: 'Erro',
+        description: 'Falha ao obter uma resposta da IA. Por favor, tente novamente.',
       });
       setMessages((prev) => prev.slice(0, -1)); // Remove user message on error
     } finally {
@@ -128,9 +129,9 @@ export function ChatView() {
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground pt-16">
                 <Bot className="mx-auto h-12 w-12 mb-4" />
-                <h2 className="text-2xl font-semibold">Welcome to Eternal Guide</h2>
-                <p className="mt-2">Ask me anything about Anime Eternal! The wiki is my knowledge base.</p>
-                {isWikiLoading && <p className="mt-2 text-sm flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/> Loading wiki...</p>}
+                <h2 className="text-2xl font-semibold">Bem-vindo ao Guia Eterno</h2>
+                <p className="mt-2">Pergunte-me qualquer coisa sobre o Anime Eternal! A wiki é minha base de conhecimento.</p>
+                {isWikiLoading && <p className="mt-2 text-sm flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/> Carregando a wiki...</p>}
               </div>
             )}
             {messages.map((message) => (
@@ -208,7 +209,7 @@ export function ChatView() {
                 <FormItem className="flex-1">
                   <FormControl>
                     <Textarea
-                      placeholder={isWikiLoading ? "Please wait, learning from the wiki..." : "e.g., How do I defeat the Shadow Titan?"}
+                      placeholder={isWikiLoading ? "Por favor espere, aprendendo com a wiki..." : "ex: Como eu derroto o Titã Sombrio?"}
                       className="resize-none"
                       {...field}
                       onKeyDown={(e) => {
@@ -225,7 +226,7 @@ export function ChatView() {
             />
             <Button type="submit" size="icon" disabled={isSendDisabled} className="bg-primary hover:bg-primary/90">
               <Send className="h-5 w-5" />
-              <span className="sr-only">Send</span>
+              <span className="sr-only">Enviar</span>
             </Button>
           </form>
         </Form>

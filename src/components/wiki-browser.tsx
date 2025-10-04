@@ -2,16 +2,18 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Search, Info, Loader2 } from 'lucide-react';
+import { Search, Info } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from './ui/scroll-area';
 import { Button } from './ui/button';
 import { useApp } from '@/context/app-provider';
 import { Skeleton } from './ui/skeleton';
+import { micromark } from 'micromark';
+
 
 export function WikiBrowser() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,14 +29,14 @@ export function WikiBrowser() {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">Game Wiki</h1>
-        <p className="text-muted-foreground">Search our database of articles, guides, and game information.</p>
+        <h1 className="text-3xl font-bold tracking-tight font-headline">Wiki do Jogo</h1>
+        <p className="text-muted-foreground">Pesquise em nosso banco de dados de artigos, guias e informações do jogo.</p>
       </header>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search articles..."
+          placeholder="Pesquisar artigos..."
           className="pl-10 w-full md:w-1/2 lg:w-1/3"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -98,7 +100,7 @@ export function WikiBrowser() {
                      <DialogTrigger asChild>
                         <Button variant="outline" className="w-full mt-2 border-primary/50 text-primary hover:bg-primary/10 hover:text-primary">
                           <Info className="mr-2 h-4 w-4" />
-                          Read More
+                          Ler Mais
                         </Button>
                     </DialogTrigger>
                   </CardFooter>
@@ -118,7 +120,10 @@ export function WikiBrowser() {
                     </DialogDescription>
                    </DialogHeader>
                   <ScrollArea className="max-h-[60vh] pr-4">
-                    <div className="whitespace-pre-wrap py-4 text-sm text-foreground/80">{article.content}</div>
+                    <div
+                      className="prose prose-sm dark:prose-invert prose-p:text-foreground/80 py-4"
+                      dangerouslySetInnerHTML={{ __html: micromark(article.content) }}
+                    />
                   </ScrollArea>
                 </DialogContent>
               </Dialog>
@@ -129,8 +134,8 @@ export function WikiBrowser() {
       {!isWikiLoading && filteredArticles.length === 0 && (
          <div className="text-center py-16 text-muted-foreground">
             <Search className="mx-auto h-12 w-12 mb-4" />
-            <h3 className="text-xl font-semibold">No Articles Found</h3>
-            <p>Try a different search term.</p>
+            <h3 className="text-xl font-semibold">Nenhum Artigo Encontrado</h3>
+            <p>Tente um termo de busca diferente.</p>
         </div>
       )}
     </div>

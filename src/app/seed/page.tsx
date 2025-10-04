@@ -95,7 +95,7 @@ export default function SeedPage() {
     handleLoading(loadingKey, true);
     
     if (!firestore) {
-        toast({ title: 'Error', description: 'Firestore is not initialized.', variant: 'destructive' });
+        toast({ title: 'Erro', description: 'O Firestore não foi inicializado.', variant: 'destructive' });
         handleLoading(loadingKey, false);
         return;
     }
@@ -132,7 +132,7 @@ export default function SeedPage() {
     seedSubcollection('dungeons', worldData.dungeons);
     
     batch.commit().then(() => {
-        toast({ title: 'Success!', description: `${worldData.name} data has been successfully seeded.` });
+        toast({ title: 'Sucesso!', description: `Os dados do ${worldData.name} foram populados com sucesso.` });
     }).catch(() => {
         const permissionError = new FirestorePermissionError({
             path: `worlds/${worldId} and subcollections`, operation: 'write', requestResourceData: allDataForBatch,
@@ -146,7 +146,7 @@ export default function SeedPage() {
   async function seedArticle(article: WikiArticle, loadingKey: keyof typeof loadingStates, articleName: string) {
     handleLoading(loadingKey, true);
     if (!firestore) {
-        toast({ title: 'Error', description: 'Firestore is not initialized.', variant: 'destructive' });
+        toast({ title: 'Erro', description: 'O Firestore não foi inicializado.', variant: 'destructive' });
         handleLoading(loadingKey, false);
         return;
     }
@@ -155,7 +155,7 @@ export default function SeedPage() {
     batch.set(articleRef, article);
     
     batch.commit().then(() => {
-        toast({ title: 'Success!', description: `${articleName} article has been seeded.` });
+        toast({ title: 'Sucesso!', description: `O artigo "${articleName}" foi populado.` });
     }).catch(() => {
         const permissionError = new FirestorePermissionError({
             path: `wikiContent/${article.id}`, operation: 'write', requestResourceData: { [articleRef.path]: article },
@@ -169,7 +169,7 @@ export default function SeedPage() {
   async function handleSeedAccessories() {
     handleLoading('accessories', true);
     if (!firestore) {
-      toast({ title: 'Error', description: 'Firestore is not initialized.', variant: 'destructive' });
+      toast({ title: 'Erro', description: 'O Firestore não foi inicializado.', variant: 'destructive' });
       handleLoading('accessories', false);
       return;
     }
@@ -187,7 +187,7 @@ export default function SeedPage() {
     }
 
     batch.commit().then(() => {
-      toast({ title: 'Success!', description: 'Accessory data has been successfully seeded.' });
+      toast({ title: 'Sucesso!', description: 'Os dados dos acessórios foram populados com sucesso.' });
     }).catch(() => {
       const permissionError = new FirestorePermissionError({
         path: 'accessories batch write', operation: 'write', requestResourceData: allDataForBatch,
@@ -203,59 +203,59 @@ export default function SeedPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <Card>
-        <CardHeader><CardTitle>Seed Wiki Articles & Game Data</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Popular Artigos da Wiki e Dados do Jogo</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
-            <CardHeader><CardTitle className="text-lg">Seed Rank System</CardTitle></CardHeader>
-            <CardContent><CardDescription>Seed the "Rank System" article to the `wikiContent` collection.</CardDescription></CardContent>
+            <CardHeader><CardTitle className="text-lg">Popular Sistema de Ranks</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Sistema de Ranks" na coleção `wikiContent`.</CardDescription></CardContent>
             <CardFooter>
-              <Button onClick={() => seedArticle(rankArticle, 'ranks', 'Rank System')} disabled={loadingStates.ranks || !firestore}>
+              <Button onClick={() => seedArticle(rankArticle, 'ranks', 'Sistema de Ranks')} disabled={loadingStates.ranks || !firestore}>
                 {loadingStates.ranks ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.ranks ? 'Seeding...' : 'Seed Rank Article'}
+                {loadingStates.ranks ? 'Populando...' : 'Popular Artigo de Ranks'}
               </Button>
             </CardFooter>
           </Card>
           
           <Card>
-            <CardHeader><CardTitle className="text-lg">Seed Aura System</CardTitle></CardHeader>
-            <CardContent><CardDescription>Seed the "Aura System" article to the `wikiContent` collection.</CardDescription></CardContent>
+            <CardHeader><CardTitle className="text-lg">Popular Sistema de Auras</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Sistema de Auras" na coleção `wikiContent`.</CardDescription></CardContent>
             <CardFooter>
-              <Button onClick={() => seedArticle(auraArticle, 'auras', 'Aura System')} disabled={loadingStates.auras || !firestore}>
+              <Button onClick={() => seedArticle(auraArticle, 'auras', 'Sistema de Auras')} disabled={loadingStates.auras || !firestore}>
                 {loadingStates.auras ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.auras ? 'Seeding...' : 'Seed Aura Article'}
+                {loadingStates.auras ? 'Populando...' : 'Popular Artigo de Auras'}
               </Button>
             </CardFooter>
           </Card>
           
           <Card>
-            <CardHeader><CardTitle className="text-lg">Seed Prestige System</CardTitle></CardHeader>
-            <CardContent><CardDescription>Seed the "Prestige System" article to the `wikiContent` collection.</CardDescription></CardContent>
+            <CardHeader><CardTitle className="text-lg">Popular Sistema de Prestígio</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Sistema de Prestígio" na coleção `wikiContent`.</CardDescription></CardContent>
             <CardFooter>
-              <Button onClick={() => seedArticle(prestigeArticle, 'prestige', 'Prestige System')} disabled={loadingStates.prestige || !firestore}>
+              <Button onClick={() => seedArticle(prestigeArticle, 'prestige', 'Sistema de Prestígio')} disabled={loadingStates.prestige || !firestore}>
                 {loadingStates.prestige ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.prestige ? 'Seeding...' : 'Seed Prestige Article'}
+                {loadingStates.prestige ? 'Populando...' : 'Popular Artigo de Prestígio'}
               </Button>
             </CardFooter>
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-lg">Seed World Boss Guide</CardTitle></CardHeader>
-            <CardContent><CardDescription>Seed the "World Boss Guide" article to the `wikiContent` collection.</CardDescription></CardContent>
+            <CardHeader><CardTitle className="text-lg">Popular Guia de Chefes de Mundo</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Guia de Chefes de Mundo" na coleção `wikiContent`.</CardDescription></CardContent>
             <CardFooter>
-              <Button onClick={() => seedArticle(worldBossesArticle, 'bosses', 'World Boss Guide')} disabled={loadingStates.bosses || !firestore}>
+              <Button onClick={() => seedArticle(worldBossesArticle, 'bosses', 'Guia de Chefes de Mundo')} disabled={loadingStates.bosses || !firestore}>
                 {loadingStates.bosses ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.bosses ? 'Seeding...' : 'Seed Boss Guide'}
+                {loadingStates.bosses ? 'Populando...' : 'Popular Guia de Chefes'}
               </Button>
             </CardFooter>
           </Card>
 
            <Card>
-            <CardHeader><CardTitle className="text-lg">Seed Accessories</CardTitle></CardHeader>
-            <CardContent><CardDescription>Seed all game accessories to their respective worlds.</CardDescription></CardContent>
+            <CardHeader><CardTitle className="text-lg">Popular Acessórios</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula todos os acessórios do jogo em seus respectivos mundos.</CardDescription></CardContent>
             <CardFooter>
               <Button onClick={handleSeedAccessories} disabled={loadingStates.accessories || !firestore}>
                 {loadingStates.accessories ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.accessories ? 'Seeding...' : 'Seed Accessories'}
+                {loadingStates.accessories ? 'Populando...' : 'Popular Acessórios'}
               </Button>
             </CardFooter>
           </Card>
@@ -266,8 +266,8 @@ export default function SeedPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Seed World Game Data</CardTitle>
-          <CardDescription>Populate Firestore with game data for each world individually. Data for worlds other than 1, 2, and 20 is not yet available.</CardDescription>
+          <CardTitle>Popular Dados de Jogo por Mundo</CardTitle>
+          <CardDescription>Popula o Firestore com dados de jogo para cada mundo individualmente. Dados para mundos diferentes de 1, 2 e 20 ainda não estão disponíveis.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
           {worldNumbers.map(worldNum => (
@@ -275,21 +275,21 @@ export default function SeedPage() {
               {worldNum === 1 ? (
                  <Button onClick={() => seedWorldGeneric('world-1', world1Data, 'world1')} disabled={loadingStates.world1 || !firestore} className="w-full">
                     {loadingStates.world1 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    {loadingStates.world1 ? 'Seeding...' : `Seed World ${worldNum}`}
+                    {loadingStates.world1 ? 'Populando...' : `Popular Mundo ${worldNum}`}
                 </Button>
               ) : worldNum === 2 ? (
                 <Button onClick={() => seedWorldGeneric('world-2', world2Data, 'world2')} disabled={loadingStates.world2 || !firestore} className="w-full">
                   {loadingStates.world2 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {loadingStates.world2 ? 'Seeding...' : `Seed World ${worldNum}`}
+                  {loadingStates.world2 ? 'Populando...' : `Popular Mundo ${worldNum}`}
                 </Button>
               ) : worldNum === 20 ? (
                 <Button onClick={() => seedWorldGeneric('world-20', world20Data, 'world20')} disabled={loadingStates.world20 || !firestore} className="w-full">
                   {loadingStates.world20 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {loadingStates.world20 ? 'Seeding...' : `Seed World ${worldNum}`}
+                  {loadingStates.world20 ? 'Populando...' : `Popular Mundo ${worldNum}`}
                 </Button>
               ) : (
                 <Button disabled className="w-full">
-                  Seed World {worldNum}
+                  Popular Mundo {worldNum}
                 </Button>
               )}
             </div>

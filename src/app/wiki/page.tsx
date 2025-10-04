@@ -2,7 +2,7 @@ import { WikiBrowser } from '@/components/wiki-browser';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Game Wiki - Eternal Guide',
+  title: 'Wiki do Jogo - Guia Eterno',
 };
 
 export default function WikiPage() {

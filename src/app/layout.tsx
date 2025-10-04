@@ -16,8 +16,8 @@ import { Bot } from 'lucide-react';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Eternal Guide',
-  description: 'Your AI assistant for the Roblox game Anime Eternal.',
+  title: 'Guia Eterno',
+  description: 'Seu assistente de IA para o jogo Roblox Anime Eternal.',
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="pt-BR" className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -40,7 +40,7 @@ export default function RootLayout({
                 <div className="flex items-center gap-3 px-2">
                   <Link href="/" className="flex items-center gap-3 text-primary hover:text-primary/80 transition-colors">
                     <Bot size={28} />
-                    <h1 className="text-xl font-semibold font-headline">Eternal Guide</h1>
+                    <h1 className="text-xl font-semibold font-headline">Guia Eterno</h1>
                   </Link>
                 </div>
               </SidebarHeader>
@@ -49,7 +49,7 @@ export default function RootLayout({
               </SidebarContent>
               <SidebarFooter>
                 <div className="text-xs text-muted-foreground p-4">
-                  © 2024 Eternal Guide. All rights reserved.
+                  © 2024 Guia Eterno. Todos os direitos reservados.
                 </div>
               </SidebarFooter>
             </Sidebar>
@@ -58,7 +58,7 @@ export default function RootLayout({
                 <SidebarTrigger />
                 <div className="flex items-center gap-2 text-primary">
                   <Bot size={24} />
-                  <h1 className="text-lg font-semibold font-headline">Eternal Guide</h1>
+                  <h1 className="text-lg font-semibold font-headline">Guia Eterno</h1>
                 </div>
               </header>
               <main className="flex flex-1 flex-col p-4 md:p-6">

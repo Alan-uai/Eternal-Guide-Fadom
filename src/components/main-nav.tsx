@@ -11,11 +11,11 @@ import {
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/', icon: BotMessageSquare, label: 'AI Chat', tooltip: 'AI Chat' },
-  { href: '/wiki', icon: FileText, label: 'Game Wiki', tooltip: 'Game Wiki' },
-  { href: '/saved', icon: Bookmark, label: 'Saved Answers', tooltip: 'Saved Answers' },
-  { href: '/suggest', icon: Lightbulb, label: 'Suggest Content', tooltip: 'Suggest Content' },
-  { href: '/seed', icon: Database, label: 'Seed Data', tooltip: 'Seed Data' },
+  { href: '/', icon: BotMessageSquare, label: 'Chat IA', tooltip: 'Chat com a IA' },
+  { href: '/wiki', icon: FileText, label: 'Wiki do Jogo', tooltip: 'Wiki do Jogo' },
+  { href: '/saved', icon: Bookmark, label: 'Respostas Salvas', tooltip: 'Respostas Salvas' },
+  { href: '/suggest', icon: Lightbulb, label: 'Sugerir Conteúdo', tooltip: 'Sugerir Conteúdo' },
+  { href: '/seed', icon: Database, label: 'Popular Dados', tooltip: 'Popular Dados' },
 ];
 
 export function MainNav() {

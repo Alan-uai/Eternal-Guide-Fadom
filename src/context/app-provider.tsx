@@ -39,7 +39,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
         setSavedAnswers(JSON.parse(item));
       }
     } catch (error) {
-      console.error("Failed to load saved answers from local storage", error);
+      console.error("Falha ao carregar respostas salvas do armazenamento local", error);
     }
     setIsMounted(true);
   }, []);
@@ -49,7 +49,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
       try {
         window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(savedAnswers));
       } catch (error) {
-        console.error("Failed to save answers to local storage", error);
+        console.error("Falha ao salvar respostas no armazenamento local", error);
       }
     }
   }, [savedAnswers, isMounted]);
@@ -64,15 +64,15 @@ function AppStateProvider({ children }: { children: ReactNode }) {
       if (isSaved) {
         toast({
           variant: 'default',
-          title: "Answer Unsaved",
-          description: "Removed from your saved list.",
+          title: "Resposta Removida",
+          description: "A resposta foi removida da sua lista salva.",
         });
         return prev.filter((saved) => saved.id !== answer.id);
       } else {
         toast({
           variant: 'default',
-          title: "Answer Saved!",
-          description: "Find it in the 'Saved Answers' section.",
+          title: "Resposta Salva!",
+          description: "Encontre-a na seção 'Respostas Salvas'.",
         });
         return [...prev, answer];
       }
@@ -105,7 +105,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 export function useApp() {
   const context = useContext(AppContext);
   if (context === undefined) {
-    throw new Error('useApp must be used within an AppProvider');
+    throw new Error('useApp deve ser usado dentro de um AppProvider');
   }
   return context;
 }

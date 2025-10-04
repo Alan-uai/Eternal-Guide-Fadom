@@ -6,144 +6,179 @@ import type { WikiArticle } from '@/lib/types';
 
 export const gettingStartedArticle: WikiArticle = {
     id: 'getting-started',
-    title: 'Getting Started in Anime Eternal',
-    summary: "A beginner's guide to starting your adventure in the world of Anime Eternal.",
-    content: `Welcome to Anime Eternal! This guide will walk you through the key features of World 1, the central hub of the game.
+    title: 'Começando no Anime Eternal',
+    summary: "Um guia para iniciantes para começar sua aventura no mundo do Anime Eternal.",
+    content: `Bem-vindo ao Anime Eternal! Este guia irá guiá-lo através das principais características do Mundo 1, o hub central do jogo.
 
-**Character Creation & First Quest**
-First, you need to choose your starting class: Warrior, Mage, or Rogue. Each class has unique abilities. Your first quest will be given by the Village Elder in Silverwind, which will teach you movement, combat, and how to interact with the world.
+**Criação de Personagem e Primeira Missão**
+Primeiro, você precisa escolher sua classe inicial: Guerreiro, Mago ou Ladino. Cada classe tem habilidades únicas. Sua primeira missão será dada pelo Ancião da Vila em Vento Argênteo, que lhe ensinará a se mover, combater e interagir com o mundo.
 
-**Key Activities in World 1:**
-*   **Global Leaderboards:** Check out the top players in the world and see where you stand.
-*   **Rank Up & Avatar Leveling:** World 1 is where you will increase your Rank and level up your avatars.
-*   **Chests & Daily Missions:** Find and collect chests and complete daily missions for valuable rewards.
-*   **World Dungeon - Tournemant:** Your first world-specific dungeon is the Tournemant, which goes up to Room 550.
-*   **Lobby Dungeons:** Access a variety of special dungeons, which are different from the dungeons found within each world. The Lobby Dungeons include: Easy, Medium, Hard, Insane, Crazy, Nightmare, and Leaf. Another is coming soon!`,
-    tags: ['beginner', 'guide', 'new player', 'class', 'world 1'],
+**Principais Atividades no Mundo 1:**
+*   **Placares de Líderes Globais:** Confira os melhores jogadores do mundo e veja sua posição.
+*   **Subir de Rank e Nível de Avatar:** O Mundo 1 é onde você aumentará seu Rank e o nível de seus avatares.
+*   **Baús e Missões Diárias:** Encontre e colete baús e complete missões diárias para obter recompensas valiosas.
+*   **Dungeon do Mundo - Torneio:** Sua primeira dungeon específica do mundo é o Torneio, que vai até a Sala 550.
+*   **Lobby de Dungeons:** Acesse uma variedade de dungeons especiais, que são diferentes das dungeons encontradas em cada mundo. As Dungeons do Lobby incluem: Fácil, Média, Difícil, Insana, Louca, Pesadelo e Folha. Outra está chegando em breve!`,
+    tags: ['iniciante', 'guia', 'novo jogador', 'classe', 'mundo 1'],
     imageId: 'wiki-1',
 };
 
 export const auraArticle: WikiArticle = {
     id: 'aura-system',
-    title: 'Aura System',
-    summary: 'Learn about Auras from SS-Bosses, how to unlock them, and how they enhance your abilities.',
-    content: `Auras are powerful buffs dropped by SS-Rank Bosses in various worlds. Each Aura provides a unique stat boost. Here is a list of known Auras and their stats:\n\n*   **World 2:** Luck Aura (10% Starluck)
-*   **World 11:** Red Emperor Aura (0.1x)
-*   **World 3:** Purple Traitor Aura (0.25x)
-*   **World 4:** Fire King Aura (25% Drops)
-*   **World 5:** Flaming Aura (0.15x)
-*   **World 6:** Statue Aura (0.75x)
-*   **World 8:** Leafy Aura (25% Starluck)
-*   **World 10:** Energetic Aura (1.5x)
-*   **World 11:** Titanic Aura (0.5x)
-*   **World 13:** Monster Aura (2.0x)
-*   **World 15:** Virtual Aura (35% Drops)
-*   **World 16:** Hamon Aura (10% Exp)
-*   **World 17:** Ghoul Aura (1.0x)
-*   **World 19:** Fire Captain Aura (1.5x)`,
-    tags: ['aura', 'power', 'abilities', 'buffs', 'boss drop'],
+    title: 'Sistema de Auras',
+    summary: 'Aprenda sobre Auras de Chefes de Rank-SS, como desbloqueá-las e como elas melhoram suas habilidades.',
+    content: `Auras são buffs poderosos dropados por Chefes de Rank-SS em vários mundos. Cada Aura fornece um bônus de status único. Aqui está uma lista de Auras conhecidas e seus status:\n\n*   **Mundo 2:** Aura da Sorte (10% de Sorte de Estrela)
+*   **Mundo 11:** Aura do Imperador Vermelho (0.1x)
+*   **Mundo 3:** Aura do Traidor Roxo (0.25x)
+*   **Mundo 4:** Aura do Rei do Fogo (25% de Drops)
+*   **Mundo 5:** Aura Flamejante (0.15x)
+*   **Mundo 6:** Aura da Estátua (0.75x)
+*   **Mundo 8:** Aura da Folha (25% de Sorte de Estrela)
+*   **Mundo 10:** Aura Energética (1.5x)
+*   **Mundo 11:** Aura Titânica (0.5x)
+*   **Mundo 13:** Aura Monstruosa (2.0x)
+*   **Mundo 15:** Aura Virtual (35% de Drops)
+*   **Mundo 16:** Aura de Hamon (10% de Exp)
+*   **Mundo 17:** Aura de Ghoul (1.0x)
+*   **Mundo 19:** Aura do Capitão de Fogo (1.5x)`,
+    tags: ['aura', 'poder', 'habilidades', 'buffs', 'drop de chefe'],
     imageId: 'wiki-2',
 };
 
 export const legendaryWeaponsArticle: WikiArticle = {
     id: 'legendary-weapons',
-    title: 'Crafting Legendary Weapons',
-    summary: 'Discover the secrets to forging the most powerful weapons in the game.',
-    content: 'Legendary weapons are the pinnacle of equipment in Anime Eternal. Crafting one is a long and arduous journey that requires rare materials, a high crafting level, and a special forge.\n\nThe required materials, known as "Celestial Fragments," are dropped by world bosses and can be found in the deepest dungeons. You will need 100 fragments, along with other rare components, to attempt a craft. The forge is located at the peak of Mount Celestia. Be warned, the path is treacherous.',
-    tags: ['crafting', 'weapons', 'legendary', ' endgame'],
+    title: 'Fabricação de Armas Lendárias',
+    summary: 'Descubra os segredos para forjar as armas mais poderosas do jogo.',
+    content: 'Armas lendárias são o auge do equipamento em Anime Eternal. Fabricar uma é uma jornada longa e árdua que requer materiais raros, um alto nível de fabricação e uma forja especial.\n\nOs materiais necessários, conhecidos como "Fragmentos Celestiais", são dropados por chefes de mundo e podem ser encontrados nas masmorras mais profundas. Você precisará de 100 fragmentos, juntamente com outros componentes raros, para tentar uma fabricação. A forja está localizada no pico do Monte Celestia. Cuidado, o caminho é traiçoeiro.',
+    tags: ['fabricação', 'armas', 'lendário', 'endgame'],
     imageId: 'wiki-3',
 };
 
 export const guildWarsArticle: WikiArticle = {
     id: 'guild-wars',
-    title: 'An Introduction to Guild Wars',
-    summary: 'Team up with your guild and battle for supremacy and rare rewards.',
-    content: 'Guild Wars are weekly events where guilds compete against each other in large-scale PvP battles. To participate, you must be a member of a guild with at least 10 members.\n\nWars take place every Saturday. The objective is to capture and hold control points on a special map. The guild with the most points at the end of the event wins. Victorious guilds receive exclusive rewards, including rare cosmetics, powerful gear, and a significant amount of in-game currency.',
-    tags: ['guild', 'pvp', 'event', 'team'],
+    title: 'Uma Introdução às Guerras de Guildas',
+    summary: 'Junte-se à sua guilda e lute pela supremacia e recompensas raras.',
+    content: 'Guerras de Guildas são eventos semanais onde guildas competem entre si em batalhas PvP em grande escala. Para participar, você deve ser membro de uma guilda com pelo menos 10 membros.\n\nAs guerras ocorrem todo sábado. O objetivo é capturar e manter pontos de controle em um mapa especial. A guilda com mais pontos no final do evento vence. Guildas vitoriosas recebem recompensas exclusivas, incluindo cosméticos raros, equipamentos poderosos e uma quantidade significativa de moeda do jogo.',
+    tags: ['guilda', 'pvp', 'evento', 'equipe'],
     imageId: 'wiki-4',
 };
 
 export const prestigeArticle: WikiArticle = {
     id: 'prestige-system',
-    title: 'Prestige System',
-    summary: 'Understand how to prestige to increase your level cap and gain more power.',
-    content: `The Prestige system allows players to reset their level in exchange for powerful permanent bonuses. Here's how it works:\n\n**Prestige Levels & Requirements:**\n\n*   **Prestige 1:**
-    *   Required Level: 200
-    *   New Level Cap: 210
-    *   Statpoints per level: 2
-    *   Exp Multi: 0.1x\n
-*   **Prestige 2:**
-    *   Required Level: 210
-    *   New Level Cap: 220
-    *   Statpoints per level: 3
-    *   Exp Multi: 0.2x\n
-*   **Prestige 3:**
-    *   Required Level: 220
-    *   New Level Cap: 230
-    *   Statpoints per level: 4
-    *   Exp Multi: 0.3x\n
-*   **Prestige 4:**
-    *   Required Level: 230
-    *   New Level Cap: 250
-    *   Statpoints per level: 5
-    *   Exp Multi: 0.4x\n
-*   **Prestige 5:**
-    *   Required Level: 250
-    *   New Level Cap: 270
-    *   Statpoints per level: 6
-    *   Exp Multi: 0.5x
+    title: 'Sistema de Prestígio',
+    summary: 'Entenda como prestigiar para aumentar seu limite de nível e ganhar mais poder.',
+    content: `O sistema de Prestígio permite que os jogadores resetem seu nível em troca de bônus permanentes poderosos. Veja como funciona:
 
-Each time you prestige, you unlock a higher level cap and receive more stat points per level, allowing for greater character customization and power.`,
-    tags: ['prestige', 'leveling', 'endgame', 'stats'],
+### Níveis e Requisitos de Prestígio:
+
+**Prestígio 1:**
+*   Nível Requerido: 200
+*   Novo Limite de Nível: 210
+*   Pontos de Status por nível: 2
+*   Multiplicador de Exp: 0.1x
+
+**Prestígio 2:**
+*   Nível Requerido: 210
+*   Novo Limite de Nível: 220
+*   Pontos de Status por nível: 3
+*   Multiplicador de Exp: 0.2x
+
+**Prestígio 3:**
+*   Nível Requerido: 220
+*   Novo Limite de Nível: 230
+*   Pontos de Status por nível: 4
+*   Multiplicador de Exp: 0.3x
+
+**Prestígio 4:**
+*   Nível Requerido: 230
+*   Novo Limite de Nível: 250
+*   Pontos de Status por nível: 5
+*   Multiplicador de Exp: 0.4x
+
+**Prestígio 5:**
+*   Nível Requerido: 250
+*   Novo Limite de Nível: 270
+*   Pontos de Status por nível: 6
+*   Multiplicador de Exp: 0.5x
+
+Cada vez que você prestigia, você desbloqueia um limite de nível mais alto e recebe mais pontos de status por nível, permitindo maior personalização e poder do personagem.`,
+    tags: ['prestígio', 'nível', 'endgame', 'status'],
     imageId: 'wiki-5',
 };
 
 export const rankArticle: WikiArticle = {
     id: 'rank-system',
-    title: 'Rank System',
-    summary: 'A reference for the energy required to achieve each rank in the game.',
-    content: `Ranking up is a core part of progressing in Anime Eternal. Each rank requires a certain amount of energy to achieve. Below is a table detailing the energy needed for each rank.\n\n| Rank Up | Stats          |    | Rank Up | Stats    |    | Rank Up | Stats       |    | Rank Up | Stats       |
-|:--------|:---------------|:---|:--------|:---------|:---|:--------|:------------|:---|:--------|:------------|
-| 1       | 9k             |    | 31      | 7.05O    |    | 61      | 4.90sxD     |    | 91      | 2 QnV       |
-| 2       | 45k            |    | 32      | 52.15O   |    | 62      | 45.59sxD    |    | 92      | 10 QnV      |
-| 3       | 243.03k        |    | 33      | 407.01O  |    | 63      | 319.31sxD   |    | 93      | 50 QnV      |
-| 4       | 1.41M          |    | 34      | 2.04N    |    | 64      | 2.36 SpD    |    | 94      | 500 QnV     |
-| 5       | 8.75M          |    | 35      | 11.01N   |    | 65      | 18.41 SpD   |    | 95      | 5 SeV       |
-| 6       | 57.84M         |    | 36      | 63.80N   |    | 66      | 92.06 SpD   |    | 96      | 500 SeV     |
-| 7       | 405.18M        |    | 37      | 395.72N  |    | 67      | 497.12SpD   |    | 97      | 25 SPG      |
-| 8       | 3B             |    | 38      | 2.61de   |    | 68      | 2.89OcD     |    | 98      | 250 SPG     |
-| 9       | 23.39B         |    | 39      | 18.29de  |    | 69      | 17.92OcD    |    | 99      | 2.5 OVG     |
-| 10      | 116.96B        |    | 40      | 135.46de |    | 70      | 118.360OcD  |    | 100     | 100 OVG     |
-| 11      | 631.36B        |    | 41      | 1.06Ud   |    | 71      | 828.38OcD   |    | 101     | 750 OVG     |
-| 12      | 1.07T          |    | 42      | 5.28Ud   |    | 72      | 6.13NvD     |    | 102     | 3 NVG       |
-| 13      | 2.52T          |    | 43      | 28.53Ud  |    | 73      | 47.81NvD    |    | 103     | 30 NVG      |
-| 14      | 14.99T         |    | 44      | 165.50Ud |    | 74      | 239.06NvD   |    | 104     | 250 NVG     |
-| 15      | 154.95T        |    | 45      | 1.03DD   |    | 75      | 1.29Vgn     |    | 105     | 1 TGN       |
-| 16      | 776.49T        |    | 46      | 6.77DD   |    | 76      | 7.49Vgn     |    | 106     |             |
-| 17      | 7.06qd         |    | 47      | 47.40DD  |    | 77      | 46.41Vgn    |    | 107     |             |
-| 18      | 90.32qd        |    | 48      | 351.06DD |    | 78      | 306.38Vgn   |    | 108     |             |
-| 19      | 1.04Qn         |    | 49      | 2.74tdD  |    | 79      | 2.15Uvg     |    | 109     |             |
-| 20      | 9.49Qn         |    | 50      | 13.71tdD |    | 80      | 16.00Uvg    |    | 110     |             |
-| 21      | 58.84Qn        |    | 51      | 74.00tdD |    | 81      | 124.80 Uvg  |    | 111     |             |
-| 22      | 388.50Qn       |    | 52      | 429.34tdD|    | 82      | 748.80 Uvg  |    | 112     |             |
-| 23      | 2.72sx         |    | 53      | 2.66qdD  |    | 83      | 4.79 DVg    |    | 113     |             |
-| 24      | 20.14sx        |    | 54      | 17.57qdD |    | 84      | 32.59 DVg   |    | 114     |             |
-| 25      | 157.16sx       |    | 55      | 85.29qdD |    | 85      | 234.63 DVg  |    | 115     |             |
-| 26      | 785.79sx       |    | 56      | 910.22qdD|    | 86      | 100 TVg     |    | 116     |             |
-| 27      | 4.24Sp         |    | 57      | 4.10QnD  |    | 87      | 1 qtV       |    | 117     |             |
-| 28      | 24.61Sp        |    | 58      | 8.20QnD  |    | 88      | 15 qtV      |    | 118     |             |
-| 29      | 152.63Sp       |    | 59      | 48.00QnD |    | 89      | 50 qtV      |    | 119     |             |
-| 30      | 1.01O          |    | 60      | 336.00QnD|    | 90      | 250 qtV     |    | 120     |             |`,
-    tags: ['rank', 'progression', 'energy', 'stats'],
+    title: 'Sistema de Ranks',
+    summary: 'Uma referência para a energia necessária para alcançar cada rank no jogo.',
+    content: `Subir de rank é uma parte central da progressão no Anime Eternal. Cada rank requer uma certa quantidade de energia para ser alcançado. Abaixo está uma tabela detalhando a energia necessária para cada rank.
+
+| Rank | Energia | | Rank | Energia | | Rank | Energia | | Rank | Energia |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| 1 | 9k | | 31 | 7.05O | | 61 | 4.90sxD | | 91 | 2 QnV |
+| 2 | 45k | | 32 | 52.15O | | 62 | 45.59sxD | | 92 | 10 QnV |
+| 3 | 243.03k | | 33 | 407.01O | | 63 | 319.31sxD | | 93 | 50 QnV |
+| 4 | 1.41M | | 34 | 2.04N | | 64 | 2.36 SpD | | 94 | 500 QnV |
+| 5 | 8.75M | | 35 | 11.01N | | 65 | 18.41 SpD | | 95 | 5 SeV |
+| 6 | 57.84M | | 36 | 63.80N | | 66 | 92.06 SpD | | 96 | 500 SeV |
+| 7 | 405.18M | | 37 | 395.72N | | 67 | 497.12SpD | | 97 | 25 SPG |
+| 8 | 3B | | 38 | 2.61de | | 68 | 2.89OcD | | 98 | 250 SPG |
+| 9 | 23.39B | | 39 | 18.29de | | 69 | 17.92OcD | | 99 | 2.5 OVG |
+| 10 | 116.96B | | 40 | 135.46de | | 70 | 118.360OcD | | 100 | 100 OVG |
+| 11 | 631.36B | | 41 | 1.06Ud | | 71 | 828.38OcD | | 101 | 750 OVG |
+| 12 | 1.07T | | 42 | 5.28Ud | | 72 | 6.13NvD | | 102 | 3 NVG |
+| 13 | 2.52T | | 43 | 28.53Ud | | 73 | 47.81NvD | | 103 | 30 NVG |
+| 14 | 14.99T | | 44 | 165.50Ud | | 74 | 239.06NvD | | 104 | 250 NVG |
+| 15 | 154.95T | | 45 | 1.03DD | | 75 | 1.29Vgn | | 105 | 1 TGN |
+| 16 | 776.49T | | 46 | 6.77DD | | 76 | 7.49Vgn | | 106 | |
+| 17 | 7.06qd | | 47 | 47.40DD | | 77 | 46.41Vgn | | 107 | |
+| 18 | 90.32qd | | 48 | 351.06DD | | 78 | 306.38Vgn | | 108 | |
+| 19 | 1.04Qn | | 49 | 2.74tdD | | 79 | 2.15Uvg | | 109 | |
+| 20 | 9.49Qn | | 50 | 13.71tdD | | 80 | 16.00Uvg | | 110 | |
+| 21 | 58.84Qn | | 51 | 74.00tdD | | 81 | 124.80 Uvg | | 111 | |
+| 22 | 388.50Qn | | 52 | 429.34tdD | | 82 | 748.80 Uvg | | 112 | |
+| 23 | 2.72sx | | 53 | 2.66qdD | | 83 | 4.79 DVg | | 113 | |
+| 24 | 20.14sx | | 54 | 17.57qdD | | 84 | 32.59 DVg | | 114 | |
+| 25 | 157.16sx | | 55 | 85.29qdD | | 85 | 234.63 DVg | | 115 | |
+| 26 | 785.79sx | | 56 | 910.22qdD | | 86 | 100 TVg | | 116 | |
+| 27 | 4.24Sp | | 57 | 4.10QnD | | 87 | 1 qtV | | 117 | |
+| 28 | 24.61Sp | | 58 | 8.20QnD | | 88 | 15 qtV | | 118 | |
+| 29 | 152.63Sp | | 59 | 48.00QnD | | 89 | 50 qtV | | 119 | |
+| 30 | 1.01O | | 60 | 336.00QnD | | 90 | 250 qtV | | 120 | |`,
+    tags: ['rank', 'progressão', 'energia', 'status'],
     imageId: 'wiki-6',
 };
 
 export const worldBossesArticle: WikiArticle = {
   id: 'world-bosses',
-  title: 'World Boss Guide',
-  summary: 'A complete guide to all the world bosses, their stats, and the recommended DPS to defeat them.',
-  content: `This guide provides a comprehensive list of all SS-Rank world bosses.\n\n| World             | Boss Name         | HP          | Rank | Exp      | DPS Recom.   |\n|:------------------|:------------------|:------------|:-----|:---------|:-------------|\n| Earth City        | Kid Kohan         | 2.500 - Qd  | SS   | 15.0     | 50 - T       |\n| Windmill Island   | Shanks            | 5.00 - Sx   | SS   | 30.0     | 100 - QN     |\n| Soul Society      | Eizen             | 2.5 - Sp    | SS   | 60.0     | 50 - SX      |\n| Cursed School     | Sakuni            | 120.00 - Sp | SS   | 120.0    | 2.4 - SP     |\n| Slayer Village    | Rangoki           | 31.2 - De   | SS   | 240.0    | 624 - N      |\n| Solo Island       | Statue of God     | 195 - UD    | SS   | 480.0    | 3.90 - UD    |\n| Clover Village    | Novi Chroni       | 101 - TdD   | SS   | 960.0    | 2 - TDD      |\n| Leaf Village      | Itechi            | 2.82 - QnD  | SS   | 1.92K    | 56.4 - QDD   |\n| Leaf Village      | Madera            | 5.64 - QnD  | SS   | 2.88K    | 113 - QDD    |\n| Spirit Residence  | Ken Turbo         | 494 - SxD   | SS   | 5.76K    | 10 - SXD     |\n| Magic Hunter City | Killas Godspeed   | 296 - OcD   | SS   | 11.52K   | 6 - OCD      |\n| Titan City        | Eran              | 49.4 - VgN  | SS   | 23.04K   | 988 - NVD    |\n| Village of Sins   | Esanor            | 9.77 - DvG  | SS   | 46.08K   | 195 - UVG    |\n| Kaiju Base        | Number N°8        | 5.5 - QtV   | SS   | 92.16K   | 111 - TVG    |\n| Tempest Capital   | Valzora           | 4.79 - SeV  | SS   | 184.32K  | 98 - QNV     |\n| Virtual City      | The Paladin       | 967 - SpG   | SS   | 368.64K  | 20 - SPG     |\n| Cairo             | Dio               | 195 - NvG   | SS   | 737.28K  | 3.9 - NVG    |\n| Ghoul City        | Arama             | 686 - UtG   | SS   | 1.52M    | 15 - UTG     |\n| Chainsaw City     | Mr. Chainsaw      | 5.09 - TsTG | SS   | 2.55M    | 105 - DTG    |\n| Tokyo Empire      | Leonardo          | 1.76 - QnTG | SS   | 5.14M    | 100 - QTTG   |\n| Green Planet      | Goku SSJ          | 1.52 - NoTG | SS   | 16.1M    | 1 - OCTG     |\n| Hollow Word       | Cifer             | 87.2 - uQDR | SS   | 40.6M    | 16 - uQDR    |`,
-  tags: ['bosses', 'guide', 'dps', 'hp', 'rewards'],
+  title: 'Guia de Chefes de Mundo',
+  summary: 'Um guia completo para todos os chefes de mundo, seus status e o DPS recomendado para derrotá-los.',
+  content: `Este guia fornece uma lista completa de todos os chefes de mundo de Rank-SS.
+
+| Mundo | Chefe | HP | Rank | Exp | DPS Recom. |
+|:---|:---|:---|:---|:---|:---|
+| Earth City | Kid Kohan | 2.500 - Qd | SS | 15.0 | 50 - T |
+| Windmill Island | Shanks | 5.00 - Sx | SS | 30.0 | 100 - QN |
+| Soul Society | Eizen | 2.5 - Sp | SS | 60.0 | 50 - SX |
+| Cursed School | Sakuni | 120.00 - Sp | SS | 120.0 | 2.4 - SP |
+| Slayer Village | Rangoki | 31.2 - De | SS | 240.0 | 624 - N |
+| Solo Island | Statue of God | 195 - UD | SS | 480.0 | 3.90 - UD |
+| Clover Village | Novi Chroni | 101 - TdD | SS | 960.0 | 2 - TDD |
+| Leaf Village | Itechi | 2.82 - QnD | SS | 1.92K | 56.4 - QDD |
+| Leaf Village | Madera | 5.64 - QnD | SS | 2.88K | 113 - QDD |
+| Spirit Residence | Ken Turbo | 494 - SxD | SS | 5.76K | 10 - SXD |
+| Magic Hunter City | Killas Godspeed | 296 - OcD | SS | 11.52K | 6 - OCD |
+| Titan City | Eran | 49.4 - VgN | SS | 23.04K | 988 - NVD |
+| Village of Sins | Esanor | 9.77 - DvG | SS | 46.08K | 195 - UVG |
+| Kaiju Base | Number N°8 | 5.5 - QtV | SS | 92.16K | 111 - TVG |
+| Tempest Capital | Valzora | 4.79 - SeV | SS | 184.32K | 98 - QNV |
+| Virtual City | The Paladin | 967 - SpG | SS | 368.64K | 20 - SPG |
+| Cairo | Dio | 195 - NvG | SS | 737.28K | 3.9 - NVG |
+| Ghoul City | Arama | 686 - UtG | SS | 1.52M | 15 - UTG |
+| Chainsaw City | Mr. Chainsaw | 5.09 - TsTG | SS | 2.55M | 105 - DTG |
+| Tokyo Empire | Leonardo | 1.76 - QnTG | SS | 5.14M | 100 - QTTG |
+| Green Planet | Goku SSJ | 1.52 - NoTG | SS | 16.1M | 1 - OCTG |
+| Hollow Word | Cifer | 87.2 - uQDR | SS | 40.6M | 16 - uQDR |`,
+  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas'],
   imageId: 'wiki-7',
 };
 
@@ -158,4 +193,3 @@ export const allWikiArticles = [
   rankArticle,
   worldBossesArticle,
 ];
-
