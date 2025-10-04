@@ -10,7 +10,7 @@ const world20Data = {
     {
       id: 'grand-elder-power',
       name: 'Grand Elder Power',
-      type: 'progression',
+      type: 'gacha',
       statType: 'energy', // Custom field to distinguish power type
       stats: [
         { name: 'Sleeping Power', multiplier: '2x' },
@@ -26,7 +26,7 @@ const world20Data = {
     {
       id: 'frost-demon-evolution',
       name: 'Frost Demon Evolution',
-      type: 'progression',
+      type: 'gacha',
       statType: 'damage', // Custom field to distinguish power type
       stats: [
         { name: 'Second Form', multiplier: '1x' },
