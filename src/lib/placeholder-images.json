@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "wiki-1",
+      "description": "A fantasy landscape for a getting started guide.",
+      "imageUrl": "https://images.unsplash.com/photo-1717564954563-e0263d335695?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmYW50YXN5JTIwbGFuZHNjYXBlfGVufDB8fHx8MTc1OTU1NDY1NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fantasy landscape"
+    },
+    {
+      "id": "wiki-2",
+      "description": "An image representing a magical aura.",
+      "imageUrl": "https://images.unsplash.com/photo-1730562764749-75a7210fcbd8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYWdpYyUyMGF1cmF8ZW58MHx8fHwxNzU5NTU0NzUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "magic aura"
+    },
+    {
+      "id": "wiki-3",
+      "description": "An image of a powerful warrior.",
+      "imageUrl": "https://images.unsplash.com/photo-1689452283620-fd3de4062563?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx3YXJyaW9yJTIwYXJtb3J8ZW58MHx8fHwxNzU5NTU0NzUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "warrior armor"
+    },
+    {
+      "id": "wiki-4",
+      "description": "A crafting table with glowing items.",
+      "imageUrl": "https://images.unsplash.com/photo-1620140036708-455ed5c0426a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjcmFmdGluZyUyMG1hZ2ljfGVufDB8fHx8MTc1OTU1NDc1MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "crafting magic"
+    }
+  ]
 }
