@@ -120,7 +120,6 @@ export function WikiBrowser() {
       (article.tags && article.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
-  const generalArticles = filteredArticles.filter(a => a.tags.includes('geral'));
   const worldRelatedArticles = filteredArticles.filter(a => a.tags.some(tag => !isNaN(parseInt(tag))));
   
   const worldNumbers = [...new Set(
@@ -152,9 +151,9 @@ export function WikiBrowser() {
 
         <TabsContent value="geral" className="mt-6">
             {isWikiLoading ? <LoadingSkeletons /> : (
-              generalArticles.length > 0 ? (
+              filteredArticles.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {generalArticles.map((article) => <ArticleCard key={article.id} article={article} />)}
+                  {filteredArticles.map((article) => <ArticleCard key={article.id} article={article} />)}
                 </div>
               ) : <NoArticlesFound />
             )}
