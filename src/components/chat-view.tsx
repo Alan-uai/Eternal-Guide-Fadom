@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,47 +15,21 @@ import { useApp } from '@/context/app-provider';
 import type { Message } from '@/lib/types';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { micromark } from 'micromark';
 
 const chatSchema = z.object({
   prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
 });
 
 function AssistantMessage({ content }: { content: string }) {
-  const lines = content.split('\n').filter(line => line.trim() !== '');
+  const htmlContent = useMemo(() => micromark(content), [content]);
 
-  const renderedLines = lines.map((line, index) => {
-    const trimmedLine = line.trim();
-    if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
-      const itemContent = trimmedLine.substring(2).trim();
-      return <li key={index}>{itemContent}</li>;
-    }
-    if (trimmedLine.endsWith(':') && !trimmedLine.startsWith('*') && !trimmedLine.startsWith('-')) {
-        return <strong key={index} className="block mt-2">{trimmedLine}</strong>;
-    }
-    return <p key={index} className="whitespace-pre-wrap">{line}</p>;
-  });
-  
-  const groupedElements = [];
-  let currentList: JSX.Element[] = [];
-  
-  for (let i = 0; i < renderedLines.length; i++) {
-      const line = renderedLines[i];
-      if (line.type === 'li') {
-          currentList.push(line);
-      } else {
-          if (currentList.length > 0) {
-              groupedElements.push(<ul key={`ul-${i - currentList.length}`} className="list-disc pl-5 space-y-1">{currentList}</ul>);
-              currentList = [];
-          }
-          groupedElements.push(line);
-      }
-  }
-
-  if (currentList.length > 0) {
-      groupedElements.push(<ul key={`ul-${renderedLines.length - currentList.length}`} className="list-disc pl-5 space-y-1">{currentList}</ul>);
-  }
-
-  return <div className="space-y-2">{groupedElements}</div>;
+  return (
+      <div 
+        className="prose prose-sm dark:prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: htmlContent }} 
+      />
+  );
 }
 
 const CHAT_STORAGE_KEY = 'eternal-guide-chat-history';
@@ -66,7 +40,7 @@ export function ChatView() {
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
   const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading } = useApp();
-  const scrollAreaViewport = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof chatSchema>>({
     resolver: zodResolver(chatSchema),
@@ -96,14 +70,17 @@ export function ChatView() {
   }, [messages, isMounted]);
 
   const scrollToBottom = () => {
-    if (scrollAreaViewport.current) {
-      scrollAreaViewport.current.scrollTop = scrollAreaViewport.current.scrollHeight;
+    if (scrollAreaRef.current) {
+        scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
     }
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]);
 
   async function onSubmit(values: z.infer<typeof chatSchema>) {
     const userMessage: Message = {
@@ -118,7 +95,7 @@ export function ChatView() {
     form.reset();
 
     try {
-      const wikiContext = wikiArticles.map(article => `Title: ${article.title}\nContent: ${article.content}`).join('\n\n---\n\n');
+      const wikiContext = wikiArticles.map(article => `Title: ${article.title}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`).join('\n\n---\n\n');
       const historyForAI = currentMessages.slice(0, -1).map(({ id, ...rest }) => rest);
       
       const result = await generateSolution({ 
@@ -160,8 +137,8 @@ export function ChatView() {
   return (
     <div className="flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-3.5rem)]">
       <div className="flex-1 overflow-hidden relative">
-        <ScrollArea className="h-full">
-          <div className="p-4 md:p-6 space-y-6" ref={scrollAreaViewport}>
+        <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
+          <div className="p-4 md:p-6 space-y-6">
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground pt-16">
                 <Bot className="mx-auto h-12 w-12 mb-4" />
