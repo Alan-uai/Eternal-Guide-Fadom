@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BotMessageSquare, Bookmark, FileText, Lightbulb } from 'lucide-react';
+import { BotMessageSquare, Bookmark, FileText, Lightbulb, Database } from 'lucide-react';
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -15,6 +15,7 @@ const navItems = [
   { href: '/wiki', icon: FileText, label: 'Game Wiki', tooltip: 'Game Wiki' },
   { href: '/saved', icon: Bookmark, label: 'Saved Answers', tooltip: 'Saved Answers' },
   { href: '/suggest', icon: Lightbulb, label: 'Suggest Content', tooltip: 'Suggest Content' },
+  { href: '/seed', icon: Database, label: 'Seed Data', tooltip: 'Seed Data' },
 ];
 
 export function MainNav() {
