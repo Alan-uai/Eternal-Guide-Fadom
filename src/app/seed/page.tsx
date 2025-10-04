@@ -13,6 +13,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 import { rankArticle, auraArticle, prestigeArticle, worldBossesArticle } from '@/lib/wiki-data';
 import type { WikiArticle } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
+import { accessories, worldNameToId } from '@/lib/accessory-data';
 
 const world20Data = {
     name: 'World 20 - Grand Elder',
@@ -80,6 +81,7 @@ export default function SeedPage() {
     auras: false,
     prestige: false,
     bosses: false,
+    accessories: false,
   });
 
   const handleLoading = (key: keyof typeof loadingStates, value: boolean) => {
@@ -152,12 +154,44 @@ export default function SeedPage() {
     });
   }
 
+  async function handleSeedAccessories() {
+    handleLoading('accessories', true);
+    if (!firestore) {
+      toast({ title: 'Error', description: 'Firestore is not initialized.', variant: 'destructive' });
+      handleLoading('accessories', false);
+      return;
+    }
+
+    const batch = writeBatch(firestore);
+    const allDataForBatch: Record<string, any> = {};
+
+    for (const acc of accessories) {
+      const worldId = worldNameToId[acc.world];
+      if (worldId) {
+        const accessoryRef = doc(firestore, 'worlds', worldId, 'accessories', acc.id);
+        batch.set(accessoryRef, acc);
+        allDataForBatch[accessoryRef.path] = acc;
+      }
+    }
+
+    batch.commit().then(() => {
+      toast({ title: 'Success!', description: 'Accessory data has been successfully seeded.' });
+    }).catch(() => {
+      const permissionError = new FirestorePermissionError({
+        path: 'accessories batch write', operation: 'write', requestResourceData: allDataForBatch,
+      });
+      errorEmitter.emit('permission-error', permissionError);
+    }).finally(() => {
+      handleLoading('accessories', false);
+    });
+  }
+
   const worldNumbers = Array.from({ length: 21 }, (_, i) => i + 1);
 
   return (
     <div className="container mx-auto py-8 space-y-8">
       <Card>
-        <CardHeader><CardTitle>Seed Wiki Articles</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Seed Wiki Articles & Game Data</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader><CardTitle className="text-lg">Seed Rank System</CardTitle></CardHeader>
@@ -199,6 +233,17 @@ export default function SeedPage() {
               <Button onClick={() => seedArticle(worldBossesArticle, 'bosses', 'World Boss Guide')} disabled={loadingStates.bosses || !firestore}>
                 {loadingStates.bosses ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loadingStates.bosses ? 'Seeding...' : 'Seed Boss Guide'}
+              </Button>
+            </CardFooter>
+          </Card>
+
+           <Card>
+            <CardHeader><CardTitle className="text-lg">Seed Accessories</CardTitle></CardHeader>
+            <CardContent><CardDescription>Seed all game accessories to their respective worlds.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={handleSeedAccessories} disabled={loadingStates.accessories || !firestore}>
+                {loadingStates.accessories ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.accessories ? 'Seeding...' : 'Seed Accessories'}
               </Button>
             </CardFooter>
           </Card>
