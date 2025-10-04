@@ -92,7 +92,38 @@ export const rankArticle: WikiArticle = {
     id: 'rank-system',
     title: 'Rank System',
     summary: 'A reference for the energy required to achieve each rank in the game.',
-    content: `Ranking up is a core part of progressing in Anime Eternal. Each rank requires a certain amount of energy to achieve. Below is a table detailing the energy needed for ranks 81 through 120.\n\n| Rank Up | Stats          |    | Rank Up | Stats    |\n|:--------|:---------------|:---|:--------|:---------|\n| 81      | 124.80 Uvg     |    | 101     | 750 OVG  |\n| 82      | 748.80 Uvg     |    | 102     | 3 NVG    |\n| 83      | 4.79 DVg       |    | 103     | 30 NVG   |\n| 84      | 32.59 DVg      |    | 104     | 250 NVG  |\n| 85      | 234.63 DVg     |    | 105     | 1 TGN    |\n| 86      | 100 TVg        |    | 106     |          |\n| 87      | 1 qtV          |    | 107     |          |\n| 88      | 15 qtV         |    | 108     |          |\n| 89      | 50 qtV         |    | 109     |          |\n| 90      | 250 qtV        |    | 110     |          |\n| 91      | 2 QnV          |    | 111     |          |\n| 92      | 10 QnV         |    | 112     |          |\n| 93      | 50 QnV         |    | 113     |          |\n| 94      | 500 QnV        |    | 114     |          |\n| 95      | 5 SeV          |    | 115     |          |\n| 96      | 500 SeV        |    | 116     |          |\n| 97      | 25 SPG         |    | 117     |          |\n| 98      | 250 SPG        |    | 118     |          |\n| 99      | 2.5 OVG        |    | 119     |          |\n| 100     | 100 OVG        |    | 120     |          |`,
+    content: `Ranking up is a core part of progressing in Anime Eternal. Each rank requires a certain amount of energy to achieve. Below is a table detailing the energy needed for each rank.\n\n| Rank Up | Stats          |    | Rank Up | Stats    |    | Rank Up | Stats       |    | Rank Up | Stats       |
+|:--------|:---------------|:---|:--------|:---------|:---|:--------|:------------|:---|:--------|:------------|
+| 1       | 9k             |    | 31      | 7.05O    |    | 61      | 4.90sxD     |    | 91      | 2 QnV       |
+| 2       | 45k            |    | 32      | 52.15O   |    | 62      | 45.59sxD    |    | 92      | 10 QnV      |
+| 3       | 243.03k        |    | 33      | 407.01O  |    | 63      | 319.31sxD   |    | 93      | 50 QnV      |
+| 4       | 1.41M          |    | 34      | 2.04N    |    | 64      | 2.36 SpD    |    | 94      | 500 QnV     |
+| 5       | 8.75M          |    | 35      | 11.01N   |    | 65      | 18.41 SpD   |    | 95      | 5 SeV       |
+| 6       | 57.84M         |    | 36      | 63.80N   |    | 66      | 92.06 SpD   |    | 96      | 500 SeV     |
+| 7       | 405.18M        |    | 37      | 395.72N  |    | 67      | 497.12SpD   |    | 97      | 25 SPG      |
+| 8       | 3B             |    | 38      | 2.61de   |    | 68      | 2.89OcD     |    | 98      | 250 SPG     |
+| 9       | 23.39B         |    | 39      | 18.29de  |    | 69      | 17.92OcD    |    | 99      | 2.5 OVG     |
+| 10      | 116.96B        |    | 40      | 135.46de |    | 70      | 118.360OcD  |    | 100     | 100 OVG     |
+| 11      | 631.36B        |    | 41      | 1.06Ud   |    | 71      | 828.38OcD   |    | 101     | 750 OVG     |
+| 12      | 1.07T          |    | 42      | 5.28Ud   |    | 72      | 6.13NvD     |    | 102     | 3 NVG       |
+| 13      | 2.52T          |    | 43      | 28.53Ud  |    | 73      | 47.81NvD    |    | 103     | 30 NVG      |
+| 14      | 14.99T         |    | 44      | 165.50Ud |    | 74      | 239.06NvD   |    | 104     | 250 NVG     |
+| 15      | 154.95T        |    | 45      | 1.03DD   |    | 75      | 1.29Vgn     |    | 105     | 1 TGN       |
+| 16      | 776.49T        |    | 46      | 6.77DD   |    | 76      | 7.49Vgn     |    | 106     |             |
+| 17      | 7.06qd         |    | 47      | 47.40DD  |    | 77      | 46.41Vgn    |    | 107     |             |
+| 18      | 90.32qd        |    | 48      | 351.06DD |    | 78      | 306.38Vgn   |    | 108     |             |
+| 19      | 1.04Qn         |    | 49      | 2.74tdD  |    | 79      | 2.15Uvg     |    | 109     |             |
+| 20      | 9.49Qn         |    | 50      | 13.71tdD |    | 80      | 16.00Uvg    |    | 110     |             |
+| 21      | 58.84Qn        |    | 51      | 74.00tdD |    | 81      | 124.80 Uvg  |    | 111     |             |
+| 22      | 388.50Qn       |    | 52      | 429.34tdD|    | 82      | 748.80 Uvg  |    | 112     |             |
+| 23      | 2.72sx         |    | 53      | 2.66qdD  |    | 83      | 4.79 DVg    |    | 113     |             |
+| 24      | 20.14sx        |    | 54      | 17.57qdD |    | 84      | 32.59 DVg   |    | 114     |             |
+| 25      | 157.16sx       |    | 55      | 85.29qdD |    | 85      | 234.63 DVg  |    | 115     |             |
+| 26      | 785.79sx       |    | 56      | 910.22qdD|    | 86      | 100 TVg     |    | 116     |             |
+| 27      | 4.24Sp         |    | 57      | 4.10QnD  |    | 87      | 1 qtV       |    | 117     |             |
+| 28      | 24.61Sp        |    | 58      | 8.20QnD  |    | 88      | 15 qtV      |    | 118     |             |
+| 29      | 152.63Sp       |    | 59      | 48.00QnD |    | 89      | 50 qtV      |    | 119     |             |
+| 30      | 1.01O          |    | 60      | 336.00QnD|    | 90      | 250 qtV     |    | 120     |             |`,
     tags: ['rank', 'progression', 'energy', 'stats'],
     imageId: 'wiki-6',
 };
