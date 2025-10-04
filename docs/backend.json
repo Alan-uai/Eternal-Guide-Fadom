@@ -205,7 +205,8 @@
         "description": "Represents a dungeon within a world.",
         "properties": {
             "name": { "type": "string" },
-            "boss": { "type": "string" }
+            "boss": { "type": "string" },
+            "description": { "type": "string" }
         },
         "required": ["name"]
     },

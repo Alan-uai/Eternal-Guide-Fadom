@@ -1,3 +1,4 @@
+
 export const world2Data = {
     name: 'Windmill Island',
     powers: [
@@ -44,9 +45,10 @@ export const world2Data = {
     ],
     dungeons: [
         {
-            id: 'pirate-ship',
-            name: 'Pirate Ship',
-            boss: 'Buggy'
+            id: 'restaurante',
+            name: 'Restaurante',
+            boss: 'Don Krieg',
+            description: 'Goes up to level 1000. Drops 5 tokens, each with a 20% chance. Tokens are used for gacha/progression powers.'
         }
     ],
   };
