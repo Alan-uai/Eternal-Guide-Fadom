@@ -19,7 +19,7 @@ Primeiro, você precisa escolher sua classe inicial: Guerreiro, Mago ou Ladino. 
 *   **Baús e Missões Diárias:** Encontre e colete baús e complete missões diárias para obter recompensas valiosas.
 *   **Dungeon do Mundo - Torneio:** Sua primeira dungeon específica do mundo é o Torneio, que vai até a Sala 550.
 *   **Lobby de Dungeons:** Acesse uma variedade de dungeons especiais, que são diferentes das dungeons encontradas em cada mundo. As Dungeons do Lobby incluem: Fácil, Média, Difícil, Insana, Louca, Pesadelo e Folha. Outra está chegando em breve!`,
-    tags: ['iniciante', 'guia', 'novo jogador', 'classe', 'mundo 1'],
+    tags: ['iniciante', 'guia', 'novo jogador', 'classe', 'mundo 1', 'geral'],
     imageId: 'wiki-1',
 };
 
@@ -27,21 +27,20 @@ export const auraArticle: WikiArticle = {
     id: 'aura-system',
     title: 'Sistema de Auras',
     summary: 'Aprenda sobre Auras de Chefes de Rank-SS, como desbloqueá-las e como elas melhoram suas habilidades.',
-    content: `Auras são buffs poderosos dropados por Chefes de Rank-SS em vários mundos. Cada Aura fornece um bônus de status único. Aqui está uma lista de Auras conhecidas e seus status:\n\n*   **Mundo 2:** Aura da Sorte (10% de Sorte de Estrela)
-*   **Mundo 11:** Aura do Imperador Vermelho (0.1x)
-*   **Mundo 3:** Aura do Traidor Roxo (0.25x)
-*   **Mundo 4:** Aura do Rei do Fogo (25% de Drops)
-*   **Mundo 5:** Aura Flamejante (0.15x)
-*   **Mundo 6:** Aura da Estátua (0.75x)
-*   **Mundo 8:** Aura da Folha (25% de Sorte de Estrela)
-*   **Mundo 10:** Aura Energética (1.5x)
-*   **Mundo 11:** Aura Titânica (0.5x)
-*   **Mundo 13:** Aura Monstruosa (2.0x)
-*   **Mundo 15:** Aura Virtual (35% de Drops)
-*   **Mundo 16:** Aura de Hamon (10% de Exp)
-*   **Mundo 17:** Aura de Ghoul (1.0x)
-*   **Mundo 19:** Aura do Capitão de Fogo (1.5x)`,
-    tags: ['aura', 'poder', 'habilidades', 'buffs', 'drop de chefe'],
+    content: `Auras são buffs poderosos dropados por Chefes de Rank-SS em vários mundos. Cada Aura fornece um bônus de status único. Aqui está uma lista de Auras conhecidas e seus status:\n\n*   **Mundo 2 (Shanks):** Aura da Sorte (10% de Sorte de Estrela)
+*   **Mundo 11 (Eran):** Aura do Imperador Vermelho (0.1x)
+*   **Mundo 3 (Eizen):** Aura do Traidor Roxo (0.25x)
+*   **Mundo 4 (Sakuni):** Aura do Rei do Fogo (25% de Drops)
+*   **Mundo 5 (Rangoki):** Aura Flamejante (0.15x)
+*   **Mundo 6 (Statue of God):** Aura da Estátua (0.75x)
+*   **Mundo 8 (Itechi/Madera):** Aura da Folha (25% de Sorte de Estrela)
+*   **Mundo 10 (Ken Turbo):** Aura Energética (1.5x)
+*   **Mundo 13 (Esanor):** Aura Monstruosa (2.0x)
+*   **Mundo 15 (The Paladin):** Aura Virtual (35% de Drops)
+*   **Mundo 16 (Dio):** Aura de Hamon (10% de Exp)
+*   **Mundo 17 (Arama):** Aura de Ghoul (1.0x)
+*   **Mundo 19 (Leonardo):** Aura do Capitão de Fogo (1.5x)`,
+    tags: ['aura', 'poder', 'habilidades', 'buffs', 'drop de chefe', 'sistema', 'geral'],
     imageId: 'wiki-2',
 };
 
@@ -50,7 +49,7 @@ export const legendaryWeaponsArticle: WikiArticle = {
     title: 'Fabricação de Armas Lendárias',
     summary: 'Descubra os segredos para forjar as armas mais poderosas do jogo.',
     content: 'Armas lendárias são o auge do equipamento em Anime Eternal. Fabricar uma é uma jornada longa e árdua que requer materiais raros, um alto nível de fabricação e uma forja especial.\n\nOs materiais necessários, conhecidos como "Fragmentos Celestiais", são dropados por chefes de mundo e podem ser encontrados nas masmorras mais profundas. Você precisará de 100 fragmentos, juntamente com outros componentes raros, para tentar uma fabricação. A forja está localizada no pico do Monte Celestia. Cuidado, o caminho é traiçoeiro.',
-    tags: ['fabricação', 'armas', 'lendário', 'endgame'],
+    tags: ['fabricação', 'armas', 'lendário', 'endgame', 'guia', 'geral'],
     imageId: 'wiki-3',
 };
 
@@ -59,7 +58,7 @@ export const guildWarsArticle: WikiArticle = {
     title: 'Uma Introdução às Guerras de Guildas',
     summary: 'Junte-se à sua guilda e lute pela supremacia e recompensas raras.',
     content: 'Guerras de Guildas são eventos semanais onde guildas competem entre si em batalhas PvP em grande escala. Para participar, você deve ser membro de uma guilda com pelo menos 10 membros.\n\nAs guerras ocorrem todo sábado. O objetivo é capturar e manter pontos de controle em um mapa especial. A guilda com mais pontos no final do evento vence. Guildas vitoriosas recebem recompensas exclusivas, incluindo cosméticos raros, equipamentos poderosos e uma quantidade significativa de moeda do jogo.',
-    tags: ['guilda', 'pvp', 'evento', 'equipe'],
+    tags: ['guilda', 'pvp', 'evento', 'equipe', 'guia', 'geral'],
     imageId: 'wiki-4',
 };
 
@@ -102,7 +101,7 @@ export const prestigeArticle: WikiArticle = {
 *   Multiplicador de Exp: 0.5x
 
 Cada vez que você prestigia, você desbloqueia um limite de nível mais alto e recebe mais pontos de status por nível, permitindo maior personalização e poder do personagem.`,
-    tags: ['prestígio', 'nível', 'endgame', 'status'],
+    tags: ['prestígio', 'nível', 'endgame', 'status', 'sistema', 'geral'],
     imageId: 'wiki-5',
 };
 
@@ -113,7 +112,7 @@ export const rankArticle: WikiArticle = {
     content: `Subir de rank é uma parte central da progressão no Anime Eternal. Cada rank requer uma certa quantidade de energia para ser alcançado. Abaixo está uma tabela detalhando a energia necessária para cada rank.
 
 | Rank | Energia | | Rank | Energia | | Rank | Energia | | Rank | Energia |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+|:---|:---|---|:---|:---|---|:---|:---|---|:---|
 | 1 | 9k | | 31 | 7.05O | | 61 | 4.90sxD | | 91 | 2 QnV |
 | 2 | 45k | | 32 | 52.15O | | 62 | 45.59sxD | | 92 | 10 QnV |
 | 3 | 243.03k | | 33 | 407.01O | | 63 | 319.31sxD | | 93 | 50 QnV |
@@ -144,7 +143,7 @@ export const rankArticle: WikiArticle = {
 | 28 | 24.61Sp | | 58 | 8.20QnD | | 88 | 15 qtV | | 118 | |
 | 29 | 152.63Sp | | 59 | 48.00QnD | | 89 | 50 qtV | | 119 | |
 | 30 | 1.01O | | 60 | 336.00QnD | | 90 | 250 qtV | | 120 | |`,
-    tags: ['rank', 'progressão', 'energia', 'status'],
+    tags: ['rank', 'progressão', 'energia', 'status', 'sistema', 'geral'],
     imageId: 'wiki-6',
 };
 
@@ -178,7 +177,7 @@ export const worldBossesArticle: WikiArticle = {
 | Tokyo Empire | Leonardo | 1.76 - QnTG | SS | 5.14M | 100 - QTTG |
 | Green Planet | Goku SSJ | 1.52 - NoTG | SS | 16.1M | 1 - OCTG |
 | Hollow Word | Cifer | 87.2 - uQDR | SS | 40.6M | 16 - uQDR |`,
-  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas'],
+  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'sistema', 'geral'],
   imageId: 'wiki-7',
 };
 
