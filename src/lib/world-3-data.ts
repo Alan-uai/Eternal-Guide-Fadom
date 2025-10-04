@@ -32,23 +32,20 @@ export const world3Data = {
         ],
       },
       {
-        id: 'spiritual-pressure-damage',
-        name: 'Spiritual Pressure (Damage)',
+        id: 'spiritual-pressure',
+        name: 'Spiritual Pressure',
         type: 'progression',
-        statType: 'damage',
+        statType: 'mixed',
         maxLevel: 210,
-        maxBoost: '1.01x Damage',
-      },
-      {
-        id: 'spiritual-pressure-energy',
-        name: 'Spiritual Pressure (Energy)',
-        type: 'progression',
-        statType: 'energy',
-        maxLevel: 210,
-        maxBoost: '1.11x Energy',
+        boosts: [
+            { type: 'damage', value: '1.01x' },
+            { type: 'energy', value: '1.11x' },
+        ]
       },
     ],
     npcs: [],
     pets: [],
     dungeons: [],
   };
+
+    

@@ -161,7 +161,20 @@
         "description": "Represents a gacha or progression power within a world.",
         "properties": {
             "name": { "type": "string", "description": "Name of the power set (e.g., 'Grand Elder Power')." },
-            "type": { "type": "string", "enum": ["gacha", "progression"], "description": "The type of power."}
+            "type": { "type": "string", "enum": ["gacha", "progression"], "description": "The type of power." },
+            "statType": { "type": "string", "enum": ["energy", "damage", "coin", "mixed"], "description": "The primary stat this power affects. 'mixed' indicates multiple types of boosts." },
+            "maxLevel": { "type": "number", "description": "The maximum level for a progression power." },
+            "boosts": {
+              "type": "array",
+              "description": "An array of boosts for mixed progression powers.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": { "type": "string", "enum": ["damage", "energy", "coin"] },
+                  "value": { "type": "string" }
+                }
+              }
+            }
         },
         "required": ["name", "type"]
     },
@@ -173,7 +186,8 @@
             "name": { "type": "string", "description": "Name of the stat level (e.g., 'Sleeping Power', 'Second Form')." },
             "multiplier": { "type": "string", "description": "The stat multiplier (e.g., '2x', '1.5x')." },
             "rarity": { "type": "string", "description": "The rarity of the gacha roll (e.g., 'Phantom', 'Supreme')." },
-            "probability": { "type": "number", "description": "The probability of getting this roll."}
+            "probability": { "type": "number", "description": "The probability of getting this roll."},
+            "statType": { "type": "string", "enum": ["energy", "damage", "coin"], "description": "The stat this specific level affects, for mixed gacha powers." }
         },
         "required": ["name", "multiplier"]
     },
@@ -328,6 +342,5 @@
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', and now 'accessories', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all accessories for 'World 1', you query the '/worlds/world1/accessories' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
-
 
     

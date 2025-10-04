@@ -61,15 +61,17 @@ export async function getGameData(worldName: string, category: string, itemName?
         const itemData = { id: itemDoc.id, ...itemDoc.data() };
         
         // Fetch sub-collections like 'stats' for a power
-        const statsCollectionRef = collection(itemDoc.ref, 'stats');
-        const statsSnapshot = await getDocs(statsCollectionRef);
-        if (!statsSnapshot.empty) {
-            const statsData = statsSnapshot.docs.map(d => ({id: d.id, ...d.data()}));
-            
-            // Sort stats by multiplier in ascending order
-            statsData.sort((a, b) => parseMultiplier(a.multiplier) - parseMultiplier(b.multiplier));
+        if (category === 'powers') {
+            const statsCollectionRef = collection(itemDoc.ref, 'stats');
+            const statsSnapshot = await getDocs(statsCollectionRef);
+            if (!statsSnapshot.empty) {
+                const statsData = statsSnapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                
+                // Sort stats by multiplier in ascending order
+                statsData.sort((a, b) => parseMultiplier(a.multiplier) - parseMultiplier(b.multiplier));
 
-            (itemData as any)['stats'] = statsData;
+                (itemData as any)['stats'] = statsData;
+            }
         }
         
         results.push(itemData);
@@ -87,3 +89,5 @@ export async function getGameData(worldName: string, category: string, itemName?
 export async function getRaceStats(raceName: string) {
   return getGameData("World1", "races", raceName);
 }
+
+    

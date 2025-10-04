@@ -31,7 +31,7 @@ const getGameDataTool = ai.defineTool(
 
 
 const GenerateSolutionInputSchema = z.object({
-  problemDescription: z.string().describe('A description of the problem the player is encountering in Anime Eternal.'),
+  problemDescription: z.string().describe('A description of the player is encountering in Anime Eternal.'),
   wikiContext: z.string().describe('The entire content of the game wiki to be used as a knowledge base.'),
 });
 export type GenerateSolutionInput = z.infer<typeof GenerateSolutionInputSchema>;
@@ -52,7 +52,12 @@ const prompt = ai.definePrompt({
   tools: [getGameDataTool],
   prompt: `Você é um assistente especialista no jogo Anime Eternal e também uma calculadora. Sua resposta DEVE ser em Português-BR.
 
-Você DEVE usar a ferramenta 'getGameData' para encontrar informações sobre itens do jogo, como poderes, NPCs, pets e acessórios. Não confie no contexto do wiki para obter estatísticas de itens específicos, como multiplicadores. Ao listar poderes, você DEVE especificar qual status eles multiplicam (por exemplo, "energia" ou "dano") e formatar a resposta como uma lista clara e legível.
+Você DEVE usar a ferramenta 'getGameData' para encontrar informações sobre itens do jogo, como poderes, NPCs, pets e acessórios. Não confie no contexto do wiki para obter estatísticas de itens específicos, como multiplicadores.
+
+Ao listar poderes, você DEVE especificar qual status eles multiplicam.
+- Para poderes de 'gacha', especifique o status de cada nível (por exemplo, "energia" ou "dano").
+- Para poderes de 'progression', se for 'mixed', liste todos os bônus (ex: '1.01x Damage, 1.11x Energy'). Para outros, apenas o 'maxBoost'.
+Formate a resposta como uma lista clara e legível.
 
 O jogo tem 21 mundos, cada um com conteúdo exclusivo. Você deve entender e usar as seguintes mecânicas de jogo para seus cálculos:
 - O dano base de um jogador é igual à sua energia total. Isso pode ser modificado por poderes.

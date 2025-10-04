@@ -112,6 +112,7 @@ export default function SeedPage() {
       if (items && items.length > 0) {
         for (const item of items) {
             const itemRef = doc(worldRef, subcollectionName, item.id);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { stats, ...itemData } = item;
             batch.set(itemRef, itemData);
             allDataForBatch[itemRef.path] = itemData;
@@ -306,3 +307,5 @@ export default function SeedPage() {
     </div>
   );
 }
+
+    
