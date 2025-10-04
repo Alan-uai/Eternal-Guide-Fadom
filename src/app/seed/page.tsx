@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { accessories, worldNameToId } from '@/lib/accessory-data';
 import { world1Data } from '@/lib/world-1-data';
 import { world2Data } from '@/lib/world-2-data';
+import { world3Data } from '@/lib/world-3-data';
 
 const world20Data = {
     name: 'World 20 - Grand Elder',
@@ -79,6 +80,7 @@ export default function SeedPage() {
   const [loadingStates, setLoadingStates] = useState({
     world1: false,
     world2: false,
+    world3: false,
     world20: false,
     ranks: false,
     auras: false,
@@ -267,7 +269,7 @@ export default function SeedPage() {
       <Card>
         <CardHeader>
           <CardTitle>Popular Dados de Jogo por Mundo</CardTitle>
-          <CardDescription>Popula o Firestore com dados de jogo para cada mundo individualmente. Dados para mundos diferentes de 1, 2 e 20 ainda não estão disponíveis.</CardDescription>
+          <CardDescription>Popula o Firestore com dados de jogo para cada mundo individualmente. Dados para mundos diferentes de 1, 2, 3 e 20 ainda não estão disponíveis.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
           {worldNumbers.map(worldNum => (
@@ -281,6 +283,11 @@ export default function SeedPage() {
                 <Button onClick={() => seedWorldGeneric('world-2', world2Data, 'world2')} disabled={loadingStates.world2 || !firestore} className="w-full">
                   {loadingStates.world2 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   {loadingStates.world2 ? 'Populando...' : `Popular Mundo ${worldNum}`}
+                </Button>
+              ) : worldNum === 3 ? (
+                <Button onClick={() => seedWorldGeneric('world-3', world3Data, 'world3')} disabled={loadingStates.world3 || !firestore} className="w-full">
+                  {loadingStates.world3 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {loadingStates.world3 ? 'Populando...' : `Popular Mundo ${worldNum}`}
                 </Button>
               ) : worldNum === 20 ? (
                 <Button onClick={() => seedWorldGeneric('world-20', world20Data, 'world20')} disabled={loadingStates.world20 || !firestore} className="w-full">
