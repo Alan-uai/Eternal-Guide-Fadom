@@ -65,7 +65,7 @@ function ArticleCard({ article }: { article: WikiArticle }) {
          </DialogHeader>
         <ScrollArea className="max-h-[60vh] pr-4 -mr-4">
           <div
-            className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground/80 prose-headings:text-foreground prose-table:w-full prose-th:text-left prose-td:py-2 prose-td:px-3 prose-tr:border-b prose-tr:border-border"
+            className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground/80 prose-headings:text-foreground prose-table:w-full prose-tr:border-b prose-tr:border-border prose-th:text-left prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2"
             dangerouslySetInnerHTML={{ __html: micromark(article.content) }}
           />
         </ScrollArea>
@@ -113,14 +113,14 @@ export function WikiBrowser() {
   const [searchTerm, setSearchTerm] = useState('');
   const { wikiArticles, isWikiLoading } = useApp();
 
-  const filteredArticles = wikiArticles.filter(
+  const allArticles = wikiArticles.filter(
     (article) =>
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       article.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (article.tags && article.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
-  const worldRelatedArticles = filteredArticles.filter(a => a.tags.some(tag => !isNaN(parseInt(tag))));
+  const worldRelatedArticles = allArticles.filter(a => a.tags.some(tag => !isNaN(parseInt(tag)) && tag !== 'geral'));
   
   const worldNumbers = [...new Set(
     worldRelatedArticles.flatMap(a => a.tags).filter(tag => !isNaN(parseInt(tag)))
@@ -151,9 +151,9 @@ export function WikiBrowser() {
 
         <TabsContent value="geral" className="mt-6">
             {isWikiLoading ? <LoadingSkeletons /> : (
-              filteredArticles.length > 0 ? (
+              allArticles.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredArticles.map((article) => <ArticleCard key={article.id} article={article} />)}
+                  {allArticles.map((article) => <ArticleCard key={article.id} article={article} />)}
                 </div>
               ) : <NoArticlesFound />
             )}
