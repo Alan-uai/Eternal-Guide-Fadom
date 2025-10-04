@@ -16,10 +16,10 @@ import { getGameData } from '@/firebase/firestore/data';
 const getGameDataTool = ai.defineTool(
   {
     name: 'getGameData',
-    description: 'Get information about game content like powers, NPCs, pets, or dungeons from a specific world.',
+    description: 'Get information about game content like powers, NPCs, pets, accessories, or dungeons from a specific world.',
     inputSchema: z.object({
       worldName: z.string().describe('The name of the world to search in (e.g., "World 20").'),
-      category: z.string().describe('The category of information to get (e.g., "powers", "npcs", "pets").'),
+      category: z.string().describe('The category of information to get (e.g., "powers", "npcs", "pets", "accessories").'),
       itemName: z.string().optional().describe('The specific name of the item to look for (e.g., "Grand Elder Power").'),
     }),
     outputSchema: z.unknown(),
@@ -50,9 +50,19 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateSolutionInputSchema},
   output: {schema: GenerateSolutionOutputSchema},
   tools: [getGameDataTool],
-  prompt: `You are an expert Anime Eternal game assistant. Your knowledge base is the official game wiki provided below. A player is encountering a problem, and you will generate a potential solution. 
-The game has 21 worlds, each with unique content like powers (gacha or progression), NPCs (with ranks and drops), pets (with rarities and energy boosts), and dungeons. 
-Use ONLY the information from the wiki to answer the question. If the information is not in the provided wiki context, use the available tools to find the information from the correct world and category. If the answer is not in the wiki or available via tools, say that you do not have enough information to answer.
+  prompt: `You are an expert Anime Eternal game assistant and calculator. Your knowledge base is the official game wiki provided below. A player is encountering a problem or asking a question, and you will generate a potential solution or answer.
+
+The game has 21 worlds, each with unique content. You must understand and use the following game mechanics for your calculations:
+- A player's base damage is equal to their total energy. This can be modified by powers.
+- The "fast click" gamepass gives a player 4 clicks per second. Total DPS should be calculated as (Damage * 4).
+- To answer calculation questions (e.g., "how long to defeat a boss"), you must break down the problem:
+  1. Find the player's energy for their given rank from the 'Rank System' wiki article.
+  2. Find the boss's total HP from the 'World Boss Guide' wiki article.
+  3. Calculate the player's total Damage Per Second (DPS), accounting for gamepasses like 'fast click'.
+  4. Calculate the time to defeat the boss (Boss HP / Player's DPS).
+  5. Explain your calculation to the user.
+
+Use ONLY the information from the wiki context below or the available tools to find the information. If the answer is not in the wiki or available via tools, say that you do not have enough information to answer.
 
 START OF WIKI CONTENT
 {{{wikiContext}}}
