@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { 
+  gettingStartedArticle,
   rankArticle, 
   auraArticle, 
   prestigeArticle, 
@@ -97,6 +99,7 @@ export default function SeedPage() {
     world3: false,
     world4: false,
     world20: false,
+    gettingStarted: false,
     ranks: false,
     auras: false,
     prestige: false,
@@ -231,7 +234,8 @@ export default function SeedPage() {
   async function handleSeedAll() {
     handleLoading('all', true);
     toast({ title: 'Iniciando...', description: 'Populando todos os dados do jogo. Isso pode levar um momento.' });
-
+    
+    await seedArticle(gettingStartedArticle, 'gettingStarted', 'Começando no Anime Eternal');
     await seedArticle(rankArticle, 'ranks', 'Sistema de Ranks');
     await seedArticle(auraArticle, 'auras', 'Sistema de Auras');
     await seedArticle(prestigeArticle, 'prestige', 'Sistema de Prestígio');
@@ -281,6 +285,16 @@ export default function SeedPage() {
       <Card>
         <CardHeader><CardTitle>Popular Artigos da Wiki e Dados do Jogo</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Artigo Inicial</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Começando no Anime Eternal" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(gettingStartedArticle, 'gettingStarted', 'Começando no Anime Eternal')} disabled={loadingStates.gettingStarted || !firestore}>
+                {loadingStates.gettingStarted ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.gettingStarted ? 'Populando...' : 'Popular Artigo Inicial'}
+              </Button>
+            </CardFooter>
+          </Card>
           <Card>
             <CardHeader><CardTitle className="text-lg">Popular Sistema de Ranks</CardTitle></CardHeader>
             <CardContent><CardDescription>Popula o artigo "Sistema de Ranks" na coleção `wikiContent`.</CardDescription></CardContent>
