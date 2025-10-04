@@ -93,41 +93,41 @@ export const rankArticle: WikiArticle = {
       ranks: {
         headers: ['Rank', 'Energia'],
         rows: [
-          { Rank: 1, Energia: '9k' }, { Rank: 2, Energia: '45k' }, { Rank: 3, Energia: '243.03k' },
-          { Rank: 4, Energia: '1.41M' }, { Rank: 5, Energia: '8.75M' }, { Rank: 6, Energia: '57.84M' },
-          { Rank: 7, Energia: '405.18M' }, { Rank: 8, Energia: '3B' }, { Rank: 9, Energia: '23.39B' },
-          { Rank: 10, Energia: '116.96B' }, { Rank: 11, Energia: '631.36B' }, { Rank: 12, Energia: '1.07T' },
-          { Rank: 13, Energia: '2.52T' }, { Rank: 14, Energia: '14.99T' }, { Rank: 15, Energia: '154.95T' },
-          { Rank: 16, Energia: '776.49T' }, { Rank: 17, Energia: '7.06qd' }, { Rank: 18, Energia: '90.32qd' },
-          { Rank: 19, Energia: '1.04Qn' }, { Rank: 20, Energia: '9.49Qn' }, { Rank: 21, Energia: '58.84Qn' },
-          { Rank: 22, Energia: '388.50Qn' }, { Rank: 23, Energia: '2.72sx' }, { Rank: 24, Energia: '20.14sx' },
-          { Rank: 25, Energia: '157.16sx' }, { Rank: 26, Energia: '785.79sx' }, { Rank: 27, Energia: '4.24Sp' },
-          { Rank: 28, Energia: '24.61Sp' }, { Rank: 29, Energia: '152.63Sp' }, { Rank: 30, Energia: '1.01O' },
-          { Rank: 31, Energia: '7.05O' }, { Rank: 32, Energia: '52.15O' }, { Rank: 33, Energia: '407.01O' },
-          { Rank: 34, Energia: '2.04N' }, { Rank: 35, Energia: '11.01N' }, { Rank: 36, Energia: '63.80N' },
-          { Rank: 37, Energia: '395.72N' }, { Rank: 38, Energia: '2.61de' }, { Rank: 39, Energia: '18.29de' },
-          { Rank: 40, Energia: '135.46de' }, { Rank: 41, Energia: '1.06Ud' }, { Rank: 42, Energia: '5.28Ud' },
-          { Rank: 43, Energia: '28.53Ud' }, { Rank: 44, Energia: '165.50Ud' }, { Rank: 45, Energia: '1.03DD' },
-          { Rank: 46, Energia: '6.77DD' }, { Rank: 47, Energia: '47.40DD' }, { Rank: 48, Energia: '351.06DD' },
-          { Rank: 49, Energia: '2.74tdD' }, { Rank: 50, Energia: '13.71tdD' }, { Rank: 51, Energia: '74.00tdD' },
-          { Rank: 52, Energia: '429.34tdD' }, { Rank: 53, Energia: '2.66qdD' }, { Rank: 54, Energia: '17.57qdD' },
-          { Rank: 55, Energia: '85.29qdD' }, { Rank: 56, Energia: '910.22qdD' }, { Rank: 57, Energia: '4.10QnD' },
-          { Rank: 58, Energia: '8.20QnD' }, { Rank: 59, Energia: '48.00QnD' }, { Rank: 60, Energia: '336.00QnD' },
-          { Rank: 61, Energia: '4.90sxD' }, { Rank: 62, Energia: '45.59sxD' }, { Rank: 63, Energia: '319.31sxD' },
-          { Rank: 64, Energia: '2.36 SpD' }, { Rank: 65, Energia: '18.41 SpD' }, { Rank: 66, Energia: '92.06 SpD' },
-          { Rank: 67, Energia: '497.12SpD' }, { Rank: 68, Energia: '2.89OcD' }, { Rank: 69, Energia: '17.92OcD' },
-          { Rank: 70, Energia: '118.360OcD' }, { Rank: 71, Energia: '828.38OcD' }, { Rank: 72, Energia: '6.13NvD' },
-          { Rank: 73, Energia: '47.81NvD' }, { Rank: 74, Energia: '239.06NvD' }, { Rank: 75, Energia: '1.29Vgn' },
-          { Rank: 76, Energia: '7.49Vgn' }, { Rank: 77, Energia: '46.41Vgn' }, { Rank: 78, Energia: '306.38Vgn' },
-          { Rank: 79, Energia: '2.15Uvg' }, { Rank: 80, Energia: '16.00Uvg' }, { Rank: 81, Energia: '124.80 Uvg' },
-          { Rank: 82, Energia: '748.80 Uvg' }, { Rank: 83, Energia: '4.79 DVg' }, { Rank: 84, Energia: '32.59 DVg' },
-          { Rank: 85, Energia: '234.63 DVg' }, { Rank: 86, Energia: '100 TVg' }, { Rank: 87, Energia: '1 qtV' },
-          { Rank: 88, Energia: '15 qtV' }, { Rank: 89, Energia: '50 qtV' }, { Rank: 90, Energia: '250 qtV' },
-          { Rank: 91, Energia: '2 QnV' }, { Rank: 92, Energia: '10 QnV' }, { Rank: 93, Energia: '50 QnV' },
-          { Rank: 94, Energia: '500 QnV' }, { Rank: 95, Energia: '5 SeV' }, { Rank: 96, Energia: '500 SeV' },
-          { Rank: 97, Energia: '25 SPG' }, { Rank: 98, Energia: '250 SPG' }, { Rank: 99, Energia: '2.5 OVG' },
-          { Rank: 100, Energia: '100 OVG' }, { Rank: 101, Energia: '750 OVG' }, { Rank: 102, Energia: '3 NVG' },
-          { Rank: 103, Energia: '30 NVG' }, { Rank: 104, Energia: '250 NVG' }, { Rank: 105, Energia: '1 TGN' },
+            { Rank: 1, Energia: '9k' }, { Rank: 2, Energia: '45k' }, { Rank: 3, Energia: '243.03k' },
+            { Rank: 4, Energia: '1.41M' }, { Rank: 5, Energia: '8.75M' }, { Rank: 6, Energia: '57.84M' },
+            { Rank: 7, Energia: '405.18M' }, { Rank: 8, Energia: '3B' }, { Rank: 9, Energia: '23.39B' },
+            { Rank: 10, Energia: '116.96B' }, { Rank: 11, Energia: '631.36B' }, { Rank: 12, Energia: '1.07T' },
+            { Rank: 13, Energia: '2.52T' }, { Rank: 14, Energia: '14.99T' }, { Rank: 15, Energia: '154.95T' },
+            { Rank: 16, Energia: '776.49T' }, { Rank: 17, Energia: '7.06qd' }, { Rank: 18, Energia: '90.32qd' },
+            { Rank: 19, Energia: '1.04Qn' }, { Rank: 20, Energia: '9.49Qn' }, { Rank: 21, Energia: '58.84Qn' },
+            { Rank: 22, Energia: '388.50Qn' }, { Rank: 23, Energia: '2.72sx' }, { Rank: 24, Energia: '20.14sx' },
+            { Rank: 25, Energia: '157.16sx' }, { Rank: 26, Energia: '785.79sx' }, { Rank: 27, Energia: '4.24Sp' },
+            { Rank: 28, Energia: '24.61Sp' }, { Rank: 29, Energia: '152.63Sp' }, { Rank: 30, Energia: '1.01O' },
+            { Rank: 31, Energia: '7.05O' }, { Rank: 32, Energia: '52.15O' }, { Rank: 33, Energia: '407.01O' },
+            { Rank: 34, Energia: '2.04N' }, { Rank: 35, Energia: '11.01N' }, { Rank: 36, Energia: '63.80N' },
+            { Rank: 37, Energia: '395.72N' }, { Rank: 38, Energia: '2.61de' }, { Rank: 39, Energia: '18.29de' },
+            { Rank: 40, Energia: '135.46de' }, { Rank: 41, Energia: '1.06Ud' }, { Rank: 42, Energia: '5.28Ud' },
+            { Rank: 43, Energia: '28.53Ud' }, { Rank: 44, Energia: '165.50Ud' }, { Rank: 45, Energia: '1.03DD' },
+            { Rank: 46, Energia: '6.77DD' }, { Rank: 47, Energia: '47.40DD' }, { Rank: 48, Energia: '351.06DD' },
+            { Rank: 49, Energia: '2.74tdD' }, { Rank: 50, Energia: '13.71tdD' }, { Rank: 51, Energia: '74.00tdD' },
+            { Rank: 52, Energia: '429.34tdD' }, { Rank: 53, Energia: '2.66qdD' }, { Rank: 54, Energia: '17.57qdD' },
+            { Rank: 55, Energia: '85.29qdD' }, { Rank: 56, Energia: '910.22qdD' }, { Rank: 57, Energia: '4.10QnD' },
+            { Rank: 58, Energia: '8.20QnD' }, { Rank: 59, Energia: '48.00QnD' }, { Rank: 60, Energia: '336.00QnD' },
+            { Rank: 61, Energia: '4.90sxD' }, { Rank: 62, Energia: '45.59sxD' }, { Rank: 63, Energia: '319.31sxD' },
+            { Rank: 64, Energia: '2.36 SpD' }, { Rank: 65, Energia: '18.41 SpD' }, { Rank: 66, Energia: '92.06 SpD' },
+            { Rank: 67, Energia: '497.12SpD' }, { Rank: 68, Energia: '2.89OcD' }, { Rank: 69, Energia: '17.92OcD' },
+            { Rank: 70, Energia: '118.360OcD' }, { Rank: 71, Energia: '828.38OcD' }, { Rank: 72, Energia: '6.13NvD' },
+            { Rank: 73, Energia: '47.81NvD' }, { Rank: 74, Energia: '239.06NvD' }, { Rank: 75, Energia: '1.29Vgn' },
+            { Rank: 76, Energia: '7.49Vgn' }, { Rank: 77, Energia: '46.41Vgn' }, { Rank: 78, Energia: '306.38Vgn' },
+            { Rank: 79, Energia: '2.15Uvg' }, { Rank: 80, Energia: '16.00Uvg' }, { Rank: 81, Energia: '124.80 Uvg' },
+            { Rank: 82, Energia: '748.80 Uvg' }, { Rank: 83, Energia: '4.79 DVg' }, { Rank: 84, Energia: '32.59 DVg' },
+            { Rank: 85, Energia: '234.63 DVg' }, { Rank: 86, Energia: '100 TVg' }, { Rank: 87, Energia: '1 qtV' },
+            { Rank: 88, Energia: '15 qtV' }, { Rank: 89, Energia: '50 qtV' }, { Rank: 90, Energia: '250 qtV' },
+            { Rank: 91, Energia: '2 QnV' }, { Rank: 92, Energia: '10 QnV' }, { Rank: 93, Energia: '50 QnV' },
+            { Rank: 94, Energia: '500 QnV' }, { Rank: 95, Energia: '5 SeV' }, { Rank: 96, Energia: '500 SeV' },
+            { Rank: 97, Energia: '25 SPG' }, { Rank: 98, Energia: '250 SPG' }, { Rank: 99, Energia: '2.5 OVG' },
+            { Rank: 100, Energia: '100 OVG' }, { Rank: 101, Energia: '750 OVG' }, { Rank: 102, Energia: '3 NVG' },
+            { Rank: 103, Energia: '30 NVG' }, { Rank: 104, Energia: '250 NVG' }, { Rank: 105, Energia: '1 TGN' },
         ],
       },
     },
@@ -138,7 +138,7 @@ export const worldBossesArticle: WikiArticle = {
   title: 'Guia de Chefes de Mundo',
   summary: 'Um guia completo para todos os chefes de mundo, seus status e o DPS recomendado para derrotá-los.',
   content: `Este guia fornece uma lista completa de todos os chefes de mundo de Rank-SS.`,
-  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'geral', '1', '2', '3', '4', '5', '6', '7', '8', '10', '11', '13', '15', '16', '17', '19', '20'],
+  tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'geral'],
   imageId: 'wiki-7',
   tables: {
     bosses: {
@@ -268,6 +268,34 @@ export const world20RaidsArticle: WikiArticle = {
   }
 };
 
+export const raidRequirementsArticle: WikiArticle = {
+  id: 'raid-requirements',
+  title: 'Requisitos de Energia para Raids',
+  summary: 'Um guia completo com os requisitos de energia para passar por diferentes ondas em várias raids e dungeons do jogo.',
+  content: 'Este guia consolida a energia necessária para progredir nas principais raids e dungeons do Anime Eternal.',
+  tags: ['raid', 'dungeon', 'energia', 'guia', 'geral'],
+  imageId: 'wiki-11',
+  tables: {
+    requirements: {
+      headers: ['Wave', 'Tournament Raid', 'Restaurant Raid', 'Cursed Raid', 'Leaf Raid', 'Progression Raid', 'Titan Defense', 'Raid Sins', 'Kaiju Dungeon', 'Progression Raid 2', 'Ghoul Raid', 'Chainsaw Defense', 'Nether World Raid', 'Green Planet Raid'],
+      rows: [
+        { 'Wave': 50, 'Tournament Raid': '10 QD', 'Restaurant Raid': '750 T', 'Cursed Raid': '500 QN', 'Leaf Raid': '500 UD', 'Progression Raid': '500 DD', 'Titan Defense': '300 SXD', 'Raid Sins': '111 OCD', 'Kaiju Dungeon': '500 UVG', 'Progression Raid 2': '200 QNV', 'Ghoul Raid': '600 SPG', 'Chainsaw Defense': '230 TGN', 'Nether World Raid': '6 TSTG', 'Green Planet Raid': '200 SSTG' },
+        { 'Wave': 100, 'Tournament Raid': '11 N', 'Restaurant Raid': '140 QD', 'Cursed Raid': '140 QD', 'Leaf Raid': '5 DD', 'Progression Raid': '62 TDD', 'Titan Defense': '20 SPD', 'Raid Sins': '13 NVD', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '24 SEV', 'Ghoul Raid': '70 OVG', 'Chainsaw Defense': '27 UTG', 'Nether World Raid': '40 QTTG', 'Green Planet Raid': '23 SPTG' },
+        { 'Wave': 200, 'Tournament Raid': '14 NVD', 'Restaurant Raid': '2 SX', 'Cursed Raid': '860 SP', 'Leaf Raid': '75 TDD', 'Progression Raid': '900 QDD', 'Titan Defense': '250 OCD', 'Raid Sins': '200 VGN', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '333 SPG', 'Ghoul Raid': '1 TGN', 'Chainsaw Defense': '375 DTG', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 300, 'Tournament Raid': '17 NVG', 'Restaurant Raid': '27,5 SP', 'Cursed Raid': '12 N', 'Leaf Raid': '1 QND', 'Progression Raid': '12 SXD', 'Titan Defense': '10 VGN', 'Raid Sins': '2 DVG', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '5 NVG', 'Ghoul Raid': '13 UTG', 'Chainsaw Defense': '5 QTTG', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 500, 'Tournament Raid': '????', 'Restaurant Raid': '5 DE', 'Cursed Raid': '2,25 DD', 'Leaf Raid': '200 SPG', 'Progression Raid': '2,25 NVD', 'Titan Defense': '650 DVG', 'Raid Sins': '10 OVG', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '900 UTG', 'Ghoul Raid': '2,5 QTTG', 'Chainsaw Defense': '1 SPTG', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 750, 'Tournament Raid': '//////', 'Restaurant Raid': '110 TDD', 'Cursed Raid': '500 QND', 'Leaf Raid': '4,5 UVG', 'Progression Raid': '50 DVG', 'Titan Defense': '15 SEV', 'Raid Sins': '200 UTG', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '20 QNTG', 'Ghoul Raid': '55 SPTG', 'Chainsaw Defense': '22 QDDR', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 1000, 'Tournament Raid': '//////', 'Restaurant Raid': '2,5 SPD', 'Cursed Raid': '1,1 NVD', 'Leaf Raid': '95 QTV', 'Progression Raid': '1 SEV', 'Titan Defense': '350 NVG', 'Raid Sins': '//////', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '500 OCTG', 'Ghoul Raid': '2 UQDR', 'Chainsaw Defense': '//////', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 1200, 'Tournament Raid': '//////', 'Restaurant Raid': '//////', 'Cursed Raid': '//////', 'Leaf Raid': '18 SPG', 'Progression Raid': '//////', 'Titan Defense': '//////', 'Raid Sins': '//////', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '//////', 'Ghoul Raid': '//////', 'Chainsaw Defense': '//////', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 1400, 'Tournament Raid': '//////', 'Restaurant Raid': '//////', 'Cursed Raid': '//////', 'Leaf Raid': '3,5 TGN', 'Progression Raid': '//////', 'Titan Defense': '//////', 'Raid Sins': '//////', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '//////', 'Ghoul Raid': '//////', 'Chainsaw Defense': '//////', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 1600, 'Tournament Raid': '//////', 'Restaurant Raid': '//////', 'Cursed Raid': '//////', 'Leaf Raid': '650 DTG', 'Progression Raid': '//////', 'Titan Defense': '//////', 'Raid Sins': '//////', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '//////', 'Ghoul Raid': '//////', 'Chainsaw Defense': '//////', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 1800, 'Tournament Raid': '//////', 'Restaurant Raid': '//////', 'Cursed Raid': '//////', 'Leaf Raid': '100 QNTG', 'Progression Raid': '//////', 'Titan Defense': '//////', 'Raid Sins': '//////', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '//////', 'Ghoul Raid': '//////', 'Chainsaw Defense': '//////', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+        { 'Wave': 2000, 'Tournament Raid': '//////', 'Restaurant Raid': '//////', 'Cursed Raid': '//////', 'Leaf Raid': '35 OCTG', 'Progression Raid': '//////', 'Titan Defense': '//////', 'Raid Sins': '//////', 'Kaiju Dungeon': '//////', 'Progression Raid 2': '//////', 'Ghoul Raid': '//////', 'Chainsaw Defense': '//////', 'Nether World Raid': '//////', 'Green Planet Raid': '?????' },
+      ]
+    }
+  }
+};
+
 
 // A comprehensive list for seeding all articles at once if needed.
 export const allWikiArticles = [
@@ -281,5 +309,7 @@ export const allWikiArticles = [
   swordsArticle,
   damageSwordsArticle,
   world20RaidsArticle,
+  raidRequirementsArticle,
 ];
+
 

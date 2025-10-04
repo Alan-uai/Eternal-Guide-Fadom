@@ -22,8 +22,8 @@ function WikiArticleContent({ article }: { article: WikiArticle }) {
   const contentHtml = article.content ? micromark(article.content) : '';
   const hasTables = article.tables && Object.keys(article.tables).length > 0;
 
-  // Specific grid rendering for the Rank System article
   if (article.id === 'rank-system' && article.tables?.ranks) {
+    const ranks = article.tables.ranks.rows;
     return (
       <div>
         <div
@@ -31,7 +31,7 @@ function WikiArticleContent({ article }: { article: WikiArticle }) {
           dangerouslySetInnerHTML={{ __html: contentHtml }}
         />
         <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-2 text-sm">
-          {article.tables.ranks.rows.map((row, index) => (
+          {ranks.map((row: any, index: number) => (
             <React.Fragment key={index}>
               <div className="font-semibold text-foreground">Rank {row.Rank}</div>
               <div className="text-muted-foreground">{row.Energia}</div>
@@ -42,7 +42,6 @@ function WikiArticleContent({ article }: { article: WikiArticle }) {
     );
   }
 
-  // Standard table rendering for other articles
   return (
     <div>
       <div
@@ -61,9 +60,9 @@ function WikiArticleContent({ article }: { article: WikiArticle }) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tableData.rows.map((row, rowIndex) => (
+                {tableData.rows.map((row: any, rowIndex: number) => (
                   <TableRow key={rowIndex}>
-                    {tableData.headers.map((header, cellIndex) => (
+                    {tableData.headers.map((header: string, cellIndex: number) => (
                       <TableCell key={`${rowIndex}-${cellIndex}`} className="whitespace-nowrap">{row[header]}</TableCell>
                     ))}
                   </TableRow>
@@ -248,3 +247,4 @@ export function WikiBrowser() {
     </div>
   );
 }
+
