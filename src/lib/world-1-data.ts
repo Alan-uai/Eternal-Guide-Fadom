@@ -11,9 +11,9 @@ export const world1Data = {
           { name: 'Android', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
           { name: 'Namekian', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
           { name: 'Frost Demon', multiplier: '5x', rarity: 'Legendary', probability: 5 },
-          { name: 'Majin', multiplier: '8x', rarity: 'Mythic' },
-          { name: 'Half-Saiyan', multiplier: '10x', rarity: 'Phantom' },
-          { name: 'Saiyan', multiplier: '12x', rarity: 'Supreme' },
+          { name: 'Majin', multiplier: '8x', rarity: 'Mythic', probability: 1 },
+          { name: 'Half-Saiyan', multiplier: '10x', rarity: 'Phantom', probability: 0.5 },
+          { name: 'Saiyan', multiplier: '12x', rarity: 'Supreme', probability: 0.05 },
         ],
       },
       {
