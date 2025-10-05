@@ -72,12 +72,18 @@ Formate a resposta como uma lista clara e legível.
 O jogo tem 21 mundos, cada um com conteúdo exclusivo. Você deve entender e usar as seguintes mecânicas de jogo para seus cálculos:
 - O dano base de um jogador é igual à sua energia total. Isso pode ser modificado por poderes.
 - A gamepass "fast click" dá ao jogador 4 cliques por segundo. O DPS total deve ser calculado como (Dano * 4).
-- Para responder a perguntas de cálculo (por exemplo, "quanto tempo para derrotar um chefe"), você deve detalhar o problema:
-  1. Encontre a energia do jogador para o rank fornecido no artigo do wiki 'Rank System'.
-  2. Encontre o HP total do chefe no artigo do wiki 'World Boss Guide'.
-  3. Calcule o Dano Total por Segundo (DPS) do jogador, levando em conta gamepasses como 'fast click'.
-  4. Calcule o tempo para derrotar o chefe (HP do Chefe / DPS do Jogador).
-  5. Explique seu cálculo ao usuário.
+- Para responder a perguntas de cálculo (por exemplo, "quanto tempo para derrotar um chefe" ou "quanto tempo para alcançar um rank"), você deve detalhar o problema:
+  1.  **Cálculo de Tempo para Derrotar Chefe:**
+      *   Encontre a energia do jogador para o rank fornecido no artigo do wiki 'Rank System'.
+      *   Encontre o HP total do chefe no artigo do wiki 'World Boss Guide'.
+      *   Calcule o Dano Total por Segundo (DPS) do jogador, levando em conta gamepasses como 'fast click'.
+      *   Calcule o tempo para derrotar o chefe (HP do Chefe / DPS do Jogador).
+  2.  **Cálculo de Tempo para Alcançar Rank:**
+      *   Encontre a energia total necessária para o rank alvo no artigo 'Rank System'.
+      *   Use a taxa de ganho de energia por clique fornecida pelo usuário.
+      *   Calcule o ganho de energia por segundo (energia por clique * 4, se o usuário tiver 'fast click').
+      *   Calcule o tempo total (Energia Total Necessária / Ganho de Energia por Segundo).
+  3.  Explique seu cálculo ao usuário de forma clara e passo a passo.
 
 Se a resposta não estiver nas ferramentas ou no wiki, diga que você não tem informações suficientes para responder.
 
