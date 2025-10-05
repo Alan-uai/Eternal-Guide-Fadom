@@ -290,10 +290,49 @@ export const raidRequirementsArticle: WikiArticle = {
   id: 'raid-requirements',
   title: 'Requisitos de Energia para Raids',
   summary: 'Um guia completo com os requisitos de energia para passar por diferentes ondas em várias raids e dungeons do jogo.',
-  content: 'Este guia consolida a energia necessária para progredir nas principais raids e dungeons do Anime Eternal.',
-  tags: ['raid', 'dungeon', 'energia', 'guia', 'geral'],
+  content: `Este guia consolida a energia necessária para progredir nas principais raids e dungeons do Anime Eternal. É importante notar que as raids podem ser solo ou em grupo.
+
+**Raids Solo (1 Jogador):**
+*   **Gleam Raid (Mundo 15):** Uma raid de desafio individual.
+*   **Raid Sins:** Outra raid projetada para um único jogador.
+
+**Raids em Grupo (até 4 Jogadores):**
+*   Todas as outras raids não mencionadas como "solo" permitem a participação de até 4 jogadores.
+
+Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a tabela consolidada para as raids mais antigas.`,
+  tags: ['raid', 'dungeon', 'energia', 'guia', 'geral', 'solo'],
   imageId: 'wiki-11',
   tables: {
+    gleamRaidWorld15: {
+      headers: ['Wave', 'HP', 'DPS'],
+      rows: [
+        { 'Wave': 1, 'HP': '12.00 - QnV', 'DPS': '500 - QtV' },
+        { 'Wave': 2, 'HP': '240.00 - QnV', 'DPS': '10 - QnV' },
+        { 'Wave': 3, 'HP': '4.80 - SeV', 'DPS': '170 - QnV' },
+        { 'Wave': 4, 'HP': '96.00 - SeV', 'DPS': '3.5 - SeV' },
+        { 'Wave': 5, 'HP': '1.92 - SpG', 'DPS': '80 - SeV' },
+        { 'Wave': 6, 'HP': '38.40 - SpG', 'DPS': '1.5 - SpG' },
+        { 'Wave': 7, 'HP': '768.00 - SpG', 'DPS': '30 - SpG' },
+        { 'Wave': 8, 'HP': '16.36 - OvG', 'DPS': '650 - SpG' },
+        { 'Wave': 9, 'HP': '307.20 - OvG', 'DPS': '12 - OvG' },
+        { 'Wave': 10, 'HP': '6.14 - NvG', 'DPS': '230 - OvG' }
+      ]
+    },
+    mundoRaidWorld21: {
+      headers: ['Wave', 'HP', 'DPS'],
+      rows: [
+        { 'Wave': 1, 'HP': '81 - NoTG', 'DPS': '8.1 - NoTG' },
+        { 'Wave': 2, 'HP': '2.91 - QdDR', 'DPS': '700 - NoTG' },
+        { 'Wave': 3, 'HP': '58 - QdDR', 'DPS': '5.8 - QdDR' },
+        { 'Wave': 4, 'HP': '1.16 - uQDR', 'DPS': '600 - QdDR' },
+        { 'Wave': 5, 'HP': '23.3 - uQDR', 'DPS': '2.33 - uQDR' },
+        { 'Wave': 6, 'HP': '466 - uQDR', 'DPS': '46 - uQDR' },
+        { 'Wave': 7, 'HP': '9.32 - dQDR', 'DPS': '932 - uQDR' },
+        { 'Wave': 8, 'HP': '186 - dQDR', 'DPS': '18.6 - dQDR' },
+        { 'Wave': 9, 'HP': '3.73 - tQDR', 'DPS': '373 - dQDR' },
+        { 'Wave': 10, 'HP': '74.5 - tQDR', 'DPS': '7.45 - tQDR' }
+      ]
+    },
     requirements: {
       headers: ['Wave', 'Tournament Raid', 'Restaurant Raid', 'Cursed Raid', 'Leaf Raid', 'Progression Raid', 'Titan Defense', 'Raid Sins', 'Kaiju Dungeon', 'Progression Raid 2', 'Ghoul Raid', 'Chainsaw Defense', 'Nether World Raid', 'Green Planet Raid'],
       rows: [
@@ -623,5 +662,6 @@ export const allWikiArticles = [
 
 
     
+
 
 
