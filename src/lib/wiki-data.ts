@@ -10,13 +10,23 @@ export const gettingStartedArticle: WikiArticle = {
 **Criação de Personagem e Primeira Missão**
 Primeiro, você precisa escolher sua classe inicial: Guerreiro, Mago ou Ladino. Cada classe tem habilidades únicas. Sua primeira missão será dada pelo Ancião da Vila em Vento Argênteo, que lhe ensinará a se mover, combater e interagir com o mundo.
 
+**Legenda de Cores de Raridade**
+No jogo, a cor de fundo do nome de um item indica sua raridade:
+*   **Cinza:** Comum
+*   **Verde:** Incomum
+*   **Azul:** Raro
+*   **Amarelo:** Lendário
+*   **Vermelho:** Mítico
+*   **Roxo:** Phantom
+*   **Laranja:** Supreme
+
 **Principais Atividades no Mundo 1:**
 *   **Placares de Líderes Globais:** Confira os melhores jogadores do mundo e veja sua posição.
 *   **Subir de Rank e Nível de Avatar:** O Mundo 1 é onde você aumentará seu Rank e o nível de seus avatares.
 *   **Baús e Missões Diárias:** Encontre e colete baús e complete missões diárias para obter recompensas valiosas.
 *   **Dungeon do Mundo - Torneio:** Sua primeira dungeon específica do mundo é o Torneio, que vai até a Sala 550.
 *   **Lobby de Dungeons:** Acesse uma variedade de dungeons especiais, que são diferentes das dungeons encontradas em cada mundo. As dungeons de lobby são: **Fácil, Média, Difícil, Insana, Louca, Pesadelo e Folha**. Todas as outras raids e dungeons pertencem a mundos específicos.`,
-    tags: ['iniciante', 'guia', 'novo jogador', 'classe', 'mundo 1', 'geral', '1'],
+    tags: ['iniciante', 'guia', 'novo jogador', 'classe', 'mundo 1', 'geral', '1', 'raridade'],
     imageId: 'wiki-1',
 };
 
@@ -226,21 +236,24 @@ export const swordsArticle: WikiArticle = {
 export const damageSwordsArticle: WikiArticle = {
   id: 'damage-swords',
   title: 'Espadas de Dano (Evolução)',
-  summary: 'Um guia para as espadas de dano e seus multiplicadores em cada nível de evolução (estrela).',
-  content: 'Espadas de dano aumentam seu poder de ataque. A cada evolução (nível de estrela), o multiplicador de dano aumenta significativamente.',
-  tags: ['espadas', 'dano', 'arma', 'guia', 'geral', 'evolução'],
+  summary: 'Um guia para as espadas de dano e seus multiplicadores em cada nível de evolução (estrela), incluindo informações sobre a espada de evento Golden Venom Strike.',
+  content: `Espadas de dano aumentam seu poder de ataque. A cada evolução (nível de estrela), o multiplicador de dano aumenta significativamente.
+
+**Nota Especial sobre a Golden Venom Strike:** A Golden Venom Strike foi uma espada de evento da atualização 17, que não está mais disponível para obtenção. Ela era adquirida no Mundo 2 ao trocar uma Venomstrike de 3 estrelas (Phantom). Ela possui um multiplicador de dano base de 38x e não possui estrelas ou passivas.`,
+  tags: ['espadas', 'dano', 'arma', 'guia', 'geral', 'evolução', 'golden venom'],
   imageId: 'wiki-9',
   tables: {
     damageSwords: {
-      headers: ['Espada', 'Stats (Base)', 'Stats (1 Estrela)', 'Stats (2 Estrelas)', 'Stats (3 Estrelas)'],
+      headers: ['Espada', 'Raridade', 'Dano Base (3 Estrelas)', 'Com Respiração Phantom', 'Com Runa de Dano Phantom + Respiração Phantom', 'Com Runa de Dano Supremo + Respiração Phantom'],
       rows: [
-        { 'Espada': 'Bloodthorn', 'Stats (Base)': '0.25x', 'Stats (1 Estrela)': '0.5x', 'Stats (2 Estrelas)': '0.75x', 'Stats (3 Estrelas)': '1.25x' },
-        { 'Espada': 'Eclipse Warden', 'Stats (Base)': '0.45x', 'Stats (1 Estrela)': '0.9x', 'Stats (2 Estrelas)': '1.35x', 'Stats (3 Estrelas)': '2.25x' },
-        { 'Espada': 'Obsidian Reaver', 'Stats (Base)': '0.75x', 'Stats (1 Estrela)': '1.5x', 'Stats (2 Estrelas)': '2.25x', 'Stats (3 Estrelas)': '3.75x' },
-        { 'Espada': 'Aquarius Edge', 'Stats (Base)': '1x', 'Stats (1 Estrela)': '2x', 'Stats (2 Estrelas)': '3x', 'Stats (3 Estrelas)': '5x' },
-        { 'Espada': 'Doomsoul', 'Stats (Base)': '1.25x', 'Stats (1 Estrela)': '2.5x', 'Stats (2 Estrelas)': '3.75x', 'Stats (3 Estrelas)': '6.25x' },
-        { 'Espada': 'Redmourne', 'Stats (Base)': '1.5x', 'Stats (1 Estrela)': '3x', 'Stats (2 Estrelas)': '4.5x', 'Stats (3 Estrelas)': '7.5x' },
-        { 'Espada': 'Venomstrike', 'Stats (Base)': '2x', 'Stats (1 Estrela)': '4x', 'Stats (2 Estrelas)': '6x', 'Stats (3 Estrelas)': '10x' },
+        { 'Espada': 'BloodThorn', 'Raridade': 'Comum', 'Dano Base (3 Estrelas)': '1.25x', 'Com Respiração Phantom': '2.25x', 'Com Runa de Dano Phantom + Respiração Phantom': '4.05x', 'Com Runa de Dano Supremo + Respiração Phantom': '5x' },
+        { 'Espada': 'Eclipse Warden', 'Raridade': 'Incomum', 'Dano Base (3 Estrelas)': '2.25x', 'Com Respiração Phantom': '4.05x', 'Com Runa de Dano Phantom + Respiração Phantom': '7.29x', 'Com Runa de Dano Supremo + Respiração Phantom': '9.10x' },
+        { 'Espada': 'Obsidian Reaver', 'Raridade': 'Raro', 'Dano Base (3 Estrelas)': '3.75x', 'Com Respiração Phantom': '6.75x', 'Com Runa de Dano Phantom + Respiração Phantom': '12.15x', 'Com Runa de Dano Supremo + Respiração Phantom': '13.50x' },
+        { 'Espada': 'Aquarius Edge', 'Raridade': 'Lendário', 'Dano Base (3 Estrelas)': '5x', 'Com Respiração Phantom': '9x', 'Com Runa de Dano Phantom + Respiração Phantom': '16.2x', 'Com Runa de Dano Supremo + Respiração Phantom': '18x' },
+        { 'Espada': 'Demon Soul', 'Raridade': 'Mítico', 'Dano Base (3 Estrelas)': '6.25x', 'Com Respiração Phantom': '11.25x', 'Com Runa de Dano Phantom + Respiração Phantom': '20.25x', 'Com Runa de Dano Supremo + Respiração Phantom': '22.50x' },
+        { 'Espada': 'Redmourne', 'Raridade': 'Mítico', 'Dano Base (3 Estrelas)': '7.5x', 'Com Respiração Phantom': '13.5x', 'Com Runa de Dano Phantom + Respiração Phantom': '24.3x', 'Com Runa de Dano Supremo + Respiração Phantom': '27x' },
+        { 'Espada': 'VenomStrike', 'Raridade': 'Phantom', 'Dano Base (3 Estrelas)': '10x', 'Com Respiração Phantom': '18x', 'Com Runa de Dano Phantom + Respiração Phantom': '32.4x', 'Com Runa de Dano Supremo + Respiração Phantom': '36x' },
+        { 'Espada': 'Golden Venom Strike', 'Raridade': 'Evento', 'Dano Base (3 Estrelas)': '38x (Não possui estrelas)', 'Com Respiração Phantom': 'N/A', 'Com Runa de Dano Phantom + Respiração Phantom': 'N/A', 'Com Runa de Dano Supremo + Respiração Phantom': 'N/A' },
       ],
     },
   },
@@ -532,6 +545,7 @@ export const allWikiArticles = [
     
 
     
+
 
 
 
