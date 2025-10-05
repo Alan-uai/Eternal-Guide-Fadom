@@ -62,7 +62,7 @@ export const world4Data = {
         {
             id: 'cursed-dungeon',
             name: 'Cursed Dungeon',
-            description: 'The Cursed Raid is located in World 4.'
+            description: 'The Cursed Raid is located in World 4. It drops 11 tokens for early world powers, each with a 9% chance of dropping.'
         }
     ],
   };

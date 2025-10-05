@@ -108,7 +108,7 @@ export const world2Data = {
             id: 'restaurante',
             name: 'Restaurante',
             boss: 'Don Krieg',
-            description: 'Goes up to level 1000. Drops 5 tokens, each with a 20% chance. Tokens are used for gacha/progression powers.'
+            description: 'Goes up to level 1000. Drops 5 tokens for early world powers, each with a 20% chance of dropping.'
         }
     ],
   };
