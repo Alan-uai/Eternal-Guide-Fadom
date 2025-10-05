@@ -242,6 +242,30 @@
             "movespeed_bonus": { "type": "string", "description": "The movement speed bonus percentage (e.g., '10%', '75%')." }
         },
         "required": ["name", "world", "boss"]
+    },
+    "Shadow": {
+      "title": "Shadow",
+      "type": "object",
+      "description": "Represents a Shadow fighter, a special type of fighter dropped by bosses from World 6 onwards.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "description": "The name of the Shadow, usually tied to the boss that drops it." },
+        "type": { "type": "string", "enum": ["Energy", "Damage"], "description": "The type of bonus the Shadow provides." },
+        "stats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rank": { "type": "string", "description": "The boss rank that drops this stat version (e.g., 'Rank SS', 'Rank SSS')." },
+              "rarity": { "type": "string", "description": "The rarity of the Shadow (e.g., 'Phantom', 'Supremo')." },
+              "bonus": { "type": "string", "description": "The bonus value (e.g., '7% Energy', '7% Damage')." },
+              "cooldown": { "type": "string", "description": "The attack cooldown, applicable only to Damage Shadows (e.g., '2s')." }
+            },
+            "required": ["rank", "rarity", "bonus"]
+          }
+        }
+      },
+      "required": ["id", "name", "type", "stats"]
     }
   },
   "auth": {
@@ -339,10 +363,16 @@
           "schema": { "$ref": "#/backend/entities/Accessory" },
           "description": "Sub-collection for accessories available in a world."
         }
+      },
+      {
+        "path": "/worlds/{worldId}/shadows/{shadowId}",
+        "definition": {
+          "entityName": "Shadow",
+          "schema": { "$ref": "#/backend/entities/Shadow" },
+          "description": "Sub-collection for Shadow fighters available in a world."
+        }
       }
     ],
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', and now 'accessories', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all accessories for 'World 1', you query the '/worlds/world1/accessories' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
-
-    

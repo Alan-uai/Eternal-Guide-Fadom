@@ -32,64 +32,23 @@ import { world1Data } from '@/lib/world-1-data';
 import { world2Data } from '@/lib/world-2-data';
 import { world3Data } from '@/lib/world-3-data';
 import { world4Data } from '@/lib/world-4-data';
+import { world6Data } from '@/lib/world-6-data';
+import { world7Data } from '@/lib/world-7-data';
+import { world8Data } from '@/lib/world-8-data';
+import { world9Data } from '@/lib/world-9-data';
+import { world10Data } from '@/lib/world-10-data';
+import { world11Data } from '@/lib/world-11-data';
+import { world12Data } from '@/lib/world-12-data';
+import { world13Data } from '@/lib/world-13-data';
+import { world14Data } from '@/lib/world-14-data';
+import { world15Data } from '@/lib/world-15-data';
+import { world16Data } from '@/lib/world-16-data';
+import { world17Data } from '@/lib/world-17-data';
+import { world18Data } from '@/lib/world-18-data';
+import { world19Data } from '@/lib/world-19-data';
+import { world20Data } from '@/lib/world-20-data';
+import { world21Data } from '@/lib/world-21-data';
 
-const world20Data = {
-    name: 'World 20 - Grand Elder',
-    powers: [
-      {
-        id: 'grand-elder-power',
-        name: 'Grand Elder Power',
-        type: 'gacha',
-        statType: 'energy',
-        stats: [
-          { name: 'Sleeping Power', multiplier: '2x', rarity: 'Common' },
-          { name: 'Stirring Spirit', multiplier: '3x', rarity: 'Uncommon' },
-          { name: 'Hidden Potential', multiplier: '4.5x', rarity: 'Rare' },
-          { name: 'Inner Strength', multiplier: '6x', rarity: 'Legendary' },
-          { name: 'Power Unleashed', multiplier: '8x', rarity: 'Mythic' },
-          { name: 'True Potential', multiplier: '10x', rarity: 'Phantom' },
-          { name: 'Limitless Growth', multiplier: '12x', rarity: 'Phantom' },
-          { name: 'Potential Unbound', multiplier: '15x', rarity: 'Supreme' },
-        ],
-      },
-      {
-        id: 'frost-demon-evolution',
-        name: 'Frost Demon Evolution',
-        type: 'gacha',
-        statType: 'damage',
-        stats: [
-          { name: 'Second Form', multiplier: '1x', rarity: 'Common' },
-          { name: 'Third Form', multiplier: '1.5x', rarity: 'Uncommon' },
-          { name: 'Final Form', multiplier: '2x', rarity: 'Rare' },
-          { name: '50% Power', multiplier: '3x', rarity: 'Legendary' },
-          { name: '100% Full Power', multiplier: '5x', rarity: 'Mythic' },
-          { name: 'Mecha Form', multiplier: '7x', rarity: 'Phantom' },
-          { name: 'Golden Form', multiplier: '9x', rarity: 'Phantom' },
-          { name: 'Black Form', multiplier: '12x', rarity: 'Supreme' },
-        ],
-      },
-       {
-        id: 'dragon-energy',
-        name: 'Dragon Energy',
-        type: 'progression',
-        statType: 'energy',
-        maxLevel: 50,
-        maxBoost: '1x Energy'
-      },
-      {
-        id: 'dragon-damage',
-        name: 'Dragon Damage',
-        type: 'progression',
-        statType: 'damage',
-        maxLevel: 500,
-        maxBoost: '10x Damage'
-      }
-    ],
-    npcs: [],
-    pets: [],
-    dungeons: [],
-  };
-  
 export default function SeedPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -98,7 +57,23 @@ export default function SeedPage() {
     world2: false,
     world3: false,
     world4: false,
+    world5: false,
+    world6: false,
+    world7: false,
+    world8: false,
+    world9: false,
+    world10: false,
+    world11: false,
+    world12: false,
+    world13: false,
+    world14: false,
+    world15: false,
+    world16: false,
+    world17: false,
+    world18: false,
+    world19: false,
     world20: false,
+    world21: false,
     gettingStarted: false,
     ranks: false,
     auras: false,
@@ -147,7 +122,9 @@ export default function SeedPage() {
 
             if (stats && stats.length > 0) {
                 for (const stat of stats) {
-                    const statId = stat.name.toLowerCase().replace(/\s+/g, '-').replace(/%/g, '');
+                    // Use a combination of properties to create a unique ID for stats if they don't have one
+                    const statId = (stat.id || stat.name || JSON.stringify(stat)).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                    if (!statId) continue;
                     const statRef = doc(itemRef, 'stats', statId);
                     batch.set(statRef, stat);
                     allDataForBatch[statRef.path] = stat;
@@ -161,6 +138,7 @@ export default function SeedPage() {
     seedSubcollection('npcs', worldData.npcs);
     seedSubcollection('pets', worldData.pets);
     seedSubcollection('dungeons', worldData.dungeons);
+    seedSubcollection('shadows', worldData.shadows);
     
     await batch.commit().then(() => {
         toast({ title: 'Sucesso!', description: `Os dados do ${worldData.name} foram populados com sucesso.` });
@@ -230,6 +208,28 @@ export default function SeedPage() {
   }
 
   const worldNumbers = Array.from({ length: 21 }, (_, i) => i + 1);
+  const worldSeedData: { [key: number]: any } = {
+    1: { data: world1Data, key: 'world1' },
+    2: { data: world2Data, key: 'world2' },
+    3: { data: world3Data, key: 'world3' },
+    4: { data: world4Data, key: 'world4' },
+    6: { data: world6Data, key: 'world6' },
+    7: { data: world7Data, key: 'world7' },
+    8: { data: world8Data, key: 'world8' },
+    9: { data: world9Data, key: 'world9' },
+    10: { data: world10Data, key: 'world10' },
+    11: { data: world11Data, key: 'world11' },
+    12: { data: world12Data, key: 'world12' },
+    13: { data: world13Data, key: 'world13' },
+    14: { data: world14Data, key: 'world14' },
+    15: { data: world15Data, key: 'world15' },
+    16: { data: world16Data, key: 'world16' },
+    17: { data: world17Data, key: 'world17' },
+    18: { data: world18Data, key: 'world18' },
+    19: { data: world19Data, key: 'world19' },
+    20: { data: world20Data, key: 'world20' },
+    21: { data: world21Data, key: 'world21' },
+  };
 
   async function handleSeedAll() {
     handleLoading('all', true);
@@ -251,11 +251,10 @@ export default function SeedPage() {
 
     await handleSeedAccessories();
 
-    await seedWorldGeneric('world-1', world1Data, 'world1');
-    await seedWorldGeneric('world-2', world2Data, 'world2');
-    await seedWorldGeneric('world-3', world3Data, 'world3');
-    await seedWorldGeneric('world-4', world4Data, 'world4');
-    await seedWorldGeneric('world-20', world20Data, 'world20');
+    for (const worldNum in worldSeedData) {
+      const seedInfo = worldSeedData[worldNum];
+      await seedWorldGeneric(`world-${worldNum}`, seedInfo.data, seedInfo.key as keyof typeof loadingStates);
+    }
 
     toast({ title: 'Concluído!', description: 'Todos os dados foram populados com sucesso.' });
     handleLoading('all', false);
@@ -410,7 +409,7 @@ export default function SeedPage() {
           </Card>
           <Card>
             <CardHeader><CardTitle className="text-lg">Popular Foices (Mundo 21)</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Foices (Mundo 21)" na coleção `wikiContent`.</CardDescription></Content>
+            <CardContent><CardDescription>Popula o artigo "Foices (Mundo 21)" na coleção `wikiContent`.</CardDescription></CardContent>
             <CardFooter>
               <Button onClick={() => seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)')} disabled={loadingStates.scythes || !firestore}>
                 {loadingStates.scythes ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -436,43 +435,27 @@ export default function SeedPage() {
       <Card>
         <CardHeader>
           <CardTitle>Popular Dados de Jogo por Mundo</CardTitle>
-          <CardDescription>Popula o Firestore com dados de jogo para cada mundo individualmente. Dados para mundos diferentes de 1, 2, 3, 4 e 20 ainda não estão disponíveis.</CardDescription>
+          <CardDescription>Popula o Firestore com dados de jogo para cada mundo individualmente.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
-          {worldNumbers.map(worldNum => (
-            <div key={worldNum}>
-              {worldNum === 1 ? (
-                 <Button onClick={() => seedWorldGeneric('world-1', world1Data, 'world1')} disabled={loadingStates.world1 || !firestore} className="w-full">
-                    {loadingStates.world1 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    {loadingStates.world1 ? 'Populando...' : `Popular Mundo ${worldNum}`}
-                </Button>
-              ) : worldNum === 2 ? (
-                <Button onClick={() => seedWorldGeneric('world-2', world2Data, 'world2')} disabled={loadingStates.world2 || !firestore} className="w-full">
-                  {loadingStates.world2 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {loadingStates.world2 ? 'Populando...' : `Popular Mundo ${worldNum}`}
-                </Button>
-              ) : worldNum === 3 ? (
-                <Button onClick={() => seedWorldGeneric('world-3', world3Data, 'world3')} disabled={loadingStates.world3 || !firestore} className="w-full">
-                  {loadingStates.world3 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {loadingStates.world3 ? 'Populando...' : `Popular Mundo ${worldNum}`}
-                </Button>
-              ) : worldNum === 4 ? (
-                <Button onClick={() => seedWorldGeneric('world-4', world4Data, 'world4')} disabled={loadingStates.world4 || !firestore} className="w-full">
-                  {loadingStates.world4 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {loadingStates.world4 ? 'Populando...' : `Popular Mundo ${worldNum}`}
-                </Button>
-              ) : worldNum === 20 ? (
-                <Button onClick={() => seedWorldGeneric('world-20', world20Data, 'world20')} disabled={loadingStates.world20 || !firestore} className="w-full">
-                  {loadingStates.world20 ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {loadingStates.world20 ? 'Populando...' : `Popular Mundo ${worldNum}`}
-                </Button>
-              ) : (
-                <Button disabled className="w-full">
-                  Popular Mundo {worldNum}
-                </Button>
-              )}
-            </div>
-          ))}
+          {worldNumbers.map(worldNum => {
+            const seedInfo = worldSeedData[worldNum];
+            const loadingKey = seedInfo ? seedInfo.key as keyof typeof loadingStates : null;
+            return (
+              <div key={worldNum}>
+                {seedInfo ? (
+                   <Button onClick={() => seedWorldGeneric(`world-${worldNum}`, seedInfo.data, loadingKey!)} disabled={loadingStates[loadingKey!] || !firestore} className="w-full">
+                      {loadingStates[loadingKey!] ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      {loadingStates[loadingKey!] ? 'Populando...' : `Popular Mundo ${worldNum}`}
+                  </Button>
+                ) : (
+                  <Button disabled className="w-full">
+                    Popular Mundo {worldNum}
+                  </Button>
+                )}
+              </div>
+            )
+          })}
         </CardContent>
       </Card>
     </div>
