@@ -8,10 +8,10 @@ export const world2Data = {
         type: 'gacha',
         statType: 'damage',
         stats: [
-          { name: 'Conquerors Haki', multiplier: '1.1x' },
-          { name: 'Red Hair', multiplier: '1.2x' },
-          { name: 'Emperor', multiplier: '1.3x' },
-          { name: 'Yonko', multiplier: '1.4x' },
+          { name: 'Conquerors Haki', multiplier: '1.1x', rarity: 'Rare' },
+          { name: 'Red Hair', multiplier: '1.2x', rarity: 'Legendary' },
+          { name: 'Emperor', multiplier: '1.3x', rarity: 'Mythic' },
+          { name: 'Yonko', multiplier: '1.4x', rarity: 'Phantom' },
         ],
       },
       {
@@ -20,13 +20,13 @@ export const world2Data = {
         type: 'gacha',
         statType: 'energy',
         stats: [
-            { name: 'Whitebeard Pirates', multiplier: '2x' },
-            { name: 'Cross Guild', multiplier: '3x' },
-            { name: 'Big Mom Pirates', multiplier: '4x' },
-            { name: 'Beast pirates', multiplier: '5x' },
-            { name: 'Blackbeard Pirates', multiplier: '8x' },
-            { name: 'Straw Hat Pirates', multiplier: '10x' },
-            { name: 'Red-Haired Pirates', multiplier: '12x' }
+            { name: 'Whitebeard Pirates', multiplier: '2x', rarity: 'Common' },
+            { name: 'Cross Guild', multiplier: '3x', rarity: 'Uncommon' },
+            { name: 'Big Mom Pirates', multiplier: '4x', rarity: 'Rare' },
+            { name: 'Beast pirates', multiplier: '5x', rarity: 'Legendary' },
+            { name: 'Blackbeard Pirates', multiplier: '8x', rarity: 'Mythic' },
+            { name: 'Straw Hat Pirates', multiplier: '10x', rarity: 'Phantom' },
+            { name: 'Red-Haired Pirates', multiplier: '12x', rarity: 'Supreme' }
         ]
       },
       {
@@ -35,13 +35,13 @@ export const world2Data = {
         type: 'gacha',
         statType: 'damage',
         stats: [
-            { name: 'Common Chef', multiplier: '1x' },
-            { name: 'Uncommon Chef', multiplier: '1.5x' },
-            { name: 'Rare Chef', multiplier: '2x' },
-            { name: 'Epic Chef', multiplier: '3x' },
-            { name: 'Legendary Chef', multiplier: '5x' },
-            { name: 'Mythical Chef', multiplier: '7x' },
-            { name: 'Phantom Chef', multiplier: '10x' }
+            { name: 'Common Chef', multiplier: '1x', rarity: 'Common' },
+            { name: 'Uncommon Chef', multiplier: '1.5x', rarity: 'Uncommon' },
+            { name: 'Rare Chef', multiplier: '2x', rarity: 'Rare' },
+            { name: 'Epic Chef', multiplier: '3x', rarity: 'Legendary' },
+            { name: 'Legendary Chef', multiplier: '5x', rarity: 'Mythic' },
+            { name: 'Mythical Chef', multiplier: '7x', rarity: 'Phantom' },
+            { name: 'Phantom Chef', multiplier: '10x', rarity: 'Supreme' }
         ]
       },
       {
@@ -50,20 +50,20 @@ export const world2Data = {
         type: 'gacha',
         // statType is defined on individual stats because it's mixed
         stats: [
-          { name: 'Bomb Fruit', multiplier: '2x', statType: 'coin' },
-          { name: 'Rubber Fruit', multiplier: '3x', statType: 'energy' },
-          { name: 'Sand Fruit', multiplier: '4x', statType: 'coin' },
-          { name: 'Flame Fruit', multiplier: '5x', statType: 'energy' },
-          { name: 'Smoke Fruit', multiplier: '6x', statType: 'energy' },
-          { name: 'Magma Fruit', multiplier: '7x', statType: 'damage' },
-          { name: 'Revive Fruit', multiplier: '8x', statType: 'energy' },
-          { name: 'String Fruit', multiplier: '9x', statType: 'coin' },
-          { name: 'Human Fruit', multiplier: '10x', statType: 'coin' },
-          { name: 'Dark Fruit', multiplier: '11x', statType: 'coin' },
-          { name_id: 'quake-fruit', name: 'Quake Fruit', multiplier: '12x', statType: 'damage' },
-          { name: 'Money Fruit', multiplier: '1x', statType: 'coin' },
-          { name: 'Phoenix Fruit', multiplier: '15x', statType: 'energy' },
-          { name: 'Dough Fruit', multiplier: '10x', statType: 'energy' },
+          { name: 'Bomb Fruit', multiplier: '2x', statType: 'coin', rarity: 'Common' },
+          { name: 'Rubber Fruit', multiplier: '3x', statType: 'energy', rarity: 'Uncommon' },
+          { name: 'Sand Fruit', multiplier: '4x', statType: 'coin', rarity: 'Rare' },
+          { name: 'Flame Fruit', multiplier: '5x', statType: 'energy', rarity: 'Legendary' },
+          { name: 'Smoke Fruit', multiplier: '6x', statType: 'energy', rarity: 'Legendary' },
+          { name: 'Magma Fruit', multiplier: '7x', statType: 'damage', rarity: 'Mythic' },
+          { name: 'Revive Fruit', multiplier: '8x', statType: 'energy', rarity: 'Mythic' },
+          { name: 'String Fruit', multiplier: '9x', statType: 'coin', rarity: 'Phantom' },
+          { name: 'Human Fruit', multiplier: '10x', statType: 'coin', rarity: 'Phantom' },
+          { name: 'Dark Fruit', multiplier: '11x', statType: 'coin', rarity: 'Phantom' },
+          { name_id: 'quake-fruit', name: 'Quake Fruit', multiplier: '12x', statType: 'damage', rarity: 'Supreme' },
+          { name: 'Money Fruit', multiplier: '1x', statType: 'coin', rarity: 'Uncommon' },
+          { name: 'Phoenix Fruit', multiplier: '15x', statType: 'energy', rarity: 'Supreme' },
+          { name: 'Dough Fruit', multiplier: '10x', statType: 'energy', rarity: 'Phantom' },
         ]
       },
       {

@@ -42,14 +42,14 @@ const world20Data = {
         type: 'gacha',
         statType: 'energy',
         stats: [
-          { name: 'Sleeping Power', multiplier: '2x' },
-          { name: 'Stirring Spirit', multiplier: '3x' },
-          { name: 'Hidden Potential', multiplier: '4.5x' },
-          { name: 'Inner Strength', multiplier: '6x' },
-          { name: 'Power Unleashed', multiplier: '8x' },
-          { name: 'True Potential', multiplier: '10x' },
-          { name: 'Limitless Growth', multiplier: '12x' },
-          { name: 'Potential Unbound', multiplier: '15x' },
+          { name: 'Sleeping Power', multiplier: '2x', rarity: 'Common' },
+          { name: 'Stirring Spirit', multiplier: '3x', rarity: 'Uncommon' },
+          { name: 'Hidden Potential', multiplier: '4.5x', rarity: 'Rare' },
+          { name: 'Inner Strength', multiplier: '6x', rarity: 'Legendary' },
+          { name: 'Power Unleashed', multiplier: '8x', rarity: 'Mythic' },
+          { name: 'True Potential', multiplier: '10x', rarity: 'Phantom' },
+          { name: 'Limitless Growth', multiplier: '12x', rarity: 'Phantom' },
+          { name: 'Potential Unbound', multiplier: '15x', rarity: 'Supreme' },
         ],
       },
       {
@@ -58,14 +58,14 @@ const world20Data = {
         type: 'gacha',
         statType: 'damage',
         stats: [
-          { name: 'Second Form', multiplier: '1x' },
-          { name: 'Third Form', multiplier: '1.5x' },
-          { name: 'Final Form', multiplier: '2x' },
-          { name: '50% Power', multiplier: '3x' },
-          { name: '100% Full Power', multiplier: '5x' },
-          { name: 'Mecha Form', multiplier: '7x' },
-          { name: 'Golden Form', multiplier: '9x' },
-          { name: 'Black Form', multiplier: '12x' },
+          { name: 'Second Form', multiplier: '1x', rarity: 'Common' },
+          { name: 'Third Form', multiplier: '1.5x', rarity: 'Uncommon' },
+          { name: 'Final Form', multiplier: '2x', rarity: 'Rare' },
+          { name: '50% Power', multiplier: '3x', rarity: 'Legendary' },
+          { name: '100% Full Power', multiplier: '5x', rarity: 'Mythic' },
+          { name: 'Mecha Form', multiplier: '7x', rarity: 'Phantom' },
+          { name: 'Golden Form', multiplier: '9x', rarity: 'Phantom' },
+          { name: 'Black Form', multiplier: '12x', rarity: 'Supreme' },
         ],
       },
        {
@@ -410,7 +410,7 @@ export default function SeedPage() {
           </Card>
           <Card>
             <CardHeader><CardTitle className="text-lg">Popular Foices (Mundo 21)</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Foices (Mundo 21)" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardContent><CardDescription>Popula o artigo "Foices (Mundo 21)" na coleção `wikiContent`.</CardDescription></Content>
             <CardFooter>
               <Button onClick={() => seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)')} disabled={loadingStates.scythes || !firestore}>
                 {loadingStates.scythes ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
