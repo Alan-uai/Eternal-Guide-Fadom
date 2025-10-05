@@ -23,7 +23,8 @@ import {
   gamepassTierListArticle,
   scientificNotationArticle,
   scythesArticle,
-  titansArticle
+  titansArticle,
+  howToGetStrongerArticle
 } from '@/lib/wiki-data';
 import type { WikiArticle } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
@@ -88,6 +89,7 @@ export default function SeedPage() {
     notation: false,
     scythes: false,
     titans: false,
+    howToGetStronger: false,
     all: false
   });
 
@@ -248,6 +250,7 @@ export default function SeedPage() {
     await seedArticle(scientificNotationArticle, 'notation', 'Notação Científica');
     await seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)');
     await seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)');
+    await seedArticle(howToGetStrongerArticle, 'howToGetStronger', 'Guia Estratégico');
 
     await handleSeedAccessories();
 
@@ -424,6 +427,16 @@ export default function SeedPage() {
               <Button onClick={() => seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)')} disabled={loadingStates.titans || !firestore}>
                 {loadingStates.titans ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loadingStates.titans ? 'Populando...' : 'Popular Titãs'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Guia Estratégico</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Como Ficar Mais Forte" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(howToGetStrongerArticle, 'howToGetStronger', 'Guia Estratégico')} disabled={loadingStates.howToGetStronger || !firestore}>
+                {loadingStates.howToGetStronger ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.howToGetStronger ? 'Populando...' : 'Popular Guia'}
               </Button>
             </CardFooter>
           </Card>
