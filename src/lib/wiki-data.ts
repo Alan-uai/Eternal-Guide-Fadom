@@ -566,6 +566,29 @@ Não compensa. É muito melhor comprar o Starter Pack #1 por 300 créditos, que 
   imageId: 'wiki-3', // Reusing a relevant image
 };
 
+export const lobbyDungeonsArticle: WikiArticle = {
+  id: 'lobby-dungeons',
+  title: 'Guia de Dungeons do Lobby',
+  summary: 'Um guia completo com horários, vida do chefe e requisitos de dano para as dungeons do lobby.',
+  content: 'Este guia detalha as informações essenciais para participar e ter sucesso nas dungeons acessíveis pelo lobby central do jogo. Use esta tabela como referência para saber quando cada dungeon abre e se você tem o dano necessário.',
+  tags: ['dungeon', 'lobby', 'guia', 'requisitos', 'dano', 'geral'],
+  imageId: 'wiki-11', // Reusing a relevant image
+  tables: {
+    lobbySchedule: {
+      headers: ['Horário', 'Dificuldade', 'Vida Último Boss', 'Dano Mínimo', 'Dano Recomendado'],
+      rows: [
+        { 'Horário': 'XX:00', 'Dificuldade': 'Easy', 'Vida Último Boss': '600x-1Sp', 'Dano Mínimo': '800qn', 'Dano Recomendado': '1sx' },
+        { 'Horário': 'XX:10', 'Dificuldade': 'Medium', 'Vida Último Boss': '60o-100o', 'Dano Mínimo': '50sp', 'Dano Recomendado': '100SP' },
+        { 'Horário': 'XX:20', 'Dificuldade': 'Hard', 'Vida Último Boss': '100de-140d', 'Dano Mínimo': '80N', 'Dano Recomendado': '150N' },
+        { 'Horário': 'XX:30', 'Dificuldade': 'Insane', 'Vida Último Boss': '90DD-130DD', 'Dano Mínimo': '60Ud', 'Dano Recomendado': '100Ud' },
+        { 'Horário': 'XX:40', 'Dificuldade': 'Crazy', 'Vida Último Boss': '90Qnd-35Nvd', 'Dano Mínimo': '300qnd', 'Dano Recomendado': '1Nvd' },
+        { 'Horário': 'XX:50', 'Dificuldade': 'Nightmare', 'Vida Último Boss': '40VG-50VG', 'Dano Mínimo': '500spg', 'Dano Recomendado': '700SPG' },
+        { 'Horário': 'XX:15', 'Dificuldade': 'Leaf Raid (1800)', 'Vida Último Boss': '///////// ', 'Dano Mínimo': '18qntg', 'Dano Recomendado': '50QNTG' },
+      ],
+    },
+  },
+};
+
 
 // A comprehensive list for seeding all articles at once if needed.
 export const allWikiArticles = [
@@ -585,6 +608,7 @@ export const allWikiArticles = [
   scythesArticle,
   titansArticle,
   howToGetStrongerArticle,
+  lobbyDungeonsArticle,
 ];
 
     
@@ -599,4 +623,5 @@ export const allWikiArticles = [
 
 
     
+
 

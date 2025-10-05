@@ -24,7 +24,8 @@ import {
   scientificNotationArticle,
   scythesArticle,
   titansArticle,
-  howToGetStrongerArticle
+  howToGetStrongerArticle,
+  lobbyDungeonsArticle
 } from '@/lib/wiki-data';
 import type { WikiArticle } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
@@ -90,6 +91,7 @@ export default function SeedPage() {
     scythes: false,
     titans: false,
     howToGetStronger: false,
+    lobbyDungeons: false,
     all: false
   });
 
@@ -251,6 +253,8 @@ export default function SeedPage() {
     await seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)');
     await seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)');
     await seedArticle(howToGetStrongerArticle, 'howToGetStronger', 'Guia Estratégico');
+    await seedArticle(lobbyDungeonsArticle, 'lobbyDungeons', 'Guia de Dungeons do Lobby');
+
 
     await handleSeedAccessories();
 
@@ -437,6 +441,16 @@ export default function SeedPage() {
               <Button onClick={() => seedArticle(howToGetStrongerArticle, 'howToGetStronger', 'Guia Estratégico')} disabled={loadingStates.howToGetStronger || !firestore}>
                 {loadingStates.howToGetStronger ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loadingStates.howToGetStronger ? 'Populando...' : 'Popular Guia'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Dungeons do Lobby</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Guia de Dungeons do Lobby" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(lobbyDungeonsArticle, 'lobbyDungeons', 'Guia de Dungeons do Lobby')} disabled={loadingStates.lobbyDungeons || !firestore}>
+                {loadingStates.lobbyDungeons ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.lobbyDungeons ? 'Populando...' : 'Popular Dungeons'}
               </Button>
             </CardFooter>
           </Card>
