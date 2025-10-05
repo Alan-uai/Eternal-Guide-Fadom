@@ -24,6 +24,7 @@ import {
   scientificNotationArticle,
   scythesArticle,
   titansArticle,
+  standsArticle,
   howToGetStrongerArticle,
   lobbyDungeonsArticle
 } from '@/lib/wiki-data';
@@ -90,6 +91,7 @@ export default function SeedPage() {
     notation: false,
     scythes: false,
     titans: false,
+    stands: false,
     howToGetStronger: false,
     lobbyDungeons: false,
     all: false
@@ -143,6 +145,7 @@ export default function SeedPage() {
     seedSubcollection('pets', worldData.pets);
     seedSubcollection('dungeons', worldData.dungeons);
     seedSubcollection('shadows', worldData.shadows);
+    seedSubcollection('stands', worldData.stands);
     
     await batch.commit().then(() => {
         toast({ title: 'Sucesso!', description: `Os dados do ${worldData.name} foram populados com sucesso.` });
@@ -252,6 +255,7 @@ export default function SeedPage() {
     await seedArticle(scientificNotationArticle, 'notation', 'Notação Científica');
     await seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)');
     await seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)');
+    await seedArticle(standsArticle, 'stands', 'Guia de Stands (Mundo 16)');
     await seedArticle(howToGetStrongerArticle, 'howToGetStronger', 'Guia Estratégico');
     await seedArticle(lobbyDungeonsArticle, 'lobbyDungeons', 'Guia de Dungeons do Lobby');
 
@@ -431,6 +435,16 @@ export default function SeedPage() {
               <Button onClick={() => seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)')} disabled={loadingStates.titans || !firestore}>
                 {loadingStates.titans ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loadingStates.titans ? 'Populando...' : 'Popular Titãs'}
+              </Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Guia de Stands (Mundo 16)</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Guia de Stands (Mundo 16)" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(standsArticle, 'stands', 'Guia de Stands (Mundo 16)')} disabled={loadingStates.stands || !firestore}>
+                {loadingStates.stands ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.stands ? 'Populando...' : 'Popular Stands'}
               </Button>
             </CardFooter>
           </Card>

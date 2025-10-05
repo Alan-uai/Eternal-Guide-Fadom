@@ -266,6 +266,18 @@
         }
       },
       "required": ["id", "name", "type", "stats"]
+    },
+    "Stand": {
+      "title": "Stand",
+      "type": "object",
+      "description": "Represents a Stand fighter, a special type of fighter from World 16.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "description": "The name of the Stand." },
+        "rarity": { "type": "string", "description": "The rarity of the Stand." },
+        "energy_bonus": { "type": "string", "description": "The energy bonus provided by the Stand." }
+      },
+      "required": ["id", "name", "rarity", "energy_bonus"]
     }
   },
   "auth": {
@@ -371,8 +383,17 @@
           "schema": { "$ref": "#/backend/entities/Shadow" },
           "description": "Sub-collection for Shadow fighters available in a world."
         }
+      },
+      {
+        "path": "/worlds/{worldId}/stands/{standId}",
+        "definition": {
+          "entityName": "Stand",
+          "schema": { "$ref": "#/backend/entities/Stand" },
+          "description": "Sub-collection for Stand fighters available in a world."
+        }
       }
     ],
-    "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', and 'shadows', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
+    "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
+
