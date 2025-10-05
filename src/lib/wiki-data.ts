@@ -15,10 +15,11 @@ No jogo, a cor de fundo do nome de um item indica sua raridade:
 *   **Cinza:** Comum
 *   **Verde:** Incomum
 *   **Azul:** Raro
+*   **Lilás/Magenta:** Épico
 *   **Amarelo:** Lendário
 *   **Vermelho:** Mítico
 *   **Roxo:** Phantom
-*   **Laranja:** Supreme
+*   **Laranja/Arco-íris:** Supreme
 
 **Principais Atividades no Mundo 1:**
 *   **Placares de Líderes Globais:** Confira os melhores jogadores do mundo e veja sua posição.
@@ -662,6 +663,7 @@ export const allWikiArticles = [
 
 
     
+
 
 
 
