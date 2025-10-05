@@ -8,10 +8,10 @@ export const world2Data = {
         type: 'gacha',
         statType: 'damage',
         stats: [
-          { name: 'Conquerors Haki', multiplier: '1.1x', rarity: 'Rare' },
-          { name: 'Red Hair', multiplier: '1.2x', rarity: 'Legendary' },
-          { name: 'Emperor', multiplier: '1.3x', rarity: 'Mythic' },
-          { name: 'Yonko', multiplier: '1.4x', rarity: 'Phantom' },
+          { name: 'Conquerors Haki', multiplier: '1.1x', rarity: 'Rare', probability: 19.9 },
+          { name: 'Red Hair', multiplier: '1.2x', rarity: 'Legendary', probability: 5 },
+          { name: 'Emperor', multiplier: '1.3x', rarity: 'Mythic', probability: 1 },
+          { name: 'Yonko', multiplier: '1.4x', rarity: 'Phantom', probability: 0.5 },
         ],
       },
       {
@@ -20,13 +20,13 @@ export const world2Data = {
         type: 'gacha',
         statType: 'energy',
         stats: [
-            { name: 'Whitebeard Pirates', multiplier: '2x', rarity: 'Common' },
-            { name: 'Cross Guild', multiplier: '3x', rarity: 'Uncommon' },
-            { name: 'Big Mom Pirates', multiplier: '4x', rarity: 'Rare' },
-            { name: 'Beast pirates', multiplier: '5x', rarity: 'Legendary' },
-            { name: 'Blackbeard Pirates', multiplier: '8x', rarity: 'Mythic' },
-            { name: 'Straw Hat Pirates', multiplier: '10x', rarity: 'Phantom' },
-            { name: 'Red-Haired Pirates', multiplier: '12x', rarity: 'Supreme' }
+            { name: 'Whitebeard Pirates', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+            { name: 'Cross Guild', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+            { name: 'Big Mom Pirates', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+            { name: 'Beast pirates', multiplier: '5x', rarity: 'Legendary', probability: 5 },
+            { name: 'Blackbeard Pirates', multiplier: '8x', rarity: 'Mythic', probability: 1 },
+            { name: 'Straw Hat Pirates', multiplier: '10x', rarity: 'Phantom', probability: 0.5 },
+            { name: 'Red-Haired Pirates', multiplier: '12x', rarity: 'Supreme', probability: 0.05 }
         ]
       },
       {
@@ -35,13 +35,13 @@ export const world2Data = {
         type: 'gacha',
         statType: 'damage',
         stats: [
-            { name: 'Common Chef', multiplier: '1x', rarity: 'Common' },
-            { name: 'Uncommon Chef', multiplier: '1.5x', rarity: 'Uncommon' },
-            { name: 'Rare Chef', multiplier: '2x', rarity: 'Rare' },
-            { name: 'Epic Chef', multiplier: '3x', rarity: 'Legendary' },
-            { name: 'Legendary Chef', multiplier: '5x', rarity: 'Mythic' },
-            { name: 'Mythical Chef', multiplier: '7x', rarity: 'Phantom' },
-            { name: 'Phantom Chef', multiplier: '10x', rarity: 'Supreme' }
+            { name: 'Common Chef', multiplier: '1x', rarity: 'Common', probability: 40.55 },
+            { name: 'Uncommon Chef', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
+            { name: 'Rare Chef', multiplier: '2x', rarity: 'Rare', probability: 19.9 },
+            { name: 'Epic Chef', multiplier: '3x', rarity: 'Legendary', probability: 5 },
+            { name: 'Legendary Chef', multiplier: '5x', rarity: 'Mythic', probability: 1 },
+            { name: 'Mythical Chef', multiplier: '7x', rarity: 'Phantom', probability: 0.5 },
+            { name: 'Phantom Chef', multiplier: '10x', rarity: 'Supreme', probability: 0.05 }
         ]
       },
       {
@@ -108,7 +108,7 @@ export const world2Data = {
             id: 'restaurante',
             name: 'Restaurante',
             boss: 'Don Krieg',
-            description: 'Goes up to level 1000. Drops 5 tokens for early world powers, each with a 20% chance of dropping.'
+            description: 'Sobe até o nível 1000. Dropa 5 tokens para poderes de mundos iniciais, cada um com 20% de chance de drop.'
         }
     ],
   };

@@ -8,13 +8,13 @@ export const world4Data = {
         type: 'gacha',
         statType: 'energy',
         stats: [
-          { name: 'Blazing Cataclysm', multiplier: '2x', rarity: 'Common' },
-          { name: 'Nullborn Phantom', multiplier: '3x', rarity: 'Uncommon' },
-          { name: 'Infernal Crater', multiplier: '4x', rarity: 'Rare' },
-          { name: 'Abyssal Tide', multiplier: '5x', rarity: 'Legendary' },
-          { name: 'Verdant Calamity', multiplier: '8x', rarity: 'Mythic' },
-          { name: 'Soulbender', multiplier: '10x', rarity: 'Phantom' },
-          { name: 'Wandered Mind', multiplier: '12x', rarity: 'Supreme' },
+          { name: 'Blazing Cataclysm', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+          { name: 'Nullborn Phantom', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+          { name: 'Infernal Crater', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+          { name: 'Abyssal Tide', multiplier: '5x', rarity: 'Legendary', probability: 5 },
+          { name: 'Verdant Calamity', multiplier: '8x', rarity: 'Mythic', probability: 1 },
+          { name: 'Soulbender', multiplier: '10x', rarity: 'Phantom', probability: 0.5 },
+          { name: 'Wandered Mind', multiplier: '12x', rarity: 'Supreme', probability: 0.05 },
         ],
       },
       {
@@ -23,13 +23,13 @@ export const world4Data = {
         type: 'gacha',
         statType: 'damage',
         stats: [
-          { name: 'Bloodthorn', multiplier: '0.5x', rarity: 'Common' },
-          { name: 'Eclipse Warden', multiplier: '0.9x', rarity: 'Uncommon' },
-          { name: 'Obsidian Reaver', multiplier: '1.5x', rarity: 'Rare' },
-          { name: 'Aquarius Edge', multiplier: '2x', rarity: 'Legendary' },
-          { name: 'Doomsoul', multiplier: '2.5x', rarity: 'Mythic' },
-          { name: 'Redmourne', multiplier: '3x', rarity: 'Phantom' },
-          { name: 'Venomstrike', multiplier: '4x', rarity: 'Supreme' },
+          { name: 'Bloodthorn', multiplier: '0.5x', rarity: 'Common', probability: 40.55 },
+          { name: 'Eclipse Warden', multiplier: '0.9x', rarity: 'Uncommon', probability: 33 },
+          { name: 'Obsidian Reaver', multiplier: '1.5x', rarity: 'Rare', probability: 19.9 },
+          { name: 'Aquarius Edge', multiplier: '2x', rarity: 'Legendary', probability: 5 },
+          { name: 'Doomsoul', multiplier: '2.5x', rarity: 'Mythic', probability: 1 },
+          { name: 'Redmourne', multiplier: '3x', rarity: 'Phantom', probability: 0.5 },
+          { name: 'Venomstrike', multiplier: '4x', rarity: 'Supreme', probability: 0.05 },
         ],
       },
       {
@@ -46,13 +46,13 @@ export const world4Data = {
         type: 'gacha',
         statType: 'mixed',
         stats: [
-            { name: 'Common Curse', multiplier: '0.6x', statType: 'damage', rarity: 'Common' },
-            { name: 'Uncommon Curse', multiplier: '0.8x', statType: 'damage', rarity: 'Uncommon' },
-            { name: 'Rare Curse', multiplier: '1x', statType: 'damage', energy_crit_bonus: '1.00%', rarity: 'Rare' },
-            { name: 'Epic Curse', multiplier: '2x', statType: 'damage', energy_crit_bonus: '2.00%', rarity: 'Legendary' },
-            { name: 'Legendary Curse', multiplier: '3x', statType: 'damage', energy_crit_bonus: '3.00%', rarity: 'Mythic' },
-            { name: 'Mythical Curse', multiplier: '4x', statType: 'damage', energy_crit_bonus: '4.00%', rarity: 'Phantom' },
-            { name: 'Phantom Curse', multiplier: '5x', statType: 'damage', energy_crit_bonus: '5.00%', rarity: 'Supreme' }
+            { name: 'Common Curse', multiplier: '0.6x', statType: 'damage', rarity: 'Common', probability: 40.55 },
+            { name: 'Uncommon Curse', multiplier: '0.8x', statType: 'damage', rarity: 'Uncommon', probability: 33 },
+            { name: 'Rare Curse', multiplier: '1x', statType: 'damage', energy_crit_bonus: '1.00%', rarity: 'Rare', probability: 19.9 },
+            { name: 'Epic Curse', multiplier: '2x', statType: 'damage', energy_crit_bonus: '2.00%', rarity: 'Legendary', probability: 5 },
+            { name: 'Legendary Curse', multiplier: '3x', statType: 'damage', energy_crit_bonus: '3.00%', rarity: 'Mythic', probability: 1 },
+            { name: 'Mythical Curse', multiplier: '4x', statType: 'damage', energy_crit_bonus: '4.00%', rarity: 'Phantom', probability: 0.5 },
+            { name: 'Phantom Curse', multiplier: '5x', statType: 'damage', energy_crit_bonus: '5.00%', rarity: 'Supreme', probability: 0.05 }
         ]
       }
     ],
@@ -62,7 +62,7 @@ export const world4Data = {
         {
             id: 'cursed-dungeon',
             name: 'Cursed Dungeon',
-            description: 'The Cursed Raid is located in World 4. It drops 11 tokens for early world powers, each with a 9% chance of dropping.'
+            description: 'A Cursed Raid está localizada no Mundo 4. Ela dropa 11 tokens para poderes de mundos iniciais, cada um com 9% de chance de drop.'
         }
     ],
   };
