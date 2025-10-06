@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useFirestore } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { doc, writeBatch } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldAlert } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { useAdmin } from '@/hooks/use-admin';
 import { 
   gettingStartedArticle,
   rankArticle, 
@@ -53,7 +54,7 @@ import { world20Data } from '@/lib/world-20-data';
 import { world21Data } from '@/lib/world-21-data';
 import { world22Data } from '@/lib/world-22-data';
 
-export default function SeedPage() {
+function AdminSeedPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const [loadingStates, setLoadingStates] = useState({
@@ -505,4 +506,30 @@ export default function SeedPage() {
       </Card>
     </div>
   );
+}
+
+export default function SeedPage() {
+  const { isAdmin, isLoading } = useAdmin();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <ShieldAlert className="h-16 w-16 mb-4 text-destructive" />
+        <h1 className="text-2xl font-bold">Acesso Negado</h1>
+        <p className="text-muted-foreground mt-2">
+          Você não tem permissão para acessar esta página.
+        </p>
+      </div>
+    );
+  }
+
+  return <AdminSeedPage />;
 }
