@@ -1,3 +1,4 @@
+
 export const world22Data = {
     name: 'World 22 - Shadow Garden',
     powers: [
@@ -6,6 +7,11 @@ export const world22Data = {
         name: 'Shadow Garden',
         type: 'gacha',
         statType: 'energy',
+        enchantment: {
+          token: 'Garden Lvl Token',
+          costPerLevel: 10,
+          description: 'Pode ser evoluído para aumentar seu poder usando Garden Lvl Tokens.'
+        },
         stats: [
           { name: 'Operative', multiplier: '1x', rarity: 'Common', probability: 40.55 },
           { name: 'Agent', multiplier: '2x', rarity: 'Uncommon', probability: 33 },
@@ -22,6 +28,11 @@ export const world22Data = {
         name: 'Shadow Arts',
         type: 'gacha',
         statType: 'damage',
+        enchantment: {
+          token: 'Arts Lvl Token',
+          costPerLevel: 10,
+          description: 'Pode ser evoluído para aumentar seu poder usando Arts Lvl Tokens.'
+        },
         stats: [
           { name: 'Silent Step', multiplier: '1x', rarity: 'Common', probability: 40.55 },
           { name: 'Shadow Bind', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
@@ -72,3 +83,4 @@ export const world22Data = {
     shadows: [],
     stands: []
   };
+
