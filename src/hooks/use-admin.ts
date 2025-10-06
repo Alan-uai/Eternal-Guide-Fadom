@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface AdminState {
   isAdmin: boolean;
@@ -10,6 +11,7 @@ interface AdminState {
 
 export function useAdmin(): AdminState {
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const [adminState, setAdminState] = useState<AdminState>({
     isAdmin: false,
     isLoading: true,
@@ -17,7 +19,7 @@ export function useAdmin(): AdminState {
 
   useEffect(() => {
     // If the main user object is still loading, we are also loading.
-    if (isUserLoading) {
+    if (isUserLoading || !firestore) {
       setAdminState({ isAdmin: false, isLoading: true });
       return;
     }
@@ -28,18 +30,29 @@ export function useAdmin(): AdminState {
       return;
     }
 
-    // User is available, check their custom claims.
-    user.getIdTokenResult(true) // Force refresh to get latest claims
-      .then((idTokenResult) => {
-        const isAdmin = idTokenResult.claims.admin === true;
-        setAdminState({ isAdmin, isLoading: false });
+    // User is available, check their document in Firestore.
+    const userDocRef = doc(firestore, 'users', user.uid);
+    
+    getDoc(userDocRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          // Check for the 'tag' field in the user's document
+          const userData = docSnap.data();
+          const isAdmin = userData.tag === 'admin';
+          setAdminState({ isAdmin, isLoading: false });
+        } else {
+          // User document doesn't exist, so they are not an admin.
+          setAdminState({ isAdmin: false, isLoading: false });
+        }
       })
       .catch((error) => {
-        console.error("Error getting user admin status:", error);
+        console.error("Error getting user admin status from Firestore:", error);
         setAdminState({ isAdmin: false, isLoading: false });
       });
 
-  }, [user, isUserLoading]);
+  }, [user, isUserLoading, firestore]);
 
   return adminState;
 }
+
+    
