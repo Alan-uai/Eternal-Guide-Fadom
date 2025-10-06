@@ -7,6 +7,7 @@ export const world4Data = {
         name: 'Curses',
         type: 'gacha',
         statType: 'energy',
+        rollCost: '500k',
         stats: [
           { name: 'Blazing Cataclysm', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Nullborn Phantom', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -49,10 +50,10 @@ export const world4Data = {
             { name: 'Common Curse', multiplier: '0.6x', statType: 'damage', rarity: 'Common', probability: 40.55 },
             { name: 'Uncommon Curse', multiplier: '0.8x', statType: 'damage', rarity: 'Uncommon', probability: 33 },
             { name: 'Rare Curse', multiplier: '1x', statType: 'damage', energy_crit_bonus: '1.00%', rarity: 'Rare', probability: 19.9 },
-            { name: 'Epic Curse', multiplier: '2x', statType: 'damage', energy_crit_bonus: '2.00%', rarity: 'Legendary', probability: 5 },
-            { name: 'Legendary Curse', multiplier: '3x', statType: 'damage', energy_crit_bonus: '3.00%', rarity: 'Mythic', probability: 1 },
-            { name: 'Mythical Curse', multiplier: '4x', statType: 'damage', energy_crit_bonus: '4.00%', rarity: 'Phantom', probability: 0.5 },
-            { name: 'Phantom Curse', multiplier: '5x', statType: 'damage', energy_crit_bonus: '5.00%', rarity: 'Supreme', probability: 0.05 }
+            { name: 'Epic Curse', multiplier: '2x', statType: 'damage', energy_crit_bonus: '2.00%', rarity: 'Epic', probability: 5 },
+            { name: 'Legendary Curse', multiplier: '3x', statType: 'damage', energy_crit_bonus: '3.00%', rarity: 'Legendary', probability: 1 },
+            { name: 'Mythical Curse', multiplier: '4x', statType: 'damage', energy_crit_bonus: '4.00%', rarity: 'Mythic', probability: 0.5 },
+            { name: 'Phantom Curse', multiplier: '5x', statType: 'damage', energy_crit_bonus: '5.00%', rarity: 'Phantom', probability: 0.05 }
         ]
       }
     ],

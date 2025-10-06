@@ -1,5 +1,14 @@
 export const world16Data = {
     name: 'World 16',
+    powers: [
+        {
+            id: 'stands',
+            name: 'Stands',
+            type: 'gacha',
+            rollCost: '900Qn',
+            statType: 'energy'
+        }
+    ],
     shadows: [
         {
             id: 'dio-shadow',

@@ -6,6 +6,7 @@ export const world3Data = {
         name: 'Reiatsu Color',
         type: 'gacha',
         statType: 'energy',
+        rollCost: '110k',
         stats: [
           { name: 'Gray Reiatsu', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Green Reiatsu', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -21,6 +22,7 @@ export const world3Data = {
         name: 'Zanpakuto',
         type: 'gacha',
         statType: 'damage',
+        rollCost: '190k',
         stats: [
           { name: 'Common', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Uncommon', multiplier: '3x', rarity: 'Uncommon', probability: 33 },

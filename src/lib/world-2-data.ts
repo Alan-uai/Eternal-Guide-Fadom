@@ -19,6 +19,7 @@ export const world2Data = {
         name: 'Pirate Crew',
         type: 'gacha',
         statType: 'energy',
+        rollCost: '25k',
         stats: [
             { name: 'Whitebeard Pirates', multiplier: '2x', rarity: 'Common', probability: 40.55 },
             { name: 'Cross Guild', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -38,16 +39,17 @@ export const world2Data = {
             { name: 'Common Chef', multiplier: '1x', rarity: 'Common', probability: 40.55 },
             { name: 'Uncommon Chef', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
             { name: 'Rare Chef', multiplier: '2x', rarity: 'Rare', probability: 19.9 },
-            { name: 'Epic Chef', multiplier: '3x', rarity: 'Legendary', probability: 5 },
-            { name: 'Legendary Chef', multiplier: '5x', rarity: 'Mythic', probability: 1 },
-            { name: 'Mythical Chef', multiplier: '7x', rarity: 'Phantom', probability: 0.5 },
-            { name: 'Phantom Chef', multiplier: '10x', rarity: 'Supreme', probability: 0.05 }
+            { name: 'Epic Chef', multiplier: '3x', rarity: 'Epic', probability: 5 },
+            { name: 'Legendary Chef', multiplier: '5x', rarity: 'Legendary', probability: 1 },
+            { name: 'Mythical Chef', multiplier: '7x', rarity: 'Mythic', probability: 0.5 },
+            { name: 'Phantom Chef', multiplier: '10x', rarity: 'Phantom', probability: 0.05 }
         ]
       },
       {
         id: 'demon-fruit',
         name: 'Demon Fruit',
         type: 'gacha',
+        rollCost: '55k',
         // statType is defined on individual stats because it's mixed
         stats: [
           { name: 'Bomb Fruit', multiplier: '2x', statType: 'coin', rarity: 'Common' },

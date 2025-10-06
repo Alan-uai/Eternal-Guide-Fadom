@@ -6,6 +6,7 @@ export const world20Data = {
         name: 'Grand Elder Power',
         type: 'gacha',
         statType: 'energy',
+        rollCost: '1.50',
         stats: [
           { name: 'Sleeping Power', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Stirring Spirit', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -22,6 +23,7 @@ export const world20Data = {
         name: 'Frost Demon Evolution',
         type: 'gacha',
         statType: 'damage',
+        rollCost: '2.00',
         stats: [
           { name: 'Second Form', multiplier: '1x', rarity: 'Common', probability: 40.55 },
           { name: 'Third Form', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
