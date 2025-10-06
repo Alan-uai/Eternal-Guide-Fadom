@@ -34,6 +34,7 @@ import { world1Data } from '@/lib/world-1-data';
 import { world2Data } from '@/lib/world-2-data';
 import { world3Data } from '@/lib/world-3-data';
 import { world4Data } from '@/lib/world-4-data';
+import { world5Data } from '@/lib/world-5-data';
 import { world6Data } from '@/lib/world-6-data';
 import { world7Data } from '@/lib/world-7-data';
 import { world8Data } from '@/lib/world-8-data';
@@ -221,6 +222,7 @@ export default function SeedPage() {
     2: { data: world2Data, key: 'world2' },
     3: { data: world3Data, key: 'world3' },
     4: { data: world4Data, key: 'world4' },
+    5: { data: world5Data, key: 'world5' },
     6: { data: world6Data, key: 'world6' },
     7: { data: world7Data, key: 'world7' },
     8: { data: world8Data, key: 'world8' },
