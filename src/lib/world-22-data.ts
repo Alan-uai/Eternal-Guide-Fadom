@@ -7,7 +7,7 @@ export const world22Data = {
         name: 'Shadow Garden',
         type: 'gacha',
         statType: 'energy',
-        enchantment: {
+        leveling: {
           token: 'Garden Lvl Token',
           costPerLevel: 10,
           description: 'Pode ser evoluído para aumentar seu poder usando Garden Lvl Tokens.'
@@ -28,7 +28,7 @@ export const world22Data = {
         name: 'Shadow Arts',
         type: 'gacha',
         statType: 'damage',
-        enchantment: {
+        leveling: {
           token: 'Arts Lvl Token',
           costPerLevel: 10,
           description: 'Pode ser evoluído para aumentar seu poder usando Arts Lvl Tokens.'
