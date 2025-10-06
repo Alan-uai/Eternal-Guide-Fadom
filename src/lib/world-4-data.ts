@@ -7,7 +7,7 @@ export const world4Data = {
         name: 'Curses',
         type: 'gacha',
         statType: 'energy',
-        rollCost: '500k',
+        unlockCost: '500k',
         stats: [
           { name: 'Blazing Cataclysm', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Nullborn Phantom', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -23,6 +23,7 @@ export const world4Data = {
         name: 'Swords',
         type: 'gacha',
         statType: 'damage',
+        unlockCost: '1M',
         stats: [
           { name: 'Bloodthorn', multiplier: '0.5x', rarity: 'Common', probability: 40.55 },
           { name: 'Eclipse Warden', multiplier: '0.9x', rarity: 'Uncommon', probability: 33 },
@@ -37,6 +38,7 @@ export const world4Data = {
         id: 'cursed-progression',
         name: 'Cursed Progression',
         type: 'progression',
+        unlockCost: '2.5M',
         statType: 'damage',
         maxLevel: 410,
         maxBoost: '4.10x Damage'
@@ -45,6 +47,7 @@ export const world4Data = {
         id: 'cursed-power',
         name: 'Cursed Power',
         type: 'gacha',
+        unlockCost: '1.5M',
         statType: 'mixed',
         stats: [
             { name: 'Common Curse', multiplier: '0.6x', statType: 'damage', rarity: 'Common', probability: 40.55 },

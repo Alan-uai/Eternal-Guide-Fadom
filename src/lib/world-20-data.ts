@@ -6,7 +6,7 @@ export const world20Data = {
         name: 'Grand Elder Power',
         type: 'gacha',
         statType: 'energy',
-        rollCost: '1.50',
+        unlockCost: '1.50OcTG',
         stats: [
           { name: 'Sleeping Power', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Stirring Spirit', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -23,7 +23,7 @@ export const world20Data = {
         name: 'Frost Demon Evolution',
         type: 'gacha',
         statType: 'damage',
-        rollCost: '2.00',
+        unlockCost: '2.00OcTG',
         stats: [
           { name: 'Second Form', multiplier: '1x', rarity: 'Common', probability: 40.55 },
           { name: 'Third Form', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
@@ -39,6 +39,7 @@ export const world20Data = {
         id: 'dragon-energy',
         name: 'Dragon Energy',
         type: 'progression',
+        unlockCost: '2.5OcTG',
         statType: 'energy',
         maxLevel: 50,
         maxBoost: '1x Energy'
@@ -47,6 +48,7 @@ export const world20Data = {
         id: 'dragon-damage',
         name: 'Dragon Damage',
         type: 'progression',
+        unlockCost: '3.0OcTG',
         statType: 'damage',
         maxLevel: 500,
         maxBoost: '10x Damage'

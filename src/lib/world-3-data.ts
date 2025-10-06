@@ -6,7 +6,7 @@ export const world3Data = {
         name: 'Reiatsu Color',
         type: 'gacha',
         statType: 'energy',
-        rollCost: '110k',
+        unlockCost: '110k',
         stats: [
           { name: 'Gray Reiatsu', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Green Reiatsu', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -22,7 +22,7 @@ export const world3Data = {
         name: 'Zanpakuto',
         type: 'gacha',
         statType: 'damage',
-        rollCost: '190k',
+        unlockCost: '190k',
         stats: [
           { name: 'Common', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Uncommon', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -37,6 +37,7 @@ export const world3Data = {
         id: 'spiritual-pressure',
         name: 'Spiritual Pressure',
         type: 'progression',
+        unlockCost: '250k',
         statType: 'mixed',
         maxLevel: 210,
         boosts: [

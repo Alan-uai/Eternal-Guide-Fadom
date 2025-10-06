@@ -5,7 +5,7 @@ export const world16Data = {
             id: 'stands',
             name: 'Stands',
             type: 'gacha',
-            rollCost: '900Qn',
+            unlockCost: '900Qn',
             statType: 'energy'
         }
     ],

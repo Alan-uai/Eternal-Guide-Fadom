@@ -19,7 +19,7 @@ export const world2Data = {
         name: 'Pirate Crew',
         type: 'gacha',
         statType: 'energy',
-        rollCost: '25k',
+        unlockCost: '25k',
         stats: [
             { name: 'Whitebeard Pirates', multiplier: '2x', rarity: 'Common', probability: 40.55 },
             { name: 'Cross Guild', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -35,6 +35,7 @@ export const world2Data = {
         name: 'Chef Power',
         type: 'gacha',
         statType: 'damage',
+        unlockCost: '35k',
         stats: [
             { name: 'Common Chef', multiplier: '1x', rarity: 'Common', probability: 40.55 },
             { name: 'Uncommon Chef', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
@@ -49,7 +50,7 @@ export const world2Data = {
         id: 'demon-fruit',
         name: 'Demon Fruit',
         type: 'gacha',
-        rollCost: '55k',
+        unlockCost: '55k',
         // statType is defined on individual stats because it's mixed
         stats: [
           { name: 'Bomb Fruit', multiplier: '2x', statType: 'coin', rarity: 'Common' },
