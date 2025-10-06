@@ -6,10 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Bot, Trash2, Inbox } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Head from 'next/head';
+import { useUser } from '@/firebase';
 
 
 export default function SavedAnswersPage() {
   const { savedAnswers, toggleSaveAnswer } = useApp();
+  const { user } = useUser();
+
+  const handleToggleSave = (answer: any) => {
+    // Ensure we have a valid user and answer before proceeding
+    if (user && answer) {
+        toggleSaveAnswer(answer);
+    }
+  };
 
   return (
     <>
@@ -38,7 +47,7 @@ export default function SavedAnswersPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => toggleSaveAnswer(answer)}
+                      onClick={() => handleToggleSave(answer)}
                       className="bg-accent/80 text-accent-foreground hover:bg-accent"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />

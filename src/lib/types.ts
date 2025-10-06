@@ -4,6 +4,15 @@ export interface Message {
   content: string;
 }
 
+export interface SavedAnswer {
+    id: string;
+    userId: string;
+    question: string;
+    answer: string;
+    createdAt: any; // Firestore Timestamp
+    content: string;
+}
+
 export interface WikiArticleTable {
   headers: string[];
   rows: Record<string, string | number>[];

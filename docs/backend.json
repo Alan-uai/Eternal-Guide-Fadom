@@ -145,9 +145,7 @@
       },
       "required": [
         "id",
-        "username",
-        "email",
-        "createdAt"
+        "email"
       ]
     },
     "World": {
@@ -166,7 +164,7 @@
         "properties": {
             "name": { "type": "string", "description": "Name of the power set (e.g., 'Grand Elder Power')." },
             "type": { "type": "string", "enum": ["gacha", "progression"], "description": "The type of power." },
-            "statType": { "type": "string", "enum": ["energy", "damage", "coin", "mixed"], "description": "The primary stat this power affects. 'mixed' indicates multiple types of boosts." },
+            "statType": { "type": "string", "enum": ["energy", "damage", "coin", "mixed", "luck"], "description": "The primary stat this power affects. 'mixed' indicates multiple types of boosts." },
             "maxLevel": { "type": "number", "description": "The maximum level for a progression power." },
             "maxBoost": { "type": "string", "description": "The maximum boost for a single-stat progression power." },
             "unlockCost": { "type": "string", "description": "The cost in coins to unlock this power for rolling or progression." },
@@ -298,8 +296,9 @@
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "anonymous",
+      "google.com",
+      "password"
     ]
   },
   "firestore": {
@@ -412,6 +411,3 @@
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
-
-
-    

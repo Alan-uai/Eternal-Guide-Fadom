@@ -14,6 +14,8 @@ import {
 import { Toaster } from '@/components/ui/toaster';
 import { Bot } from 'lucide-react';
 import Link from 'next/link';
+import { UserNav } from '@/components/user-nav';
+import { AuthDialog } from '@/components/auth-dialog';
 
 export const metadata: Metadata = {
   title: 'Guia Eterno',
@@ -54,18 +56,22 @@ export default function RootLayout({
               </SidebarFooter>
             </Sidebar>
             <SidebarInset>
-              <header className="sticky top-0 z-10 flex h-14 items-center justify-start gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:hidden">
-                <SidebarTrigger />
-                <div className="flex items-center gap-2 text-primary">
-                  <Bot size={24} />
-                  <h1 className="text-lg font-semibold font-headline">Guia Eterno</h1>
+              <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm">
+                <div className='flex items-center gap-4'>
+                    <SidebarTrigger className='md:hidden'/>
+                    <div className="hidden items-center gap-2 text-primary md:flex">
+                    <Bot size={24} />
+                    <h1 className="text-lg font-semibold font-headline">Guia Eterno</h1>
+                    </div>
                 </div>
+                <UserNav />
               </header>
               <main className="flex flex-1 flex-col p-4 md:p-6">
                 {children}
               </main>
             </SidebarInset>
           </SidebarProvider>
+          <AuthDialog />
           <Toaster />
         </AppProvider>
       </body>
