@@ -9,6 +9,14 @@ export const world16Data = {
             statType: 'energy'
         }
     ],
+    npcs: [
+        { id: 'world16-e-rank', name: 'E Rank NPC', rank: 'E', exp: 312698 },
+        { id: 'world16-d-rank', name: 'D Rank NPC', rank: 'D', exp: 343968 },
+        { id: 'world16-c-rank', name: 'C Rank NPC', rank: 'C', exp: 378365 },
+        { id: 'world16-b-rank', name: 'B Rank NPC', rank: 'B', exp: 416201 },
+        { id: 'world16-a-rank', name: 'A Rank NPC', rank: 'A', exp: 457821 },
+        { id: 'world16-s-rank', name: 'S Rank NPC', rank: 'S', exp: 503603 },
+    ],
     shadows: [
         {
             id: 'dio-shadow',

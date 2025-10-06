@@ -46,7 +46,14 @@ export const world3Data = {
         ]
       },
     ],
-    npcs: [],
+    npcs: [
+      { id: 'world3-e-rank', name: 'E Rank NPC', rank: 'E', exp: 21 },
+      { id: 'world3-d-rank', name: 'D Rank NPC', rank: 'D', exp: 22 },
+      { id: 'world3-c-rank', name: 'C Rank NPC', rank: 'C', exp: 23 },
+      { id: 'world3-b-rank', name: 'B Rank NPC', rank: 'B', exp: 24 },
+      { id: 'world3-a-rank', name: 'A Rank NPC', rank: 'A', exp: 25 },
+      { id: 'world3-s-rank', name: 'S Rank NPC', rank: 'S', exp: 26 },
+    ],
     pets: [],
     dungeons: [],
   };

@@ -79,12 +79,12 @@ export const world2Data = {
       }
     ],
     npcs: [
-        {
-            id: 'zoro',
-            name: 'Zoro',
-            rank: 'SS',
-            drops: ['Swords']
-        }
+        { id: 'world2-e-rank', name: 'E Rank NPC', rank: 'E', exp: 9 },
+        { id: 'world2-d-rank', name: 'D Rank NPC', rank: 'D', exp: 10 },
+        { id: 'world2-c-rank', name: 'C Rank NPC', rank: 'C', exp: 11 },
+        { id: 'world2-b-rank', name: 'B Rank NPC', rank: 'B', exp: 12 },
+        { id: 'world2-a-rank', name: 'A Rank NPC', rank: 'A', exp: 13 },
+        { id: 'world2-s-rank', name: 'S Rank NPC', rank: 'S', exp: 14 },
     ],
     pets: [
         {

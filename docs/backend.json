@@ -165,6 +165,17 @@
             "statType": { "type": "string", "enum": ["energy", "damage", "coin", "mixed"], "description": "The primary stat this power affects. 'mixed' indicates multiple types of boosts." },
             "maxLevel": { "type": "number", "description": "The maximum level for a progression power." },
             "maxBoost": { "type": "string", "description": "The maximum boost for a single-stat progression power." },
+            "unlockCost": { "type": "string", "description": "The cost in coins to unlock this power for rolling or progression." },
+            "leveling": {
+                "type": "object",
+                "description": "Details about the leveling system for a gacha power.",
+                "properties": {
+                    "token": { "type": "string", "description": "The name of the token used for leveling." },
+                    "costPerLevel": { "type": "number", "description": "The number of tokens required for each level-up." },
+                    "maxLevel": { "type": "number", "description": "The maximum level achievable." },
+                    "description": { "type": "string", "description": "A brief description of the leveling mechanic." }
+                }
+            },
             "boosts": {
               "type": "array",
               "description": "An array of boosts for mixed progression powers.",
@@ -200,7 +211,8 @@
         "properties": {
             "name": { "type": "string" },
             "rank": { "type": "string", "description": "The rank of the NPC (e.g., 'E', 'SS')." },
-            "drops": { "type": "array", "items": { "type": "string" }, "description": "List of items dropped by the NPC." }
+            "drops": { "type": "array", "items": { "type": "string" }, "description": "List of items dropped by the NPC." },
+            "exp": { "type": "number", "description": "Experience points dropped by the NPC." }
         },
         "required": ["name", "rank"]
     },
