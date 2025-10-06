@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -51,6 +50,7 @@ import { world18Data } from '@/lib/world-18-data';
 import { world19Data } from '@/lib/world-19-data';
 import { world20Data } from '@/lib/world-20-data';
 import { world21Data } from '@/lib/world-21-data';
+import { world22Data } from '@/lib/world-22-data';
 
 export default function SeedPage() {
   const firestore = useFirestore();
@@ -77,6 +77,7 @@ export default function SeedPage() {
     world19: false,
     world20: false,
     world21: false,
+    world22: false,
     gettingStarted: false,
     ranks: false,
     auras: false,
@@ -214,7 +215,7 @@ export default function SeedPage() {
     });
   }
 
-  const worldNumbers = Array.from({ length: 21 }, (_, i) => i + 1);
+  const worldNumbers = Array.from({ length: 22 }, (_, i) => i + 1);
   const worldSeedData: { [key: number]: any } = {
     1: { data: world1Data, key: 'world1' },
     2: { data: world2Data, key: 'world2' },
@@ -236,6 +237,7 @@ export default function SeedPage() {
     19: { data: world19Data, key: 'world19' },
     20: { data: world20Data, key: 'world20' },
     21: { data: world21Data, key: 'world21' },
+    22: { data: world22Data, key: 'world22' },
   };
 
   async function handleSeedAll() {
