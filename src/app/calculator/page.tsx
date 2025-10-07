@@ -10,8 +10,9 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Swords, Shield, Zap, Flame, Calculator } from 'lucide-react';
+import { Loader2, Swords, Shield, Zap, Flame, Calculator as CalculatorIcon, Construction } from 'lucide-react';
 import Head from 'next/head';
+import { useAdmin } from '@/hooks/use-admin';
 
 interface Npc {
   id: string;
@@ -70,7 +71,7 @@ function parseGameNotation(value: string | number): number {
     return num.toExponential(2);
   }
 
-export default function CalculatorPage() {
+function AdminCalculatorPage() {
   const firestore = useFirestore();
   const [worlds, setWorlds] = useState<World[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -165,7 +166,7 @@ export default function CalculatorPage() {
       </Head>
       <div className="space-y-8">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-3"><Calculator/> Calculadora de Batalha</h1>
+          <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-3"><CalculatorIcon/> Calculadora de Batalha</h1>
           <p className="text-muted-foreground">Calcule seu DPS e o tempo para derrotar inimigos.</p>
         </header>
 
@@ -251,3 +252,31 @@ export default function CalculatorPage() {
     </>
   );
 }
+
+
+export default function CalculatorPage() {
+    const { isAdmin, isLoading } = useAdmin();
+  
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      );
+    }
+  
+    if (!isAdmin) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <Construction className="h-16 w-16 mb-4 text-primary" />
+          <h1 className="text-2xl font-bold">Em Breve</h1>
+          <p className="text-muted-foreground mt-2">
+            A calculadora de batalha está em desenvolvimento e será lançada em breve!
+          </p>
+        </div>
+      );
+    }
+  
+    return <AdminCalculatorPage />;
+  }
+  
