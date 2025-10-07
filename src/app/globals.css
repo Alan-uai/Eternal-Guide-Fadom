@@ -86,7 +86,7 @@
 @layer utilities {
   @keyframes bounce-dot {
     0%, 80%, 100% {
-      transform: scale(0);
+      transform: scale(0.2);
     }
     40% {
       transform: scale(1.0);
@@ -95,6 +95,7 @@
 
   .animate-bounce-dot-1 {
     animation: bounce-dot 1.4s infinite ease-in-out both;
+    animation-delay: -0.32s;
   }
 
   .animate-bounce-dot-2 {
@@ -104,6 +105,5 @@
 
   .animate-bounce-dot-3 {
     animation: bounce-dot 1.4s infinite ease-in-out both;
-    animation-delay: -0.32s;
   }
 }
