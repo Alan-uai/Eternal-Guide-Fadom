@@ -61,8 +61,8 @@ export const world22Data = {
         id: 'eminence-damage',
         name: 'Eminence Damage',
         type: 'progression',
-        unlockCost: '12.50uQDR',
         statType: 'damage',
+        unlockCost: '12.50uQDR',
         maxLevel: 50,
         maxBoost: '0.5x Damage'
       },
@@ -85,9 +85,19 @@ export const world22Data = {
         maxBoost: '0.5x Coins'
       }
     ],
-    npcs: [],
+    npcs: [
+        { id: 'world22-e-rank', name: 'E Rank NPC', rank: 'E', exp: 50816596 },
+        { id: 'world22-d-rank', name: 'D Rank NPC', rank: 'D', exp: 55898255 },
+        { id: 'world22-c-rank', name: 'C Rank NPC', rank: 'C', exp: 61488081 },
+        { id: 'world22-b-rank', name: 'B Rank NPC', rank: 'B', exp: 67636889 },
+        { id: 'world22-a-rank', name: 'A Rank NPC', rank: 'A', exp: 74400578 },
+        { id: 'world22-s-rank', name: 'S Rank NPC', rank: 'S', exp: 81840636 },
+        { id: 'world22-ss-rank', name: 'SS Rank NPC', rank: 'SS', exp: 102300794 },
+        { id: 'world22-sss-rank', name: 'SSS Rank NPC', rank: 'SSS', exp: 153451192 },
+    ],
     pets: [],
     dungeons: [],
     shadows: [],
     stands: []
   };
+
