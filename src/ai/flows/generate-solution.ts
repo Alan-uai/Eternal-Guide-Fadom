@@ -137,7 +137,7 @@ const generateSolutionStreamFlow = ai.defineFlow(
     {
       name: 'generateSolutionStreamFlow',
       inputSchema: GenerateSolutionInputSchema,
-      outputSchema: z.string(),
+      outputSchema: GenerateSolutionOutputSchema,
       stream: true,
     },
     async (input) => {
