@@ -101,25 +101,10 @@ export function AuthDialog() {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
-      if (auth.currentUser && auth.currentUser.isAnonymous) {
-        // Link account
-        const userCredential = await linkWithCredential(auth.currentUser, provider).catch(
-          async (linkError) => {
-            if (linkError.code === 'auth/credential-already-in-use') {
-              const result = await signInWithPopup(auth, provider);
-              return result;
-            }
-            throw linkError;
-          }
-        );
-        if (userCredential?.user) {
-            await handleUserLogin(userCredential.user);
-        }
-      } else {
-        // Sign in
-        const result = await signInWithPopup(auth, provider);
-        await handleUserLogin(result.user);
-      }
+      // Simplificado: signInWithPopup lidará com login e vinculação de anônimos.
+      const result = await signInWithPopup(auth, provider);
+      await handleUserLogin(result.user);
+      
       setAuthDialogOpen(false);
       toast({ title: 'Login bem-sucedido!', description: 'Você entrou com sua conta do Google.' });
     } catch (error) {
@@ -295,3 +280,5 @@ export function AuthDialog() {
     </Dialog>
   );
 }
+
+    
