@@ -9,31 +9,83 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Send } from 'lucide-react';
+import { Send, Loader2, Upload } from 'lucide-react';
 import Head from 'next/head';
+import { useUser, useFirebase } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useState } from 'react';
 
 const suggestionSchema = z.object({
   title: z.string().min(5, 'O título deve ter pelo menos 5 caracteres.').max(100, 'O título não pode exceder 100 caracteres.'),
-  description: z.string().min(20, 'A descrição deve ter pelo menos 20 caracteres.').max(1000, 'A descrição não pode exceder 1000 caracteres.'),
+  content: z.string().min(20, 'A descrição deve ter pelo menos 20 caracteres.').max(5000, 'A descrição não pode exceder 5000 caracteres.'),
+  attachment: z.any().optional(),
 });
 
 export default function SuggestContentPage() {
   const { toast } = useToast();
+  const { user } = useUser();
+  const { firestore, firebaseApp } = useFirebase();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const storage = firebaseApp ? getStorage(firebaseApp) : null;
+
+
   const form = useForm<z.infer<typeof suggestionSchema>>({
     resolver: zodResolver(suggestionSchema),
     defaultValues: {
       title: '',
-      description: '',
+      content: '',
     },
   });
 
-  function onSubmit(values: z.infer<typeof suggestionSchema>) {
-    console.log('Sugestão enviada:', values);
-    toast({
-      title: 'Sugestão Enviada!',
-      description: 'Obrigado por sua contribuição para a Wiki.',
-    });
-    form.reset();
+  const fileRef = form.register("attachment");
+
+  async function onSubmit(values: z.infer<typeof suggestionSchema>) {
+    if (!user || !firestore || !storage) {
+        toast({
+            title: 'Erro',
+            description: 'Você precisa estar logado para enviar uma sugestão.',
+            variant: 'destructive'
+        });
+        return;
+    }
+    setIsSubmitting(true);
+    try {
+        let attachmentURL = null;
+        const file = values.attachment?.[0];
+
+        if (file) {
+            const storageRef = ref(storage, `suggestions/${user.uid}/${Date.now()}-${file.name}`);
+            const uploadResult = await uploadBytes(storageRef, file);
+            attachmentURL = await getDownloadURL(uploadResult.ref);
+        }
+
+        const suggestionsCollection = collection(firestore, 'contentSuggestions');
+        await addDoc(suggestionsCollection, {
+            userId: user.uid,
+            userEmail: user.email,
+            title: values.title,
+            content: values.content,
+            attachmentURL: attachmentURL,
+            status: 'pending',
+            createdAt: serverTimestamp(),
+        });
+
+        toast({
+        title: 'Sugestão Enviada!',
+        description: 'Obrigado por sua contribuição para a Wiki. Sua sugestão será revisada em breve.',
+        });
+        form.reset();
+    } catch (error) {
+        console.error("Erro ao enviar sugestão: ", error);
+        toast({
+            title: 'Erro ao Enviar',
+            description: 'Ocorreu um problema ao enviar sua sugestão. Tente novamente.',
+            variant: 'destructive'
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
   }
 
   return (
@@ -48,8 +100,8 @@ export default function SuggestContentPage() {
         </header>
         <Card>
           <CardHeader>
-            <CardTitle>Sugestão de Novo Artigo</CardTitle>
-            <CardDescription>Preencha o formulário abaixo para enviar sua ideia.</CardDescription>
+            <CardTitle>Formulário de Sugestão</CardTitle>
+            <CardDescription>Preencha os detalhes abaixo. Anexos são opcionais, mas ajudam a ilustrar sua ideia.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -69,13 +121,13 @@ export default function SuggestContentPage() {
                 />
                 <FormField
                   control={form.control}
-                  name="description"
+                  name="content"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Conteúdo / Descrição do Artigo</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Descreva o conteúdo do artigo. O que ele deve cobrir?"
+                          placeholder="Descreva o conteúdo do artigo. O que ele deve cobrir? Seja o mais detalhado possível."
                           className="min-h-[150px]"
                           {...field}
                         />
@@ -84,9 +136,36 @@ export default function SuggestContentPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                  <Send className="mr-2 h-4 w-4" />
-                  Enviar Sugestão
+                 <FormField
+                  control={form.control}
+                  name="attachment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Anexo (Opcional)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                            <Input id="attachment" type="file" className="pl-12" {...fileRef} />
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <Upload className="h-5 w-5 text-gray-400" />
+                            </div>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Enviando...
+                        </>
+                    ) : (
+                        <>
+                            <Send className="mr-2 h-4 w-4" />
+                            Enviar Sugestão
+                        </>
+                    )}
                 </Button>
               </form>
             </Form>
