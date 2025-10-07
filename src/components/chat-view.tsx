@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { generateSolutionStream } from '@/ai/flows/generate-solution';
-import { Bot, User, Send, Loader2, Bookmark, Trash2 } from 'lucide-react';
+import { Bot, User, Send, Bookmark, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -32,6 +32,14 @@ function AssistantMessage({ content }: { content: string }) {
       />
   );
 }
+
+const TypingIndicator = () => (
+    <div className="flex items-center space-x-1.5 p-2">
+      <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce-dot-1"></div>
+      <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce-dot-2"></div>
+      <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce-dot-3"></div>
+    </div>
+);
 
 const CHAT_STORAGE_KEY = 'eternal-guide-chat-history';
 
@@ -202,7 +210,11 @@ export function ChatView() {
                 <Bot className="mx-auto h-12 w-12 mb-4" />
                 <h2 className="text-2xl font-semibold">Bem-vindo ao Guia Eterno</h2>
                 <p className="mt-2">Pergunte-me qualquer coisa sobre o Anime Eternal!</p>
-                {isWikiLoading && <p className="mt-2 text-sm flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/> Carregando a wiki...</p>}
+                {isWikiLoading && 
+                  <div className="mt-2 text-sm flex items-center justify-center gap-2">
+                    <TypingIndicator /> Carregando a wiki...
+                  </div>
+                }
                 
                 {!isWikiLoading && (
                     <Card className='mt-8 max-w-2xl mx-auto bg-card/50'>
@@ -243,13 +255,14 @@ export function ChatView() {
                       : 'bg-card'
                   )}
                 >
-                  {message.role === 'assistant' ? (
+                  {message.isStreaming && !message.content ? (
+                    <TypingIndicator />
+                  ) : message.role === 'assistant' ? (
                     <AssistantMessage content={message.content} />
                   ) : (
                     <p className="whitespace-pre-wrap">{message.content}</p>
                   )}
-                  {message.isStreaming && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
-
+                  
                   {message.role === 'assistant' && !message.isStreaming && message.content && (
                      <Button
                         variant="ghost"
