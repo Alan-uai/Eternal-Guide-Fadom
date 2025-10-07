@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { generateSolution } from '@/ai/flows/generate-solution';
+import { generateSolutionStream } from '@/ai/flows/generate-solution';
 import { Bot, User, Send, Loader2, Bookmark, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
@@ -88,28 +88,61 @@ export function ChatView() {
       role: 'user',
       content: values.prompt,
     };
-    
+  
     const currentMessages = [...messages, userMessage];
     setMessages(currentMessages);
     setIsLoading(true);
     form.reset();
-
+  
+    const assistantMessageId = `assistant-${Date.now()}`;
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      isStreaming: true,
+    };
+    setMessages((prev) => [...prev, assistantMessage]);
+  
     try {
       const wikiContext = wikiArticles.map(article => `Title: ${article.title}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`).join('\n\n---\n\n');
       const historyForAI = currentMessages.slice(0, -1).map(({ id, ...rest }) => rest);
-      
-      const result = await generateSolution({ 
-        problemDescription: values.prompt, 
+  
+      const stream = await generateSolutionStream({
+        problemDescription: values.prompt,
         wikiContext,
-        history: historyForAI
+        history: historyForAI,
       });
-      
-      const assistantMessage: Message = {
-        id: `assistant-${Date.now()}`,
-        role: 'assistant',
-        content: result.potentialSolution,
+
+      if (!stream) {
+        throw new Error('A resposta da IA está vazia.');
+      }
+  
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedContent = '';
+
+      const processText = async () => {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
+              )
+            );
+            break;
+          }
+          accumulatedContent += decoder.decode(value, { stream: true });
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
+            )
+          );
+        }
       };
-      setMessages((prev) => [...prev, assistantMessage]);
+
+      await processText();
+  
     } catch (error) {
       console.error('Erro ao gerar solução:', error);
       toast({
@@ -117,8 +150,8 @@ export function ChatView() {
         title: 'Erro',
         description: 'Falha ao obter uma resposta da IA. Por favor, tente novamente.',
       });
-      // Remove the user message that caused the error
-      setMessages((prev) => prev.filter(msg => msg.id !== userMessage.id));
+      // Remove o usuário e a mensagem de assistente com falha
+      setMessages((prev) => prev.filter(msg => msg.id !== userMessage.id && msg.id !== assistantMessageId));
     } finally {
       setIsLoading(false);
     }
@@ -175,8 +208,9 @@ export function ChatView() {
                   ) : (
                     <p className="whitespace-pre-wrap">{message.content}</p>
                   )}
+                  {message.isStreaming && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
 
-                  {message.role === 'assistant' && (
+                  {message.role === 'assistant' && !message.isStreaming && message.content && (
                      <Button
                         variant="ghost"
                         size="icon"
@@ -196,18 +230,6 @@ export function ChatView() {
                 )}
               </div>
             ))}
-            {isLoading && (
-              <div className="flex items-start gap-4">
-                <Avatar className="h-9 w-9 border border-primary/50">
-                  <AvatarFallback className="bg-primary/20 text-primary">
-                    <Bot size={20} />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="max-w-xl rounded-lg bg-card p-3 text-sm">
-                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                </div>
-              </div>
-            )}
           </div>
         </ScrollArea>
         {messages.length > 0 && (

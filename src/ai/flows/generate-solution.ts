@@ -1,4 +1,3 @@
-
 // src/ai/flows/generate-solution.ts
 'use server';
 /**
@@ -49,6 +48,10 @@ export type GenerateSolutionOutput = z.infer<typeof GenerateSolutionOutputSchema
 
 export async function generateSolution(input: GenerateSolutionInput): Promise<GenerateSolutionOutput> {
   return generateSolutionFlow(input);
+}
+
+export async function generateSolutionStream(input: GenerateSolutionInput) {
+    return generateSolutionStreamFlow(input);
 }
 
 const prompt = ai.definePrompt({
@@ -129,3 +132,38 @@ const generateSolutionFlow = ai.defineFlow(
     }
   }
 );
+
+const generateSolutionStreamFlow = ai.defineFlow(
+    {
+      name: 'generateSolutionStreamFlow',
+      inputSchema: GenerateSolutionInputSchema,
+      outputSchema: z.string(),
+      stream: true,
+    },
+    async (input) => {
+      try {
+        const { stream } = await prompt.stream(input);
+        const chunkStream = new ReadableStream({
+            async start(controller) {
+                for await (const chunk of stream) {
+                    const text = chunk.output?.potentialSolution;
+                    if (text) {
+                        controller.enqueue(text);
+                    }
+                }
+                controller.close();
+            }
+        });
+        return chunkStream;
+      } catch (error) {
+        console.error("Erro no fluxo de geração de solução (stream):", error);
+        const errorStream = new ReadableStream({
+            start(controller) {
+                controller.enqueue("Desculpe, não consegui encontrar uma resposta para sua pergunta. Por favor, tente reformular a pergunta ou verifique se as informações existem no wiki ou nos dados do jogo.");
+                controller.close();
+            }
+        });
+        return errorStream;
+      }
+    }
+  );
