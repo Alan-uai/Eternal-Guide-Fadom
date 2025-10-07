@@ -56,10 +56,16 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
         
         return new ReadableStream({
             async start(controller) {
+                let previousText = '';
                 for await (const chunk of stream) {
-                    const text = chunk.output?.potentialSolution;
-                    if (text) {
-                        controller.enqueue(new TextEncoder().encode(text));
+                    const currentText = chunk.output?.potentialSolution;
+                    if (currentText) {
+                        // Compare the current text with the previous one to find the new part.
+                        const newText = currentText.substring(previousText.length);
+                        if (newText) {
+                            controller.enqueue(new TextEncoder().encode(newText));
+                        }
+                        previousText = currentText; // Update the previous text
                     }
                 }
                 controller.close();
