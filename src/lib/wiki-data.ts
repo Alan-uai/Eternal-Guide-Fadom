@@ -17,7 +17,7 @@ No jogo, a cor de fundo do nome de um item indica sua raridade:
 *   **Azul:** Raro
 *   **Lilás/Magenta:** Épico
 *   **Amarelo:** Lendário
-*   **Vermelho:** Mítico
+*   **Red:** Mítico
 *   **Roxo:** Phantom
 *   **Laranja/Arco-íris:** Supreme
 
@@ -142,6 +142,132 @@ export const rankArticle: WikiArticle = {
         ],
       },
     },
+};
+
+export const energyGainPerRankArticle: WikiArticle = {
+    id: 'energy-gain-per-rank',
+    title: 'Ganho de Energia Base por Rank',
+    summary: 'Uma referência para o ganho de energia base por clique para cada rank no jogo.',
+    content: `Esta tabela detalha o ganho de energia base que um jogador recebe por cada clique em um determinado rank. Esse valor pode ser aumentado por vários multiplicadores no jogo.`,
+    tags: ['ganho', 'energia', 'rank', 'clique', 'guia', 'geral'],
+    imageId: 'wiki-2',
+    tables: {
+      energyGain: {
+        headers: ['Rank', 'Ganho de Energia'],
+        rows: [
+            { Rank: 1, 'Ganho de Energia': '2.3e-24' },
+            { Rank: 2, 'Ganho de Energia': '4.6e-24' },
+            { Rank: 3, 'Ganho de Energia': '9.2e-24' },
+            { Rank: 4, 'Ganho de Energia': '1.8e-23' },
+            { Rank: 5, 'Ganho de Energia': '3.7e-23' },
+            { Rank: 6, 'Ganho de Energia': '7.4e-23' },
+            { Rank: 7, 'Ganho de Energia': '1.5e-22' },
+            { Rank: 8, 'Ganho de Energia': '3e-22' },
+            { Rank: 9, 'Ganho de Energia': '5.9e-22' },
+            { Rank: 10, 'Ganho de Energia': '1.2e-21' },
+            { Rank: 11, 'Ganho de Energia': '2.4e-21' },
+            { Rank: 12, 'Ganho de Energia': '4.8e-21' },
+            { Rank: 13, 'Ganho de Energia': '9.5e-21' },
+            { Rank: 14, 'Ganho de Energia': '1.9e-20' },
+            { Rank: 15, 'Ganho de Energia': '3.8e-20' },
+            { Rank: 16, 'Ganho de Energia': '7.6e-20' },
+            { Rank: 17, 'Ganho de Energia': '1.5e-19' },
+            { Rank: 18, 'Ganho de Energia': '3e-19' },
+            { Rank: 19, 'Ganho de Energia': '6.1e-19' },
+            { Rank: 20, 'Ganho de Energia': '1.2e-18' },
+            { Rank: 21, 'Ganho de Energia': '2.4e-18' },
+            { Rank: 22, 'Ganho de Energia': '4.9e-18' },
+            { Rank: 23, 'Ganho de Energia': '9.8e-18' },
+            { Rank: 24, 'Ganho de Energia': '2e-17' },
+            { Rank: 25, 'Ganho de Energia': '3.9e-17' },
+            { Rank: 26, 'Ganho de Energia': '7.8e-17' },
+            { Rank: 27, 'Ganho de Energia': '1.6e-16' },
+            { Rank: 28, 'Ganho de Energia': '3.1e-16' },
+            { Rank: 29, 'Ganho de Energia': '6.3e-16' },
+            { Rank: 30, 'Ganho de Energia': '1.3e-15' },
+            { Rank: 31, 'Ganho de Energia': '2.5e-15' },
+            { Rank: 32, 'Ganho de Energia': '5.1e-15' },
+            { Rank: 33, 'Ganho de Energia': '1e-14' },
+            { Rank: 34, 'Ganho de Energia': '2e-14' },
+            { Rank: 35, 'Ganho de Energia': '4.1e-14' },
+            { Rank: 36, 'Ganho de Energia': '8.2e-14' },
+            { Rank: 37, 'Ganho de Energia': '1.6e-13' },
+            { Rank: 38, 'Ganho de Energia': '3.3e-13' },
+            { Rank: 39, 'Ganho de Energia': '6.6e-13' },
+            { Rank: 40, 'Ganho de Energia': '1.3e-12' },
+            { Rank: 41, 'Ganho de Energia': '2.6e-12' },
+            { Rank: 42, 'Ganho de Energia': '5.3e-12' },
+            { Rank: 43, 'Ganho de Energia': '1.1e-11' },
+            { Rank: 44, 'Ganho de Energia': '2.1e-11' },
+            { Rank: 45, 'Ganho de Energia': '4.2e-11' },
+            { Rank: 46, 'Ganho de Energia': '8.5e-11' },
+            { Rank: 47, 'Ganho de Energia': '1.7e-10' },
+            { Rank: 48, 'Ganho de Energia': '3.4e-10' },
+            { Rank: 49, 'Ganho de Energia': '6.8e-10' },
+            { Rank: 50, 'Ganho de Energia': '1.4e-09' },
+            { Rank: 51, 'Ganho de Energia': '2.7e-09' },
+            { Rank: 52, 'Ganho de Energia': '5.5e-09' },
+            { Rank: 53, 'Ganho de Energia': '1.1e-08' },
+            { Rank: 54, 'Ganho de Energia': '2.2e-08' },
+            { Rank: 55, 'Ganho de Energia': '4.4e-08' },
+            { Rank: 56, 'Ganho de Energia': '8.8e-08' },
+            { Rank: 57, 'Ganho de Energia': '1.8e-07' },
+            { Rank: 58, 'Ganho de Energia': '3.5e-07' },
+            { Rank: 59, 'Ganho de Energia': '7.1e-07' },
+            { Rank: 60, 'Ganho de Energia': '1.4e-06' },
+            { Rank: 61, 'Ganho de Energia': '2.8e-06' },
+            { Rank: 62, 'Ganho de Energia': '5.7e-06' },
+            { Rank: 63, 'Ganho de Energia': '1.1e-05' },
+            { Rank: 64, 'Ganho de Energia': '2.3e-05' },
+            { Rank: 65, 'Ganho de Energia': '4.6e-05' },
+            { Rank: 66, 'Ganho de Energia': '9.2e-05' },
+            { Rank: 67, 'Ganho de Energia': '0.00018' },
+            { Rank: 68, 'Ganho de Energia': '0.00037' },
+            { Rank: 69, 'Ganho de Energia': '0.00074' },
+            { Rank: 70, 'Ganho de Energia': '0.0015' },
+            { Rank: 71, 'Ganho de Energia': '0.003' },
+            { Rank: 72, 'Ganho de Energia': '0.0059' },
+            { Rank: 73, 'Ganho de Energia': '0.012' },
+            { Rank: 74, 'Ganho de Energia': '0.024' },
+            { Rank: 75, 'Ganho de Energia': '0.047' },
+            { Rank: 76, 'Ganho de Energia': '0.095' },
+            { Rank: 77, 'Ganho de Energia': '0.19' },
+            { Rank: 78, 'Ganho de Energia': '0.38' },
+            { Rank: 79, 'Ganho de Energia': '0.75' },
+            { Rank: 80, 'Ganho de Energia': '1.5' },
+            { Rank: 81, 'Ganho de Energia': '3' },
+            { Rank: 82, 'Ganho de Energia': '6.1' },
+            { Rank: 83, 'Ganho de Energia': '12.1' },
+            { Rank: 84, 'Ganho de Energia': '24.2' },
+            { Rank: 85, 'Ganho de Energia': '48.3' },
+            { Rank: 86, 'Ganho de Energia': '96.5' },
+            { Rank: 87, 'Ganho de Energia': '193' },
+            { Rank: 88, 'Ganho de Energia': '386' },
+            { Rank: 89, 'Ganho de Energia': '772' },
+            { Rank: 90, 'Ganho de Energia': '1.5k' },
+            { Rank: 91, 'Ganho de Energia': '3.1k' },
+            { Rank: 92, 'Ganho de Energia': '6.2k' },
+            { Rank: 93, 'Ganho de Energia': '12.3k' },
+            { Rank: 94, 'Ganho de Energia': '24.7k' },
+            { Rank: 95, 'Ganho de Energia': '49.4k' },
+            { Rank: 96, 'Ganho de Energia': '98.8k' },
+            { Rank: 97, 'Ganho de Energia': '197.6k' },
+            { Rank: 98, 'Ganho de Energia': '395.2k' },
+            { Rank: 99, 'Ganho de Energia': '790.4k' },
+            { Rank: 100, 'Ganho de Energia': '1.6M' },
+            { Rank: 101, 'Ganho de Energia': '3.2M' },
+            { Rank: 102, 'Ganho de Energia': '6.3M' },
+            { Rank: 103, 'Ganho de Energia': '12.7M' },
+            { Rank: 104, 'Ganho de Energia': '25.3M' },
+            { Rank: 105, 'Ganho de Energia': '50.7M' },
+            { Rank: 106, 'Ganho de Energia': '101.3M' },
+            { Rank: 107, 'Ganho de Energia': '202.7M' },
+            { Rank: 108, 'Ganho de Energia': '405.4M' },
+            { Rank: 109, 'Ganho de Energia': '810.7M' },
+            { Rank: 110, 'Ganho de Energia': '1.6B' }
+        ]
+      }
+    }
 };
 
 export const worldBossesArticle: WikiArticle = {
@@ -663,6 +789,7 @@ export const allWikiArticles = [
   guildWarsArticle,
   prestigeArticle,
   rankArticle,
+  energyGainPerRankArticle,
   worldBossesArticle,
   swordsArticle,
   damageSwordsArticle,
@@ -689,6 +816,7 @@ export const allWikiArticles = [
 
 
     
+
 
 
 
