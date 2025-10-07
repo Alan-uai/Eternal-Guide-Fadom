@@ -117,10 +117,15 @@ const generateSolutionFlow = ai.defineFlow(
     outputSchema: GenerateSolutionOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error("A IA não retornou uma resposta.");
+      }
+      return output;
+    } catch (error) {
+      console.error("Erro no fluxo de geração de solução:", error);
       return { potentialSolution: "Desculpe, não consegui encontrar uma resposta para sua pergunta. Por favor, tente reformular a pergunta ou verifique se as informações existem no wiki ou nos dados do jogo." };
     }
-    return output;
   }
 );
