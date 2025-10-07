@@ -41,6 +41,7 @@ export const world1Data = {
         { id: 'world1-b-rank', name: 'B Rank NPC', rank: 'B', exp: 4 },
         { id: 'world1-a-rank', name: 'A Rank NPC', rank: 'A', exp: 5 },
         { id: 'world1-s-rank', name: 'S Rank NPC', rank: 'S', exp: 6 },
+        { id: 'kid-kohan-boss', name: 'Kid Kohan', rank: 'SS', exp: 6, drops: ['Aura da Sorte', 'Straw Hat'] },
     ],
     pets: [],
     dungeons: [
@@ -51,3 +52,4 @@ export const world1Data = {
     ],
   };
   
+    

@@ -1,5 +1,8 @@
 export const world17Data = {
     name: 'World 17',
+    npcs: [
+        { id: 'arama-boss', name: 'Arama', rank: 'SS', exp: 0, drops: ['Aura de Ghoul', 'Shadow'] },
+    ],
     shadows: [
         {
             id: 'arama-shadow',
@@ -20,3 +23,5 @@ export const world17Data = {
         }
     ]
 };
+
+    

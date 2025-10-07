@@ -16,6 +16,7 @@ export const world16Data = {
         { id: 'world16-b-rank', name: 'B Rank NPC', rank: 'B', exp: 416201 },
         { id: 'world16-a-rank', name: 'A Rank NPC', rank: 'A', exp: 457821 },
         { id: 'world16-s-rank', name: 'S Rank NPC', rank: 'S', exp: 503603 },
+        { id: 'dio-boss', name: 'Dio', rank: 'SS', exp: 503603, drops: ['Aura de Hamon', 'Shadow'] },
     ],
     shadows: [
         {
@@ -39,3 +40,5 @@ export const world16Data = {
         }
     ]
 };
+
+    

@@ -7,6 +7,7 @@ export const world12Data = {
         { id: 'world12-b-rank', name: 'B Rank NPC', rank: 'B', exp: 25340 },
         { id: 'world12-a-rank', name: 'A Rank NPC', rank: 'A', exp: 27874 },
         { id: 'world12-s-rank', name: 'S Rank NPC', rank: 'S', exp: 30662 },
+        { id: 'escanor-boss', name: 'Esanor', rank: 'SS', exp: 30662, drops: ['Aura Monstruosa', 'Shadow'] },
     ],
     shadows: [
         {
@@ -30,3 +31,5 @@ export const world12Data = {
         }
     ]
 };
+
+    

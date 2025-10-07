@@ -85,6 +85,7 @@ export const world2Data = {
         { id: 'world2-b-rank', name: 'B Rank NPC', rank: 'B', exp: 12 },
         { id: 'world2-a-rank', name: 'A Rank NPC', rank: 'A', exp: 13 },
         { id: 'world2-s-rank', name: 'S Rank NPC', rank: 'S', exp: 14 },
+        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 14, drops: ['Aura do Imperador Vermelho'] },
     ],
     pets: [
         {
@@ -116,3 +117,5 @@ export const world2Data = {
     ],
   };
   
+
+    

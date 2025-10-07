@@ -1,5 +1,8 @@
 export const world18Data = {
     name: 'World 18',
+    npcs: [
+        { id: 'mr-chainsaw-boss', name: 'Mr Chainsaw', rank: 'SS', exp: 0, drops: ['Shadow'] },
+    ],
     shadows: [
         {
             id: 'mr-chainsaw-shadow',
@@ -22,3 +25,5 @@ export const world18Data = {
         }
     ]
 };
+
+    

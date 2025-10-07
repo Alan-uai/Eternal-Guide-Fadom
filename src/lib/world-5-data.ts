@@ -8,6 +8,7 @@ export const world5Data = {
         { id: 'world5-b-rank', name: 'B Rank NPC', rank: 'B', exp: 96 },
         { id: 'world5-a-rank', name: 'A Rank NPC', rank: 'A', exp: 105 },
         { id: 'world5-s-rank', name: 'S Rank NPC', rank: 'S', exp: 116 },
+        { id: 'rangoki-boss', name: 'Rangoki', rank: 'SS', exp: 116, drops: ['Aura Flamejante'] },
     ],
     powers: [],
     pets: [],
@@ -15,3 +16,5 @@ export const world5Data = {
     shadows: [],
     stands: []
 };
+
+    

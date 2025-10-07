@@ -7,6 +7,7 @@ export const world9Data = {
         { id: 'world9-b-rank', name: 'B Rank NPC', rank: 'B', exp: 1898 },
         { id: 'world9-a-rank', name: 'A Rank NPC', rank: 'A', exp: 2373 },
         { id: 'world9-s-rank', name: 'S Rank NPC', rank: 'S', exp: 3915 },
+        { id: 'ken-turbo-boss', name: 'Ken Turbo', rank: 'SS', exp: 3915, drops: ['Aura Energética', 'Shadow'] },
     ],
     shadows: [
         {
@@ -28,3 +29,5 @@ export const world9Data = {
         }
     ]
 };
+
+    

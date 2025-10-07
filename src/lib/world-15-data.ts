@@ -7,6 +7,7 @@ export const world15Data = {
         { id: 'world15-b-rank', name: 'B Rank NPC', rank: 'B', exp: 206742 },
         { id: 'world15-a-rank', name: 'A Rank NPC', rank: 'A', exp: 227417 },
         { id: 'world15-s-rank', name: 'S Rank NPC', rank: 'S', exp: 250158 },
+        { id: 'the-paladin-boss', name: 'The Paladin', rank: 'SS', exp: 250158, drops: ['Aura Virtual', 'Virtual Headset', 'Shadow'] },
     ],
     shadows: [
         {
@@ -28,3 +29,5 @@ export const world15Data = {
         }
     ]
 };
+
+    

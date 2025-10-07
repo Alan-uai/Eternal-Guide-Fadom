@@ -7,6 +7,7 @@ export const world7Data = {
         { id: 'world7-b-rank', name: 'B Rank NPC', rank: 'B', exp: 319 },
         { id: 'world7-a-rank', name: 'A Rank NPC', rank: 'A', exp: 351 },
         { id: 'world7-s-rank', name: 'S Rank NPC', rank: 'S', exp: 386 },
+        { id: 'novi-chrone-boss', name: 'Novi Chroni', rank: 'SS', exp: 386, drops: ['Clover Pendant', 'Shadow'] },
     ],
     shadows: [
         {
@@ -28,3 +29,5 @@ export const world7Data = {
         }
     ]
 };
+
+    

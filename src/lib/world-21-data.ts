@@ -1,5 +1,9 @@
 export const world21Data = {
     name: 'World 21',
+    npcs: [
+        { id: 'cifer-boss', name: 'Cifer', rank: 'SSS', exp: 0, drops: ['Shadow'] },
+        { id: 'vasto-ichge-boss', name: 'Vasto Ichge', rank: 'SSS', exp: 0, drops: [] },
+    ],
     shadows: [
         {
             id: 'cifer-shadow',
@@ -20,3 +24,5 @@ export const world21Data = {
         }
     ]
 };
+
+    

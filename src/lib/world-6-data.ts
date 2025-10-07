@@ -7,6 +7,7 @@ export const world6Data = {
         { id: 'world6-b-rank', name: 'B Rank NPC', rank: 'B', exp: 159 },
         { id: 'world6-a-rank', name: 'A Rank NPC', rank: 'A', exp: 174 },
         { id: 'world6-s-rank', name: 'S Rank NPC', rank: 'S', exp: 192 },
+        { id: 'statue-of-god-boss', name: 'Statue of God', rank: 'SS', exp: 192, drops: ['Aura da Estátua', 'Shadow'] },
     ],
     shadows: [
         {
@@ -30,3 +31,5 @@ export const world6Data = {
         }
     ]
 };
+
+    

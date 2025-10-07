@@ -54,7 +54,10 @@ export const world20Data = {
         maxBoost: '10x Damage'
       }
     ],
-    npcs: [],
+    npcs: [
+      { id: 'koku-ssj-boss', name: 'Koku SSJ', rank: 'SS', exp: 0, drops: ['Shadow'] },
+      { id: 'frezi-final-form-boss', name: 'Frezi Final Form', rank: 'SSS', exp: 0, drops: [] },
+    ],
     pets: [],
     dungeons: [],
     shadows: [
@@ -80,3 +83,5 @@ export const world20Data = {
     ]
   };
   
+
+    

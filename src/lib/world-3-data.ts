@@ -53,9 +53,11 @@ export const world3Data = {
       { id: 'world3-b-rank', name: 'B Rank NPC', rank: 'B', exp: 24 },
       { id: 'world3-a-rank', name: 'A Rank NPC', rank: 'A', exp: 25 },
       { id: 'world3-s-rank', name: 'S Rank NPC', rank: 'S', exp: 26 },
+      { id: 'eizen-boss', name: 'Eizen', rank: 'SS', exp: 26, drops: ['Aura do Traidor Roxo', 'Shinigami Scarf'] },
     ],
     pets: [],
     dungeons: [],
   };
 
+    
     

@@ -411,3 +411,5 @@
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
+
+    
