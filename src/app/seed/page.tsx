@@ -27,7 +27,8 @@ import {
   standsArticle,
   howToGetStrongerArticle,
   lobbyDungeonsArticle,
-  energyGainPerRankArticle
+  energyGainPerRankArticle,
+  levelExpArticle
 } from '@/lib/wiki-data';
 import type { WikiArticle } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
@@ -99,6 +100,7 @@ function AdminSeedPage() {
     howToGetStronger: false,
     lobbyDungeons: false,
     energyGain: false,
+    levelExp: false,
     all: false
   });
 
@@ -252,6 +254,7 @@ function AdminSeedPage() {
     await seedArticle(gettingStartedArticle, 'gettingStarted', 'Começando no Anime Eternal');
     await seedArticle(rankArticle, 'ranks', 'Sistema de Ranks');
     await seedArticle(energyGainPerRankArticle, 'energyGain', 'Ganho de Energia por Rank');
+    await seedArticle(levelExpArticle, 'levelExp', 'Experiência por Nível');
     await seedArticle(auraArticle, 'auras', 'Sistema de Auras');
     await seedArticle(prestigeArticle, 'prestige', 'Sistema de Prestígio');
     await seedArticle(worldBossesArticle, 'bosses', 'Guia de Chefes de Mundo');
@@ -330,6 +333,16 @@ function AdminSeedPage() {
               <Button onClick={() => seedArticle(energyGainPerRankArticle, 'energyGain', 'Ganho de Energia por Rank')} disabled={loadingStates.energyGain || !firestore}>
                 {loadingStates.energyGain ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loadingStates.energyGain ? 'Populando...' : 'Popular Ganho de Energia'}
+              </Button>
+            </CardFooter>
+          </Card>
+           <Card>
+            <CardHeader><CardTitle className="text-lg">Popular Experiência por Nível</CardTitle></CardHeader>
+            <CardContent><CardDescription>Popula o artigo "Experiência por Nível" na coleção `wikiContent`.</CardDescription></CardContent>
+            <CardFooter>
+              <Button onClick={() => seedArticle(levelExpArticle, 'levelExp', 'Experiência por Nível')} disabled={loadingStates.levelExp || !firestore}>
+                {loadingStates.levelExp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingStates.levelExp ? 'Populando...' : 'Popular EXP por Nível'}
               </Button>
             </CardFooter>
           </Card>

@@ -112,11 +112,10 @@ O jogo tem 21 mundos, cada um com conteúdo exclusivo. Você deve entender e usa
       *   Procure por **modificadores de porcentagem** na pergunta (ex: "20% da vida"). Se encontrar, use 'HP Total * Porcentagem'. Se não, use o HP total.
       *   Calcule o Dano Total por Segundo (DPS) do jogador.
       *   Calcule o tempo para derrotar: 'HP Alvo / DPS do Jogador'.
-  2.  **Cálculo de Tempo para Alcançar Rank:**
-      *   Encontre a energia total necessária para o rank alvo no artigo 'Sistema de Ranks'.
-      *   Use a taxa de ganho de energia por clique fornecida pelo usuário.
-      *   Calcule o ganho de energia por segundo (energia por clique * 4, se o usuário tiver 'fast click').
-      *   Calcule o tempo total: 'Energia Total Necessária / Ganho de Energia por Segundo'.
+  2.  **Cálculo de Tempo para Alcançar Nível (XP):**
+      *   Encontre a EXP total necessária para o nível alvo no artigo 'Experiência por Nível'.
+      *   Use a taxa de ganho de EXP por monstro/missão fornecida pelo usuário.
+      *   Calcule o tempo total: 'EXP Total Necessária / Ganho de EXP por Segundo/Minuto'.
   3.  **Apresente a Resposta em Cenários:** Forneça uma análise comparativa:
       *   **Tempo Cru:** Calcule o tempo considerando apenas os status base, sem gamepasses ou poderes.
       *   **Seu Tempo Atual:** Calcule o tempo usando os dados exatos que o jogador forneceu.
