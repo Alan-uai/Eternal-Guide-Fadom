@@ -7,7 +7,7 @@ export const world10Data = {
         { id: 'world10-b-rank', name: 'B Rank NPC', rank: 'B', exp: 6513 },
         { id: 'world10-a-rank', name: 'A Rank NPC', rank: 'A', exp: 7164 },
         { id: 'world10-s-rank', name: 'S Rank NPC', rank: 'S', exp: 7881 },
-        { id: 'killas-godspeed-boss', name: 'Killas Godspeed', rank: 'SS', exp: 7881, drops: ['Hunter License', 'Shadow'] },
+        { id: 'killas-godspeed-boss', name: 'Killas Godspeed', rank: 'SS', exp: 11520, drops: ['Hunter License', 'Shadow'] },
     ],
     shadows: [
         {

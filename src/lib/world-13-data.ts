@@ -7,7 +7,7 @@ export const world13Data = {
         { id: 'world13-b-rank', name: 'B Rank NPC', rank: 'B', exp: 51013 },
         { id: 'world13-a-rank', name: 'A Rank NPC', rank: 'A', exp: 56115 },
         { id: 'world13-s-rank', name: 'S Rank NPC', rank: 'S', exp: 61726 },
-        { id: 'number-8-boss', name: 'Number 8', rank: 'SS', exp: 61726, drops: ['Sins Emblem', 'Shadow'] },
+        { id: 'number-8-boss', name: 'Number 8', rank: 'SS', exp: 92160, drops: ['Sins Emblem', 'Shadow'] },
     ],
     shadows: [
         {

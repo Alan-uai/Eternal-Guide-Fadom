@@ -7,7 +7,7 @@ export const world11Data = {
         { id: 'world11-b-rank', name: 'B Rank NPC', rank: 'B', exp: 12587 },
         { id: 'world11-a-rank', name: 'A Rank NPC', rank: 'A', exp: 13846 },
         { id: 'world11-s-rank', name: 'S Rank NPC', rank: 'S', exp: 15231 },
-        { id: 'eran-boss', name: 'Eran', rank: 'SS', exp: 15231, drops: ['Shadow'] },
+        { id: 'eran-boss', name: 'Eran', rank: 'SS', exp: 23040, drops: ['Shadow'] },
     ],
     shadows: [
         {

@@ -7,7 +7,7 @@ export const world14Data = {
         { id: 'world14-b-rank', name: 'B Rank NPC', rank: 'B', exp: 102697 },
         { id: 'world14-a-rank', name: 'A Rank NPC', rank: 'A', exp: 112966 },
         { id: 'world14-s-rank', name: 'S Rank NPC', rank: 'S', exp: 124263 },
-        { id: 'valzora-boss', name: 'Valzora', rank: 'SS', exp: 124263, drops: ['Shadow'] },
+        { id: 'valzora-boss', name: 'Valzora', rank: 'SS', exp: 184320, drops: ['Shadow'] },
     ],
     shadows: [
         {

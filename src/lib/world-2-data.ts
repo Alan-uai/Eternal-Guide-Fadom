@@ -7,6 +7,7 @@ export const world2Data = {
         name: 'Red Emperor Power',
         type: 'gacha',
         statType: 'damage',
+        unlockCost: '75k',
         stats: [
           { name: 'Conquerors Haki', multiplier: '1.1x', rarity: 'Rare', probability: 19.9 },
           { name: 'Red Hair', multiplier: '1.2x', rarity: 'Legendary', probability: 5 },
@@ -73,6 +74,7 @@ export const world2Data = {
         id: 'haki-upgrade',
         name: 'Haki Upgrade',
         type: 'progression',
+        unlockCost: '100k',
         statType: 'damage',
         maxLevel: 60,
         maxBoost: '0.6x Damage'
@@ -85,7 +87,7 @@ export const world2Data = {
         { id: 'world2-b-rank', name: 'B Rank NPC', rank: 'B', exp: 12 },
         { id: 'world2-a-rank', name: 'A Rank NPC', rank: 'A', exp: 13 },
         { id: 'world2-s-rank', name: 'S Rank NPC', rank: 'S', exp: 14 },
-        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 14, drops: ['Aura do Imperador Vermelho'] },
+        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 30, drops: ['Aura do Imperador Vermelho'] },
     ],
     pets: [
         {
@@ -117,5 +119,3 @@ export const world2Data = {
     ],
   };
   
-
-    

@@ -67,7 +67,7 @@ export const world4Data = {
         { id: 'world4-b-rank', name: 'B Rank NPC', rank: 'B', exp: 45 },
         { id: 'world4-a-rank', name: 'A Rank NPC', rank: 'A', exp: 47 },
         { id: 'world4-s-rank', name: 'S Rank NPC', rank: 'S', exp: 50 },
-        { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 50, drops: ['Aura do Rei do Fogo', 'Cursed Blindfold'] },
+        { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, drops: ['Aura do Rei do Fogo', 'Cursed Blindfold'] },
     ],
     pets: [],
     dungeons: [

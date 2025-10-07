@@ -7,8 +7,8 @@ export const world8Data = {
         { id: 'world8-b-rank', name: 'B Rank NPC', rank: 'B', exp: 643 },
         { id: 'world8-a-rank', name: 'A Rank NPC', rank: 'A', exp: 707 },
         { id: 'world8-s-rank', name: 'S Rank NPC', rank: 'S', exp: 777 },
-        { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 777, drops: ['Aura da Folha', 'Akatsuki Cloak', 'Shadow'] },
-        { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 777, drops: ['Aura da Folha', 'Shadow'] },
+        { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 1920, drops: ['Aura da Folha', 'Akatsuki Cloak', 'Shadow'] },
+        { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 2880, drops: ['Aura da Folha', 'Shadow'] },
     ],
     shadows: [
         {
