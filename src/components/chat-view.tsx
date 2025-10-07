@@ -116,52 +116,62 @@ export function ChatView() {
       const wikiContext = wikiArticles.map(article => `Title: ${article.title}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`).join('\n\n---\n\n');
       const historyForAI = currentMessages.slice(0, -1).map(({ id, ...rest }) => rest);
   
-      const stream = await generateSolutionStream({
+      generateSolutionStream({
         problemDescription: values.prompt,
         wikiContext,
         history: historyForAI,
-      });
+      }).then(async (stream) => {
+        if (!stream) {
+          throw new Error('A resposta da IA está vazia.');
+        }
 
-      if (!stream) {
-        throw new Error('A resposta da IA está vazia.');
-      }
-  
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let accumulatedContent = '';
+        const reader = stream.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedContent = '';
 
-      const processText = async () => {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) {
+        const processText = async () => {
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) {
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
+                )
+              );
+              setIsLoading(false);
+              break;
+            }
+            accumulatedContent += decoder.decode(value, { stream: true });
             setMessages((prev) =>
               prev.map((msg) =>
-                msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
+                msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
               )
             );
-            break;
           }
-          accumulatedContent += decoder.decode(value, { stream: true });
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
-            )
-          );
-        }
-      };
+        };
+        await processText();
 
-      await processText();
+      }).catch(error => {
+        // This catch block will handle errors from the generateSolutionStream promise itself (e.g., network issues)
+        console.error('Erro ao iniciar o stream da solução:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Erro de Conexão',
+          description: 'Não foi possível conectar com a IA. Por favor, verifique sua conexão e tente novamente.',
+        });
+        setMessages((prev) => prev.filter(msg => msg.id !== userMessage.id && msg.id !== assistantMessageId));
+        setIsLoading(false);
+      });
   
     } catch (error) {
+      // This catch block handles synchronous errors before the promise starts
       console.error('Erro ao gerar solução:', error);
       toast({
         variant: 'destructive',
         title: 'Erro',
         description: 'Falha ao obter uma resposta da IA. Por favor, tente novamente.',
       });
-      // Remove o usuário e a mensagem de assistente com falha
       setMessages((prev) => prev.filter(msg => msg.id !== userMessage.id && msg.id !== assistantMessageId));
-    } finally {
       setIsLoading(false);
     }
   }
