@@ -55,8 +55,14 @@ export const world20Data = {
       }
     ],
     npcs: [
-      { id: 'koku-ssj-boss', name: 'Koku SSJ', rank: 'SS', exp: 0, drops: ['Shadow'] },
-      { id: 'frezi-final-form-boss', name: 'Frezi Final Form', rank: 'SSS', exp: 0, drops: [] },
+      { id: 'world20-e-rank', name: 'E Rank NPC', rank: 'E', exp: 8024882 },
+      { id: 'world20-d-rank', name: 'D Rank NPC', rank: 'D', exp: 8827370 },
+      { id: 'world20-c-rank', name: 'C Rank NPC', rank: 'C', exp: 9710107 },
+      { id: 'world20-b-rank', name: 'B Rank NPC', rank: 'B', exp: 10681118 },
+      { id: 'world20-a-rank', name: 'A Rank NPC', rank: 'A', exp: 11749230 },
+      { id: 'world20-s-rank', name: 'S Rank NPC', rank: 'S', exp: 12924153 },
+      { id: 'koku-ssj-boss', name: 'Koku SSJ', rank: 'SS', exp: 16155191, drops: ['Shadow'] },
+      { id: 'frezi-final-form-boss', name: 'Frezi Final Form', rank: 'SSS', exp: 24232787, drops: [] },
     ],
     pets: [],
     dungeons: [],
@@ -82,6 +88,3 @@ export const world20Data = {
         }
     ]
   };
-  
-
-    
