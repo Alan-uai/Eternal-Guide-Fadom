@@ -12,24 +12,16 @@ export async function handleUserLogin(user: User) {
     id: user.uid,
     email: user.email,
     username: user.displayName || user.email?.split('@')[0],
-    // Do not set createdAt on every login, only on creation.
-    // Let merge:true handle this. If the doc exists, this won't overwrite.
-    // If it's a new doc, this will be set.
   };
 
-  if (!user.metadata.creationTime || user.metadata.creationTime === user.metadata.lastSignInTime) {
+  // Set createdAt only if the user is new.
+  if (user.metadata.creationTime === user.metadata.lastSignInTime) {
     userData.createdAt = serverTimestamp();
-  }
-
-
-  // Check if the sign-in provider is Google to assign admin tag
-  if (user.providerData.some(provider => provider.providerId === 'google.com')) {
-    userData.tag = 'admin';
   }
 
   try {
     // Use { merge: true } to create the document if it doesn't exist,
-    // or update it if it does, without overwriting existing fields.
+    // or update it if it does, without overwriting existing fields like 'tag'.
     await setDoc(userRef, userData, { merge: true });
     console.log('User document written/updated for:', user.uid);
   } catch (error) {
@@ -38,5 +30,3 @@ export async function handleUserLogin(user: User) {
     throw new Error('Failed to update user profile in Firestore.');
   }
 }
-
-    
