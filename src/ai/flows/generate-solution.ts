@@ -51,7 +51,29 @@ export async function generateSolution(input: GenerateSolutionInput): Promise<Ge
 }
 
 export async function generateSolutionStream(input: GenerateSolutionInput) {
-    return generateSolutionStreamFlow(input);
+    try {
+        const { stream } = await prompt.stream(input);
+        
+        return new ReadableStream({
+            async start(controller) {
+                for await (const chunk of stream) {
+                    const text = chunk.output?.potentialSolution;
+                    if (text) {
+                        controller.enqueue(new TextEncoder().encode(text));
+                    }
+                }
+                controller.close();
+            }
+        });
+    } catch (error) {
+        console.error("Erro no fluxo de geração de solução (stream):", error);
+        return new ReadableStream({
+            start(controller) {
+                controller.enqueue(new TextEncoder().encode("Desculpe, não consegui processar sua pergunta. Tente reformulá-la."));
+                controller.close();
+            }
+        });
+    }
 }
 
 const prompt = ai.definePrompt({
@@ -122,8 +144,9 @@ const generateSolutionFlow = ai.defineFlow(
   async input => {
     try {
       const {output} = await prompt(input);
-      if (!output) {
-        throw new Error("A IA não retornou uma resposta.");
+      if (!output || !output.potentialSolution) {
+        // Fallback in case the AI returns an empty object or misses the field.
+        return { potentialSolution: "Desculpe, não consegui gerar uma resposta. Por favor, tente reformular sua pergunta." };
       }
       return output;
     } catch (error) {
@@ -132,38 +155,3 @@ const generateSolutionFlow = ai.defineFlow(
     }
   }
 );
-
-const generateSolutionStreamFlow = ai.defineFlow(
-    {
-      name: 'generateSolutionStreamFlow',
-      inputSchema: GenerateSolutionInputSchema,
-      outputSchema: GenerateSolutionOutputSchema,
-      stream: true,
-    },
-    async (input) => {
-      try {
-        const { stream } = await prompt.stream(input);
-        const chunkStream = new ReadableStream({
-            async start(controller) {
-                for await (const chunk of stream) {
-                    const text = chunk.output?.potentialSolution;
-                    if (text) {
-                        controller.enqueue(text);
-                    }
-                }
-                controller.close();
-            }
-        });
-        return chunkStream;
-      } catch (error) {
-        console.error("Erro no fluxo de geração de solução (stream):", error);
-        const errorStream = new ReadableStream({
-            start(controller) {
-                controller.enqueue("Desculpe, não consegui encontrar uma resposta para sua pergunta. Por favor, tente reformular a pergunta ou verifique se as informações existem no wiki ou nos dados do jogo.");
-                controller.close();
-            }
-        });
-        return errorStream;
-      }
-    }
-  );
