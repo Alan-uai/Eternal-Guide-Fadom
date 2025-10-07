@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Swords, Shield, Zap, Flame } from 'lucide-react';
+import { Loader2, Swords, Shield, Zap, Flame, Calculator } from 'lucide-react';
 import Head from 'next/head';
 
 interface Npc {
