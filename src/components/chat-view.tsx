@@ -16,6 +16,7 @@ import type { Message } from '@/lib/types';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { micromark } from 'micromark';
+import { Card, CardContent } from './ui/card';
 
 const chatSchema = z.object({
   prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
@@ -33,6 +34,14 @@ function AssistantMessage({ content }: { content: string }) {
 }
 
 const CHAT_STORAGE_KEY = 'eternal-guide-chat-history';
+
+const suggestedPrompts = [
+    'Qual o melhor poder para o Mundo 4?',
+    'Como derroto o chefe de Windmill Island?',
+    'Qual a ordem de prioridade das gamepasses?',
+    'Quanto de DPS preciso para o Mundo 10?',
+];
+
 
 export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -165,6 +174,12 @@ export function ChatView() {
     });
   }
 
+  const handleSuggestedPrompt = (prompt: string) => {
+    form.setValue('prompt', prompt);
+    form.handleSubmit(onSubmit)();
+  };
+
+
   const isSendDisabled = isLoading || isWikiLoading;
 
   return (
@@ -173,11 +188,26 @@ export function ChatView() {
         <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
           <div className="p-4 md:p-6 space-y-6">
             {messages.length === 0 && (
-              <div className="text-center text-muted-foreground pt-16">
+              <div className="text-center text-muted-foreground pt-10 md:pt-16">
                 <Bot className="mx-auto h-12 w-12 mb-4" />
                 <h2 className="text-2xl font-semibold">Bem-vindo ao Guia Eterno</h2>
-                <p className="mt-2">Pergunte-me qualquer coisa sobre o Anime Eternal! A wiki é minha base de conhecimento.</p>
+                <p className="mt-2">Pergunte-me qualquer coisa sobre o Anime Eternal!</p>
                 {isWikiLoading && <p className="mt-2 text-sm flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin"/> Carregando a wiki...</p>}
+                
+                {!isWikiLoading && (
+                    <Card className='mt-8 max-w-2xl mx-auto bg-card/50'>
+                        <CardContent className='p-4'>
+                            <p className="text-sm mb-4">Ou tente uma dessas perguntas:</p>
+                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                                {suggestedPrompts.map(prompt => (
+                                    <Button key={prompt} variant='outline' size='sm' className='h-auto py-2' onClick={() => handleSuggestedPrompt(prompt)}>
+                                        {prompt}
+                                    </Button>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
               </div>
             )}
             {messages.map((message) => (
