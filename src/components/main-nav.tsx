@@ -4,25 +4,26 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, Calculator, HeartPulse, Database } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
-import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const navItems = [
-  { href: '/', icon: BotMessageSquare, label: 'Chat IA', tooltip: 'Chat com a IA' },
-  { href: '/tips', icon: HeartPulse, label: 'Dicas', tooltip: 'Como Ficar Mais Forte' },
-  { href: '/calculator', icon: Calculator, label: 'Calculadora', tooltip: 'Calculadora de Batalha' },
-  { href: '/saved', icon: Bookmark, label: 'Respostas Salvas', tooltip: 'Respostas Salvas' },
-  { href: '/suggest', icon: Lightbulb, label: 'Sugerir Conteúdo', tooltip: 'Sugerir Conteúdo' },
+  { href: '/', icon: BotMessageSquare, label: 'Chat IA' },
+  { href: '/tips', icon: HeartPulse, label: 'Dicas' },
+  { href: '/calculator', icon: Calculator, label: 'Calculadora' },
+  { href: '/saved', icon: Bookmark, label: 'Salvas' },
+  { href: '/suggest', icon: Lightbulb, label: 'Sugerir' },
 ];
 
 const adminNavItems = [
-    { href: '/suggestions', icon: ClipboardList, label: 'Ver Sugestões', tooltip: 'Ver Sugestões de Conteúdo' },
-    { href: '/admin/manage-content', icon: Database, label: 'Gerenciar Conteúdo', tooltip: 'Gerenciar dados da Wiki e do Jogo' },
-    { href: '/admin-chat', icon: BrainCircuit, label: 'Canal com IA', tooltip: 'Interagir com a IA para desenvolvimento' },
+    { href: '/suggestions', icon: ClipboardList, label: 'Sugestões' },
+    { href: '/admin/manage-content', icon: Database, label: 'Gerenciar' },
+    { href: '/admin-chat', icon: BrainCircuit, label: 'Canal IA' },
 ];
 
 export function MainNav() {
@@ -30,43 +31,43 @@ export function MainNav() {
   const { isAdmin } = useAdmin();
 
   return (
-    <SidebarMenu>
-      {navItems.map((item) => (
-        <SidebarMenuItem key={item.href}>
-          <Link href={item.href} className="w-full">
-            <SidebarMenuButton
-              isActive={pathname === item.href}
-              tooltip={{ children: item.tooltip }}
-              className={cn(
-                'w-full justify-start',
-                pathname === item.href &&
-                  'bg-primary/10 text-primary hover:bg-primary/20'
-              )}
-            >
-              <item.icon className="size-5" />
-              <span>{item.label}</span>
-            </SidebarMenuButton>
-          </Link>
-        </SidebarMenuItem>
-      ))}
-      {isAdmin && adminNavItems.map((item) => (
-         <SidebarMenuItem key={item.href}>
-          <Link href={item.href} className="w-full">
-            <SidebarMenuButton
-              isActive={pathname.startsWith(item.href)}
-              tooltip={{ children: item.tooltip }}
-              className={cn(
-                'w-full justify-start',
-                pathname.startsWith(item.href) &&
-                  'bg-primary/10 text-primary hover:bg-primary/20'
-              )}
-            >
-              <item.icon className="size-5" />
-              <span>{item.label}</span>
-            </SidebarMenuButton>
-          </Link>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
+    <TooltipProvider>
+      <nav className="flex items-center space-x-2">
+        {navItems.map((item) => (
+          <Tooltip key={item.href}>
+            <TooltipTrigger asChild>
+              <Link
+                href={item.href}
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
+                  pathname === item.href && 'bg-accent text-accent-foreground'
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="sr-only">{item.label}</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{item.label}</TooltipContent>
+          </Tooltip>
+        ))}
+        {isAdmin && adminNavItems.map((item) => (
+          <Tooltip key={item.href}>
+            <TooltipTrigger asChild>
+              <Link
+                href={item.href}
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
+                   pathname.startsWith(item.href) && 'bg-accent text-accent-foreground'
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="sr-only">{item.label}</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{item.label}</TooltipContent>
+          </Tooltip>
+        ))}
+      </nav>
+    </TooltipProvider>
   );
 }
