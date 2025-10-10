@@ -106,4 +106,55 @@ Sem suposições. Sem correções automáticas. Sem alterações não solicitada
 
 ---
 
-*Fim das regras estritas para a IA — Aplicável a todas as páginas citadas pelo usuário.*
+## 🧩 Regras Adicionais — Protocolo de Correção e Diagnóstico Profundo
+
+1. **Gatilho de Ativação:**
+
+   * Este protocolo entra em vigor **automaticamente** quando um erro, falha ou problema é relatado **pela segunda vez ou mais**.
+   * A partir desse ponto, a IA deve adotar comportamento **analítico, meticuloso e metódico**.
+
+2. **Análise Profunda Obrigatória:**
+
+   * A IA deve realizar uma **varredura completa** do trecho envolvido no erro e de **todas as suas dependências diretas e indiretas**.
+   * A varredura inclui: fluxo lógico, integração entre módulos, dependências, escopos de variáveis, manipulação de estado, dados e eventuais side effects.
+   * A IA deve investigar **nos mínimos detalhes**, linha por linha, se necessário.
+
+3. **Uso Controlado de Caminhos e Métodos Adicionais:**
+
+   * A IA **pode acessar e utilizar outros arquivos, caminhos, funções ou métodos** **somente** para fins de diagnóstico e verificação.
+   * Nenhum desses arquivos pode ser **editado, removido ou modificado** sem autorização direta do usuário.
+   * O acesso deve ser **leitura e análise apenas**, até que a origem real do erro seja confirmada.
+
+4. **Testes Repetidos e Verificação de Consistência:**
+
+   * A IA deve realizar **múltiplos testes** (mínimo de 3, máximo de 10) em diferentes condições, simulando casos de borda e cenários extremos.
+   * Cada execução deve validar se o erro é **consistente, intermitente ou contextual**.
+   * A IA não pode propor correção até compreender **completamente** a causa raiz.
+
+5. **Proibição de Conclusões Precipitadas:**
+
+   * A IA **não deve apresentar conclusões rápidas ou superficiais**.
+   * Ela deve se instruir melhor, revisar suas hipóteses e validar cada possível causa **antes** de sugerir qualquer alteração.
+
+6. **Respostas Detalhadas e Completas:**
+
+   * É **terminantemente proibido** entregar respostas vazias, incompletas ou superficiais durante o processo de correção.
+   * Cada resposta deve conter:
+     * Um resumo do diagnóstico realizado;
+     * As hipóteses verificadas;
+     * O resultado de cada teste;
+     * E os próximos passos exatos (ou a confirmação final do erro corrigido).
+
+7. **Correção com Garantia Total:**
+
+   * Após identificar a causa real, a IA deve realizar a correção **com total cautela**, garantindo que **nenhum outro trecho funcional seja afetado**.
+   * A alteração deve ser isolada, reversível e validada por meio de testes completos de regressão antes de ser entregue.
+
+8. **Verificação Pós-Correção:**
+
+   * Após aplicar o conserto, a IA deve executar **nova varredura completa** e **repetir todos os testes anteriores**, para garantir que o erro não reapareça.
+   * Caso surjam novos comportamentos inesperados, a IA deve **interromper a execução imediatamente** e solicitar nova autorização antes de continuar.
+
+---
+
+*Fim das regras estritas para a IA — Aplicável a todas as páginascitadas pelo usuário.*
