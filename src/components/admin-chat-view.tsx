@@ -58,14 +58,14 @@ function WikiManagementTab() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
-  const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string } | null>(null);
+  const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, editPath?: string } | null>(null);
 
   const handleLoading = (key: string, value: boolean) => {
     setLoadingStates(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleViewContent = (title: string, data: any, id?: string) => {
-    setViewingContent({ title, data, id });
+  const handleViewContent = (title: string, data: any, id?: string, editPath?: string) => {
+    setViewingContent({ title, data, id, editPath });
   };
 
   async function seedWorldGeneric(worldId: string, worldData: any, loadingKey: string) {
@@ -156,6 +156,29 @@ function WikiManagementTab() {
     });
   }
 
+  async function handleSeedArticle(article: WikiArticle, loadingKey: string) {
+    handleLoading(loadingKey, true);
+    if (!firestore) {
+        toast({ title: 'Erro', description: 'O Firestore não foi inicializado.', variant: 'destructive' });
+        handleLoading(loadingKey, false);
+        return;
+    }
+
+    const articleRef = doc(firestore, 'wikiContent', article.id);
+    const batch = writeBatch(firestore);
+    batch.set(articleRef, article);
+    await batch.commit().then(() => {
+      toast({ title: 'Artigo Populado!', description: `O artigo "${article.title}" foi sincronizado.` });
+    }).catch(() => {
+         const permissionError = new FirestorePermissionError({
+            path: `wikiContent/${article.id}`, operation: 'write', requestResourceData: { [articleRef.path]: article },
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    }).finally(() => {
+        handleLoading(loadingKey, false);
+    });
+  }
+
   const worldNumbers = Array.from({ length: 22 }, (_, i) => i + 1);
   const worldSeedData: { [key: number]: any } = {
     1: { data: world1Data, key: 'world1' }, 2: { data: world2Data, key: 'world2' },
@@ -182,16 +205,8 @@ function WikiManagementTab() {
     handleLoading('all', true);
     toast({ title: 'Iniciando...', description: 'Populando todos os dados do jogo. Isso pode levar um momento.' });
 
-    for (const { article } of articleSeedData) {
-        const articleRef = doc(firestore, 'wikiContent', article.id);
-        const batch = writeBatch(firestore);
-        batch.set(articleRef, article);
-        await batch.commit().catch(() => {
-             const permissionError = new FirestorePermissionError({
-                path: `wikiContent/${article.id}`, operation: 'write', requestResourceData: { [articleRef.path]: article },
-            });
-            errorEmitter.emit('permission-error', permissionError);
-        });
+    for (const { article, key } of articleSeedData) {
+        await handleSeedArticle(article, key);
     }
     toast({ title: 'Artigos Populados!', description: 'Todos os artigos da wiki foram sincronizados.' });
     
@@ -235,13 +250,12 @@ function WikiManagementTab() {
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {articleSeedData.map(({ article, key, name }) => (
                 <div key={key} className="flex gap-2">
-                   <Link href={`/wiki/edit/${article.id}`} className='w-full'>
-                      <Button variant="outline" className="w-full justify-between">
-                          {name}
-                          <Pencil className="h-4 w-4 text-muted-foreground" />
-                      </Button>
-                   </Link>
-                  <Button variant="ghost" size="icon" onClick={() => handleViewContent(name, article)}>
+                  <Button onClick={() => handleSeedArticle(article, key)} disabled={loadingStates[key] || !firestore} className="w-full justify-start">
+                      {loadingStates[key] && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      <Database className="mr-2 h-4 w-4" />
+                      {name}
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleViewContent(name, article, article.id, `/wiki/edit/${article.id}`)}>
                     <Eye className="h-5 w-5" />
                   </Button>
                 </div>
@@ -282,13 +296,8 @@ function WikiManagementTab() {
                        <Database className="mr-2 h-4 w-4" />
                       Mundo {worldNum}
                     </Button>
-                    <Link href={`/admin/edit-collection/worlds/world-${worldNum}`} passHref>
-                       <Button variant="outline" size="icon" aria-label={`Editar Mundo ${worldNum}`} disabled={!seedInfo}>
-                         <Pencil className="h-4 w-4" />
-                       </Button>
-                     </Link>
                     {seedInfo && (
-                      <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, `world-${worldNum}`)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, `world-${worldNum}`, `/admin/edit-collection/worlds/world-${worldNum}`)}>
                         <Eye className="h-5 w-5" />
                       </Button>
                     )}
@@ -303,12 +312,12 @@ function WikiManagementTab() {
           <DialogHeader>
             <div className="flex items-center justify-between">
                 <DialogTitle>{viewingContent?.title}</DialogTitle>
-                {viewingContent?.id && (
-                <Link href={`/admin/edit-collection/worlds/${viewingContent.id}`} passHref>
+                {viewingContent?.editPath && (
+                  <Link href={viewingContent.editPath} passHref>
                     <Button variant="ghost" size="icon">
-                    <Pencil className="h-5 w-5" />
+                      <Pencil className="h-5 w-5" />
                     </Button>
-                </Link>
+                  </Link>
                 )}
             </div>
             <DialogDescription>
@@ -341,8 +350,8 @@ export function AdminChatView() {
                         <span>Gerenciar Conteúdo</span>
                          <TooltipProvider>
                             <Tooltip>
-                                <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                <span className="text-muted-foreground cursor-pointer" tabIndex={0}><Info className="h-4 w-4" /></span>
+                                <TooltipTrigger asChild onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                                    <span className="text-muted-foreground cursor-pointer" tabIndex={0}><Info className="h-4 w-4" /></span>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs text-sm" side="top" align="center">
                                 <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
@@ -402,7 +411,7 @@ export function AdminChatView() {
                     </div>
                 </TabsContent>
     
-                <TabsContent value="wiki-management" className="mt-4 flex-1 overflow-auto">
+                 <TabsContent value="wiki-management" className="mt-4 flex-1 overflow-auto">
                    <WikiManagementTab />
                 </TabsContent>
             </Tabs>
