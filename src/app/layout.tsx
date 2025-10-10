@@ -30,67 +30,6 @@ import { usePathname, useRouter } from 'next/navigation';
 //   description: 'Seu assistente de IA para o jogo Roblox Anime Eternal.',
 // };
 
-const LAST_VISITED_ROUTE_KEY = 'eternal-guide-last-route';
-
-function LayoutRedirectManager({ children }: { children: React.ReactNode }) {
-    const { isAdmin, isLoading: isAdminLoading } = useAdmin();
-    const router = useRouter();
-    const pathname = usePathname();
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
-
-    useEffect(() => {
-        if (!isAdminLoading) {
-            const lastRoute = localStorage.getItem(LAST_VISITED_ROUTE_KEY);
-            let targetRoute: string | null = null;
-            
-            if (isAdmin) {
-                // If user is admin, check for a valid last admin route, otherwise go to admin-chat
-                if (lastRoute && lastRoute.startsWith('/admin')) {
-                    targetRoute = lastRoute;
-                } else {
-                    targetRoute = '/admin-chat';
-                }
-            } else {
-                // If user is not admin, but is trying to access an admin page, redirect to home
-                if (pathname.startsWith('/admin')) {
-                    targetRoute = '/';
-                }
-            }
-
-            if (targetRoute && pathname !== targetRoute) {
-                router.replace(targetRoute);
-            } else {
-                // If no redirect is needed, we can finish loading
-                setIsInitialLoad(false);
-            }
-        }
-    }, [isAdmin, isAdminLoading, router, pathname]);
-
-    // This effect handles the case where a redirect is triggered.
-    // The component will stay in a loading state until the new page's content is ready.
-    useEffect(() => {
-        const handleRouteChange = () => {
-            setIsInitialLoad(false);
-        };
-        // Assuming router events are available and work this way in this Next.js version
-        // This is a conceptual way to listen for the route change to complete.
-        // In modern Next.js app router, the router.replace is typically fast enough,
-        // and the main loading state handles the visual transition.
-        // The check `!isAdminLoading` combined with `isInitialLoad` is the primary guard.
-    }, [router]);
-
-
-    if (isAdminLoading || isInitialLoad) {
-        return (
-            <div className="flex h-screen w-screen items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
-    }
-
-    return <>{children}</>;
-}
-
 
 export default function RootLayout({
   children,
@@ -108,7 +47,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AppProvider>
-          <LayoutRedirectManager>
             <SidebarProvider>
               <Sidebar>
                 <SidebarHeader>
@@ -146,7 +84,6 @@ export default function RootLayout({
             </SidebarProvider>
             <AuthDialog />
             <Toaster />
-          </LayoutRedirectManager>
         </AppProvider>
       </body>
     </html>

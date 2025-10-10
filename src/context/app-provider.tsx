@@ -6,7 +6,10 @@ import type { Message, SavedAnswer, WikiArticle } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { FirebaseClientProvider, useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, doc, deleteDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAdmin } from '@/hooks/use-admin';
+import { Loader2 } from 'lucide-react';
+
 
 interface AppContextType {
   savedAnswers: SavedAnswer[];
@@ -25,25 +28,57 @@ const LAST_VISITED_ROUTE_KEY = 'eternal-guide-last-route';
 
 function AppStateProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const router = useRouter();
   const pathname = usePathname();
   
   const [wikiArticles, setWikiArticles] = useState<WikiArticle[]>([]);
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
+  
+  // State to manage initial app load and redirection logic
+  const [isInitialAppLoad, setIsInitialAppLoad] = useState(true);
 
   // Effect to store the last visited route
   useEffect(() => {
     // We only store the path if it's not a dynamic editing or creation route
     // to avoid redirect loops when navigating through the admin panel.
     const shouldSaveRoute = pathname && 
-                            !pathname.endsWith('/new') && 
-                            !pathname.startsWith('/admin/edit-collection/');
+                            !pathname.includes('/new') && 
+                            !pathname.includes('/edit-collection');
 
     if (shouldSaveRoute) {
       localStorage.setItem(LAST_VISITED_ROUTE_KEY, pathname);
     }
   }, [pathname]);
+
+  // Effect to handle initial redirection ONCE
+  useEffect(() => {
+    if (!isAdminLoading && isInitialAppLoad) {
+      const lastRoute = localStorage.getItem(LAST_VISITED_ROUTE_KEY);
+      let targetRoute: string | null = null;
+      
+      if (isAdmin) {
+        if (lastRoute && lastRoute.startsWith('/admin')) {
+          targetRoute = lastRoute;
+        } else {
+          targetRoute = '/admin-chat';
+        }
+      } else {
+        if (pathname.startsWith('/admin')) {
+          targetRoute = '/';
+        }
+      }
+
+      if (targetRoute && pathname !== targetRoute) {
+        router.replace(targetRoute);
+      }
+      
+      // Mark initial load as complete to prevent this from running again
+      setIsInitialAppLoad(false);
+    }
+  }, [isAdmin, isAdminLoading, isInitialAppLoad, router, pathname]);
 
 
   // Firestore listeners
@@ -133,6 +168,15 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     isAuthDialogOpen,
     setAuthDialogOpen,
   };
+  
+  // While the initial redirection logic is running, show a full-screen loader.
+  if (isInitialAppLoad || isAdminLoading) {
+      return (
+          <div className="flex h-screen w-screen items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+      );
+  }
 
   return (
     <AppContext.Provider value={value}>
