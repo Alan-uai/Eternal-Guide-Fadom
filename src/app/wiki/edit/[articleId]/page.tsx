@@ -14,7 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, ShieldAlert, Sparkles } from 'lucide-react';
+import { Loader2, Save, ShieldAlert, Sparkles, Upload } from 'lucide-react';
 import type { WikiArticle } from '@/lib/types';
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
@@ -29,6 +29,7 @@ const articleSchema = z.object({
   tags: z.string().min(1, 'Pelo menos uma tag é necessária.'),
   imageId: z.string().optional(),
   tables: z.string().optional(), // We'll edit tables as a JSON string for now
+  attachment: z.any().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -66,6 +67,9 @@ export default function EditArticlePage() {
       tables: '',
     },
   });
+  
+  const fileRef = form.register("attachment");
+
 
   useEffect(() => {
     if (!isWikiLoading && !isNewArticle) {
@@ -239,6 +243,25 @@ export default function EditArticlePage() {
                   </FormItem>
                 )}
               />
+               <FormField
+                  control={form.control}
+                  name="attachment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Anexo (Opcional)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                            <Input id="attachment" type="file" className="pl-12" {...fileRef} />
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <Upload className="h-5 w-5 text-gray-400" />
+                            </div>
+                        </div>
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground">Envie um arquivo para preencher o conteúdo. (Markdown, Imagem, PDF, etc.)</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               <FormField
                 control={form.control}
                 name="content"
