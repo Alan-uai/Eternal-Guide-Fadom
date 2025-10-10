@@ -210,8 +210,7 @@ function WikiManagementTab() {
 
   return (
     <>
-      <ScrollArea className="h-full">
-        <div className="p-1 md:p-4 space-y-6">
+      <div className="p-1 md:p-4 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Controle Geral de Dados</CardTitle>
@@ -283,6 +282,11 @@ function WikiManagementTab() {
                        <Database className="mr-2 h-4 w-4" />
                       Mundo {worldNum}
                     </Button>
+                    <Link href={`/admin/edit-collection/worlds/world-${worldNum}`} passHref>
+                       <Button variant="outline" size="icon" aria-label={`Editar Mundo ${worldNum}`} disabled={!seedInfo}>
+                         <Pencil className="h-4 w-4" />
+                       </Button>
+                     </Link>
                     {seedInfo && (
                       <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data)}>
                         <Eye className="h-5 w-5" />
@@ -293,8 +297,7 @@ function WikiManagementTab() {
               })}
             </CardContent>
           </Card>
-        </div>
-      </ScrollArea>
+      </div>
       <Dialog open={!!viewingContent} onOpenChange={(isOpen) => !isOpen && setViewingContent(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
@@ -322,34 +325,32 @@ export function AdminChatView() {
                 <p className="text-muted-foreground">Utilize este painel para direcionar o desenvolvimento e gerenciar o conteúdo da Wiki.</p>
             </header>
 
-            <Tabs defaultValue="wiki-management" className="flex flex-col flex-1 min-h-0">
+            <Tabs defaultValue="wiki-management" className="flex-1 flex flex-col min-h-0">
                 <TabsList className="grid w-full grid-cols-2 max-w-md self-start">
                     <TabsTrigger value="chat">Conversar com a IA</TabsTrigger>
-                     <TabsTrigger value="wiki-management">
-                        <div className='flex items-center gap-2'>
-                           <span>Gerenciar Conteúdo</span>
-                           <TooltipProvider>
-                               <Tooltip>
-                                   <TooltipTrigger asChild>
-                                        <div className="text-muted-foreground cursor-pointer" tabIndex={0}><Info className="h-4 w-4" /></div>
-                                   </TooltipTrigger>
-                                   <TooltipContent className="max-w-xs text-sm" side="top" align="center">
-                                       <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
-                                       <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
-                                       <ul className="list-disc list-inside space-y-1 text-left">
-                                           <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
-                                           <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
-                                           <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
-                                           <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
-                                       </ul>
-                                   </TooltipContent>
-                               </Tooltip>
-                           </TooltipProvider>
-                        </div>
+                    <TabsTrigger value="wiki-management" className='flex items-center gap-2'>
+                        <span>Gerenciar Conteúdo</span>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                    <span className="text-muted-foreground cursor-pointer" tabIndex={0}><Info className="h-4 w-4" /></span>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-xs text-sm" side="top" align="center">
+                                    <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
+                                    <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
+                                    <ul className="list-disc list-inside space-y-1 text-left">
+                                        <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
+                                        <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
+                                        <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
+                                        <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
+                                    </ul>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="chat" className="flex-1 flex flex-col mt-4 min-h-0">
+                <TabsContent value="chat" className="mt-4 flex-1 flex flex-col min-h-0">
                     <div className="flex-1 overflow-auto relative">
                         <div className="p-4 md:p-6 space-y-6">
                             <div className="flex items-start gap-4">
