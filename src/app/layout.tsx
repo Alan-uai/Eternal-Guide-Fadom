@@ -39,27 +39,29 @@ function LayoutRedirectManager({ children }: { children: React.ReactNode }) {
     const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     useEffect(() => {
-        if (!isAdminLoading && isInitialLoad) {
-            const lastRoute = localStorage.getItem(LAST_VISITED_ROUTE_KEY);
-            
-            // Redirect admin to last visited page or admin-chat
-            if (isAdmin) {
-                if (lastRoute && lastRoute.startsWith('/admin')) {
-                    if(pathname !== lastRoute) router.replace(lastRoute);
-                } else {
-                    if(pathname !== '/admin-chat') router.replace('/admin-chat');
+        if (!isAdminLoading) {
+            if (isInitialLoad) {
+                const lastRoute = localStorage.getItem(LAST_VISITED_ROUTE_KEY);
+                
+                // Redirect admin to last visited page or admin-chat
+                if (isAdmin) {
+                    if (lastRoute && lastRoute.startsWith('/admin')) {
+                        if(pathname !== lastRoute) router.replace(lastRoute);
+                    } else {
+                        if(pathname !== '/admin-chat') router.replace('/admin-chat');
+                    }
+                } 
+                // Redirect non-admin away from admin pages
+                else if (!isAdmin && pathname.startsWith('/admin')) {
+                    router.replace('/');
                 }
-            } 
-            // Redirect non-admin away from admin pages
-            else if (!isAdmin && pathname.startsWith('/admin')) {
-                router.replace('/');
+                
+                setIsInitialLoad(false);
             }
-
-            setIsInitialLoad(false);
         }
     }, [isAdmin, isAdminLoading, router, isInitialLoad, pathname]);
 
-    if (isAdminLoading && isInitialLoad) {
+    if (isAdminLoading || isInitialLoad) {
         return (
             <div className="flex h-screen w-screen items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
