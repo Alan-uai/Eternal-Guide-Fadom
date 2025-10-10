@@ -34,9 +34,13 @@ function AppStateProvider({ children }: { children: ReactNode }) {
 
   // Effect to store the last visited route
   useEffect(() => {
-    // We only store the path if it's not a 'new' item creation route
-    // to avoid redirect loops when the creation page is under construction.
-    if (pathname && !pathname.endsWith('/new')) {
+    // We only store the path if it's not a dynamic editing or creation route
+    // to avoid redirect loops when navigating through the admin panel.
+    const shouldSaveRoute = pathname && 
+                            !pathname.endsWith('/new') && 
+                            !pathname.startsWith('/admin/edit-collection/');
+
+    if (shouldSaveRoute) {
       localStorage.setItem(LAST_VISITED_ROUTE_KEY, pathname);
     }
   }, [pathname]);
