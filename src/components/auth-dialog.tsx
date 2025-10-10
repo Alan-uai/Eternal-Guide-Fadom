@@ -27,7 +27,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithRedirect,
+  signInWithPopup,
   linkWithCredential,
   EmailAuthProvider,
 } from 'firebase/auth';
@@ -105,9 +105,10 @@ export function AuthDialog() {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
-      // Usar signInWithRedirect em vez de signInWithPopup
-      await signInWithRedirect(auth, provider);
-      // O resultado será tratado no FirebaseProvider após o redirecionamento
+      const result = await signInWithPopup(auth, provider);
+      await handleUserLogin(result.user);
+      setAuthDialogOpen(false);
+      toast({ title: 'Login bem-sucedido!', description: 'Você entrou com sua conta do Google.' });
     } catch (error) {
       handleAuthError(error);
     }
