@@ -317,16 +317,9 @@ function WikiManagementTab() {
                       Mundo {worldNum}
                     </Button>
                      {seedInfo && (
-                       <div className="flex">
-                         <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, `world-${worldNum}`)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, `world-${worldNum}`, `/admin/edit-collection/worlds/world-${worldNum}`)}>
                             <Eye className="h-5 w-5" />
                         </Button>
-                        <Link href={`/admin/edit-collection/worlds/world-${worldNum}`} passHref>
-                          <Button variant="ghost" size="icon">
-                            <Pencil className="h-5 w-5" />
-                          </Button>
-                        </Link>
-                       </div>
                     )}
                   </div>
                 )
@@ -341,8 +334,9 @@ function WikiManagementTab() {
                 <DialogTitle>{viewingContent?.title}</DialogTitle>
                 {viewingContent?.editPath && (
                   <Link href={viewingContent.editPath} passHref>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-5 w-5" />
+                    <Button variant="outline" size="sm">
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Editar
                     </Button>
                   </Link>
                 )}
