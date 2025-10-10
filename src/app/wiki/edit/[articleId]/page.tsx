@@ -14,10 +14,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, ShieldAlert } from 'lucide-react';
+import { Loader2, Save, ShieldAlert, Sparkles } from 'lucide-react';
 import type { WikiArticle } from '@/lib/types';
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
+import { generateTags } from '@/ai/flows/generate-tags-flow';
 
 // Schema for the form validation
 const articleSchema = z.object({
@@ -39,6 +40,7 @@ export default function EditArticlePage() {
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const { wikiArticles, isWikiLoading } = useApp();
   const [isSaving, setIsSaving] = useState(false);
+  const [isGeneratingTags, setIsGeneratingTags] = useState(false);
 
   const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
   const isNewArticle = articleIdParam === 'new';
@@ -82,6 +84,25 @@ export default function EditArticlePage() {
       });
     }
   }, [article, form]);
+  
+  const handleGenerateTags = async () => {
+    setIsGeneratingTags(true);
+    const { title, summary, content } = form.getValues();
+    try {
+      const result = await generateTags({ title, summary, content });
+      if (result.tags) {
+        form.setValue('tags', result.tags);
+        toast({ title: 'Tags Geradas!', description: 'As tags foram preenchidas com sugestões da IA.' });
+      } else {
+        throw new Error('A IA não retornou tags.');
+      }
+    } catch (error) {
+      console.error('Erro ao gerar tags:', error);
+      toast({ variant: 'destructive', title: 'Erro ao Gerar Tags', description: 'Não foi possível gerar as tags.' });
+    } finally {
+      setIsGeneratingTags(false);
+    }
+  };
 
   const onSubmit = async (values: ArticleFormData) => {
     if (!articleRef) {
@@ -114,12 +135,18 @@ export default function EditArticlePage() {
       if (isNewArticle) {
         updatedArticleData.createdAt = serverTimestamp();
       } else {
+        // For existing articles, we want to preserve the original createdAt timestamp
+        if (article?.createdAt) {
+          updatedArticleData.createdAt = article.createdAt;
+        }
         updatedArticleData.updatedAt = serverTimestamp();
       }
 
-      await setDoc(articleRef, updatedArticleData, { merge: !isNewArticle });
+      await setDoc(articleRef, updatedArticleData, { merge: true });
       toast({ title: 'Sucesso!', description: `O artigo foi ${isNewArticle ? 'criado' : 'atualizado'}.` });
-      router.push('/admin-chat'); // Redirect back to the admin panel
+      if (isNewArticle) {
+        router.push('/admin-chat');
+      }
     } catch (error) {
       console.error('Erro ao salvar artigo:', error);
       toast({ variant: 'destructive', title: 'Erro ao Salvar', description: 'Não foi possível salvar o artigo no Firestore.' });
@@ -128,7 +155,7 @@ export default function EditArticlePage() {
     }
   };
 
-  const isLoading = isAdminLoading || isWikiLoading;
+  const isLoading = isAdminLoading || (isWikiLoading && !isNewArticle);
 
   if (isLoading) {
     return (
@@ -152,7 +179,7 @@ export default function EditArticlePage() {
     <div className="max-w-4xl mx-auto">
       <Card>
         <CardHeader>
-          <CardTitle>{isNewArticle ? 'Criar Novo Artigo' : `Editando: ${article?.title || articleId}`}</CardTitle>
+          <CardTitle>{isNewArticle ? 'Criar Novo Artigo' : `Editando: ${article?.title || 'Carregando...'}`}</CardTitle>
           <CardDescription>Faça as alterações abaixo e clique em salvar.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -217,9 +244,15 @@ export default function EditArticlePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tags (separadas por vírgula)</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
+                    <div className="flex gap-2">
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <Button type="button" variant="outline" onClick={handleGenerateTags} disabled={isGeneratingTags}>
+                        {isGeneratingTags ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        Gerar Tags
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
