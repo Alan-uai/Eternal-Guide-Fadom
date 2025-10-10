@@ -326,13 +326,13 @@ export function AdminChatView() {
             <Tabs defaultValue="wiki-management" className="flex flex-col flex-1 min-h-0">
                 <TabsList className="grid w-full grid-cols-2 max-w-md self-start">
                     <TabsTrigger value="chat">Conversar com a IA</TabsTrigger>
-                     <TabsTrigger value="wiki-management" asChild>
+                     <TabsTrigger value="wiki-management">
                         <div className='flex items-center gap-2 cursor-pointer'>
                            <span>Gerenciar Conteúdo</span>
                            <TooltipProvider>
                                <Tooltip>
                                    <TooltipTrigger asChild>
-                                        <span className="text-muted-foreground" tabIndex={0}><Info className="h-4 w-4" /></span>
+                                        <div className="text-muted-foreground" tabIndex={0}><Info className="h-4 w-4" /></div>
                                    </TooltipTrigger>
                                    <TooltipContent className="max-w-xs text-sm" side="top" align="center">
                                        <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
@@ -393,7 +393,7 @@ export function AdminChatView() {
                     </div>
                 </TabsContent>
     
-                <TabsContent value="wiki-management" className="flex-1 mt-4 overflow-hidden">
+                <TabsContent value="wiki-management" className="mt-4 flex-1 overflow-hidden">
                    <WikiManagementTab />
                 </TabsContent>
             </Tabs>
