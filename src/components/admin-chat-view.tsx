@@ -66,6 +66,15 @@ function WikiManagementTab() {
   const articlesCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'wikiContent') : null, [firestore]);
   const { data: articles, isLoading: areArticlesLoading } = useCollection<WikiArticle>(articlesCollectionRef as any);
 
+  const sortedWorlds = useMemoFirebase(() => {
+    if (!worlds) return [];
+    return [...worlds].sort((a, b) => {
+      const numA = parseInt(a.id.split('-').pop() || '0', 10);
+      const numB = parseInt(b.id.split('-').pop() || '0', 10);
+      return numA - numB;
+    });
+  }, [worlds]);
+
   const handleLoading = (key: string, value: boolean) => {
     setLoadingStates(prev => ({ ...prev, [key]: value }));
   };
@@ -346,7 +355,7 @@ function WikiManagementTab() {
                   <span className="ml-3 text-muted-foreground">Carregando mundos...</span>
                 </div>
               ) : (
-                worlds?.map(world => {
+                sortedWorlds?.map(world => {
                   const seedInfo = worldSeedData[world.id];
                   return (
                     <div key={world.id} className="flex gap-2">
