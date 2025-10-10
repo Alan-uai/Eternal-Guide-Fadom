@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BotMessageSquare, Bookmark, Lightbulb, Database, HeartPulse, Calculator, ClipboardList, BrainCircuit } from 'lucide-react';
+import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, Calculator, HeartPulse } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import {
   SidebarMenu,
@@ -20,9 +20,8 @@ const navItems = [
 ];
 
 const adminNavItems = [
-    { href: '/seed', icon: Database, label: 'Popular Dados', tooltip: 'Popular Dados' },
     { href: '/suggestions', icon: ClipboardList, label: 'Ver Sugestões', tooltip: 'Ver Sugestões de Conteúdo' },
-    { href: '/admin-chat', icon: BrainCircuit, label: 'Canal com IA', tooltip: 'Interagir com a IA' },
+    { href: '/admin-chat', icon: BrainCircuit, label: 'Canal com IA', tooltip: 'Gerenciar Wiki e interagir com a IA' },
 ];
 
 export function MainNav() {
@@ -53,11 +52,11 @@ export function MainNav() {
          <SidebarMenuItem key={item.href}>
           <Link href={item.href} className="w-full">
             <SidebarMenuButton
-              isActive={pathname === item.href}
+              isActive={pathname.startsWith(item.href)}
               tooltip={{ children: item.tooltip }}
               className={cn(
                 'w-full justify-start',
-                pathname === item.href &&
+                pathname.startsWith(item.href) &&
                   'bg-primary/10 text-primary hover:bg-primary/20'
               )}
             >
