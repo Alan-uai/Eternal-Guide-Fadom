@@ -182,8 +182,7 @@ function WikiManagementTab() {
     handleLoading('all', true);
     toast({ title: 'Iniciando...', description: 'Populando todos os dados do jogo. Isso pode levar um momento.' });
 
-    // Seed articles one by one
-    for (const { article, key, name } of articleSeedData) {
+    for (const { article } of articleSeedData) {
         const articleRef = doc(firestore, 'wikiContent', article.id);
         const batch = writeBatch(firestore);
         batch.set(articleRef, article);
@@ -327,12 +326,12 @@ export function AdminChatView() {
                 <TabsList className="grid w-full grid-cols-2 max-w-md self-start">
                     <TabsTrigger value="chat">Conversar com a IA</TabsTrigger>
                      <TabsTrigger value="wiki-management">
-                        <div className='flex items-center gap-2 cursor-pointer'>
+                        <div className='flex items-center gap-2'>
                            <span>Gerenciar Conteúdo</span>
                            <TooltipProvider>
                                <Tooltip>
                                    <TooltipTrigger asChild>
-                                        <div className="text-muted-foreground" tabIndex={0}><Info className="h-4 w-4" /></div>
+                                        <div className="text-muted-foreground cursor-pointer" tabIndex={0}><Info className="h-4 w-4" /></div>
                                    </TooltipTrigger>
                                    <TooltipContent className="max-w-xs text-sm" side="top" align="center">
                                        <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
@@ -393,7 +392,7 @@ export function AdminChatView() {
                     </div>
                 </TabsContent>
     
-                <TabsContent value="wiki-management" className="mt-4 flex-1 overflow-hidden">
+                <TabsContent value="wiki-management" className="mt-4 flex-1 overflow-auto">
                    <WikiManagementTab />
                 </TabsContent>
             </Tabs>
