@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useFirestore } from '@/firebase';
-import { doc, writeBatch } from 'firebase/firestore';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { doc, writeBatch, collection } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from './ui/textarea';
@@ -59,6 +59,9 @@ function WikiManagementTab() {
   const { toast } = useToast();
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, editPath?: string } | null>(null);
+
+  const worldsCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'worlds') : null, [firestore]);
+  const { data: worlds, isLoading: areWorldsLoading } = useCollection(worldsCollectionRef as any);
 
   const handleLoading = (key: string, value: boolean) => {
     setLoadingStates(prev => ({ ...prev, [key]: value }));
@@ -179,19 +182,18 @@ function WikiManagementTab() {
     });
   }
 
-  const worldNumbers = Array.from({ length: 22 }, (_, i) => i + 1);
-  const worldSeedData: { [key: number]: any } = {
-    1: { data: world1Data, key: 'world1' }, 2: { data: world2Data, key: 'world2' },
-    3: { data: world3Data, key: 'world3' }, 4: { data: world4Data, key: 'world4' },
-    5: { data: world5Data, key: 'world5' }, 6: { data: world6Data, key: 'world6' },
-    7: { data: world7Data, key: 'world7' }, 8: { data: world8Data, key: 'world8' },
-    9: { data: world9Data, key: 'world9' }, 10: { data: world10Data, key: 'world10' },
-    11: { data: world11Data, key: 'world11' }, 12: { data: world12Data, key: 'world12' },
-    13: { data: world13Data, key: 'world13' }, 14: { data: world14Data, key: 'world14' },
-    15: { data: world15Data, key: 'world15' }, 16: { data: world16Data, key: 'world16' },
-    17: { data: world17Data, key: 'world17' }, 18: { data: world18Data, key: 'world18' },
-    19: { data: world19Data, key: 'world19' }, 20: { data: world20Data, key: 'world20' },
-    21: { data: world21Data, key: 'world21' }, 22: { data: world22Data, key: 'world22' },
+  const worldSeedData: { [key: string]: any } = {
+    'world-1': { data: world1Data, key: 'world1' }, 'world-2': { data: world2Data, key: 'world2' },
+    'world-3': { data: world3Data, key: 'world3' }, 'world-4': { data: world4Data, key: 'world4' },
+    'world-5': { data: world5Data, key: 'world5' }, 'world-6': { data: world6Data, key: 'world6' },
+    'world-7': { data: world7Data, key: 'world7' }, 'world-8': { data: world8Data, key: 'world8' },
+    'world-9': { data: world9Data, key: 'world9' }, 'world-10': { data: world10Data, key: 'world10' },
+    'world-11': { data: world11Data, key: 'world11' }, 'world-12': { data: world12Data, key: 'world12' },
+    'world-13': { data: world13Data, key: 'world13' }, 'world-14': { data: world14Data, key: 'world14' },
+    'world-15': { data: world15Data, key: 'world15' }, 'world-16': { data: world16Data, key: 'world16' },
+    'world-17': { data: world17Data, key: 'world17' }, 'world-18': { data: world18Data, key: 'world18' },
+    'world-19': { data: world19Data, key: 'world19' }, 'world-20': { data: world20Data, key: 'world20' },
+    'world-21': { data: world21Data, key: 'world21' }, 'world-22': { data: world22Data, key: 'world22' },
   };
 
   const articleSeedData = allWikiArticles.map(article => ({
@@ -212,10 +214,10 @@ function WikiManagementTab() {
     
     await handleSeedAccessories();
 
-    for (const worldNum in worldSeedData) {
-      const seedInfo = worldSeedData[worldNum];
+    for (const worldId in worldSeedData) {
+      const seedInfo = worldSeedData[worldId];
       if (seedInfo) {
-        await seedWorldGeneric(`world-${worldNum}`, seedInfo.data, seedInfo.key);
+        await seedWorldGeneric(worldId, seedInfo.data, seedInfo.key);
       }
     }
 
@@ -308,24 +310,32 @@ function WikiManagementTab() {
               </Link>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {worldNumbers.map(worldNum => {
-                const seedInfo = worldSeedData[worldNum];
-                const loadingKey = seedInfo ? seedInfo.key : `world${worldNum}-disabled`;
-                return (
-                  <div key={worldNum} className="flex gap-2">
-                    <Button onClick={() => seedInfo && seedWorldGeneric(`world-${worldNum}`, seedInfo.data, loadingKey)} disabled={!seedInfo || loadingStates[loadingKey] || !firestore} className="w-full justify-start">
-                      {loadingStates[loadingKey] && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                       <Database className="mr-2 h-4 w-4" />
-                      Mundo {worldNum}
-                    </Button>
-                     {seedInfo && (
-                        <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, `world-${worldNum}`, `/admin/edit-collection/worlds/world-${worldNum}`)}>
-                            <Eye className="h-5 w-5" />
+              {areWorldsLoading ? (
+                <div className="col-span-full flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-3 text-muted-foreground">Carregando mundos...</span>
+                </div>
+              ) : (
+                worlds?.map(world => {
+                  const seedInfo = worldSeedData[world.id];
+                  const loadingKey = seedInfo ? seedInfo.key : world.id;
+                  return (
+                    <div key={world.id} className="flex gap-2">
+                      <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref className='w-full'>
+                        <Button variant="outline" className="w-full justify-start">
+                          <Database className="mr-2 h-4 w-4" />
+                          {world.name}
                         </Button>
-                    )}
-                  </div>
-                )
-              })}
+                      </Link>
+                      {seedInfo && (
+                          <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id, `/admin/edit-collection/worlds/${world.id}`)}>
+                              <Eye className="h-5 w-5" />
+                          </Button>
+                      )}
+                    </div>
+                  )
+                })
+              )}
             </CardContent>
           </Card>
       </div>
