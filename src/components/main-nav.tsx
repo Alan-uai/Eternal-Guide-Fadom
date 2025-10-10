@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BotMessageSquare, Bookmark, Lightbulb, Database, HeartPulse, Calculator, ClipboardList } from 'lucide-react';
+import { BotMessageSquare, Bookmark, Lightbulb, Database, HeartPulse, Calculator, ClipboardList, BrainCircuit } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import {
   SidebarMenu,
@@ -22,6 +22,7 @@ const navItems = [
 const adminNavItems = [
     { href: '/seed', icon: Database, label: 'Popular Dados', tooltip: 'Popular Dados' },
     { href: '/suggestions', icon: ClipboardList, label: 'Ver Sugestões', tooltip: 'Ver Sugestões de Conteúdo' },
+    { href: '/admin-chat', icon: BrainCircuit, label: 'Canal com IA', tooltip: 'Interagir com a IA' },
 ];
 
 export function MainNav() {
