@@ -86,6 +86,7 @@ function EditPageContent() {
   const docRef = useMemoFirebase(() => {
     if (!firestore) return null;
     if (isGenericCollection) {
+      if (!collectionPath) return null; // Prevent error on new items where path might be initially missing
       // e.g. /worlds/world-1/powers/dragon-race
       return doc(firestore, collectionPath, articleId);
     }
@@ -138,7 +139,7 @@ function EditPageContent() {
                 title: dataToEdit.name || article.id, // Use 'name' if available, else id
                 summary: `Editando item ${article.id} de ${collectionPath}`,
                 content: 'Os dados para este item são gerenciados no campo de Tabelas (JSON) abaixo.',
-                tags: collectionPath.split('/').join(', '),
+                tags: collectionPath?.split('/').join(', ') || '',
                 tables: JSON.stringify(dataToEdit, null, 2),
                 imageUrl: dataToEdit.imageUrl || ''
             });
@@ -336,7 +337,7 @@ function EditPageContent() {
       
       if (isNewArticle) {
         // Go back to the collection list after creation
-        router.push(isGenericCollection ? `/admin/edit-collection/${collectionPath}` : '/admin-chat');
+        router.push(isGenericCollection && collectionPath ? `/admin/edit-collection/${collectionPath}` : '/admin-chat');
       }
     } catch (error) {
       console.error('Erro ao salvar:', error);
