@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,6 +20,7 @@ import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
 import { generateTags } from '@/ai/flows/generate-tags-flow';
 import { summarizeWikiContent } from '@/ai/flows/summarize-wiki-content';
+import { extractTextFromFile } from '@/ai/flows/extract-text-from-file-flow';
 
 // Schema for the form validation
 const articleSchema = z.object({
@@ -29,7 +30,6 @@ const articleSchema = z.object({
   tags: z.string().min(1, 'Pelo menos uma tag é necessária.'),
   imageId: z.string().optional(),
   tables: z.string().optional(), // We'll edit tables as a JSON string for now
-  attachment: z.any().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -44,12 +44,15 @@ export default function EditArticlePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
 
   const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
   const isNewArticle = articleIdParam === 'new';
   const [articleId, setArticleId] = useState(isNewArticle ? nanoid() : articleIdParam);
   
   const [article, setArticle] = useState<WikiArticle | null | undefined>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const articleRef = useMemoFirebase(() => {
     if (!firestore || !articleId) return null;
@@ -67,9 +70,6 @@ export default function EditArticlePage() {
       tables: '',
     },
   });
-  
-  const fileRef = form.register("attachment");
-
 
   useEffect(() => {
     if (!isWikiLoading && !isNewArticle) {
@@ -129,6 +129,44 @@ export default function EditArticlePage() {
     }
   };
 
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, extractionType: 'markdown' | 'json') => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsExtracting(true);
+    toast({ title: 'Processando arquivo...', description: 'A IA está extraindo o texto. Isso pode levar um momento.' });
+
+    try {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            const fileDataUri = reader.result as string;
+            
+            const result = await extractTextFromFile({ fileDataUri, extractionType });
+            
+            if (result.extractedText) {
+                if (extractionType === 'markdown') {
+                    form.setValue('content', result.extractedText);
+                } else if (extractionType === 'json') {
+                    form.setValue('tables', result.extractedText);
+                }
+                toast({ title: 'Texto Extraído!', description: `O campo de ${extractionType === 'markdown' ? 'conteúdo' : 'tabelas'} foi preenchido.` });
+            } else {
+                throw new Error('A IA não retornou texto.');
+            }
+        };
+        reader.onerror = (error) => {
+            throw error;
+        }
+    } catch (error) {
+      console.error(`Erro ao extrair texto para ${extractionType}:`, error);
+      toast({ variant: 'destructive', title: 'Erro na Extração', description: 'Não foi possível extrair o texto do arquivo.' });
+    } finally {
+      setIsExtracting(false);
+      // Reset file input to allow uploading the same file again
+      if(fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const onSubmit = async (values: ArticleFormData) => {
     if (!articleRef) {
@@ -161,7 +199,6 @@ export default function EditArticlePage() {
       if (isNewArticle) {
         updatedArticleData.createdAt = serverTimestamp();
       } else {
-        // For existing articles, we want to preserve the original createdAt timestamp
         if (article?.createdAt) {
           updatedArticleData.createdAt = article.createdAt;
         }
@@ -211,6 +248,8 @@ export default function EditArticlePage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <input type="file" ref={fileInputRef} onChange={(e) => {}} style={{ display: 'none' }} accept="image/*,application/pdf" />
+
               <FormField
                 control={form.control}
                 name="title"
@@ -235,7 +274,7 @@ export default function EditArticlePage() {
                         <Textarea {...field} className="min-h-[100px]" />
                       </FormControl>
                       <Button type="button" variant="outline" onClick={handleGenerateSummary} disabled={isGeneratingSummary}>
-                        {isGeneratingSummary ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        {isGeneratingSummary ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                         Gerar
                       </Button>
                     </div>
@@ -243,31 +282,26 @@ export default function EditArticlePage() {
                   </FormItem>
                 )}
               />
-               <FormField
-                  control={form.control}
-                  name="attachment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Anexo (Opcional)</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                            <Input id="attachment" type="file" className="pl-12" {...fileRef} />
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <Upload className="h-5 w-5 text-gray-400" />
-                            </div>
-                        </div>
-                      </FormControl>
-                      <p className="text-xs text-muted-foreground">Envie um arquivo para preencher o conteúdo. (Markdown, Imagem, PDF, etc.)</p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              
               <FormField
                 control={form.control}
                 name="content"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Conteúdo (Markdown)</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Conteúdo (Markdown)</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isExtracting}
+                        onClick={() => fileInputRef.current?.setAttribute('onChange', 'this.dispatchEvent(new Event("change", { bubbles: true }))') && fileInputRef.current?.click()}
+                        onChange={(e) => handleFileChange(e as any, 'markdown')}
+                      >
+                        {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                        Enviar Arquivo
+                      </Button>
+                    </div>
                     <FormControl>
                       <Textarea {...field} className="min-h-[250px]" />
                     </FormControl>
@@ -275,12 +309,26 @@ export default function EditArticlePage() {
                   </FormItem>
                 )}
               />
+
                <FormField
                 control={form.control}
                 name="tables"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tabelas (JSON)</FormLabel>
+                     <div className="flex items-center justify-between">
+                        <FormLabel>Tabelas (JSON)</FormLabel>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            disabled={isExtracting}
+                            onClick={() => fileInputRef.current?.setAttribute('onChange', 'this.dispatchEvent(new Event("change", { bubbles: true }))') && fileInputRef.current?.click()}
+                            onChange={(e) => handleFileChange(e as any, 'json')}
+                        >
+                            {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                            Enviar Arquivo
+                        </Button>
+                     </div>
                     <FormControl>
                       <Textarea {...field} className="min-h-[250px] font-mono text-xs" />
                     </FormControl>
@@ -321,7 +369,7 @@ export default function EditArticlePage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isSaving}>
+              <Button type="submit" disabled={isSaving || isExtracting}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Salvar Alterações
               </Button>
