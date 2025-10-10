@@ -60,8 +60,7 @@ function EditPageContent() {
   const { firestore, firebaseApp } = useFirebase();
   const { toast } = useToast();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
-  const { wikiArticles, isWikiLoading: isAppLoading } = useApp();
-
+  
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
@@ -86,17 +85,14 @@ function EditPageContent() {
   const docRef = useMemoFirebase(() => {
     if (!firestore) return null;
     if (isGenericCollection) {
-      if (!collectionPath) return null; // Prevent error on new items where path might be initially missing
-      // e.g. /worlds/world-1/powers/dragon-race
+      if (!collectionPath) return null;
       return doc(firestore, collectionPath, articleId);
     }
-    // e.g. /wikiContent/getting-started
     return doc(firestore, 'wikiContent', articleId);
   }, [firestore, articleId, collectionPath, isGenericCollection]);
 
   const { data: article, isLoading: isArticleLoading } = useDoc(docRef, { skip: isNewArticle });
 
-  // Use the article schema by default
   const form = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
     defaultValues: {
@@ -133,10 +129,9 @@ function EditPageContent() {
   useEffect(() => {
     if (article) {
         if (isGenericCollection) {
-            // For generic items, we map all data into the 'tables' field as a JSON blob
             const { id, ...dataToEdit } = article;
             form.reset({
-                title: dataToEdit.name || article.id, // Use 'name' if available, else id
+                title: dataToEdit.name || article.id, 
                 summary: `Editando item ${article.id} de ${collectionPath}`,
                 content: 'Os dados para este item são gerenciados no campo de Tabelas (JSON) abaixo.',
                 tags: collectionPath?.split('/').join(', ') || '',
@@ -144,7 +139,6 @@ function EditPageContent() {
                 imageUrl: dataToEdit.imageUrl || ''
             });
         } else {
-            // For wiki articles, map fields directly
             form.reset({
                 title: article.title,
                 summary: article.summary,
@@ -268,7 +262,6 @@ function EditPageContent() {
     try {
       const result = await formatTextToJson({ rawText });
       if (result.jsonString && result.jsonString !== '[]') {
-        // Pretty-print the JSON
         const parsed = JSON.parse(result.jsonString);
         setValue('tables', JSON.stringify(parsed, null, 2));
         toast({ title: 'Texto Formatado!', description: 'O texto foi convertido para JSON com sucesso.' });
@@ -297,7 +290,6 @@ function EditPageContent() {
          try {
             dataToSave = JSON.parse(values.tables || '{}');
             dataToSave.id = articleId;
-            // The name/title is edited in the 'title' field, so we sync it back to the JSON data.
             dataToSave.name = values.title;
          } catch (e) {
             toast({ variant: 'destructive', title: 'Erro de JSON', description: 'A estrutura JSON no campo Tabelas é inválida.' });
@@ -305,7 +297,6 @@ function EditPageContent() {
             return;
          }
       } else {
-          // This is a WikiArticle
           let parsedTables = article?.tables;
           if(values.tables) {
               try {
@@ -336,7 +327,6 @@ function EditPageContent() {
       toast({ title: 'Sucesso!', description: `O item foi ${isNewArticle ? 'criado' : 'atualizado'}.` });
       
       if (isNewArticle) {
-        // Go back to the collection list after creation
         router.push(isGenericCollection && collectionPath ? `/admin/edit-collection/${collectionPath}` : '/admin-chat');
       }
     } catch (error) {
@@ -367,6 +357,16 @@ function EditPageContent() {
     );
   }
   
+  if (isNewArticle && isGenericCollection && !collectionPath) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <ShieldAlert className="h-16 w-16 mb-4 text-destructive" />
+        <h1 className="text-2xl font-bold">Erro de Caminho</h1>
+        <p className="text-muted-foreground mt-2">O caminho da coleção é necessário para criar um novo item. Volte e tente novamente.</p>
+      </div>
+    );
+  }
+
   const formTitle = isNewArticle 
     ? `Criando Novo Item em ${isGenericCollection ? collectionPath : 'Wiki'}`
     : `Editando: ${article?.name || article?.title || 'Carregando...'}`;
