@@ -1,6 +1,7 @@
 import type { WikiArticle } from '@/lib/types';
+import { serverTimestamp } from 'firebase/firestore';
 
-export const gettingStartedArticle: WikiArticle = {
+export const gettingStartedArticle: Omit<WikiArticle, 'createdAt'> = {
     id: 'getting-started',
     title: 'Começando no Anime Eternal',
     summary: "Um guia para iniciantes para começar sua aventura no mundo do Anime Eternal.",
@@ -30,7 +31,7 @@ No jogo, a cor de fundo do nome de um item indica sua raridade:
     imageId: 'wiki-1',
 };
 
-export const auraArticle: WikiArticle = {
+export const auraArticle: Omit<WikiArticle, 'createdAt'> = {
     id: 'aura-system',
     title: 'Sistema de Auras',
     summary: 'Aprenda sobre Auras de Chefes de Rank-SS, como desbloqueá-las e como elas melhoram suas habilidades.',
@@ -53,7 +54,7 @@ export const auraArticle: WikiArticle = {
     imageId: 'wiki-2',
 };
 
-export const legendaryWeaponsArticle: WikiArticle = {
+export const legendaryWeaponsArticle: Omit<WikiArticle, 'createdAt'> = {
     id: 'legendary-weapons',
     title: 'Fabricação de Armas Lendárias',
     summary: 'Descubra os segredos para forjar as armas mais poderosas do jogo.',
@@ -62,7 +63,7 @@ export const legendaryWeaponsArticle: WikiArticle = {
     imageId: 'wiki-3',
 };
 
-export const guildWarsArticle: WikiArticle = {
+export const guildWarsArticle: Omit<WikiArticle, 'createdAt'> = {
     id: 'guild-wars',
     title: 'Uma Introdução às Guerras de Guildas',
     summary: 'Junte-se à sua guilda e lute pela supremacia e recompensas raras.',
@@ -71,7 +72,7 @@ export const guildWarsArticle: WikiArticle = {
     imageId: 'wiki-4',
 };
 
-export const prestigeArticle: WikiArticle = {
+export const prestigeArticle: Omit<WikiArticle, 'createdAt'> = {
     id: 'prestige-system',
     title: 'Sistema de Prestígio',
     summary: 'Entenda como prestigiar para aumentar seu limite de nível e ganhar mais poder.',
@@ -92,7 +93,7 @@ export const prestigeArticle: WikiArticle = {
     }
 };
 
-export const rankArticle: WikiArticle = {
+export const rankArticle: Omit<WikiArticle, 'createdAt'> = {
     id: 'rank-system',
     title: 'Sistema de Ranks',
     summary: 'Uma referência para a energia necessária para alcançar cada rank no jogo.',
@@ -144,7 +145,7 @@ export const rankArticle: WikiArticle = {
     },
 };
 
-export const energyGainPerRankArticle: WikiArticle = {
+export const energyGainPerRankArticle: Omit<WikiArticle, 'createdAt'> = {
     id: 'energy-gain-per-rank',
     title: 'Ganho de Energia Base por Rank',
     summary: 'Uma referência para o ganho de energia base por clique para cada rank no jogo.',
@@ -270,7 +271,7 @@ export const energyGainPerRankArticle: WikiArticle = {
     }
 };
 
-export const levelExpArticle: WikiArticle = {
+export const levelExpArticle: Omit<WikiArticle, 'createdAt'> = {
     id: 'level-exp',
     title: 'Experiência por Nível',
     summary: 'Uma tabela de referência para a experiência necessária para cada nível do jogo.',
@@ -557,7 +558,7 @@ export const levelExpArticle: WikiArticle = {
 };
 
 
-export const worldBossesArticle: WikiArticle = {
+export const worldBossesArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'world-bosses',
   title: 'Guia de Chefes de Mundo',
   summary: 'Um guia completo para todos os chefes de mundo, seus status e o HP necessário para derrotá-los.',
@@ -600,7 +601,7 @@ export const worldBossesArticle: WikiArticle = {
 };
 
 
-export const swordsArticle: WikiArticle = {
+export const swordsArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'energy-swords',
   title: 'Espadas de Energia',
   summary: 'Um guia para as espadas que fornecem um multiplicador de energia, onde encontrá-las e seus status.',
@@ -647,7 +648,7 @@ export const swordsArticle: WikiArticle = {
   },
 };
 
-export const damageSwordsArticle: WikiArticle = {
+export const damageSwordsArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'damage-swords',
   title: 'Espadas de Dano (Evolução)',
   summary: 'Um guia para as espadas de dano e seus multiplicadores em cada nível de evolução (estrela), incluindo informações sobre a espada de evento Golden Venom Strike.',
@@ -673,7 +674,7 @@ export const damageSwordsArticle: WikiArticle = {
   },
 };
 
-export const world20RaidsArticle: WikiArticle = {
+export const world20RaidsArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'world-20-raids',
   title: 'Raids do Mundo 20',
   summary: 'Requisitos de energia para as raids "Green Planet" e "Suffering" no Mundo 20.',
@@ -700,7 +701,7 @@ export const world20RaidsArticle: WikiArticle = {
   }
 };
 
-export const raidRequirementsArticle: WikiArticle = {
+export const raidRequirementsArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'raid-requirements',
   title: 'Requisitos de Energia para Raids',
   summary: 'Um guia completo com os requisitos de energia para passar por diferentes ondas em várias raids e dungeons do jogo.',
@@ -767,7 +768,7 @@ Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a 
   }
 };
 
-export const gamepassTierListArticle: WikiArticle = {
+export const gamepassTierListArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'gamepass-tier-list',
   title: 'Tier List de Gamepasses',
   summary: 'Uma tier list da comunidade para as gamepasses, classificando-as da mais para a menos útil para jogadores novos e de endgame.',
@@ -806,7 +807,7 @@ Estas são as gamepasses que você deve ter no endgame.`,
   },
 };
 
-export const scientificNotationArticle: WikiArticle = {
+export const scientificNotationArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'scientific-notation',
   title: 'Abreviações de Notação Científica',
   summary: 'Um guia de referência para as abreviações de números grandes usadas no jogo.',
@@ -892,7 +893,7 @@ export const scientificNotationArticle: WikiArticle = {
   }
 };
 
-export const scythesArticle: WikiArticle = {
+export const scythesArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'scythes-world-21',
   title: 'Foices (Mundo 21)',
   summary: 'Um guia para as foices do Mundo 21, as armas mais recentes do jogo, e seus multiplicadores de dano.',
@@ -916,7 +917,7 @@ export const scythesArticle: WikiArticle = {
   }
 };
 
-export const titansArticle: WikiArticle = {
+export const titansArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'titans-world-11',
   title: 'Guia de Titãs (Mundo 11)',
   summary: 'Um guia sobre os Titãs, um tipo de "lutador" do Mundo 11, e o dano que eles causam em cada nível de estrela.',
@@ -975,7 +976,7 @@ export const titansArticle: WikiArticle = {
   },
 };
 
-export const standsArticle: WikiArticle = {
+export const standsArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'stands-world-16',
   title: 'Guia de Stands (Mundo 16)',
   summary: 'Um guia sobre os Stands, um tipo de "lutador" do Mundo 16, e os bônus de energia que eles fornecem.',
@@ -1000,7 +1001,7 @@ export const standsArticle: WikiArticle = {
   }
 };
 
-export const howToGetStrongerArticle: WikiArticle = {
+export const howToGetStrongerArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'how-to-get-stronger',
   title: 'Como Ficar Mais Forte',
   summary: 'Um guia estratégico com objetivos e prioridades para otimizar sua progressão no Anime Eternal.',
@@ -1044,7 +1045,7 @@ Não compensa. É muito melhor comprar o Starter Pack #1 por 300 créditos, que 
   imageId: 'wiki-3', // Reusing a relevant image
 };
 
-export const lobbyDungeonsArticle: WikiArticle = {
+export const lobbyDungeonsArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'lobby-dungeons',
   title: 'Guia de Dungeons do Lobby',
   summary: 'Um guia completo com horários, vida do chefe e requisitos de dano para as dungeons do lobby.',
@@ -1069,27 +1070,27 @@ export const lobbyDungeonsArticle: WikiArticle = {
 
 
 // A comprehensive list for seeding all articles at once if needed.
-export const allWikiArticles = [
-  gettingStartedArticle,
-  auraArticle,
-  legendaryWeaponsArticle,
-  guildWarsArticle,
-  prestigeArticle,
-  rankArticle,
-  energyGainPerRankArticle,
-  levelExpArticle,
-  worldBossesArticle,
-  swordsArticle,
-  damageSwordsArticle,
-  world20RaidsArticle,
-  raidRequirementsArticle,
-  gamepassTierListArticle,
-  scientificNotationArticle,
-  scythesArticle,
-  titansArticle,
-  standsArticle,
-  howToGetStrongerArticle,
-  lobbyDungeonsArticle,
+export const allWikiArticles: WikiArticle[] = [
+  {...gettingStartedArticle, createdAt: serverTimestamp()},
+  {...auraArticle, createdAt: serverTimestamp()},
+  {...legendaryWeaponsArticle, createdAt: serverTimestamp()},
+  {...guildWarsArticle, createdAt: serverTimestamp()},
+  {...prestigeArticle, createdAt: serverTimestamp()},
+  {...rankArticle, createdAt: serverTimestamp()},
+  {...energyGainPerRankArticle, createdAt: serverTimestamp()},
+  {...levelExpArticle, createdAt: serverTimestamp()},
+  {...worldBossesArticle, createdAt: serverTimestamp()},
+  {...swordsArticle, createdAt: serverTimestamp()},
+  {...damageSwordsArticle, createdAt: serverTimestamp()},
+  {...world20RaidsArticle, createdAt: serverTimestamp()},
+  {...raidRequirementsArticle, createdAt: serverTimestamp()},
+  {...gamepassTierListArticle, createdAt: serverTimestamp()},
+  {...scientificNotationArticle, createdAt: serverTimestamp()},
+  {...scythesArticle, createdAt: serverTimestamp()},
+  {...titansArticle, createdAt: serverTimestamp()},
+  {...standsArticle, createdAt: serverTimestamp()},
+  {...howToGetStrongerArticle, createdAt: serverTimestamp()},
+  {...lobbyDungeonsArticle, createdAt: serverTimestamp()},
 ];
     
     

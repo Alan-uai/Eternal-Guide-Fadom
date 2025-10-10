@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, writeBatch } from 'firebase/firestore';
-import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database } from 'lucide-react';
+import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -246,7 +246,15 @@ function WikiManagementTab() {
           <Separator />
 
           <Card>
-            <CardHeader><CardTitle>Artigos da Wiki</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Artigos da Wiki</CardTitle>
+              <Link href="/wiki/edit/new" passHref>
+                <Button variant="outline" size="sm">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Novo Artigo
+                </Button>
+              </Link>
+            </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {articleSeedData.map(({ article, key, name }) => (
                 <div key={key} className="flex gap-2">
@@ -266,7 +274,13 @@ function WikiManagementTab() {
           <Separator />
           
           <Card>
-            <CardHeader><CardTitle>Dados Gerais</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Dados Gerais</CardTitle>
+              <Button variant="outline" size="sm" onClick={() => toast({title: "Em breve!", description: "A criação de novos dados gerais estará disponível em breve."})}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Adicionar
+              </Button>
+            </CardHeader>
              <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                <div className="flex gap-2">
                   <Button onClick={handleSeedAccessories} disabled={loadingStates.accessories || !firestore} className="w-full justify-start">
@@ -284,7 +298,13 @@ function WikiManagementTab() {
           <Separator />
 
           <Card>
-            <CardHeader><CardTitle>Dados de Jogo por Mundo</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Dados de Jogo por Mundo</CardTitle>
+              <Button variant="outline" size="sm" onClick={() => toast({title: "Em breve!", description: "A criação de novos mundos estará disponível em breve."})}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Novo Mundo
+              </Button>
+            </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {worldNumbers.map(worldNum => {
                 const seedInfo = worldSeedData[worldNum];
@@ -296,10 +316,17 @@ function WikiManagementTab() {
                        <Database className="mr-2 h-4 w-4" />
                       Mundo {worldNum}
                     </Button>
-                    {seedInfo && (
-                      <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, `world-${worldNum}`, `/admin/edit-collection/worlds/world-${worldNum}`)}>
-                        <Eye className="h-5 w-5" />
-                      </Button>
+                     {seedInfo && (
+                       <div className="flex">
+                         <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, `world-${worldNum}`)}>
+                            <Eye className="h-5 w-5" />
+                        </Button>
+                        <Link href={`/admin/edit-collection/worlds/world-${worldNum}`} passHref>
+                          <Button variant="ghost" size="icon">
+                            <Pencil className="h-5 w-5" />
+                          </Button>
+                        </Link>
+                       </div>
                     )}
                   </div>
                 )
@@ -350,8 +377,8 @@ export function AdminChatView() {
                         <span>Gerenciar Conteúdo</span>
                          <TooltipProvider>
                             <Tooltip>
-                                <TooltipTrigger asChild onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                                    <span className="text-muted-foreground cursor-pointer" tabIndex={0}><Info className="h-4 w-4" /></span>
+                                <TooltipTrigger asChild>
+                                  <span className="text-muted-foreground cursor-pointer" tabIndex={0} onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Info className="h-4 w-4" /></span>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs text-sm" side="top" align="center">
                                 <h4 className="font-bold mb-2">Como Estruturar Informações</h4>

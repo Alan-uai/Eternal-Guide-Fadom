@@ -27,4 +27,5 @@ export interface WikiArticle {
   tags: string[];
   imageId: string;
   tables?: Record<string, WikiArticleTable>;
+  createdAt: any; // Firestore Timestamp
 }

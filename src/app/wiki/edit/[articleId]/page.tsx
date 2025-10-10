@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFirestore, useDoc, useMemoFirebase, useUser } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useAdmin } from '@/hooks/use-admin';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, Save, ShieldAlert } from 'lucide-react';
 import type { WikiArticle } from '@/lib/types';
+import { nanoid } from 'nanoid';
 
 // Schema for the form validation
 const articleSchema = z.object({
@@ -37,14 +38,19 @@ export default function EditArticlePage() {
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const [isSaving, setIsSaving] = useState(false);
 
-  const articleId = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
+  const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
+  const isNewArticle = articleIdParam === 'new';
+  const [articleId, setArticleId] = useState(isNewArticle ? nanoid() : articleIdParam);
+
 
   const articleRef = useMemoFirebase(() => {
     if (!firestore || !articleId) return null;
     return doc(firestore, 'wikiContent', articleId);
   }, [firestore, articleId]);
 
-  const { data: article, isLoading: isArticleLoading } = useDoc<WikiArticle>(articleRef);
+  const { data: article, isLoading: isArticleLoading } = useDoc<WikiArticle>(articleRef, {
+      skip: isNewArticle
+  } as any);
 
   const form = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
@@ -59,7 +65,7 @@ export default function EditArticlePage() {
   });
 
   useEffect(() => {
-    if (article) {
+    if (article && !isNewArticle) {
       form.reset({
         title: article.title,
         summary: article.summary,
@@ -69,16 +75,16 @@ export default function EditArticlePage() {
         tables: article.tables ? JSON.stringify(article.tables, null, 2) : '',
       });
     }
-  }, [article, form]);
+  }, [article, isNewArticle, form]);
 
   const onSubmit = async (values: ArticleFormData) => {
-    if (!articleRef || !article) {
+    if (!articleRef) {
       toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível encontrar o artigo para atualizar.' });
       return;
     }
     setIsSaving(true);
     try {
-        let parsedTables = article.tables;
+        let parsedTables = article?.tables;
         if(values.tables) {
             try {
                 parsedTables = JSON.parse(values.tables);
@@ -89,28 +95,34 @@ export default function EditArticlePage() {
             }
         }
 
-      const updatedArticleData: WikiArticle = {
-        ...article,
+      const updatedArticleData: Omit<WikiArticle, 'createdAt'> & { createdAt?: any } = {
+        id: articleId,
         title: values.title,
         summary: values.summary,
         content: values.content,
         tags: values.tags.split(',').map(tag => tag.trim()),
-        imageId: values.imageId || article.imageId,
+        imageId: values.imageId || article?.imageId || 'wiki-1', // Fallback imageId
         tables: parsedTables,
       };
 
-      await setDoc(articleRef, updatedArticleData);
-      toast({ title: 'Sucesso!', description: 'O artigo foi atualizado.' });
+      if (isNewArticle) {
+        updatedArticleData.createdAt = serverTimestamp();
+      }
+
+      await setDoc(articleRef, updatedArticleData, { merge: !isNewArticle });
+      toast({ title: 'Sucesso!', description: `O artigo foi ${isNewArticle ? 'criado' : 'atualizado'}.` });
       router.push('/admin-chat'); // Redirect back to the admin panel
     } catch (error) {
-      console.error('Erro ao atualizar artigo:', error);
-      toast({ variant: 'destructive', title: 'Erro ao Salvar', description: 'Não foi possível atualizar o artigo no Firestore.' });
+      console.error('Erro ao salvar artigo:', error);
+      toast({ variant: 'destructive', title: 'Erro ao Salvar', description: 'Não foi possível salvar o artigo no Firestore.' });
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (isAdminLoading || isArticleLoading) {
+  const isLoading = isAdminLoading || (isArticleLoading && !isNewArticle);
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -132,7 +144,7 @@ export default function EditArticlePage() {
     <div className="max-w-4xl mx-auto">
       <Card>
         <CardHeader>
-          <CardTitle>Editando: {article?.title}</CardTitle>
+          <CardTitle>{isNewArticle ? 'Criar Novo Artigo' : `Editando: ${article?.title}`}</CardTitle>
           <CardDescription>Faça as alterações abaixo e clique em salvar.</CardDescription>
         </CardHeader>
         <CardContent>
