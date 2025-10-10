@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, writeBatch } from 'firebase/firestore';
-import { Bot, User, Send, Info, Loader2, Eye } from 'lucide-react';
+import { Bot, User, Send, Info, Loader2, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
@@ -27,26 +27,7 @@ import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import type { WikiArticle } from '@/lib/types';
-import { 
-  gettingStartedArticle,
-  rankArticle, 
-  auraArticle, 
-  prestigeArticle, 
-  worldBossesArticle,
-  swordsArticle,
-  damageSwordsArticle,
-  world20RaidsArticle,
-  raidRequirementsArticle,
-  gamepassTierListArticle,
-  scientificNotationArticle,
-  scythesArticle,
-  titansArticle,
-  standsArticle,
-  howToGetStrongerArticle,
-  lobbyDungeonsArticle,
-  energyGainPerRankArticle,
-  levelExpArticle
-} from '@/lib/wiki-data';
+import { allWikiArticles } from '@/lib/wiki-data';
 import { accessories, worldNameToId } from '@/lib/accessory-data';
 import { world1Data } from '@/lib/world-1-data';
 import { world2Data } from '@/lib/world-2-data';
@@ -70,6 +51,7 @@ import { world19Data } from '@/lib/world-19-data';
 import { world20Data } from '@/lib/world-20-data';
 import { world21Data } from '@/lib/world-21-data';
 import { world22Data } from '@/lib/world-22-data';
+import Link from 'next/link';
 
 
 function WikiManagementTab() {
@@ -212,26 +194,12 @@ function WikiManagementTab() {
     21: { data: world21Data, key: 'world21' }, 22: { data: world22Data, key: 'world22' },
   };
 
-  const articleSeedData = [
-    { article: gettingStartedArticle, key: 'gettingStarted', name: 'Começando' },
-    { article: rankArticle, key: 'ranks', name: 'Ranks (Custo)' },
-    { article: energyGainPerRankArticle, key: 'energyGain', name: 'Ranks (Ganho)' },
-    { article: levelExpArticle, key: 'levelExp', name: 'EXP por Nível' },
-    { article: auraArticle, key: 'auras', name: 'Auras' },
-    { article: prestigeArticle, key: 'prestige', name: 'Prestígio' },
-    { article: worldBossesArticle, key: 'bosses', name: 'Chefes de Mundo' },
-    { article: swordsArticle, key: 'swords', name: 'Espadas (Energia)' },
-    { article: damageSwordsArticle, key: 'damageSwords', name: 'Espadas (Dano)' },
-    { article: world20RaidsArticle, key: 'world20Raids', name: 'Raids (Mundo 20)' },
-    { article: raidRequirementsArticle, key: 'raidRequirements', name: 'Raids (Requisitos)' },
-    { article: gamepassTierListArticle, key: 'gamepass', name: 'Gamepasses' },
-    { article: scientificNotationArticle, key: 'notation', name: 'Notação Científica' },
-    { article: scythesArticle, key: 'scythes', name: 'Foices (Mundo 21)' },
-    { article: titansArticle, key: 'titans', name: 'Titãs (Mundo 11)' },
-    { article: standsArticle, key: 'stands', name: 'Stands (Mundo 16)' },
-    { article: howToGetStrongerArticle, key: 'howToGetStronger', name: 'Guia Estratégico' },
-    { article: lobbyDungeonsArticle, key: 'lobbyDungeons', name: 'Dungeons do Lobby' },
-  ];
+  const articleSeedData = allWikiArticles.map(article => ({
+      article: article,
+      key: article.id,
+      name: article.title
+  }));
+  
 
   async function handleSeedAll() {
     handleLoading('all', true);
@@ -280,10 +248,12 @@ function WikiManagementTab() {
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {articleSeedData.map(({ article, key, name }) => (
                 <div key={key} className="flex gap-2">
-                  <Button onClick={() => seedArticle(article, key, name)} disabled={loadingStates[key] || !firestore} className="w-full justify-start">
-                    {loadingStates[key] && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {loadingStates[key] ? 'Populando...' : name}
-                  </Button>
+                   <Link href={`/wiki/edit/${article.id}`} className='w-full'>
+                      <Button variant="outline" className="w-full justify-between">
+                          {name}
+                          <Pencil className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                   </Link>
                   <Button variant="ghost" size="icon" onClick={() => handleViewContent(name, article)}>
                     <Eye className="h-5 w-5" />
                   </Button>
@@ -360,21 +330,21 @@ export function AdminChatView() {
             <TabsTrigger value="wiki-management">
               Gerenciar Wiki
               <TooltipProvider>
-                  <Tooltip>
-                      <TooltipTrigger asChild>
-                           <Button variant="ghost" size="icon" className="h-6 w-6 ml-2 text-muted-foreground"><Info className="h-4 w-4" /></Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs text-sm" side="top" align="center">
-                          <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
-                          <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
-                          <ul className="list-disc list-inside space-y-1 text-left">
-                              <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
-                              <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
-                              <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
-                              <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
-                          </ul>
-                      </TooltipContent>
-                  </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                         <Button variant="ghost" size="icon" className="h-6 w-6 ml-2 text-muted-foreground"><Info className="h-4 w-4" /></Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs text-sm" side="top" align="center">
+                        <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
+                        <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
+                        <ul className="list-disc list-inside space-y-1 text-left">
+                            <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
+                            <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
+                            <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
+                            <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
+                        </ul>
+                    </TooltipContent>
+                </Tooltip>
               </TooltipProvider>
             </TabsTrigger>
           </TabsList>

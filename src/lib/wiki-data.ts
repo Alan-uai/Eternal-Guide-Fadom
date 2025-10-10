@@ -1,4 +1,3 @@
-
 import type { WikiArticle } from '@/lib/types';
 
 export const gettingStartedArticle: WikiArticle = {
