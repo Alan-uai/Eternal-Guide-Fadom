@@ -3,6 +3,7 @@
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 
 export default function SeedPage() {
