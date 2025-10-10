@@ -84,7 +84,19 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
         if (firebaseUser) {
             // Se o usuário não for anônimo, crie/atualize o documento dele no Firestore
             if (!firebaseUser.isAnonymous) {
-              await handleUserLogin(firebaseUser);
+              
+              // Determine if the user is new on the client side
+              const isNewUser = firebaseUser.metadata.creationTime === firebaseUser.metadata.lastSignInTime;
+
+              // Create a simple, serializable object to send to the server action
+              const userData = {
+                id: firebaseUser.uid,
+                email: firebaseUser.email,
+                displayName: firebaseUser.displayName,
+                isNewUser: isNewUser
+              };
+
+              await handleUserLogin(userData);
             }
             setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
         } else {

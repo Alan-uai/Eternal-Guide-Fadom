@@ -2,28 +2,35 @@
 
 import { initializeFirebaseServer } from '@/firebase/server';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import type { User } from 'firebase/auth';
 
-export async function handleUserLogin(user: User) {
+// Define a simple interface for the user data we expect
+interface UserData {
+  id: string;
+  email: string | null;
+  displayName: string | null;
+  isNewUser: boolean;
+}
+
+export async function handleUserLogin(userData: UserData) {
   const { firestore } = initializeFirebaseServer();
-  const userRef = doc(firestore, 'users', user.uid);
+  const userRef = doc(firestore, 'users', userData.id);
 
-  const userData: any = {
-    id: user.uid,
-    email: user.email,
-    username: user.displayName || user.email?.split('@')[0],
+  const dataToSave: any = {
+    id: userData.id,
+    email: userData.email,
+    username: userData.displayName || userData.email?.split('@')[0],
   };
 
-  // Set createdAt only if the user is new.
-  if (user.metadata.creationTime === user.metadata.lastSignInTime) {
-    userData.createdAt = serverTimestamp();
+  // Use the boolean passed from the client to determine if it's a new user
+  if (userData.isNewUser) {
+    dataToSave.createdAt = serverTimestamp();
   }
 
   try {
     // Use { merge: true } to create the document if it doesn't exist,
     // or update it if it does, without overwriting existing fields like 'tag'.
-    await setDoc(userRef, userData, { merge: true });
-    console.log('User document written/updated for:', user.uid);
+    await setDoc(userRef, dataToSave, { merge: true });
+    console.log('User document written/updated for:', userData.id);
   } catch (error) {
     console.error('Error writing user document:', error);
     // You might want to throw the error or handle it in a specific way
