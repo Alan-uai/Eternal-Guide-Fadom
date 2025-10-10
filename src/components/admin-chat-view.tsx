@@ -5,22 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from './ui/textarea';
 import { Bot, Send, BookOpen } from 'lucide-react';
 import { micromark } from 'micromark';
-import aiRules from '@/../docs/ai-rules.md';
+import userGuide from '@/../docs/user-guide.md';
 import { useMemo } from 'react';
 import { ScrollArea } from './ui/scroll-area';
 
 function RulesGuide() {
-    const htmlContent = useMemo(() => micromark(aiRules), []);
+    const htmlContent = useMemo(() => micromark(userGuide), []);
 
     return (
         <Card className="h-full flex flex-col">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <BookOpen />
-                    Guia de Codificação da IA
+                    Guia de Comandos da IA
                 </CardTitle>
                 <CardDescription>
-                    Estas são as regras que a IA deve seguir.
+                    Use estes exemplos para me dar instruções.
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden">
@@ -62,13 +62,8 @@ export function AdminChatView() {
                                 <CardContent>
                                     <p>Olá! Sou seu parceiro de codificação AI. Estou pronto para ajudar.</p>
                                     <p className="mt-2 text-sm text-muted-foreground">
-                                        Use o campo abaixo para me dizer o que você precisa. Por exemplo:
+                                        Use o campo abaixo para me dizer o que você precisa. Consulte o guia ao lado para exemplos.
                                     </p>
-                                    <ul className="mt-2 list-disc list-inside text-sm text-muted-foreground space-y-1">
-                                        <li>"Adicione uma nova propriedade 'cooldown' à entidade 'PowerStat' no backend.json."</li>
-                                        <li>"Corrija o cálculo de DPS na página da calculadora para incluir o bônus do pet."</li>
-                                        <li>"Crie um novo artigo na wiki sobre o sistema de 'Rebirth'."</li>
-                                    </ul>
                                 </CardContent>
                             </Card>
                         </div>
