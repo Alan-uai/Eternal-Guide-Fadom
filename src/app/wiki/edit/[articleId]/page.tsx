@@ -19,6 +19,7 @@ import type { WikiArticle } from '@/lib/types';
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
 import { generateTags } from '@/ai/flows/generate-tags-flow';
+import { summarizeWikiContent } from '@/ai/flows/summarize-wiki-content';
 
 // Schema for the form validation
 const articleSchema = z.object({
@@ -41,6 +42,7 @@ export default function EditArticlePage() {
   const { wikiArticles, isWikiLoading } = useApp();
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
 
   const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
   const isNewArticle = articleIdParam === 'new';
@@ -103,6 +105,26 @@ export default function EditArticlePage() {
       setIsGeneratingTags(false);
     }
   };
+
+  const handleGenerateSummary = async () => {
+    setIsGeneratingSummary(true);
+    const { content, title } = form.getValues();
+    try {
+      const result = await summarizeWikiContent({ wikiContent: content, topic: title });
+      if (result.summary) {
+        form.setValue('summary', result.summary);
+        toast({ title: 'Resumo Gerado!', description: 'O resumo foi preenchido com uma sugestão da IA.' });
+      } else {
+        throw new Error('A IA não retornou um resumo.');
+      }
+    } catch (error) {
+      console.error('Erro ao gerar resumo:', error);
+      toast({ variant: 'destructive', title: 'Erro ao Gerar Resumo', description: 'Não foi possível gerar o resumo.' });
+    } finally {
+      setIsGeneratingSummary(false);
+    }
+  };
+
 
   const onSubmit = async (values: ArticleFormData) => {
     if (!articleRef) {
@@ -204,9 +226,15 @@ export default function EditArticlePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Resumo</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} className="min-h-[100px]" />
-                    </FormControl>
+                    <div className="flex gap-2">
+                       <FormControl>
+                        <Textarea {...field} className="min-h-[100px]" />
+                      </FormControl>
+                      <Button type="button" variant="outline" onClick={handleGenerateSummary} disabled={isGeneratingSummary}>
+                        {isGeneratingSummary ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        Gerar
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
