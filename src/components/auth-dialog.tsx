@@ -105,8 +105,8 @@ export function AuthDialog() {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      await handleUserLogin(result.user);
+      // A chamada para handleUserLogin é agora tratada pelo onAuthStateChanged no provider
+      await signInWithPopup(auth, provider);
       setAuthDialogOpen(false);
       toast({ title: 'Login bem-sucedido!', description: 'Você entrou com sua conta do Google.' });
     } catch (error) {
@@ -119,11 +119,11 @@ export function AuthDialog() {
     try {
         if (auth.currentUser && auth.currentUser.isAnonymous) {
             const credential = EmailAuthProvider.credential(values.email, values.password);
-            const userCredential = await linkWithCredential(auth.currentUser, credential);
-            await handleUserLogin(userCredential.user);
+            // A chamada para handleUserLogin é agora tratada pelo onAuthStateChanged no provider
+            await linkWithCredential(auth.currentUser, credential);
         } else {
-            const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-            await handleUserLogin(userCredential.user);
+            // A chamada para handleUserLogin é agora tratada pelo onAuthStateChanged no provider
+            await createUserWithEmailAndPassword(auth, values.email, values.password);
         }
       setAuthDialogOpen(false);
       toast({ title: 'Conta criada!', description: 'Sua conta foi criada com sucesso.' });
@@ -135,8 +135,8 @@ export function AuthDialog() {
   async function onSignIn(values: z.infer<typeof signInSchema>) {
     if (!auth) return;
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      await handleUserLogin(userCredential.user);
+      // A chamada para handleUserLogin é agora tratada pelo onAuthStateChanged no provider
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       setAuthDialogOpen(false);
       toast({ title: 'Login bem-sucedido!', description: 'Bem-vindo de volta.' });
     } catch (error) {

@@ -82,12 +82,16 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       auth,
       async (firebaseUser) => { // Auth state determined
         if (firebaseUser) {
+            // Se o usuário não for anônimo, crie/atualize o documento dele no Firestore
+            if (!firebaseUser.isAnonymous) {
+              await handleUserLogin(firebaseUser);
+            }
             setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
         } else {
             // No user is signed in, so sign in anonymously.
             try {
                 const userCredential = await signInAnonymously(auth);
-                await handleUserLogin(userCredential.user);
+                // Não chamamos handleUserLogin para usuários anônimos
                 setUserAuthState({ user: userCredential.user, isUserLoading: false, userError: null });
             } catch (error) {
                  console.error("FirebaseProvider: Anonymous sign-in error:", error);
