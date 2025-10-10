@@ -4,10 +4,11 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAdmin } from '@/hooks/use-admin';
-import { Loader2, ShieldAlert, Construction, ChevronRight, Files } from 'lucide-react';
+import { Loader2, ShieldAlert, Construction, ChevronRight, Files, PlusCircle } from 'lucide-react';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 // Define the potential sub-collections a world might have
 const worldSubCollections = [
@@ -22,15 +23,18 @@ const worldSubCollections = [
 
 export default function EditCollectionPage() {
   const params = useParams();
+  const router = useRouter();
   const firestore = useFirestore();
+  const { toast } = useToast();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
 
   const pathSegments = Array.isArray(params.path) ? params.path : [params.path];
+  const isNew = pathSegments.includes('new');
   const collectionPath = pathSegments.join('/');
 
-  // Check if we are at a world's root (e.g., /worlds/world-1)
-  const isWorldRoot = pathSegments.length === 2 && pathSegments[0] === 'worlds';
-  const worldId = isWorldRoot ? pathSegments[1] : null;
+  // Check if we are editing a world (e.g., /worlds/world-1) or creating a new one
+  const isWorldContext = pathSegments[0] === 'worlds';
+  const worldId = isWorldContext && !isNew ? pathSegments[1] : null;
 
   const worldRef = useMemoFirebase(() => {
     if (!firestore || !worldId) return null;
@@ -57,15 +61,15 @@ export default function EditCollectionPage() {
     );
   }
 
-  // If we are at a world's root, show sub-collection navigation
-  if (isWorldRoot) {
+  // If we are at a specific world's root, show sub-collection navigation
+  if (worldId) {
     return (
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader>
             <CardTitle>Editando Mundo: {isWorldLoading ? <Loader2 className="inline h-6 w-6 animate-spin"/> : worldData?.name || worldId}</CardTitle>
             <CardDescription>
-              Selecione uma categoria de dados para editar dentro deste mundo.
+              Selecione uma categoria de dados para editar ou adicione uma nova.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -80,13 +84,43 @@ export default function EditCollectionPage() {
                 </Button>
               </Link>
             ))}
+             <Button variant="outline" className="w-full justify-between h-12 border-dashed" onClick={() => toast({title: "Em breve!", description: "A criação de novas sub-coleções estará disponível em breve."})}>
+                <div className="flex items-center gap-3 text-muted-foreground">
+                    <PlusCircle className="h-5 w-5" />
+                    <span>Nova Categoria</span>
+                </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </Button>
           </CardContent>
         </Card>
       </div>
     );
   }
+  
+  // If creating a new world
+  if (isNew && pathSegments[0] === 'worlds') {
+     return (
+        <div className="max-w-4xl mx-auto">
+        <Card>
+            <CardHeader>
+            <CardTitle>Criar Novo Mundo</CardTitle>
+            <CardDescription>
+                Interface para criar um novo mundo e suas sub-coleções.
+            </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground border-2 border-dashed rounded-lg p-12">
+                    <Construction className="h-16 w-16 mb-4" />
+                    <h2 className="text-2xl font-semibold">Em Construção</h2>
+                    <p className="mt-2">A criação de novos mundos estará disponível em breve.</p>
+                </div>
+            </CardContent>
+        </Card>
+        </div>
+    );
+  }
 
-  // Placeholder for deeper paths (e.g., /worlds/world-1/powers)
+  // Placeholder for deeper collection paths (e.g., /worlds/world-1/powers)
   return (
     <div className="max-w-4xl mx-auto">
       <Card>

@@ -300,10 +300,12 @@ function WikiManagementTab() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Dados de Jogo por Mundo</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => toast({title: "Em breve!", description: "A criação de novos mundos estará disponível em breve."})}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Novo Mundo
-              </Button>
+              <Link href="/admin/edit-collection/worlds/new" passHref>
+                <Button variant="outline" size="sm">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Novo Mundo
+                </Button>
+              </Link>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {worldNumbers.map(worldNum => {
@@ -375,14 +377,33 @@ export function AdminChatView() {
                                   <span className="text-muted-foreground cursor-pointer" tabIndex={0} onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Info className="h-4 w-4" /></span>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs text-sm" side="top" align="center">
-                                <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
-                                <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
-                                <ul className="list-disc list-inside space-y-1 text-left">
-                                    <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
-                                    <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
-                                    <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
-                                    <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
-                                </ul>
+                                    <h4 className="font-bold mb-2 text-base">Guia para se Comunicar com a IA</h4>
+                                    <p className="mb-4">Usar os termos corretos ajuda a IA a entender seus pedidos com mais precisão. Aqui está um glossário rápido:</p>
+
+                                    <h5 className="font-semibold mb-1">Frontend / Design (O que o usuário vê)</h5>
+                                    <ul className="list-disc list-inside space-y-1 mb-4 text-left">
+                                        <li><strong>Componente:</strong> Um bloco de construção da UI. Ex: "Adicione um `Botão` no `Card` de perfil."</li>
+                                        <li><strong>Layout:</strong> Como os elementos são organizados. Ex: "Mude o layout para `grid` com 3 colunas."</li>
+                                        <li><strong>Estilo:</strong> A aparência visual. Ex: "Mude a cor primária para um tom de azul."</li>
+                                        <li><strong>Navegação:</strong> Como o usuário se move pelo app. Ex: "Adicione um `link` no `menu lateral`."</li>
+                                    </ul>
+                                    
+                                    <h5 className="font-semibold mb-1">Backend / Ferramentas (Como as coisas funcionam)</h5>
+                                    <ul className="list-disc list-inside space-y-1 mb-4 text-left">
+                                        <li><strong>Entidade:</strong> A estrutura de um tipo de dado. Ex: "Adicione 'cooldown' à entidade 'PowerStat' no `backend.json`."</li>
+                                        <li><strong>Fluxo de IA:</strong> Uma tarefa executada pela IA. Ex: "Crie um `fluxo` para gerar imagens."</li>
+                                        <li><strong>Coleção:</strong> Uma "pasta" no banco de dados. Ex: "Busque os dados da coleção `/worlds/world-1/powers`."</li>
+                                        <li><strong>Popular (Seed):</strong> Preencher o banco de dados com dados iniciais. Ex: "Crie um botão para `popular` os dados do Mundo 22."</li>
+                                    </ul>
+
+                                    <Separator className="my-3"/>
+
+                                    <h5 className="font-semibold mb-1">Estrutura de Dados (Ao popular conteúdo)</h5>
+                                    <ul className="list-disc list-inside space-y-1 text-left">
+                                        <li><strong>IDs Únicos:</strong> Cada item deve ter um `id` único em minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
+                                        <li><strong>Tabelas:</strong> Use `tables` com `headers` (lista de strings) e `rows` (lista de objetos).</li>
+                                        <li><strong>Consistência:</strong> Mantenha nomes de propriedades (`statType`, `rarity`) consistentes.</li>
+                                    </ul>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
