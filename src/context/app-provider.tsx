@@ -6,6 +6,7 @@ import type { Message, SavedAnswer, WikiArticle } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { FirebaseClientProvider, useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, doc, deleteDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { usePathname } from 'next/navigation';
 
 interface AppContextType {
   savedAnswers: SavedAnswer[];
@@ -20,14 +21,26 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const WIKI_CACHE_STORAGE_KEY = 'eternal-guide-wiki-cache';
+const LAST_VISITED_ROUTE_KEY = 'eternal-guide-last-route';
 
 function AppStateProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const pathname = usePathname();
   
   const [wikiArticles, setWikiArticles] = useState<WikiArticle[]>([]);
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
+
+  // Effect to store the last visited route
+  useEffect(() => {
+    // We only store the path if it's not the root path to avoid redirect loops
+    // and only for authenticated users if desired, but we'll do it for everyone for now.
+    if (pathname) {
+      localStorage.setItem(LAST_VISITED_ROUTE_KEY, pathname);
+    }
+  }, [pathname]);
+
 
   // Firestore listeners
   const wikiCollectionRef = useMemoFirebase(() => {
