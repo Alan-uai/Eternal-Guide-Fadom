@@ -5,7 +5,8 @@ import { useFirestore, useUser } from '@/firebase';
 import { doc, writeBatch } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Loader2, ShieldAlert } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Loader2, ShieldAlert, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -55,6 +56,7 @@ import { world19Data } from '@/lib/world-19-data';
 import { world20Data } from '@/lib/world-20-data';
 import { world21Data } from '@/lib/world-21-data';
 import { world22Data } from '@/lib/world-22-data';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 function AdminSeedPage() {
   const firestore = useFirestore();
@@ -103,9 +105,14 @@ function AdminSeedPage() {
     levelExp: false,
     all: false
   });
+  const [viewingContent, setViewingContent] = useState<{ title: string; data: any } | null>(null);
 
   const handleLoading = (key: keyof typeof loadingStates, value: boolean) => {
     setLoadingStates(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleViewContent = (title: string, data: any) => {
+    setViewingContent({ title, data });
   };
 
   async function seedWorldGeneric(worldId: string, worldData: any, loadingKey: keyof typeof loadingStates) {
@@ -247,30 +254,35 @@ function AdminSeedPage() {
     22: { data: world22Data, key: 'world22' },
   };
 
+  const articleSeedData = [
+    { article: gettingStartedArticle, key: 'gettingStarted', name: 'Começando no Anime Eternal' },
+    { article: rankArticle, key: 'ranks', name: 'Sistema de Ranks' },
+    { article: energyGainPerRankArticle, key: 'energyGain', name: 'Ganho de Energia por Rank' },
+    { article: levelExpArticle, key: 'levelExp', name: 'Experiência por Nível' },
+    { article: auraArticle, key: 'auras', name: 'Sistema de Auras' },
+    { article: prestigeArticle, key: 'prestige', name: 'Sistema de Prestígio' },
+    { article: worldBossesArticle, key: 'bosses', name: 'Guia de Chefes de Mundo' },
+    { article: swordsArticle, key: 'swords', name: 'Espadas de Energia' },
+    { article: damageSwordsArticle, key: 'damageSwords', name: 'Espadas de Dano' },
+    { article: world20RaidsArticle, key: 'world20Raids', name: 'Raids do Mundo 20' },
+    { article: raidRequirementsArticle, key: 'raidRequirements', name: 'Requisitos de Raid' },
+    { article: gamepassTierListArticle, key: 'gamepass', name: 'Tier List de Gamepasses' },
+    { article: scientificNotationArticle, key: 'notation', name: 'Notação Científica' },
+    { article: scythesArticle, key: 'scythes', name: 'Foices (Mundo 21)' },
+    { article: titansArticle, key: 'titans', name: 'Guia de Titãs (Mundo 11)' },
+    { article: standsArticle, key: 'stands', name: 'Guia de Stands (Mundo 16)' },
+    { article: howToGetStrongerArticle, key: 'howToGetStronger', name: 'Guia Estratégico' },
+    { article: lobbyDungeonsArticle, key: 'lobbyDungeons', name: 'Guia de Dungeons do Lobby' },
+  ];
+
   async function handleSeedAll() {
     handleLoading('all', true);
     toast({ title: 'Iniciando...', description: 'Populando todos os dados do jogo. Isso pode levar um momento.' });
     
-    await seedArticle(gettingStartedArticle, 'gettingStarted', 'Começando no Anime Eternal');
-    await seedArticle(rankArticle, 'ranks', 'Sistema de Ranks');
-    await seedArticle(energyGainPerRankArticle, 'energyGain', 'Ganho de Energia por Rank');
-    await seedArticle(levelExpArticle, 'levelExp', 'Experiência por Nível');
-    await seedArticle(auraArticle, 'auras', 'Sistema de Auras');
-    await seedArticle(prestigeArticle, 'prestige', 'Sistema de Prestígio');
-    await seedArticle(worldBossesArticle, 'bosses', 'Guia de Chefes de Mundo');
-    await seedArticle(swordsArticle, 'swords', 'Espadas de Energia');
-    await seedArticle(damageSwordsArticle, 'damageSwords', 'Espadas de Dano');
-    await seedArticle(world20RaidsArticle, 'world20Raids', 'Raids do Mundo 20');
-    await seedArticle(raidRequirementsArticle, 'raidRequirements', 'Requisitos de Raid');
-    await seedArticle(gamepassTierListArticle, 'gamepass', 'Tier List de Gamepasses');
-    await seedArticle(scientificNotationArticle, 'notation', 'Notação Científica');
-    await seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)');
-    await seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)');
-    await seedArticle(standsArticle, 'stands', 'Guia de Stands (Mundo 16)');
-    await seedArticle(howToGetStrongerArticle, 'howToGetStronger', 'Guia Estratégico');
-    await seedArticle(lobbyDungeonsArticle, 'lobbyDungeons', 'Guia de Dungeons do Lobby');
-
-
+    for (const { article, key, name } of articleSeedData) {
+      await seedArticle(article, key as keyof typeof loadingStates, name);
+    }
+    
     await handleSeedAccessories();
 
     for (const worldNum in worldSeedData) {
@@ -283,6 +295,7 @@ function AdminSeedPage() {
   }
 
   return (
+    <>
     <div className="container mx-auto py-8 space-y-8">
        <Card>
         <CardHeader>
@@ -306,198 +319,34 @@ function AdminSeedPage() {
       <Card>
         <CardHeader><CardTitle>Popular Artigos da Wiki e Dados do Jogo</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Artigo Inicial</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Começando no Anime Eternal" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(gettingStartedArticle, 'gettingStarted', 'Começando no Anime Eternal')} disabled={loadingStates.gettingStarted || !firestore}>
-                {loadingStates.gettingStarted ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.gettingStarted ? 'Populando...' : 'Popular Artigo Inicial'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Sistema de Ranks</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Sistema de Ranks" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(rankArticle, 'ranks', 'Sistema de Ranks')} disabled={loadingStates.ranks || !firestore}>
-                {loadingStates.ranks ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.ranks ? 'Populando...' : 'Popular Artigo de Ranks'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Ganho de Energia por Rank</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Ganho de Energia Base por Rank" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(energyGainPerRankArticle, 'energyGain', 'Ganho de Energia por Rank')} disabled={loadingStates.energyGain || !firestore}>
-                {loadingStates.energyGain ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.energyGain ? 'Populando...' : 'Popular Ganho de Energia'}
-              </Button>
-            </CardFooter>
-          </Card>
-           <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Experiência por Nível</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Experiência por Nível" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(levelExpArticle, 'levelExp', 'Experiência por Nível')} disabled={loadingStates.levelExp || !firestore}>
-                {loadingStates.levelExp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.levelExp ? 'Populando...' : 'Popular EXP por Nível'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Sistema de Auras</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Sistema de Auras" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(auraArticle, 'auras', 'Sistema de Auras')} disabled={loadingStates.auras || !firestore}>
-                {loadingStates.auras ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.auras ? 'Populando...' : 'Popular Artigo de Auras'}
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Sistema de Prestígio</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Sistema de Prestígio" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(prestigeArticle, 'prestige', 'Sistema de Prestígio')} disabled={loadingStates.prestige || !firestore}>
-                {loadingStates.prestige ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.prestige ? 'Populando...' : 'Popular Artigo de Prestígio'}
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Guia de Chefes de Mundo</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Guia de Chefes de Mundo" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(worldBossesArticle, 'bosses', 'Guia de Chefes de Mundo')} disabled={loadingStates.bosses || !firestore}>
-                {loadingStates.bosses ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.bosses ? 'Populando...' : 'Popular Guia de Chefes'}
-              </Button>
-            </CardFooter>
-          </Card>
-           <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Acessórios</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula todos os acessórios do jogo em seus respectivos mundos.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={handleSeedAccessories} disabled={loadingStates.accessories || !firestore}>
-                {loadingStates.accessories ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.accessories ? 'Populando...' : 'Popular Acessórios'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Espadas de Energia</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Espadas de Energia" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(swordsArticle, 'swords', 'Espadas de Energia')} disabled={loadingStates.swords || !firestore}>
-                {loadingStates.swords ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.swords ? 'Populando...' : 'Popular Espadas de Energia'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Espadas de Dano</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Espadas de Dano (Evolução)" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(damageSwordsArticle, 'damageSwords', 'Espadas de Dano')} disabled={loadingStates.damageSwords || !firestore}>
-                {loadingStates.damageSwords ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.damageSwords ? 'Populando...' : 'Popular Espadas de Dano'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Raids do Mundo 20</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Raids do Mundo 20" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(world20RaidsArticle, 'world20Raids', 'Raids do Mundo 20')} disabled={loadingStates.world20Raids || !firestore}>
-                {loadingStates.world20Raids ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.world20Raids ? 'Populando...' : 'Popular Raids Mundo 20'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Requisitos de Raid</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Requisitos de Energia para Raids" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(raidRequirementsArticle, 'raidRequirements', 'Requisitos de Raid')} disabled={loadingStates.raidRequirements || !firestore}>
-                {loadingStates.raidRequirements ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.raidRequirements ? 'Populando...' : 'Popular Requisitos de Raid'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Tier List de Gamepasses</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Tier List de Gamepasses" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(gamepassTierListArticle, 'gamepass', 'Tier List de Gamepasses')} disabled={loadingStates.gamepass || !firestore}>
-                {loadingStates.gamepass ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.gamepass ? 'Populando...' : 'Popular Tier List'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Notação Científica</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Abreviações de Notação Científica" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(scientificNotationArticle, 'notation', 'Notação Científica')} disabled={loadingStates.notation || !firestore}>
-                {loadingStates.notation ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.notation ? 'Populando...' : 'Popular Notação'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Foices (Mundo 21)</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Foices (Mundo 21)" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(scythesArticle, 'scythes', 'Foices (Mundo 21)')} disabled={loadingStates.scythes || !firestore}>
-                {loadingStates.scythes ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.scythes ? 'Populando...' : 'Popular Foices'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Guia de Titãs (Mundo 11)</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Guia de Titãs (Mundo 11)" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(titansArticle, 'titans', 'Guia de Titãs (Mundo 11)')} disabled={loadingStates.titans || !firestore}>
-                {loadingStates.titans ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.titans ? 'Populando...' : 'Popular Titãs'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Guia de Stands (Mundo 16)</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Guia de Stands (Mundo 16)" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(standsArticle, 'stands', 'Guia de Stands (Mundo 16)')} disabled={loadingStates.stands || !firestore}>
-                {loadingStates.stands ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.stands ? 'Populando...' : 'Popular Stands'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Guia Estratégico</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Como Ficar Mais Forte" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(howToGetStrongerArticle, 'howToGetStronger', 'Guia Estratégico')} disabled={loadingStates.howToGetStronger || !firestore}>
-                {loadingStates.howToGetStronger ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.howToGetStronger ? 'Populando...' : 'Popular Guia'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Popular Dungeons do Lobby</CardTitle></CardHeader>
-            <CardContent><CardDescription>Popula o artigo "Guia de Dungeons do Lobby" na coleção `wikiContent`.</CardDescription></CardContent>
-            <CardFooter>
-              <Button onClick={() => seedArticle(lobbyDungeonsArticle, 'lobbyDungeons', 'Guia de Dungeons do Lobby')} disabled={loadingStates.lobbyDungeons || !firestore}>
-                {loadingStates.lobbyDungeons ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loadingStates.lobbyDungeons ? 'Populando...' : 'Popular Dungeons'}
-              </Button>
-            </CardFooter>
-          </Card>
+          {articleSeedData.map(({ article, key, name }) => (
+            <Card key={key}>
+              <CardHeader><CardTitle className="text-lg">{name}</CardTitle></CardHeader>
+              <CardContent><CardDescription>Popula o artigo "{name}" na coleção `wikiContent`.</CardDescription></CardContent>
+              <CardFooter className="flex justify-between">
+                <Button onClick={() => seedArticle(article, key as keyof typeof loadingStates, name)} disabled={loadingStates[key as keyof typeof loadingStates] || !firestore}>
+                  {loadingStates[key as keyof typeof loadingStates] ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {loadingStates[key as keyof typeof loadingStates] ? 'Populando...' : 'Popular'}
+                </Button>
+                 <Button variant="ghost" size="icon" onClick={() => handleViewContent(name, article)}>
+                    <Eye className="h-5 w-5" />
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+            <Card>
+                <CardHeader><CardTitle className="text-lg">Popular Acessórios</CardTitle></CardHeader>
+                <CardContent><CardDescription>Popula todos os acessórios do jogo em seus respectivos mundos.</CardDescription></CardContent>
+                <CardFooter className="flex justify-between">
+                    <Button onClick={handleSeedAccessories} disabled={loadingStates.accessories || !firestore}>
+                        {loadingStates.accessories ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {loadingStates.accessories ? 'Populando...' : 'Popular Acessórios'}
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleViewContent("Acessórios", accessories)}>
+                        <Eye className="h-5 w-5" />
+                    </Button>
+                </CardFooter>
+            </Card>
         </CardContent>
       </Card>
 
@@ -508,21 +357,26 @@ function AdminSeedPage() {
           <CardTitle>Popular Dados de Jogo por Mundo</CardTitle>
           <CardDescription>Popula o Firestore com dados de jogo para cada mundo individualmente.</CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {worldNumbers.map(worldNum => {
             const seedInfo = worldSeedData[worldNum];
             const loadingKey = seedInfo ? seedInfo.key as keyof typeof loadingStates : null;
             return (
-              <div key={worldNum}>
+              <div key={worldNum} className="flex gap-2">
                 {seedInfo ? (
-                   <Button onClick={() => seedWorldGeneric(`world-${worldNum}`, seedInfo.data, loadingKey!)} disabled={loadingStates[loadingKey!] || !firestore} className="w-full">
+                   <Button onClick={() => seedWorldGeneric(`world-${worldNum}`, seedInfo.data, loadingKey!)} disabled={loadingStates[loadingKey!] || !firestore} className="w-full justify-start">
                       {loadingStates[loadingKey!] ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                       {loadingStates[loadingKey!] ? 'Populando...' : `Popular Mundo ${worldNum}`}
                   </Button>
                 ) : (
-                  <Button disabled className="w-full">
+                  <Button disabled className="w-full justify-start">
                     Popular Mundo {worldNum}
                   </Button>
+                )}
+                 {seedInfo && (
+                    <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data)}>
+                        <Eye className="h-5 w-5" />
+                    </Button>
                 )}
               </div>
             )
@@ -530,6 +384,22 @@ function AdminSeedPage() {
         </CardContent>
       </Card>
     </div>
+    <Dialog open={!!viewingContent} onOpenChange={(isOpen) => !isOpen && setViewingContent(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{viewingContent?.title}</DialogTitle>
+            <DialogDescription>
+              Visualizando os dados JSON que serão populados no Firestore.
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] mt-4">
+            <pre className="bg-muted p-4 rounded-md text-xs whitespace-pre-wrap">
+              {JSON.stringify(viewingContent?.data, null, 2)}
+            </pre>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
