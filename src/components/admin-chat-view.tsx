@@ -63,6 +63,9 @@ function WikiManagementTab() {
   const worldsCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'worlds') : null, [firestore]);
   const { data: worlds, isLoading: areWorldsLoading } = useCollection(worldsCollectionRef as any);
 
+  const articlesCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'wikiContent') : null, [firestore]);
+  const { data: articles, isLoading: areArticlesLoading } = useCollection<WikiArticle>(articlesCollectionRef as any);
+
   const handleLoading = (key: string, value: boolean) => {
     setLoadingStates(prev => ({ ...prev, [key]: value }));
   };
@@ -167,14 +170,22 @@ function WikiManagementTab() {
         return;
     }
 
-    const articleRef = doc(firestore, 'wikiContent', article.id);
+    // Find the original static article data to seed
+    const staticArticleData = allWikiArticles.find(a => a.id === article.id);
+    if (!staticArticleData) {
+        toast({ title: 'Erro', description: `Não foi possível encontrar os dados estáticos para o artigo "${article.title}".`, variant: 'destructive' });
+        handleLoading(loadingKey, false);
+        return;
+    }
+
+    const articleRef = doc(firestore, 'wikiContent', staticArticleData.id);
     const batch = writeBatch(firestore);
-    batch.set(articleRef, article);
+    batch.set(articleRef, staticArticleData);
     await batch.commit().then(() => {
-      toast({ title: 'Artigo Populado!', description: `O artigo "${article.title}" foi sincronizado.` });
+      toast({ title: 'Artigo Populado!', description: `O artigo "${staticArticleData.title}" foi sincronizado.` });
     }).catch(() => {
          const permissionError = new FirestorePermissionError({
-            path: `wikiContent/${article.id}`, operation: 'write', requestResourceData: { [articleRef.path]: article },
+            path: `wikiContent/${staticArticleData.id}`, operation: 'write', requestResourceData: { [articleRef.path]: staticArticleData },
         });
         errorEmitter.emit('permission-error', permissionError);
     }).finally(() => {
@@ -196,19 +207,12 @@ function WikiManagementTab() {
     'world-21': { data: world21Data, key: 'world21' }, 'world-22': { data: world22Data, key: 'world22' },
   };
 
-  const articleSeedData = allWikiArticles.map(article => ({
-      article: article,
-      key: article.id,
-      name: article.title
-  }));
-  
-
   async function handleSeedAll() {
     handleLoading('all', true);
     toast({ title: 'Iniciando...', description: 'Populando todos os dados do jogo. Isso pode levar um momento.' });
 
-    for (const { article, key } of articleSeedData) {
-        await handleSeedArticle(article, key);
+    for (const article of allWikiArticles) {
+        await handleSeedArticle(article, article.id);
     }
     toast({ title: 'Artigos Populados!', description: 'Todos os artigos da wiki foram sincronizados.' });
     
@@ -258,18 +262,35 @@ function WikiManagementTab() {
               </Link>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {articleSeedData.map(({ article, key, name }) => (
-                <div key={key} className="flex gap-2">
-                  <Button onClick={() => handleSeedArticle(article, key)} disabled={loadingStates[key] || !firestore} className="w-full justify-start">
-                      {loadingStates[key] && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      <Database className="mr-2 h-4 w-4" />
-                      {name}
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleViewContent(name, article, article.id, `/wiki/edit/${article.id}`)}>
-                    <Eye className="h-5 w-5" />
-                  </Button>
-                </div>
-              ))}
+              {areArticlesLoading ? (
+                  <div className="col-span-full flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <span className="ml-3 text-muted-foreground">Carregando artigos...</span>
+                  </div>
+              ) : (
+                articles?.map((article) => (
+                    <div key={article.id} className="flex gap-2">
+                    <Link href={`/wiki/edit/${article.id}`} passHref className='w-full'>
+                      <Button variant="outline" className="w-full justify-start">
+                        <Database className="mr-2 h-4 w-4" />
+                        {article.title}
+                      </Button>
+                    </Link>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                           <Button variant="ghost" size="icon" onClick={() => handleViewContent(article.title, article, article.id, `/wiki/edit/${article.id}`)}>
+                            <Eye className="h-5 w-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Visualizar dados do Firestore</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
 
@@ -290,9 +311,18 @@ function WikiManagementTab() {
                     <Database className="mr-2 h-4 w-4" />
                     {loadingStates.accessories ? 'Populando...' : 'Acessórios'}
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleViewContent("Acessórios", accessories)}>
-                    <Eye className="h-5 w-5" />
-                  </Button>
+                   <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => handleViewContent("Acessórios", accessories)}>
+                                <Eye className="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                         <TooltipContent>
+                          <p>Visualizar dados estáticos</p>
+                        </TooltipContent>
+                      </Tooltip>
+                   </TooltipProvider>
                 </div>
             </CardContent>
           </Card>
@@ -318,7 +348,6 @@ function WikiManagementTab() {
               ) : (
                 worlds?.map(world => {
                   const seedInfo = worldSeedData[world.id];
-                  const loadingKey = seedInfo ? seedInfo.key : world.id;
                   return (
                     <div key={world.id} className="flex gap-2">
                       <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref className='w-full'>
@@ -328,9 +357,18 @@ function WikiManagementTab() {
                         </Button>
                       </Link>
                       {seedInfo && (
-                          <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id, `/admin/edit-collection/worlds/${world.id}`)}>
-                              <Eye className="h-5 w-5" />
-                          </Button>
+                           <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id, `/admin/edit-collection/worlds/${world.id}`)}>
+                                      <Eye className="h-5 w-5" />
+                                  </Button>
+                                </TooltipTrigger>
+                                 <TooltipContent>
+                                  <p>Visualizar dados estáticos</p>
+                                </TooltipContent>
+                              </Tooltip>
+                           </TooltipProvider>
                       )}
                     </div>
                   )
@@ -354,7 +392,7 @@ function WikiManagementTab() {
                 )}
             </div>
             <DialogDescription>
-              Visualizando os dados JSON que serão populados no Firestore.
+              Visualizando os dados JSON. Para artigos, estes são os dados do Firestore. Para mundos e acessórios, estes são os dados estáticos usados para popular.
             </DialogDescription>
           </DialogHeader>
           <ScrollArea className="h-[70vh] mt-4">
