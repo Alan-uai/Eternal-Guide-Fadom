@@ -23,6 +23,7 @@ import { generateTags } from '@/ai/flows/generate-tags-flow';
 import { summarizeWikiContent } from '@/ai/flows/summarize-wiki-content';
 import { extractTextFromFile } from '@/ai/flows/extract-text-from-file-flow';
 import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 // Schema for the form validation
 const articleSchema = z.object({
@@ -77,13 +78,28 @@ export default function EditArticlePage() {
     },
   });
 
+  const { watch } = form;
+  const imageUrlValue = watch('imageUrl');
+
+  useEffect(() => {
+    if (imageUrlValue) {
+      if (imageUrlValue.startsWith('http')) {
+        setImagePreview(imageUrlValue);
+      } else {
+        const placeholder = PlaceHolderImages.find(p => p.id === imageUrlValue);
+        if (placeholder) {
+          setImagePreview(placeholder.imageUrl);
+        } else {
+          setImagePreview(null);
+        }
+      }
+    }
+  }, [imageUrlValue]);
+
   useEffect(() => {
     if (!isWikiLoading && !isNewArticle) {
       const foundArticle = wikiArticles.find(a => a.id === articleId);
       setArticle(foundArticle);
-      if (foundArticle?.imageUrl) {
-        setImagePreview(foundArticle.imageUrl);
-      }
     }
   }, [isWikiLoading, wikiArticles, articleId, isNewArticle]);
 
@@ -97,7 +113,14 @@ export default function EditArticlePage() {
         imageUrl: article.imageUrl,
         tables: article.tables ? JSON.stringify(article.tables, null, 2) : '',
       });
-      if(article.imageUrl) setImagePreview(article.imageUrl);
+      if (article.imageUrl) {
+        if(article.imageUrl.startsWith('http')) {
+            setImagePreview(article.imageUrl);
+        } else {
+            const placeholder = PlaceHolderImages.find(p => p.id === article.imageUrl);
+            if(placeholder) setImagePreview(placeholder.imageUrl);
+        }
+      }
     }
   }, [article, form]);
   
@@ -221,13 +244,13 @@ export default function EditArticlePage() {
             }
         }
 
-      const updatedArticleData: Omit<WikiArticle, 'createdAt' | 'imageId'> & { imageUrl: string, createdAt?: any, updatedAt?: any } = {
+      const updatedArticleData: Omit<WikiArticle, 'createdAt'> & { imageUrl: string, createdAt?: any, updatedAt?: any } = {
         id: articleId,
         title: values.title,
         summary: values.summary,
         content: values.content,
         tags: values.tags.split(',').map(tag => tag.trim()),
-        imageUrl: values.imageUrl || imagePreview || '', // Use new URL, then preview, then empty
+        imageUrl: values.imageUrl || '',
         tables: parsedTables,
       };
 
@@ -320,8 +343,8 @@ export default function EditArticlePage() {
               
               <FormItem>
                 <FormLabel>Imagem do Artigo</FormLabel>
-                <div className="flex items-center gap-4">
-                  <div className="w-32 h-32 relative rounded-md border bg-muted overflow-hidden">
+                <div className="flex items-start gap-4">
+                  <div className="w-32 h-32 relative rounded-md border bg-muted overflow-hidden shrink-0">
                     {imagePreview ? (
                       <Image src={imagePreview} alt="Pré-visualização do artigo" layout="fill" objectFit="cover" />
                     ) : (
@@ -330,13 +353,39 @@ export default function EditArticlePage() {
                       </div>
                     )}
                   </div>
-                  <div className="space-y-2">
-                     <input type="file" ref={imageInputRef} onChange={handleImageUpload} style={{ display: 'none' }} accept="image/*" />
-                     <Button type="button" variant="outline" onClick={() => imageInputRef.current?.click()} disabled={isUploadingImage}>
-                      {isUploadingImage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                      {isUploadingImage ? 'Enviando...' : 'Enviar Imagem'}
-                    </Button>
-                    <p className="text-xs text-muted-foreground">Envie uma imagem para o artigo.</p>
+                  <div className="space-y-4 w-full">
+                     <div>
+                       <input type="file" ref={imageInputRef} onChange={handleImageUpload} style={{ display: 'none' }} accept="image/*" />
+                       <Button type="button" variant="outline" onClick={() => imageInputRef.current?.click()} disabled={isUploadingImage} className="w-full">
+                        {isUploadingImage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                        {isUploadingImage ? 'Enviando...' : 'Enviar Nova Imagem'}
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2 text-center">Envie uma imagem para o artigo.</p>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">
+                          Ou
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <FormField
+                        control={form.control}
+                        name="imageUrl"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Input placeholder="Cole uma URL ou digite um ID (ex: wiki-1)" {...field} />
+                            </FormControl>
+                             <FormMessage />
+                        </FormItem>
+                        )}
+                    />
                   </div>
                 </div>
               </FormItem>
