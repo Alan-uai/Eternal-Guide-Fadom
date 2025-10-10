@@ -58,14 +58,14 @@ function WikiManagementTab() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
-  const [viewingContent, setViewingContent] = useState<{ title: string; data: any } | null>(null);
+  const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string } | null>(null);
 
   const handleLoading = (key: string, value: boolean) => {
     setLoadingStates(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleViewContent = (title: string, data: any) => {
-    setViewingContent({ title, data });
+  const handleViewContent = (title: string, data: any, id?: string) => {
+    setViewingContent({ title, data, id });
   };
 
   async function seedWorldGeneric(worldId: string, worldData: any, loadingKey: string) {
@@ -288,7 +288,7 @@ function WikiManagementTab() {
                        </Button>
                      </Link>
                     {seedInfo && (
-                      <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, `world-${worldNum}`)}>
                         <Eye className="h-5 w-5" />
                       </Button>
                     )}
@@ -301,7 +301,16 @@ function WikiManagementTab() {
       <Dialog open={!!viewingContent} onOpenChange={(isOpen) => !isOpen && setViewingContent(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{viewingContent?.title}</DialogTitle>
+            <div className="flex items-center justify-between">
+                <DialogTitle>{viewingContent?.title}</DialogTitle>
+                {viewingContent?.id && (
+                <Link href={`/admin/edit-collection/worlds/${viewingContent.id}`} passHref>
+                    <Button variant="ghost" size="icon">
+                    <Pencil className="h-5 w-5" />
+                    </Button>
+                </Link>
+                )}
+            </div>
             <DialogDescription>
               Visualizando os dados JSON que serão populados no Firestore.
             </DialogDescription>
@@ -330,20 +339,20 @@ export function AdminChatView() {
                     <TabsTrigger value="chat">Conversar com a IA</TabsTrigger>
                     <TabsTrigger value="wiki-management" className='flex items-center gap-2'>
                         <span>Gerenciar Conteúdo</span>
-                        <TooltipProvider>
+                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                    <span className="text-muted-foreground cursor-pointer" tabIndex={0}><Info className="h-4 w-4" /></span>
+                                <span className="text-muted-foreground cursor-pointer" tabIndex={0}><Info className="h-4 w-4" /></span>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs text-sm" side="top" align="center">
-                                    <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
-                                    <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
-                                    <ul className="list-disc list-inside space-y-1 text-left">
-                                        <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
-                                        <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
-                                        <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
-                                        <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
-                                    </ul>
+                                <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
+                                <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
+                                <ul className="list-disc list-inside space-y-1 text-left">
+                                    <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
+                                    <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
+                                    <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
+                                    <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
+                                </ul>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
