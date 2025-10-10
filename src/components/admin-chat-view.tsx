@@ -334,7 +334,7 @@ function WikiManagementTab() {
                 <DialogTitle>{viewingContent?.title}</DialogTitle>
                 {viewingContent?.editPath && (
                   <Link href={viewingContent.editPath} passHref>
-                    <Button variant="outline" size="sm">
+                    <Button variant="ghost" size="sm">
                         <Pencil className="mr-2 h-4 w-4" />
                         Editar
                     </Button>
