@@ -6,7 +6,7 @@ import { doc, writeBatch } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from './ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     Tooltip,
@@ -339,12 +339,12 @@ export function AdminChatView() {
         <Tabs defaultValue="wiki-management" className="flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-2 max-w-md self-start">
             <TabsTrigger value="chat">Conversar com a IA</TabsTrigger>
-            <TabsTrigger value="wiki-management">
-              Gerenciar Conteúdo
+            <TabsTrigger value="wiki-management" className="flex items-center gap-2">
+              <span>Gerenciar Conteúdo</span>
               <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                         <Button variant="ghost" size="icon" className="h-6 w-6 ml-2 text-muted-foreground"><Info className="h-4 w-4" /></Button>
+                         <span className="text-muted-foreground"><Info className="h-4 w-4" /></span>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs text-sm" side="top" align="center">
                         <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
