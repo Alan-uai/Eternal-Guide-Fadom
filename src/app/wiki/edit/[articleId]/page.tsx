@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState, useRef, Suspense } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useFirestore, useMemoFirebase, useUser, useFirebase } from '@/firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useFirestore, useMemoFirebase, useUser, useFirebase, useDoc } from '@/firebase';
+import { doc, setDoc, serverTimestamp, getDoc, collection } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/hooks/use-toast';
 import { useAdmin } from '@/hooks/use-admin';
@@ -26,48 +26,76 @@ import { formatTextToJson } from '@/ai/flows/format-text-to-json-flow';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-// Schema for the form validation
+// Base schema for a generic document
+const genericDocSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'O nome é obrigatório.'),
+  // All other fields will be in a single JSON blob
+  jsonData: z.string().refine((val) => {
+    try {
+      JSON.parse(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, { message: 'JSON inválido.' }),
+});
+
+// Schema for the article form validation (more specific)
 const articleSchema = z.object({
   title: z.string().min(3, 'O título é obrigatório.'),
   summary: z.string().min(10, 'O resumo é obrigatório.'),
   content: z.string().min(20, 'O conteúdo é obrigatório.'),
   tags: z.string().min(1, 'Pelo menos uma tag é necessária.'),
   imageUrl: z.string().optional(),
-  tables: z.string().optional(),
+  tables: z.string().optional(), // JSON string
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 
-export default function EditArticlePage() {
+function EditPageContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { firestore, firebaseApp } = useFirebase();
   const { toast } = useToast();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
-  const { wikiArticles, isWikiLoading } = useApp();
+  const { wikiArticles, isWikiLoading: isAppLoading } = useApp();
+
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [isFormatting, setIsFormatting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-
+  
   const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
+  const collectionPath = searchParams.get('collectionPath');
+  const isGenericCollection = !!collectionPath;
+
   const isNewArticle = articleIdParam === 'new';
   const [articleId, setArticleId] = useState(isNewArticle ? nanoid() : articleIdParam);
   
-  const [article, setArticle] = useState<WikiArticle | null | undefined>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const storage = firebaseApp ? getStorage(firebaseApp) : null;
-
-  const articleRef = useMemoFirebase(() => {
-    if (!firestore || !articleId) return null;
+  
+  // Determine the correct doc reference based on context (wiki article or generic collection item)
+  const docRef = useMemoFirebase(() => {
+    if (!firestore) return null;
+    if (isGenericCollection) {
+      // e.g. /worlds/world-1/powers/dragon-race
+      return doc(firestore, collectionPath, articleId);
+    }
+    // e.g. /wikiContent/getting-started
     return doc(firestore, 'wikiContent', articleId);
-  }, [firestore, articleId]);
+  }, [firestore, articleId, collectionPath, isGenericCollection]);
 
+  const { data: article, isLoading: isArticleLoading } = useDoc(docRef, { skip: isNewArticle });
+
+  // Use the article schema by default
   const form = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
     defaultValues: {
@@ -80,7 +108,7 @@ export default function EditArticlePage() {
     },
   });
 
-  const { watch } = form;
+  const { watch, setValue } = form;
   const imageUrlValue = watch('imageUrl');
 
   useEffect(() => {
@@ -95,36 +123,38 @@ export default function EditArticlePage() {
           setImagePreview(null);
         }
       }
+    } else {
+      setImagePreview(null);
     }
   }, [imageUrlValue]);
 
-  useEffect(() => {
-    if (!isWikiLoading && !isNewArticle) {
-      const foundArticle = wikiArticles.find(a => a.id === articleId);
-      setArticle(foundArticle);
-    }
-  }, [isWikiLoading, wikiArticles, articleId, isNewArticle]);
-
+  // When doc data loads, populate the form
   useEffect(() => {
     if (article) {
-      form.reset({
-        title: article.title,
-        summary: article.summary,
-        content: article.content,
-        tags: Array.isArray(article.tags) ? article.tags.join(', ') : '',
-        imageUrl: article.imageUrl,
-        tables: article.tables ? JSON.stringify(article.tables, null, 2) : '',
-      });
-      if (article.imageUrl) {
-        if(article.imageUrl.startsWith('http')) {
-            setImagePreview(article.imageUrl);
+        if (isGenericCollection) {
+            // For generic items, we map all data into the 'tables' field as a JSON blob
+            const { id, ...dataToEdit } = article;
+            form.reset({
+                title: dataToEdit.name || article.id, // Use 'name' if available, else id
+                summary: `Editando item ${article.id} de ${collectionPath}`,
+                content: 'Os dados para este item são gerenciados no campo de Tabelas (JSON) abaixo.',
+                tags: collectionPath.split('/').join(', '),
+                tables: JSON.stringify(dataToEdit, null, 2),
+                imageUrl: dataToEdit.imageUrl || ''
+            });
         } else {
-            const placeholder = PlaceHolderImages.find(p => p.id === article.imageUrl);
-            if(placeholder) setImagePreview(placeholder.imageUrl);
+            // For wiki articles, map fields directly
+            form.reset({
+                title: article.title,
+                summary: article.summary,
+                content: article.content,
+                tags: Array.isArray(article.tags) ? article.tags.join(', ') : '',
+                imageUrl: article.imageUrl,
+                tables: article.tables ? JSON.stringify(article.tables, null, 2) : '',
+            });
         }
-      }
     }
-  }, [article, form]);
+  }, [article, form, isGenericCollection, collectionPath]);
   
   const handleGenerateTags = async () => {
     setIsGeneratingTags(true);
@@ -132,7 +162,7 @@ export default function EditArticlePage() {
     try {
       const result = await generateTags({ title, summary, content });
       if (result.tags) {
-        form.setValue('tags', result.tags);
+        setValue('tags', result.tags);
         toast({ title: 'Tags Geradas!', description: 'As tags foram preenchidas com sugestões da IA.' });
       } else {
         throw new Error('A IA não retornou tags.');
@@ -151,7 +181,7 @@ export default function EditArticlePage() {
     try {
       const result = await summarizeWikiContent({ wikiContent: content, topic: title });
       if (result.summary) {
-        form.setValue('summary', result.summary);
+        setValue('summary', result.summary);
         toast({ title: 'Resumo Gerado!', description: 'O resumo foi preenchido com uma sugestão da IA.' });
       } else {
         throw new Error('A IA não retornou um resumo.');
@@ -181,9 +211,9 @@ export default function EditArticlePage() {
             
             if (result.extractedText) {
                 if (extractionType === 'markdown') {
-                    form.setValue('content', result.extractedText);
+                    setValue('content', result.extractedText);
                 } else if (extractionType === 'json') {
-                    form.setValue('tables', result.extractedText);
+                    setValue('tables', result.extractedText);
                 }
                 toast({ title: 'Texto Extraído!', description: `O campo de ${extractionType === 'markdown' ? 'conteúdo' : 'tabelas'} foi preenchido.` });
             } else {
@@ -198,7 +228,6 @@ export default function EditArticlePage() {
       toast({ variant: 'destructive', title: 'Erro na Extração', description: 'Não foi possível extrair o texto do arquivo.' });
     } finally {
       setIsExtracting(false);
-      // Reset file input to allow uploading the same file again
       if(fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -215,7 +244,7 @@ export default function EditArticlePage() {
       const uploadResult = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(uploadResult.ref);
       
-      form.setValue('imageUrl', downloadURL);
+      setValue('imageUrl', downloadURL);
       setImagePreview(downloadURL);
 
       toast({ title: 'Imagem Enviada!', description: 'A nova imagem do artigo foi salva.' });
@@ -238,7 +267,9 @@ export default function EditArticlePage() {
     try {
       const result = await formatTextToJson({ rawText });
       if (result.jsonString && result.jsonString !== '[]') {
-        form.setValue('tables', result.jsonString);
+        // Pretty-print the JSON
+        const parsed = JSON.parse(result.jsonString);
+        setValue('tables', JSON.stringify(parsed, null, 2));
         toast({ title: 'Texto Formatado!', description: 'O texto foi convertido para JSON com sucesso.' });
       } else {
         throw new Error('A IA não conseguiu formatar o texto.');
@@ -252,56 +283,70 @@ export default function EditArticlePage() {
   };
 
   const onSubmit = async (values: ArticleFormData) => {
-    if (!articleRef) {
-      toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível encontrar o artigo para atualizar.' });
+    if (!docRef) {
+      toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível encontrar o documento para atualizar.' });
       return;
     }
     setIsSaving(true);
+    
     try {
-        let parsedTables = article?.tables;
-        if(values.tables) {
-            try {
-                parsedTables = JSON.parse(values.tables);
-            } catch (e) {
-                toast({ variant: 'destructive', title: 'Erro de JSON', description: 'A estrutura JSON das tabelas é inválida.' });
-                setIsSaving(false);
-                return;
-            }
-        }
+      let dataToSave: any;
 
-      const updatedArticleData: Omit<WikiArticle, 'createdAt'> & { imageUrl: string, createdAt?: any, updatedAt?: any } = {
-        id: articleId,
-        title: values.title,
-        summary: values.summary,
-        content: values.content,
-        tags: values.tags.split(',').map(tag => tag.trim()),
-        imageUrl: values.imageUrl || '',
-        tables: parsedTables,
-      };
-
-      if (isNewArticle) {
-        updatedArticleData.createdAt = serverTimestamp();
+      if (isGenericCollection) {
+         try {
+            dataToSave = JSON.parse(values.tables || '{}');
+            dataToSave.id = articleId;
+            // The name/title is edited in the 'title' field, so we sync it back to the JSON data.
+            dataToSave.name = values.title;
+         } catch (e) {
+            toast({ variant: 'destructive', title: 'Erro de JSON', description: 'A estrutura JSON no campo Tabelas é inválida.' });
+            setIsSaving(false);
+            return;
+         }
       } else {
-        if (article?.createdAt) {
-          updatedArticleData.createdAt = article.createdAt;
-        }
-        updatedArticleData.updatedAt = serverTimestamp();
+          // This is a WikiArticle
+          let parsedTables = article?.tables;
+          if(values.tables) {
+              try {
+                  parsedTables = JSON.parse(values.tables);
+              } catch (e) {
+                  toast({ variant: 'destructive', title: 'Erro de JSON', description: 'A estrutura JSON das tabelas é inválida.' });
+                  setIsSaving(false);
+                  return;
+              }
+          }
+          dataToSave = {
+              id: articleId,
+              title: values.title,
+              summary: values.summary,
+              content: values.content,
+              tags: values.tags.split(',').map(tag => tag.trim()),
+              imageUrl: values.imageUrl || '',
+              tables: parsedTables,
+              updatedAt: serverTimestamp()
+          };
+      }
+      
+      if (isNewArticle) {
+        dataToSave.createdAt = serverTimestamp();
       }
 
-      await setDoc(articleRef, updatedArticleData, { merge: true });
-      toast({ title: 'Sucesso!', description: `O artigo foi ${isNewArticle ? 'criado' : 'atualizado'}.` });
+      await setDoc(docRef, dataToSave, { merge: true });
+      toast({ title: 'Sucesso!', description: `O item foi ${isNewArticle ? 'criado' : 'atualizado'}.` });
+      
       if (isNewArticle) {
-        router.push('/admin-chat');
+        // Go back to the collection list after creation
+        router.push(isGenericCollection ? `/admin/edit-collection/${collectionPath}` : '/admin-chat');
       }
     } catch (error) {
-      console.error('Erro ao salvar artigo:', error);
-      toast({ variant: 'destructive', title: 'Erro ao Salvar', description: 'Não foi possível salvar o artigo no Firestore.' });
+      console.error('Erro ao salvar:', error);
+      toast({ variant: 'destructive', title: 'Erro ao Salvar', description: 'Não foi possível salvar os dados no Firestore.' });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const isLoading = isAdminLoading || (isWikiLoading && !isNewArticle);
+  const isLoading = isAdminLoading || (isArticleLoading && !isNewArticle);
 
   if (isLoading) {
     return (
@@ -320,13 +365,17 @@ export default function EditArticlePage() {
       </div>
     );
   }
+  
+  const formTitle = isNewArticle 
+    ? `Criando Novo Item em ${isGenericCollection ? collectionPath : 'Wiki'}`
+    : `Editando: ${article?.name || article?.title || 'Carregando...'}`;
 
   return (
     <div className="max-w-4xl mx-auto">
       <Card>
         <CardHeader>
-          <CardTitle>{isNewArticle ? 'Criar Novo Artigo' : `Editando: ${article?.title || 'Carregando...'}`}</CardTitle>
-          <CardDescription>Faça as alterações abaixo e clique em salvar.</CardDescription>
+          <CardTitle>{formTitle}</CardTitle>
+          <CardDescription>Faça as alterações abaixo e clique em salvar. {isGenericCollection && "Todos os dados do item são editados no campo JSON."}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -338,7 +387,7 @@ export default function EditArticlePage() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Título</FormLabel>
+                    <FormLabel>{isGenericCollection ? 'Nome / ID' : 'Título'}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -346,107 +395,112 @@ export default function EditArticlePage() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="summary"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Resumo</FormLabel>
-                    <div className="flex gap-2">
-                       <FormControl>
-                        <Textarea {...field} className="min-h-[100px]" />
-                      </FormControl>
-                      <Button type="button" variant="outline" onClick={handleGenerateSummary} disabled={isGeneratingSummary}>
-                        {isGeneratingSummary ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                        Gerar
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormItem>
-                <FormLabel>Imagem do Artigo</FormLabel>
-                <div className="flex items-start gap-4">
-                  <div className="w-32 h-32 relative rounded-md border bg-muted overflow-hidden shrink-0">
-                    {imagePreview ? (
-                      <Image src={imagePreview} alt="Pré-visualização do artigo" layout="fill" objectFit="cover" />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-muted-foreground">
-                        <ImageIcon className="h-8 w-8" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-4 w-full">
-                     <div>
-                       <input type="file" ref={imageInputRef} onChange={handleImageUpload} style={{ display: 'none' }} accept="image/*" />
-                       <Button type="button" variant="outline" onClick={() => imageInputRef.current?.click()} disabled={isUploadingImage} className="w-full">
-                        {isUploadingImage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                        {isUploadingImage ? 'Enviando...' : 'Enviar Nova Imagem'}
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">Envie uma imagem para o artigo.</p>
-                    </div>
-                    
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground">
-                          Ou
-                        </span>
-                      </div>
-                    </div>
-                    
+
+              {!isGenericCollection && (
+                <>
                     <FormField
                         control={form.control}
-                        name="imageUrl"
+                        name="summary"
                         render={({ field }) => (
                         <FormItem>
+                            <FormLabel>Resumo</FormLabel>
+                            <div className="flex gap-2">
                             <FormControl>
-                                <Input placeholder="Cole uma URL ou digite um ID (ex: wiki-1)" {...field} />
+                                <Textarea {...field} className="min-h-[100px]" />
                             </FormControl>
-                             <FormMessage />
+                            <Button type="button" variant="outline" onClick={handleGenerateSummary} disabled={isGeneratingSummary}>
+                                {isGeneratingSummary ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                                Gerar
+                            </Button>
+                            </div>
+                            <FormMessage />
                         </FormItem>
                         )}
                     />
-                  </div>
-                </div>
-              </FormItem>
-              
-              <FormField
-                control={form.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Conteúdo (Markdown)</FormLabel>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={isExtracting}
-                        onClick={() => {
-                            const handler = (e: Event) => {
-                                handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>, 'markdown');
-                                fileInputRef.current?.removeEventListener('change', handler);
-                            };
-                            fileInputRef.current?.addEventListener('change', handler);
-                            fileInputRef.current?.click();
-                        }}
-                      >
-                        {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                        Extrair de Arquivo
-                      </Button>
-                    </div>
-                    <FormControl>
-                      <Textarea {...field} className="min-h-[250px]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    
+                    <FormItem>
+                        <FormLabel>Imagem do Artigo</FormLabel>
+                        <div className="flex items-start gap-4">
+                        <div className="w-32 h-32 relative rounded-md border bg-muted overflow-hidden shrink-0">
+                            {imagePreview ? (
+                            <Image src={imagePreview} alt="Pré-visualização do artigo" layout="fill" objectFit="cover" />
+                            ) : (
+                            <div className="flex items-center justify-center h-full text-muted-foreground">
+                                <ImageIcon className="h-8 w-8" />
+                            </div>
+                            )}
+                        </div>
+                        <div className="space-y-4 w-full">
+                            <div>
+                                <input type="file" ref={imageInputRef} onChange={handleImageUpload} style={{ display: 'none' }} accept="image/*" />
+                                <Button type="button" variant="outline" onClick={() => imageInputRef.current?.click()} disabled={isUploadingImage} className="w-full">
+                                {isUploadingImage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                {isUploadingImage ? 'Enviando...' : 'Enviar Nova Imagem'}
+                                </Button>
+                                <p className="text-xs text-muted-foreground mt-2 text-center">Envie uma imagem para o artigo.</p>
+                            </div>
+                            
+                            <div className="relative">
+                                <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-card px-2 text-muted-foreground">
+                                    Ou
+                                </span>
+                                </div>
+                            </div>
+                            
+                            <FormField
+                                control={form.control}
+                                name="imageUrl"
+                                render={({ field }) => (
+                                <FormItem className='space-y-0'>
+                                    <FormControl>
+                                        <Input placeholder="Cole uma URL ou digite um ID (ex: wiki-1)" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                        </div>
+                        </div>
+                    </FormItem>
+                    
+                    <FormField
+                        control={form.control}
+                        name="content"
+                        render={({ field }) => (
+                        <FormItem>
+                            <div className="flex items-center justify-between">
+                            <FormLabel>Conteúdo (Markdown)</FormLabel>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                disabled={isExtracting}
+                                onClick={() => {
+                                    const handler = (e: Event) => {
+                                        handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>, 'markdown');
+                                        fileInputRef.current?.removeEventListener('change', handler);
+                                    };
+                                    fileInputRef.current?.addEventListener('change', handler);
+                                    fileInputRef.current?.click();
+                                }}
+                            >
+                                {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                Extrair de Arquivo
+                            </Button>
+                            </div>
+                            <FormControl>
+                            <Textarea {...field} className="min-h-[250px]" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </>
+              )}
 
                <FormField
                 control={form.control}
@@ -454,7 +508,7 @@ export default function EditArticlePage() {
                 render={({ field }) => (
                   <FormItem>
                      <div className="flex items-center justify-between">
-                        <FormLabel>Tabelas (JSON)</FormLabel>
+                        <FormLabel>{isGenericCollection ? 'Dados do Item (JSON)' : 'Tabelas (JSON)'}</FormLabel>
                         <div className='flex gap-2'>
                           <Button
                               type="button"
@@ -488,30 +542,34 @@ export default function EditArticlePage() {
                     <FormControl>
                       <Textarea {...field} className="min-h-[250px] font-mono text-xs" />
                     </FormControl>
-                     <p className="text-xs text-muted-foreground">Cole o texto bruto e clique em "Formatar Texto", ou extraia de um arquivo. Edite o JSON com cuidado.</p>
+                     <p className="text-xs text-muted-foreground">Cole o texto bruto e clique em "Formatar Texto", extraia de um arquivo, ou edite o JSON diretamente.
+                     </p>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="tags"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tags (separadas por vírgula)</FormLabel>
-                    <div className="flex gap-2">
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <Button type="button" variant="outline" onClick={handleGenerateTags} disabled={isGeneratingTags}>
-                        {isGeneratingTags ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                        Gerar Tags
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
+              {!isGenericCollection && (
+                <FormField
+                    control={form.control}
+                    name="tags"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Tags (separadas por vírgula)</FormLabel>
+                        <div className="flex gap-2">
+                        <FormControl>
+                            <Input {...field} />
+                        </FormControl>
+                        <Button type="button" variant="outline" onClick={handleGenerateTags} disabled={isGeneratingTags}>
+                            {isGeneratingTags ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                            Gerar Tags
+                        </Button>
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              )}
 
               <Button type="submit" disabled={isSaving || isExtracting || isUploadingImage || isFormatting}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
@@ -523,4 +581,12 @@ export default function EditArticlePage() {
       </Card>
     </div>
   );
+}
+
+export default function EditArticlePage() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+            <EditPageContent />
+        </Suspense>
+    );
 }
