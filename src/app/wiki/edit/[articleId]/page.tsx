@@ -5,8 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useFirestore, useMemoFirebase, useUser } from '@/firebase';
+import { useFirestore, useMemoFirebase, useUser, useFirebase } from '@/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/hooks/use-toast';
 import { useAdmin } from '@/hooks/use-admin';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -14,13 +15,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, ShieldAlert, Sparkles, Upload } from 'lucide-react';
+import { Loader2, Save, ShieldAlert, Sparkles, Upload, Image as ImageIcon } from 'lucide-react';
 import type { WikiArticle } from '@/lib/types';
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
 import { generateTags } from '@/ai/flows/generate-tags-flow';
 import { summarizeWikiContent } from '@/ai/flows/summarize-wiki-content';
 import { extractTextFromFile } from '@/ai/flows/extract-text-from-file-flow';
+import Image from 'next/image';
 
 // Schema for the form validation
 const articleSchema = z.object({
@@ -28,8 +30,8 @@ const articleSchema = z.object({
   summary: z.string().min(10, 'O resumo é obrigatório.'),
   content: z.string().min(20, 'O conteúdo é obrigatório.'),
   tags: z.string().min(1, 'Pelo menos uma tag é necessária.'),
-  imageId: z.string().optional(),
-  tables: z.string().optional(), // We'll edit tables as a JSON string for now
+  imageUrl: z.string().optional(),
+  tables: z.string().optional(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -37,7 +39,7 @@ type ArticleFormData = z.infer<typeof articleSchema>;
 export default function EditArticlePage() {
   const params = useParams();
   const router = useRouter();
-  const firestore = useFirestore();
+  const { firestore, firebaseApp } = useFirebase();
   const { toast } = useToast();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const { wikiArticles, isWikiLoading } = useApp();
@@ -45,14 +47,18 @@ export default function EditArticlePage() {
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
   const isNewArticle = articleIdParam === 'new';
   const [articleId, setArticleId] = useState(isNewArticle ? nanoid() : articleIdParam);
   
   const [article, setArticle] = useState<WikiArticle | null | undefined>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const storage = firebaseApp ? getStorage(firebaseApp) : null;
 
   const articleRef = useMemoFirebase(() => {
     if (!firestore || !articleId) return null;
@@ -66,7 +72,7 @@ export default function EditArticlePage() {
       summary: '',
       content: '',
       tags: '',
-      imageId: '',
+      imageUrl: '',
       tables: '',
     },
   });
@@ -75,6 +81,9 @@ export default function EditArticlePage() {
     if (!isWikiLoading && !isNewArticle) {
       const foundArticle = wikiArticles.find(a => a.id === articleId);
       setArticle(foundArticle);
+      if (foundArticle?.imageUrl) {
+        setImagePreview(foundArticle.imageUrl);
+      }
     }
   }, [isWikiLoading, wikiArticles, articleId, isNewArticle]);
 
@@ -84,10 +93,11 @@ export default function EditArticlePage() {
         title: article.title,
         summary: article.summary,
         content: article.content,
-        tags: article.tags.join(', '),
-        imageId: article.imageId,
+        tags: Array.isArray(article.tags) ? article.tags.join(', ') : '',
+        imageUrl: article.imageUrl,
         tables: article.tables ? JSON.stringify(article.tables, null, 2) : '',
       });
+      if(article.imageUrl) setImagePreview(article.imageUrl);
     }
   }, [article, form]);
   
@@ -168,6 +178,31 @@ export default function EditArticlePage() {
     }
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !storage) return;
+
+    setIsUploadingImage(true);
+    toast({ title: 'Enviando imagem...', description: 'A imagem está sendo enviada para o armazenamento.' });
+
+    try {
+      const storageRef = ref(storage, `wiki-images/${articleId}/${file.name}`);
+      const uploadResult = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(uploadResult.ref);
+      
+      form.setValue('imageUrl', downloadURL);
+      setImagePreview(downloadURL);
+
+      toast({ title: 'Imagem Enviada!', description: 'A nova imagem do artigo foi salva.' });
+    } catch (error) {
+      console.error('Erro ao enviar imagem:', error);
+      toast({ variant: 'destructive', title: 'Erro no Upload', description: 'Não foi possível enviar a imagem.' });
+    } finally {
+      setIsUploadingImage(false);
+      if(imageInputRef.current) imageInputRef.current.value = '';
+    }
+  };
+
   const onSubmit = async (values: ArticleFormData) => {
     if (!articleRef) {
       toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível encontrar o artigo para atualizar.' });
@@ -186,13 +221,13 @@ export default function EditArticlePage() {
             }
         }
 
-      const updatedArticleData: Omit<WikiArticle, 'createdAt'> & { createdAt?: any, updatedAt?: any } = {
+      const updatedArticleData: Omit<WikiArticle, 'createdAt' | 'imageId'> & { imageUrl: string, createdAt?: any, updatedAt?: any } = {
         id: articleId,
         title: values.title,
         summary: values.summary,
         content: values.content,
         tags: values.tags.split(',').map(tag => tag.trim()),
-        imageId: values.imageId || article?.imageId || 'wiki-1', // Fallback imageId
+        imageUrl: values.imageUrl || imagePreview || '', // Use new URL, then preview, then empty
         tables: parsedTables,
       };
 
@@ -283,6 +318,29 @@ export default function EditArticlePage() {
                 )}
               />
               
+              <FormItem>
+                <FormLabel>Imagem do Artigo</FormLabel>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 h-32 relative rounded-md border bg-muted overflow-hidden">
+                    {imagePreview ? (
+                      <Image src={imagePreview} alt="Pré-visualização do artigo" layout="fill" objectFit="cover" />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-muted-foreground">
+                        <ImageIcon className="h-8 w-8" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                     <input type="file" ref={imageInputRef} onChange={handleImageUpload} style={{ display: 'none' }} accept="image/*" />
+                     <Button type="button" variant="outline" onClick={() => imageInputRef.current?.click()} disabled={isUploadingImage}>
+                      {isUploadingImage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                      {isUploadingImage ? 'Enviando...' : 'Enviar Imagem'}
+                    </Button>
+                    <p className="text-xs text-muted-foreground">Envie uma imagem para o artigo.</p>
+                  </div>
+                </div>
+              </FormItem>
+              
               <FormField
                 control={form.control}
                 name="content"
@@ -295,11 +353,17 @@ export default function EditArticlePage() {
                         variant="outline"
                         size="sm"
                         disabled={isExtracting}
-                        onClick={() => fileInputRef.current?.setAttribute('onChange', 'this.dispatchEvent(new Event("change", { bubbles: true }))') && fileInputRef.current?.click()}
-                        onChange={(e) => handleFileChange(e as any, 'markdown')}
+                        onClick={() => {
+                            const handler = (e: Event) => {
+                                handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>, 'markdown');
+                                fileInputRef.current?.removeEventListener('change', handler);
+                            };
+                            fileInputRef.current?.addEventListener('change', handler);
+                            fileInputRef.current?.click();
+                        }}
                       >
                         {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                        Enviar Arquivo
+                        Extrair de Arquivo
                       </Button>
                     </div>
                     <FormControl>
@@ -322,11 +386,17 @@ export default function EditArticlePage() {
                             variant="outline"
                             size="sm"
                             disabled={isExtracting}
-                            onClick={() => fileInputRef.current?.setAttribute('onChange', 'this.dispatchEvent(new Event("change", { bubbles: true }))') && fileInputRef.current?.click()}
-                            onChange={(e) => handleFileChange(e as any, 'json')}
+                            onClick={() => {
+                                const handler = (e: Event) => {
+                                    handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>, 'json');
+                                    fileInputRef.current?.removeEventListener('change', handler);
+                                };
+                                fileInputRef.current?.addEventListener('change', handler);
+                                fileInputRef.current?.click();
+                            }}
                         >
                             {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                            Enviar Arquivo
+                            Extrair de Arquivo
                         </Button>
                      </div>
                     <FormControl>
@@ -356,20 +426,8 @@ export default function EditArticlePage() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="imageId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ID da Imagem</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isSaving || isExtracting}>
+
+              <Button type="submit" disabled={isSaving || isExtracting || isUploadingImage}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Salvar Alterações
               </Button>
