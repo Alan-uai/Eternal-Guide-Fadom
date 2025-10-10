@@ -27,7 +27,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
   linkWithCredential,
   EmailAuthProvider,
 } from 'firebase/auth';
@@ -88,6 +88,10 @@ export function AuthDialog() {
             title = 'Credencial já em uso';
             description = 'Esta conta do Google já está associada a outro usuário.';
             break;
+        case 'auth/cancelled-popup-request':
+        case 'auth/popup-closed-by-user':
+            // Não mostra toast para pop-ups cancelados pelo usuário
+            return;
         default:
           title = `Erro: ${error.code}`;
           description = error.message;
@@ -101,12 +105,9 @@ export function AuthDialog() {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
-      // Simplificado: signInWithPopup lidará com login e vinculação de anônimos.
-      const result = await signInWithPopup(auth, provider);
-      await handleUserLogin(result.user);
-      
-      setAuthDialogOpen(false);
-      toast({ title: 'Login bem-sucedido!', description: 'Você entrou com sua conta do Google.' });
+      // Usar signInWithRedirect em vez de signInWithPopup
+      await signInWithRedirect(auth, provider);
+      // O resultado será tratado no FirebaseProvider após o redirecionamento
     } catch (error) {
       handleAuthError(error);
     }
@@ -280,5 +281,3 @@ export function AuthDialog() {
     </Dialog>
   );
 }
-
-    

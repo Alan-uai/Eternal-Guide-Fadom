@@ -3,9 +3,11 @@
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
-import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
+import { Auth, User, onAuthStateChanged, signInAnonymously, getRedirectResult, UserCredential } from 'firebase/auth';
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { handleUserLogin } from '@/lib/auth-actions';
+import { useToast } from '@/hooks/use-toast';
+import { FirebaseError } from 'firebase/app';
 
 
 interface FirebaseProviderProps {
@@ -68,15 +70,50 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     isUserLoading: true, // Start loading until first auth event
     userError: null,
   });
+  const { toast } = useToast();
 
-  // Effect to subscribe to Firebase auth state changes
+  const handleAuthError = (error: any) => {
+    let title = 'Erro de autenticação';
+    let description = 'Ocorreu um erro desconhecido. Tente novamente.';
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case 'auth/credential-already-in-use':
+            title = 'Credencial já em uso';
+            description = 'Esta conta do Google já está associada a outro usuário.';
+            break;
+        default:
+          title = `Erro: ${error.code}`;
+          description = error.message;
+          break;
+      }
+    }
+    toast({ variant: 'destructive', title, description });
+  };
+
+
+  // Effect to subscribe to Firebase auth state changes AND handle redirect results
   useEffect(() => {
-    if (!auth) { // If no Auth service instance, cannot determine user state
+    if (!auth) {
       setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Auth service not provided.") });
       return;
     }
 
-    setUserAuthState({ user: null, isUserLoading: true, userError: null }); // Reset on auth instance change
+    // Handle redirect result first
+    getRedirectResult(auth)
+      .then(async (result: UserCredential | null) => {
+        if (result) {
+          // User successfully signed in via redirect.
+          await handleUserLogin(result.user);
+          setUserAuthState({ user: result.user, isUserLoading: false, userError: null });
+          toast({ title: 'Login bem-sucedido!', description: 'Você entrou com sua conta do Google.' });
+        }
+      })
+      .catch((error) => {
+        console.error("FirebaseProvider: Redirect result error:", error);
+        handleAuthError(error);
+        setUserAuthState(prev => ({ ...prev, isUserLoading: false })); // Stop loading on error
+      });
+
 
     const unsubscribe = onAuthStateChanged(
       auth,
@@ -84,7 +121,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
         if (firebaseUser) {
             setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
         } else {
-            // No user is signed in, so sign in anonymously.
+            // No user is signed in, and no redirect result was found, so sign in anonymously.
             try {
                 const userCredential = await signInAnonymously(auth);
                 await handleUserLogin(userCredential.user);
