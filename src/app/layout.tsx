@@ -36,10 +36,6 @@ export default function RootLayout({
         <AppProvider>
           <div className="flex min-h-screen w-full flex-col">
             <header className="sticky top-0 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm z-50">
-                <Link href="/" className="flex items-center gap-3 text-primary hover:text-primary/80 transition-colors mr-4">
-                    <Bot size={28} />
-                    <h1 className="text-xl font-semibold font-headline">Guia Eterno</h1>
-                </Link>
               <MainNav />
               <div className="ml-auto flex items-center gap-4">
                 <UserNav />
