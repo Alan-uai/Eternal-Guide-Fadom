@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, writeBatch } from 'firebase/firestore';
-import { Bot, User, Send, Info, Loader2, Eye, Pencil } from 'lucide-react';
+import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
@@ -213,7 +213,9 @@ function WikiManagementTab() {
 
     for (const worldNum in worldSeedData) {
       const seedInfo = worldSeedData[worldNum];
-      await seedWorldGeneric(`world-${worldNum}`, seedInfo.data, seedInfo.key);
+      if (seedInfo) {
+        await seedWorldGeneric(`world-${worldNum}`, seedInfo.data, seedInfo.key);
+      }
     }
 
     toast({ title: 'Concluído!', description: 'Todos os dados foram populados com sucesso.' });
@@ -230,13 +232,13 @@ function WikiManagementTab() {
             </CardHeader>
             <CardContent>
               <CardDescription>
-                Use este botão para popular todos os artigos da wiki e dados de todos os mundos disponíveis de uma só vez.
+                Use este botão para popular (ou repopular) todos os artigos da wiki e dados de todos os mundos disponíveis de uma só vez, sincronizando o Firestore com os arquivos base do projeto.
               </CardDescription>
             </CardContent>
             <CardFooter>
               <Button onClick={handleSeedAll} disabled={loadingStates.all || !firestore}>
                 {loadingStates.all && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {loadingStates.all ? 'Populando Tudo...' : 'Popular Tudo'}
+                {loadingStates.all ? 'Populando Tudo...' : 'Popular Todos os Dados'}
               </Button>
             </CardFooter>
           </Card>
@@ -244,7 +246,7 @@ function WikiManagementTab() {
           <Separator />
 
           <Card>
-            <CardHeader><CardTitle>Artigos da Wiki e Dados Gerais</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Artigos da Wiki</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {articleSeedData.map(({ article, key, name }) => (
                 <div key={key} className="flex gap-2">
@@ -259,15 +261,24 @@ function WikiManagementTab() {
                   </Button>
                 </div>
               ))}
-              <div className="flex gap-2">
-                <Button onClick={handleSeedAccessories} disabled={loadingStates.accessories || !firestore} className="w-full justify-start">
-                  {loadingStates.accessories && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {loadingStates.accessories ? 'Populando...' : 'Acessórios'}
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleViewContent("Acessórios", accessories)}>
-                  <Eye className="h-5 w-5" />
-                </Button>
-              </div>
+            </CardContent>
+          </Card>
+
+          <Separator />
+          
+          <Card>
+            <CardHeader><CardTitle>Dados Gerais</CardTitle></CardHeader>
+             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+               <div className="flex gap-2">
+                  <Button onClick={handleSeedAccessories} disabled={loadingStates.accessories || !firestore} className="w-full justify-start">
+                    {loadingStates.accessories && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Database className="mr-2 h-4 w-4" />
+                    {loadingStates.accessories ? 'Populando...' : 'Acessórios'}
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleViewContent("Acessórios", accessories)}>
+                    <Eye className="h-5 w-5" />
+                  </Button>
+                </div>
             </CardContent>
           </Card>
 
@@ -283,6 +294,7 @@ function WikiManagementTab() {
                   <div key={worldNum} className="flex gap-2">
                     <Button onClick={() => seedInfo && seedWorldGeneric(`world-${worldNum}`, seedInfo.data, loadingKey)} disabled={!seedInfo || loadingStates[loadingKey] || !firestore} className="w-full justify-start">
                       {loadingStates[loadingKey] && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                       <Database className="mr-2 h-4 w-4" />
                       Mundo {worldNum}
                     </Button>
                     {seedInfo && (
@@ -328,7 +340,7 @@ export function AdminChatView() {
           <TabsList className="grid w-full grid-cols-2 max-w-md self-start">
             <TabsTrigger value="chat">Conversar com a IA</TabsTrigger>
             <TabsTrigger value="wiki-management">
-              Gerenciar Wiki
+              Gerenciar Conteúdo
               <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
