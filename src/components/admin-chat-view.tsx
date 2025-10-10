@@ -124,29 +124,6 @@ function WikiManagementTab() {
     });
   }
 
-  async function seedArticle(article: WikiArticle, loadingKey: string, articleName: string) {
-    handleLoading(loadingKey, true);
-    if (!firestore) {
-        toast({ title: 'Erro', description: 'O Firestore não foi inicializado.', variant: 'destructive' });
-        handleLoading(loadingKey, false);
-        return;
-    }
-    const batch = writeBatch(firestore);
-    const articleRef = doc(firestore, 'wikiContent', article.id);
-    batch.set(articleRef, article);
-    
-    await batch.commit().then(() => {
-        toast({ title: 'Sucesso!', description: `O artigo "${articleName}" foi populado.` });
-    }).catch(() => {
-        const permissionError = new FirestorePermissionError({
-            path: `wikiContent/${article.id}`, operation: 'write', requestResourceData: { [articleRef.path]: article },
-        });
-        errorEmitter.emit('permission-error', permissionError);
-    }).finally(() => {
-        handleLoading(loadingKey, false);
-    });
-  }
-
   async function handleSeedAccessories() {
     handleLoading('accessories', true);
     if (!firestore) {
@@ -204,10 +181,20 @@ function WikiManagementTab() {
   async function handleSeedAll() {
     handleLoading('all', true);
     toast({ title: 'Iniciando...', description: 'Populando todos os dados do jogo. Isso pode levar um momento.' });
-    
+
+    // Seed articles one by one
     for (const { article, key, name } of articleSeedData) {
-      await seedArticle(article, key, name);
+        const articleRef = doc(firestore, 'wikiContent', article.id);
+        const batch = writeBatch(firestore);
+        batch.set(articleRef, article);
+        await batch.commit().catch(() => {
+             const permissionError = new FirestorePermissionError({
+                path: `wikiContent/${article.id}`, operation: 'write', requestResourceData: { [articleRef.path]: article },
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        });
     }
+    toast({ title: 'Artigos Populados!', description: 'Todos os artigos da wiki foram sincronizados.' });
     
     await handleSeedAccessories();
 
@@ -336,28 +323,30 @@ export function AdminChatView() {
                 <p className="text-muted-foreground">Utilize este painel para direcionar o desenvolvimento e gerenciar o conteúdo da Wiki.</p>
             </header>
 
-            <Tabs defaultValue="wiki-management" className="flex-1 flex flex-col min-h-0">
+            <Tabs defaultValue="wiki-management" className="flex flex-col flex-1 min-h-0">
                 <TabsList className="grid w-full grid-cols-2 max-w-md self-start">
                     <TabsTrigger value="chat">Conversar com a IA</TabsTrigger>
-                    <TabsTrigger value="wiki-management" className="flex items-center gap-2">
-                        <span>Gerenciar Conteúdo</span>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span className="text-muted-foreground" tabIndex={0}><Info className="h-4 w-4" /></span>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-xs text-sm" side="top" align="center">
-                                    <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
-                                    <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
-                                    <ul className="list-disc list-inside space-y-1 text-left">
-                                        <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
-                                        <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
-                                        <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
-                                        <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
-                                    </ul>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                     <TabsTrigger value="wiki-management" asChild>
+                        <div className='flex items-center gap-2 cursor-pointer'>
+                           <span>Gerenciar Conteúdo</span>
+                           <TooltipProvider>
+                               <Tooltip>
+                                   <TooltipTrigger asChild>
+                                        <span className="text-muted-foreground" tabIndex={0}><Info className="h-4 w-4" /></span>
+                                   </TooltipTrigger>
+                                   <TooltipContent className="max-w-xs text-sm" side="top" align="center">
+                                       <h4 className="font-bold mb-2">Como Estruturar Informações</h4>
+                                       <p className="mb-2">Ao adicionar ou atualizar conteúdo, siga estas regras para garantir que a IA consiga entender e usar os dados:</p>
+                                       <ul className="list-disc list-inside space-y-1 text-left">
+                                           <li><strong>IDs Únicos:</strong> Cada item (poder, NPC, artigo) deve ter um `id` único em letras minúsculas e separado por hífen (ex: `grand-elder-power`).</li>
+                                           <li><strong>Tabelas Estruturadas:</strong> Para tabelas de dados (como ranks ou stats), use o formato `tables` com `headers` (uma lista de strings) e `rows` (uma lista de objetos).</li>
+                                           <li><strong>Notação do Jogo:</strong> Use as abreviações de números do jogo (k, M, B, T, qd, etc.) para valores de energia, HP e EXP.</li>
+                                           <li><strong>Consistência é Chave:</strong> Mantenha os nomes das propriedades (`statType`, `rarity`, `multiplier`) consistentes com os dados já existentes.</li>
+                                       </ul>
+                                   </TooltipContent>
+                               </Tooltip>
+                           </TooltipProvider>
+                        </div>
                     </TabsTrigger>
                 </TabsList>
                 
