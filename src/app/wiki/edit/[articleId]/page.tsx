@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useFirestore, useDoc, useMemoFirebase, useUser } from '@/firebase';
+import { useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useAdmin } from '@/hooks/use-admin';
@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Save, ShieldAlert } from 'lucide-react';
 import type { WikiArticle } from '@/lib/types';
 import { nanoid } from 'nanoid';
+import { useApp } from '@/context/app-provider';
 
 // Schema for the form validation
 const articleSchema = z.object({
@@ -36,21 +37,19 @@ export default function EditArticlePage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
+  const { wikiArticles, isWikiLoading } = useApp();
   const [isSaving, setIsSaving] = useState(false);
 
   const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
   const isNewArticle = articleIdParam === 'new';
   const [articleId, setArticleId] = useState(isNewArticle ? nanoid() : articleIdParam);
-
+  
+  const [article, setArticle] = useState<WikiArticle | null | undefined>(null);
 
   const articleRef = useMemoFirebase(() => {
     if (!firestore || !articleId) return null;
     return doc(firestore, 'wikiContent', articleId);
   }, [firestore, articleId]);
-
-  const { data: article, isLoading: isArticleLoading } = useDoc<WikiArticle>(articleRef, {
-      skip: isNewArticle
-  } as any);
 
   const form = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
@@ -65,7 +64,14 @@ export default function EditArticlePage() {
   });
 
   useEffect(() => {
-    if (article && !isNewArticle) {
+    if (!isWikiLoading && !isNewArticle) {
+      const foundArticle = wikiArticles.find(a => a.id === articleId);
+      setArticle(foundArticle);
+    }
+  }, [isWikiLoading, wikiArticles, articleId, isNewArticle]);
+
+  useEffect(() => {
+    if (article) {
       form.reset({
         title: article.title,
         summary: article.summary,
@@ -75,7 +81,7 @@ export default function EditArticlePage() {
         tables: article.tables ? JSON.stringify(article.tables, null, 2) : '',
       });
     }
-  }, [article, isNewArticle, form]);
+  }, [article, form]);
 
   const onSubmit = async (values: ArticleFormData) => {
     if (!articleRef) {
@@ -95,7 +101,7 @@ export default function EditArticlePage() {
             }
         }
 
-      const updatedArticleData: Omit<WikiArticle, 'createdAt'> & { createdAt?: any } = {
+      const updatedArticleData: Omit<WikiArticle, 'createdAt'> & { createdAt?: any, updatedAt?: any } = {
         id: articleId,
         title: values.title,
         summary: values.summary,
@@ -107,6 +113,8 @@ export default function EditArticlePage() {
 
       if (isNewArticle) {
         updatedArticleData.createdAt = serverTimestamp();
+      } else {
+        updatedArticleData.updatedAt = serverTimestamp();
       }
 
       await setDoc(articleRef, updatedArticleData, { merge: !isNewArticle });
@@ -120,7 +128,7 @@ export default function EditArticlePage() {
     }
   };
 
-  const isLoading = isAdminLoading || (isArticleLoading && !isNewArticle);
+  const isLoading = isAdminLoading || isWikiLoading;
 
   if (isLoading) {
     return (
@@ -144,7 +152,7 @@ export default function EditArticlePage() {
     <div className="max-w-4xl mx-auto">
       <Card>
         <CardHeader>
-          <CardTitle>{isNewArticle ? 'Criar Novo Artigo' : `Editando: ${article?.title}`}</CardTitle>
+          <CardTitle>{isNewArticle ? 'Criar Novo Artigo' : `Editando: ${article?.title || articleId}`}</CardTitle>
           <CardDescription>Faça as alterações abaixo e clique em salvar.</CardDescription>
         </CardHeader>
         <CardContent>
