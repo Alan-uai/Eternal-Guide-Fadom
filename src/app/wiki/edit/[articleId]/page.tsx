@@ -15,13 +15,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, ShieldAlert, Sparkles, Upload, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Save, ShieldAlert, Sparkles, Upload, Image as ImageIcon, Text } from 'lucide-react';
 import type { WikiArticle } from '@/lib/types';
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
 import { generateTags } from '@/ai/flows/generate-tags-flow';
 import { summarizeWikiContent } from '@/ai/flows/summarize-wiki-content';
 import { extractTextFromFile } from '@/ai/flows/extract-text-from-file-flow';
+import { formatTextToJson } from '@/ai/flows/format-text-to-json-flow';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -48,6 +49,7 @@ export default function EditArticlePage() {
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isFormatting, setIsFormatting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
@@ -223,6 +225,29 @@ export default function EditArticlePage() {
     } finally {
       setIsUploadingImage(false);
       if(imageInputRef.current) imageInputRef.current.value = '';
+    }
+  };
+
+  const handleFormatText = async () => {
+    const rawText = form.getValues('tables');
+    if (!rawText) {
+      toast({ variant: 'destructive', title: 'Campo Vazio', description: 'Por favor, insira o texto a ser formatado no campo de tabelas.' });
+      return;
+    }
+    setIsFormatting(true);
+    try {
+      const result = await formatTextToJson({ rawText });
+      if (result.jsonString && result.jsonString !== '[]') {
+        form.setValue('tables', result.jsonString);
+        toast({ title: 'Texto Formatado!', description: 'O texto foi convertido para JSON com sucesso.' });
+      } else {
+        throw new Error('A IA não conseguiu formatar o texto.');
+      }
+    } catch (error) {
+      console.error('Erro ao formatar texto:', error);
+      toast({ variant: 'destructive', title: 'Erro na Formatação', description: 'Não foi possível formatar o texto para JSON.' });
+    } finally {
+      setIsFormatting(false);
     }
   };
 
@@ -430,28 +455,40 @@ export default function EditArticlePage() {
                   <FormItem>
                      <div className="flex items-center justify-between">
                         <FormLabel>Tabelas (JSON)</FormLabel>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            disabled={isExtracting}
-                            onClick={() => {
-                                const handler = (e: Event) => {
-                                    handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>, 'json');
-                                    fileInputRef.current?.removeEventListener('change', handler);
-                                };
-                                fileInputRef.current?.addEventListener('change', handler);
-                                fileInputRef.current?.click();
-                            }}
-                        >
-                            {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                            Extrair de Arquivo
-                        </Button>
+                        <div className='flex gap-2'>
+                          <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              disabled={isFormatting}
+                              onClick={handleFormatText}
+                          >
+                              {isFormatting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Text className="mr-2 h-4 w-4" />}
+                              Formatar Texto
+                          </Button>
+                          <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              disabled={isExtracting}
+                              onClick={() => {
+                                  const handler = (e: Event) => {
+                                      handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>, 'json');
+                                      fileInputRef.current?.removeEventListener('change', handler);
+                                  };
+                                  fileInputRef.current?.addEventListener('change', handler);
+                                  fileInputRef.current?.click();
+                              }}
+                          >
+                              {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                              Extrair de Arquivo
+                          </Button>
+                        </div>
                      </div>
                     <FormControl>
                       <Textarea {...field} className="min-h-[250px] font-mono text-xs" />
                     </FormControl>
-                     <p className="text-xs text-muted-foreground">Edite o JSON bruto das tabelas. Cuidado com a sintaxe.</p>
+                     <p className="text-xs text-muted-foreground">Cole o texto bruto e clique em "Formatar Texto", ou extraia de um arquivo. Edite o JSON com cuidado.</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -476,7 +513,7 @@ export default function EditArticlePage() {
                 )}
               />
 
-              <Button type="submit" disabled={isSaving || isExtracting || isUploadingImage}>
+              <Button type="submit" disabled={isSaving || isExtracting || isUploadingImage || isFormatting}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Salvar Alterações
               </Button>
