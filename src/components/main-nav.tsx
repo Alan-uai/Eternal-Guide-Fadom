@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, Calculator, HeartPulse } from 'lucide-react';
+import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, Calculator, HeartPulse, Database } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import {
   SidebarMenu,
@@ -21,7 +21,8 @@ const navItems = [
 
 const adminNavItems = [
     { href: '/suggestions', icon: ClipboardList, label: 'Ver Sugestões', tooltip: 'Ver Sugestões de Conteúdo' },
-    { href: '/admin-chat', icon: BrainCircuit, label: 'Canal com IA', tooltip: 'Gerenciar Wiki e interagir com a IA' },
+    { href: '/admin/manage-content', icon: Database, label: 'Gerenciar Conteúdo', tooltip: 'Gerenciar dados da Wiki e do Jogo' },
+    { href: '/admin-chat', icon: BrainCircuit, label: 'Canal com IA', tooltip: 'Interagir com a IA para desenvolvimento' },
 ];
 
 export function MainNav() {
