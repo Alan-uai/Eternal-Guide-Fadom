@@ -4,12 +4,14 @@ import { useParams, useRouter, redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAdmin } from '@/hooks/use-admin';
-import { Loader2, ShieldAlert, ChevronRight, Files, PlusCircle, Pencil, Trash2 } from 'lucide-react';
-import { useFirestore, useDoc, useCollection, useMemoFirebase } from '@/firebase';
-import { doc, collection, deleteDoc } from 'firebase/firestore';
+import { Loader2, ShieldAlert, ChevronRight, Files, PlusCircle, Pencil, Trash2, Save } from 'lucide-react';
+import { useFirestore, useDoc, useCollection, useMemoFirebase, useFirebase } from '@/firebase';
+import { doc, collection, deleteDoc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import EditArticlePage from '@/app/wiki/edit/[articleId]/page';
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +35,73 @@ const worldSubCollections = [
   'stands',
 ];
 
+function NewWorldForm() {
+    const router = useRouter();
+    const { firestore } = useFirebase();
+    const { toast } = useToast();
+    const [worldName, setWorldName] = useState('');
+    const [isCreating, setIsCreating] = useState(false);
+
+    const handleCreateWorld = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!worldName.trim() || !firestore) return;
+
+        setIsCreating(true);
+        const worldId = worldName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        
+        if (!worldId) {
+            toast({ variant: 'destructive', title: 'Nome Inválido', description: 'Por favor, insira um nome de mundo válido.' });
+            setIsCreating(false);
+            return;
+        }
+
+        const worldRef = doc(firestore, 'worlds', worldId);
+
+        try {
+            await setDoc(worldRef, { name: worldName });
+            toast({ title: 'Mundo Criado!', description: `O mundo "${worldName}" foi criado com sucesso.` });
+            router.push(`/admin/edit-collection/worlds/${worldId}`);
+        } catch (error: any) {
+            console.error("Erro ao criar mundo:", error);
+            toast({ variant: 'destructive', title: "Erro ao Criar", description: error.message });
+            setIsCreating(false);
+        }
+    };
+
+    return (
+        <div className="max-w-xl mx-auto">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Criar Novo Mundo</CardTitle>
+                    <CardDescription>
+                        Este é o primeiro passo. Dê um nome ao seu novo mundo. Após a criação, você será redirecionado para adicionar coleções como poderes, NPCs e mais.
+                    </CardDescription>
+                </CardHeader>
+                <form onSubmit={handleCreateWorld}>
+                    <CardContent>
+                        <div className="space-y-2">
+                            <Label htmlFor="world-name">Nome do Mundo</Label>
+                            <Input
+                                id="world-name"
+                                value={worldName}
+                                onChange={(e) => setWorldName(e.target.value)}
+                                placeholder="ex: Ilha da Sombra"
+                                required
+                            />
+                        </div>
+                    </CardContent>
+                    <CardFooter>
+                        <Button type="submit" disabled={isCreating}>
+                            {isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                            Criar e Continuar
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Card>
+        </div>
+    );
+}
+
 export default function EditCollectionPage() {
   const params = useParams();
   const router = useRouter();
@@ -43,7 +112,6 @@ export default function EditCollectionPage() {
   const pathSegments = Array.isArray(params.path) ? params.path : [params.path];
   const isNew = pathSegments.at(-1) === 'new';
   
-  // Create collectionPath but remove '/new' if it exists for querying
   const queryPath = isNew ? pathSegments.slice(0, -1) : pathSegments;
   const collectionPath = queryPath.join('/');
   
@@ -52,6 +120,11 @@ export default function EditCollectionPage() {
 
   const isWorldContext = queryPath[0] === 'worlds';
   const worldId = isWorldContext && queryPath.length > 1 ? queryPath[1] : null;
+  
+  // Special view for creating a new world
+  if (isNew && queryPath.length === 1 && queryPath[0] === 'worlds') {
+    return <NewWorldForm />;
+  }
 
   const worldRef = useMemoFirebase(() => {
     if (!firestore || !worldId) return null;
@@ -78,11 +151,6 @@ export default function EditCollectionPage() {
   };
 
   const isLoading = isAdminLoading || isWorldLoading || isSubCollectionLoading;
-
-  // Handle 'new' world creation by redirecting
-  if (isNew && queryPath[0] === 'worlds' && queryPath.length === 1) {
-    redirect(`/wiki/edit/new?collectionPath=worlds`);
-  }
 
   if (isLoading) {
     return (
