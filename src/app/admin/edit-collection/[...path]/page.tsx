@@ -9,6 +9,7 @@ import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import EditArticlePage from '@/app/wiki/edit/[articleId]/page';
 
 // Define the potential sub-collections a world might have
 const worldSubCollections = [
@@ -29,7 +30,7 @@ export default function EditCollectionPage() {
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
 
   const pathSegments = Array.isArray(params.path) ? params.path : [params.path];
-  const isNew = pathSegments.includes('new');
+  const isNew = pathSegments.at(-1) === 'new';
   const collectionPath = pathSegments.join('/');
 
   // Check if we are editing a world (e.g., /worlds/world-1) or creating a new one
@@ -97,27 +98,9 @@ export default function EditCollectionPage() {
     );
   }
   
-  // If creating a new world
+  // If creating a new world, reuse the article editor logic
   if (isNew && pathSegments[0] === 'worlds') {
-     return (
-        <div className="max-w-4xl mx-auto">
-        <Card>
-            <CardHeader>
-            <CardTitle>Criar Novo Mundo</CardTitle>
-            <CardDescription>
-                Interface para criar um novo mundo e suas sub-coleções.
-            </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground border-2 border-dashed rounded-lg p-12">
-                    <Construction className="h-16 w-16 mb-4" />
-                    <h2 className="text-2xl font-semibold">Em Construção</h2>
-                    <p className="mt-2">A criação de novos mundos estará disponível em breve.</p>
-                </div>
-            </CardContent>
-        </Card>
-        </div>
-    );
+     return <EditArticlePage />;
   }
 
   // Placeholder for deeper collection paths (e.g., /worlds/world-1/powers)
