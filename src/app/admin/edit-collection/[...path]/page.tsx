@@ -1,10 +1,10 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAdmin } from '@/hooks/use-admin';
-import { Loader2, ShieldAlert, ChevronRight, Files, PlusCircle, Pencil, Eye, Trash2 } from 'lucide-react';
+import { Loader2, ShieldAlert, ChevronRight, Files, PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from '@/firebase';
 import { doc, collection, deleteDoc } from 'firebase/firestore';
 import Link from 'next/link';
@@ -42,15 +42,16 @@ export default function EditCollectionPage() {
 
   const pathSegments = Array.isArray(params.path) ? params.path : [params.path];
   const isNew = pathSegments.at(-1) === 'new';
-  const collectionPath = pathSegments.join('/');
   
-  // Is this a sub-collection view like /worlds/world-1/powers?
-  const isSubCollection = pathSegments.length > 2;
-  const subCollectionName = isSubCollection ? pathSegments[2] : null;
+  // Create collectionPath but remove '/new' if it exists for querying
+  const queryPath = isNew ? pathSegments.slice(0, -1) : pathSegments;
+  const collectionPath = queryPath.join('/');
+  
+  const isSubCollection = queryPath.length > 2;
+  const subCollectionName = isSubCollection ? queryPath[2] : null;
 
-  // Check if we are editing a world (e.g., /worlds/world-1)
-  const isWorldContext = pathSegments[0] === 'worlds';
-  const worldId = isWorldContext && !isNew ? pathSegments[1] : null;
+  const isWorldContext = queryPath[0] === 'worlds';
+  const worldId = isWorldContext && queryPath.length > 1 ? queryPath[1] : null;
 
   const worldRef = useMemoFirebase(() => {
     if (!firestore || !worldId) return null;
@@ -77,6 +78,11 @@ export default function EditCollectionPage() {
   };
 
   const isLoading = isAdminLoading || isWorldLoading || isSubCollectionLoading;
+
+  // Handle 'new' world creation by redirecting
+  if (isNew && queryPath[0] === 'worlds' && queryPath.length === 1) {
+    redirect(`/wiki/edit/new?collectionPath=worlds`);
+  }
 
   if (isLoading) {
     return (
@@ -130,10 +136,6 @@ export default function EditCollectionPage() {
         </Card>
       </div>
     );
-  }
-  
-  if (isNew && pathSegments.length <= 2) {
-     return <EditArticlePage />;
   }
   
   // If we are in a sub-collection view, list the items
