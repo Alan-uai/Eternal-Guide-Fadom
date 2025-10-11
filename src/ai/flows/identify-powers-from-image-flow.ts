@@ -69,10 +69,10 @@ Regras Estritas:
         *   Cinza: Common
         *   Verde: Uncommon
         *   Azul: Rare
-        *   Roxo/Magenta (cor sólida, sem brilho intenso): Epic
+        *   Magenta (um roxo mais claro, rosado): Epic
         *   Amarelo/Dourado: Legendary
         *   Vermelho: Mythic
-        *   Rosa Forte/Fúcsia (com um brilho visível e vibrante): Phantom
+        *   Roxo (um roxo escuro e sólido): Phantom
         *   Laranja/Arco-íris (borda com gradiente de várias cores): Supreme
     *   Se a cor não for clara, use o nome do poder (ex: "Super Saiyan 3" é Supreme) e o conhecimento abaixo para determinar a raridade correta.
 4.  **Determine o Mundo:** Usando o "CONHECIMENTO DE PODERES" abaixo, encontre a qual mundo cada poder pertence. Se um poder não estiver na lista de conhecimento, marque o mundo como "Desconhecido".
