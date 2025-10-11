@@ -364,25 +364,27 @@ export function WikiManagementView() {
                   return (
                     <Collapsible key={world.id} className="space-y-2">
                       <div className="flex gap-2">
-                        <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="icon">
-                                            <Database className="h-5 w-5" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Gerenciar {world.name}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </Link>
-                        <CollapsibleTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start">
-                            {world.name}
-                          </Button>
-                        </CollapsibleTrigger>
+                        <div className="flex w-full">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref>
+                                  <Button variant="outline" size="icon" className="rounded-r-none border-r-0">
+                                    <Database className="h-5 w-5" />
+                                  </Button>
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Gerenciar {world.name}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <CollapsibleTrigger asChild>
+                            <Button variant="outline" className="w-full justify-start rounded-l-none">
+                              {world.name}
+                            </Button>
+                          </CollapsibleTrigger>
+                        </div>
                         {seedInfo && (
                           <TooltipProvider>
                             <Tooltip>
