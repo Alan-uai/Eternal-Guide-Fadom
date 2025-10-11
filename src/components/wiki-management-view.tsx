@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { doc, writeBatch, collection, updateDoc } from 'firebase/firestore';
-import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2 } from 'lucide-react';
+import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
@@ -423,7 +423,7 @@ export function WikiManagementView() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="outline" size="icon" className="rounded-r-none pl-3 pr-1" onClick={() => handleOpenEditDialog(world)}>
+                              <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pl-2 pr-1" onClick={() => handleOpenEditDialog(world)}>
                                 <Database className="h-5 w-5" />
                               </Button>
                             </TooltipTrigger>
@@ -490,37 +490,33 @@ export function WikiManagementView() {
         </DialogContent>
       </Dialog>
       <Dialog open={!!editingWorld} onOpenChange={(isOpen) => !isOpen && handleCloseEditDialog()}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
             <DialogHeader>
             <DialogTitle>Editar Nome do Mundo</DialogTitle>
             <DialogDescription>
                 Altere o nome de "{editingWorld?.name}" e clique em salvar.
             </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="world-name" className="text-right">
+            <div className="flex items-center space-x-2 py-4">
+                <div className="grid flex-1 gap-2">
+                    <Label htmlFor="world-name" className="sr-only">
                     Nome
                     </Label>
                     <Input
                     id="world-name"
                     value={newWorldName}
                     onChange={(e) => setNewWorldName(e.target.value)}
-                    className="col-span-3"
                     />
                 </div>
-            </div>
-            <DialogFooter>
-                <DialogClose asChild>
-                    <Button type="button" variant="secondary">
-                        Cancelar
-                    </Button>
-                </DialogClose>
-                <Button onClick={handleUpdateWorldName} disabled={isUpdatingName}>
-                    {isUpdatingName && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Salvar
+                <Button type="submit" size="icon" className="px-3" disabled={isUpdatingName} onClick={handleUpdateWorldName}>
+                    {isUpdatingName ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <Check className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">Salvar</span>
                 </Button>
-            </DialogFooter>
+            </div>
         </DialogContent>
     </Dialog>
 
