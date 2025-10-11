@@ -491,6 +491,7 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                                 </CollapsibleTrigger>
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
+                                    {/* #devem ficar sempre visíveis em mobile (nunca hover). */}
                                     <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity data-[state=open]:opacity-100">
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
