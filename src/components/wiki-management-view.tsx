@@ -341,7 +341,7 @@ export function WikiManagementView() {
                     <div key={article.id} className="flex gap-2">
                     <Link href={`/wiki/edit/${article.id}`} passHref className='w-full'>
                       <Button variant="outline" className="w-full justify-start">
-                        <Database className="mr-2 h-4 w-4" />
+                        <Pencil className="mr-2 h-4 w-4" />
                         {article.title}
                       </Button>
                     </Link>
@@ -423,12 +423,12 @@ export function WikiManagementView() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                               <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pr-1 pl-2" onClick={() => handleOpenEditDialog(world)}>
-                                <Database className="h-5 w-5" />
+                               <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pl-3 pr-2" onClick={() => seedInfo && seedWorldGeneric(world.id, seedInfo.data, seedInfo.key)} disabled={loadingStates[seedInfo?.key] || !firestore}>
+                                {loadingStates[seedInfo?.key] ? <Loader2 className="h-5 w-5 animate-spin" /> : <Database className="h-5 w-5" />}
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Editar nome de {world.name}</p>
+                              <p>Popular dados para {world.name}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -441,7 +441,7 @@ export function WikiManagementView() {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id, `/wiki/edit/${world.id}?collectionPath=worlds`)}>
+                                <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id)}>
                                   <Eye className="h-5 w-5" />
                                 </Button>
                               </TooltipTrigger>
@@ -465,10 +465,35 @@ export function WikiManagementView() {
       <Dialog open={!!viewingContent} onOpenChange={(isOpen) => !isOpen && setViewingContent(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{viewingContent?.title}</DialogTitle>
-            <DialogDescription>
-              Visualizando os dados JSON. Para artigos, estes são os dados do Firestore. Para mundos e acessórios, estes são os dados estáticos usados para popular.
-            </DialogDescription>
+            <div className="flex items-center justify-between">
+                <div>
+                    <DialogTitle>{viewingContent?.title}</DialogTitle>
+                    <DialogDescription>
+                    Visualizando os dados JSON.
+                    </DialogDescription>
+                </div>
+                {viewingContent?.id && (
+                    <TooltipProvider>
+                        <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                                handleOpenEditDialog({ id: viewingContent!.id!, name: viewingContent!.title });
+                                setViewingContent(null);
+                            }}
+                            >
+                            <Pencil className="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Renomear {viewingContent.title}</p>
+                        </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
+            </div>
           </DialogHeader>
           <ScrollArea className="h-[70vh] mt-4">
             <pre className="bg-muted p-4 rounded-md text-xs whitespace-pre-wrap">
