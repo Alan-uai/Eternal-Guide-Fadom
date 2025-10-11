@@ -20,11 +20,14 @@ const allWorldsData = [world1Data, world2Data, world3Data, world4Data, world20Da
 
 // Gera um contexto de string com todos os poderes conhecidos para a IA.
 const powerKnowledgeContext = allWorldsData.map(world => 
-    `Mundo: ${world.name}\nPoderes:\n${world.powers.map(power => 
-        `- Nome: ${power.name}\n  Status:\n${power.stats.map(stat => 
-            `  - ${stat.name} (Raridade: ${stat.rarity})`
-        ).join('\n')}`
-    ).join('\n')}`
+    `Mundo: ${world.name}\nPoderes:\n${world.powers.map(power => {
+        const statsString = (power.stats && Array.isArray(power.stats))
+            ? `\n  Status:\n${power.stats.map(stat => 
+                `  - ${stat.name} (Raridade: ${stat.rarity})`
+              ).join('\n')}`
+            : '';
+        return `- Nome: ${power.name}${statsString}`;
+    }).join('\n')}`
 ).join('\n\n');
 
 const IdentifiedPowerSchema = z.object({
