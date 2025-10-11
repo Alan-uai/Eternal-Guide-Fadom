@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { doc, writeBatch, collection } from 'firebase/firestore';
+import { doc, writeBatch, collection, updateDoc } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -18,6 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogClose,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -53,7 +55,7 @@ import { world11Data } from '@/lib/world-11-data';
 import { world12Data } from '@/lib/world-12-data';
 import { world13Data } from '@/lib/world-13-data';
 import { world14Data } from '@/lib/world-14-data';
-import { world15Data } from '@/lib/world-15-data';
+import { world15Data } from '@/lib//world-15-data';
 import { world16Data } from '@/lib/world-16-data';
 import { world17Data } from '@/lib/world-17-data';
 import { world18Data } from '@/lib/world-18-data';
@@ -64,12 +66,19 @@ import { world22Data } from '@/lib/world-22-data';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { WorldSubcollections } from '@/components/world-subcollections';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 export function WikiManagementView() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, editPath?: string } | null>(null);
+
+  const [editingWorld, setEditingWorld] = useState<{ id: string, name: string } | null>(null);
+  const [newWorldName, setNewWorldName] = useState('');
+  const [isUpdatingName, setIsUpdatingName] = useState(false);
+
 
   const worldsCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'worlds') : null, [firestore]);
   const { data: worlds, isLoading: areWorldsLoading } = useCollection(worldsCollectionRef as any);
@@ -92,6 +101,41 @@ export function WikiManagementView() {
 
   const handleViewContent = (title: string, data: any, id?: string, editPath?: string) => {
     setViewingContent({ title, data, id, editPath });
+  };
+
+  const handleOpenEditDialog = (world: { id: string, name: string }) => {
+    setEditingWorld(world);
+    setNewWorldName(world.name);
+  };
+  
+  const handleCloseEditDialog = () => {
+    setEditingWorld(null);
+    setNewWorldName('');
+  };
+  
+  const handleUpdateWorldName = async () => {
+    if (!editingWorld || !newWorldName.trim() || !firestore) return;
+  
+    setIsUpdatingName(true);
+    const worldRef = doc(firestore, 'worlds', editingWorld.id);
+  
+    try {
+      await updateDoc(worldRef, { name: newWorldName });
+      toast({
+        title: 'Sucesso!',
+        description: `O nome do mundo foi atualizado para "${newWorldName}".`
+      });
+      handleCloseEditDialog();
+    } catch (error) {
+      console.error('Erro ao atualizar o nome do mundo:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível atualizar o nome do mundo.'
+      });
+    } finally {
+      setIsUpdatingName(false);
+    }
   };
 
   async function seedWorldGeneric(worldId: string, worldData: any, loadingKey: string) {
@@ -373,18 +417,15 @@ export function WikiManagementView() {
               ) : (
                 sortedWorlds?.map(world => {
                   const seedInfo = worldSeedData[world.id];
-                  const editWorldHref = `/wiki/edit/${world.id}?collectionPath=worlds`;
                   return (
                     <Collapsible key={world.id} className="space-y-2">
                       <div className="flex w-full">
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Link href={editWorldHref} passHref>
-                                <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pl-3 pr-1">
-                                  <Database className="h-5 w-5" />
-                                </Button>
-                              </Link>
+                              <Button variant="outline" size="icon" className="rounded-r-none pl-3 pr-1" onClick={() => handleOpenEditDialog(world)}>
+                                <Database className="h-5 w-5" />
+                              </Button>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>Editar nome de {world.name}</p>
@@ -448,6 +489,41 @@ export function WikiManagementView() {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+      <Dialog open={!!editingWorld} onOpenChange={(isOpen) => !isOpen && handleCloseEditDialog()}>
+        <DialogContent>
+            <DialogHeader>
+            <DialogTitle>Editar Nome do Mundo</DialogTitle>
+            <DialogDescription>
+                Altere o nome de "{editingWorld?.name}" e clique em salvar.
+            </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="world-name" className="text-right">
+                    Nome
+                    </Label>
+                    <Input
+                    id="world-name"
+                    value={newWorldName}
+                    onChange={(e) => setNewWorldName(e.target.value)}
+                    className="col-span-3"
+                    />
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button type="button" variant="secondary">
+                        Cancelar
+                    </Button>
+                </DialogClose>
+                <Button onClick={handleUpdateWorldName} disabled={isUpdatingName}>
+                    {isUpdatingName && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Salvar
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+
     </>
   );
 }
