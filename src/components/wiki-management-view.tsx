@@ -226,7 +226,7 @@ export function WikiManagementView() {
             if (!item.id) continue;
             const itemRef = doc(worldRef, subcollectionName, item.id);
             const { stats, ...itemData } = item;
-            batch.set(itemRef, itemData);
+            batch.set(itemRef, itemData, { merge: true });
             allDataForBatch[itemRef.path] = itemData;
 
             if (stats && stats.length > 0) {
@@ -234,7 +234,7 @@ export function WikiManagementView() {
                     const statId = (stat.id || stat.name || JSON.stringify(stat)).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
                     if (!statId) continue;
                     const statRef = doc(itemRef, 'stats', statId);
-                    batch.set(statRef, stat);
+                    batch.set(statRef, stat, { merge: true });
                     allDataForBatch[statRef.path] = stat;
                 }
             }
@@ -549,18 +549,16 @@ export function WikiManagementView() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                               {/* #a borda a direita deve permanecer removida, nunca reintroduzir. */}
-                               <Button variant="outline" size="icon" className="rounded-r-none pl-3 pr-2 border-r-0" onClick={() => seedInfo && seedWorldGeneric(world.id, seedInfo.data, seedInfo.key)} disabled={loadingStates[seedInfo?.key] || !firestore}>
+                               <Button variant="outline" size="icon" className="rounded-r-none pl-3 pr-2 border-r-0" onClick={() => seedWorldGeneric(world.id, seedInfo.data, seedInfo.key)} disabled={!seedInfo || loadingStates[seedInfo.key] || !firestore}>
                                 {loadingStates[seedInfo?.key] ? <Loader2 className="h-5 w-5 animate-spin" /> : <Database className="h-5 w-5" />}
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Popular dados para {world.name}</p>
+                              <p>{seedInfo ? `Restaurar ${world.name} para o padrão` : "Nenhum dado padrão para restaurar"}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                            {/* #a borda a esquerda deve permanecer removida, nunca reintroduzir. */}
                             <Button variant="outline" className="w-full justify-start rounded-l-none pl-2 border-l-0">
                                 {world.name}
                             </Button>
