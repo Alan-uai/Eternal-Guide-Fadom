@@ -57,23 +57,27 @@ const prompt = ai.definePrompt({
   name: 'identifyPowersPrompt',
   input: { schema: IdentifyPowersInputSchema },
   output: { schema: IdentifyPowersOutputSchema },
-  prompt: `Você é um especialista no jogo Anime Eternal. Sua tarefa é analisar um ou mais screenshots da tela de "Poderes" do jogador e identificar cada poder, sua raridade e de qual mundo ele vem.
+  prompt: `Você é um especialista em análise de imagem para o jogo Anime Eternal. Sua tarefa é analisar um ou mais screenshots da tela de "Poderes" do jogador e identificar cada poder, sua raridade e de qual mundo ele vem.
 
-Use o seguinte "CONHECIMENTO DE PODERES" como sua fonte de verdade para mapear os nomes dos poderes aos seus mundos de origem.
+**MANUAL TÉCNICO DE IDENTIFICAÇÃO DE RARIDADE:**
 
-Regras Estritas para Identificação de Raridade por Cor:
-1.  **Analise a Cor da Borda:** Inspecione a cor predominante e os efeitos da borda de cada poder.
-2.  **Use este Manual de Cores preciso:**
-    *   **Common:** Borda cinza, com textura pontilhada.
-    *   **Uncommon:** Borda verde-limão brilhante.
-    *   **Rare:** Borda ciano/azul-claro brilhante.
-    *   **Epic:** Borda magenta/lilás sólida com um brilho interno mais claro.
-    *   **Legendary:** Borda amarela/dourada sólida com um brilho interno mais claro.
-    *   **Mythic:** Borda vermelha sólida com um brilho interno laranja/claro.
-    *   **Phantom:** Borda roxa escura com um brilho interno fúcsia/magenta vibrante.
-    *   **Supreme:** Borda com gradiente de várias cores (arco-íris), geralmente laranja/rosa/amarelo, com um brilho intenso.
-3.  **Determine o Mundo:** Usando o "CONHECIMENTO DE PODERES" abaixo, encontre a qual mundo cada poder pertence. Se um poder não estiver na lista de conhecimento, marque o mundo como "Desconhecido".
-4.  **Formato de Saída:** Retorne uma lista JSON de objetos, onde cada objeto representa um poder identificado. Não inclua duplicatas na lista final.
+Analise a composição de cores da borda de cada poder. Ignore a posição exata dos brilhos, pois eles giram, mas preste atenção na combinação de cores.
+
+*   **Supreme:** Borda com um gradiente de arco-íris (várias cores como laranja, rosa, amarelo, azul).
+*   **Phantom:** Borda com base roxa escura e um brilho fúcsia/magenta vibrante.
+*   **Mythic:** Borda com base vermelha e um brilho laranja/vermelho claro.
+*   **Legendary:** Borda com base amarela/dourada e um brilho branco/amarelo claro.
+*   **Epic:** Borda com base magenta/lilás e um brilho rosa claro.
+*   **Rare:** Borda com base ciano/azul claro e um brilho azul mais claro.
+*   **Uncommon:** Borda com base verde-limão e um brilho verde mais claro.
+*   **Common:** Borda cinza com uma textura pontilhada.
+
+**PROCESSO:**
+
+1.  Para cada poder na imagem, identifique o nome do poder.
+2.  Analise a borda e compare sua composição de cores com o **MANUAL TÉCNICO** acima para determinar a raridade.
+3.  Use o **CONHECIMENTO DE PODERES** abaixo para encontrar a qual mundo cada poder pertence. Se um poder não estiver na lista de conhecimento, marque o mundo como "Desconhecido".
+4.  Retorne uma lista JSON de objetos, onde cada objeto representa um poder identificado. Não inclua duplicatas na lista final.
 
 ---
 INÍCIO DO CONHECIMENTO DE PODERES
