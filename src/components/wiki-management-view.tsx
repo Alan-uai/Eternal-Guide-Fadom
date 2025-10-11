@@ -459,7 +459,7 @@ export function WikiManagementView() {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Popular dados para {article.title}</p>
+                          <p>Restaurar {article.title} para o padrão</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -549,12 +549,12 @@ export function WikiManagementView() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                               <Button variant="outline" size="icon" className="rounded-r-none pl-3 pr-2 border-r-0" onClick={() => seedWorldGeneric(world.id, seedInfo.data, seedInfo.key)} disabled={!seedInfo || loadingStates[seedInfo.key] || !firestore}>
-                                {loadingStates[seedInfo?.key] ? <Loader2 className="h-5 w-5 animate-spin" /> : <Database className="h-5 w-5" />}
+                               <Button variant="outline" size="icon" className="rounded-r-none pl-3 pr-2 border-r-0" onClick={() => handleOpenEditDialog(world)}>
+                                <Database className="h-5 w-5" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>{seedInfo ? `Restaurar ${world.name} para o padrão` : "Nenhum dado padrão para restaurar"}</p>
+                              <p>Renomear {world.name}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
