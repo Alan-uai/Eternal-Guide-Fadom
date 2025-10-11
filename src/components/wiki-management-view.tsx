@@ -379,7 +379,7 @@ export function WikiManagementView() {
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start rounded-l-none">
+                          <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0">
                             {world.name}
                           </Button>
                         </CollapsibleTrigger>
