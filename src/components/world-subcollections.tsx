@@ -34,6 +34,8 @@ import { Textarea } from './ui/textarea';
 import backendSchema from '@/../docs/backend.json';
 import { ScrollArea } from './ui/scroll-area';
 import { nanoid } from 'nanoid';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 
 const DEFAULT_SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
@@ -62,11 +64,11 @@ function getEntitySchemaForSubcollection(subcollectionName: string) {
 function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, itemRef: any, subcollectionName: string }) {
     const { toast } = useToast();
     const [localData, setLocalData] = useState(item);
-    const [isAddingField, setIsAddingField] = useState(false);
+    
+    const [isCustomFieldOpen, setIsCustomFieldOpen] = useState(false);
     const [newFieldKey, setNewFieldKey] = useState('');
     const [newFieldValue, setNewFieldValue] = useState('');
-    const [fieldToAdd, setFieldToAdd] = useState<string | null>(null);
-
+    
     const entitySchema = useMemo(() => getEntitySchemaForSubcollection(subcollectionName), [subcollectionName]);
     
     const suggestedFields = useMemo(() => {
@@ -74,6 +76,11 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
         const existingKeys = Object.keys(localData);
         return Object.keys(entitySchema.properties).filter(propKey => !existingKeys.includes(propKey));
     }, [entitySchema, localData]);
+
+    // Update local state if the external item data changes
+    useState(() => {
+      setLocalData(item);
+    });
 
     const handleFieldChange = (key: string, value: any) => {
         if (key.includes('.')) {
@@ -91,20 +98,8 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
             setLocalData({ ...localData, [key]: value });
         }
     };
-
-    const handleSaveField = async (key: string) => {
-        let valueToSave;
-        if (key.includes('.')) {
-            const keys = key.split('.');
-            let current = localData;
-            for (const k of keys) {
-                current = current[k];
-            }
-            valueToSave = current;
-        } else {
-            valueToSave = localData[key];
-        }
-       
+    
+    const handleSaveField = async (key: string, valueToSave: any) => {
         try {
             await updateDoc(itemRef, { [key]: valueToSave });
             toast({
@@ -114,39 +109,62 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
         } catch (error: any) {
             console.error("Erro ao atualizar campo:", error);
             toast({ variant: 'destructive', title: "Erro ao Salvar", description: error.message });
-            setLocalData(item);
+            setLocalData(item); // Revert on error
         }
     };
-    
-    const handleAddNewField = async () => {
-        const keyToAdd = fieldToAdd || newFieldKey;
+
+    const handleAddNewField = async (keyToAdd: string, defaultValue: any = '') => {
         if (!keyToAdd.trim()) {
             toast({ variant: 'destructive', title: 'Erro', description: 'O nome do campo não pode ser vazio.' });
             return;
         }
         try {
-            await updateDoc(itemRef, { [keyToAdd]: newFieldValue });
+            await updateDoc(itemRef, { [keyToAdd]: defaultValue });
             toast({ title: 'Campo Adicionado!', description: `O campo "${keyToAdd}" foi adicionado.` });
-            setLocalData({ ...localData, [keyToAdd]: newFieldValue });
+            setLocalData({ ...localData, [keyToAdd]: defaultValue });
+            
+            // Close popover if it was used for custom field
+            setIsCustomFieldOpen(false);
             setNewFieldKey('');
             setNewFieldValue('');
-            setIsAddingField(false);
-            setFieldToAdd(null);
+
         } catch (error: any) {
              console.error("Erro ao adicionar campo:", error);
             toast({ variant: 'destructive', title: "Erro ao Adicionar", description: error.message });
         }
     };
 
-    const handleOpenAddFieldDialog = (fieldName: string | null = null) => {
-        setFieldToAdd(fieldName);
-        setNewFieldKey(fieldName || '');
-        setIsAddingField(true);
-    };
 
     const renderField = (key: string, value: any, prefix = '') => {
         const fullKey = prefix ? `${prefix}.${key}` : key;
-        
+        const propertySchema = entitySchema?.properties?.[key];
+
+        // Case 1: Field has an 'enum' in its schema (render as Select)
+        if (propertySchema?.enum) {
+            return (
+                 <div key={fullKey} className="space-y-2">
+                    <Label htmlFor={fullKey} className="capitalize">{key}</Label>
+                    <Select
+                        value={value}
+                        onValueChange={(newValue) => {
+                            handleFieldChange(fullKey, newValue);
+                            handleSaveField(fullKey, newValue);
+                        }}
+                    >
+                        <SelectTrigger id={fullKey}>
+                            <SelectValue placeholder={`Selecione um(a) ${key}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {propertySchema.enum.map((option: string) => (
+                                <SelectItem key={option} value={option}>{option}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                 </div>
+            )
+        }
+
+        // Case 2: Field is a nested object (render recursively)
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
              return (
                 <div key={fullKey} className="space-y-2 p-2 border rounded-md bg-background/50">
@@ -158,6 +176,7 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
              )
         }
         
+        // Case 3: Field is an array (render as JSON in Textarea)
         if (typeof value === 'object' && value !== null && Array.isArray(value)) {
             const jsonString = JSON.stringify(value, null, 2);
              return (
@@ -175,14 +194,14 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
                                // Silently ignore invalid JSON during typing
                             }
                         }}
-                        onBlur={() => handleSaveField(fullKey)}
+                        onBlur={() => handleSaveField(fullKey, value)}
                     />
                 </div>
             )
         }
-
+        
+        // Case 4: Default case (render as Input or Textarea for long strings)
         const isLongText = typeof value === 'string' && value.length > 70;
-
         return (
             <div key={fullKey} className="space-y-2">
                 <Label htmlFor={fullKey} className="capitalize">{key}</Label>
@@ -191,7 +210,7 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
                         id={fullKey}
                         value={value}
                         onChange={(e) => handleFieldChange(fullKey, e.target.value)}
-                        onBlur={() => handleSaveField(fullKey)}
+                        onBlur={(e) => handleSaveField(fullKey, e.target.value)}
                     />
                 ) : (
                     <Input
@@ -199,7 +218,7 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
                         type={typeof value === 'number' ? 'number' : 'text'}
                         value={value}
                         onChange={(e) => handleFieldChange(fullKey, e.target.value)}
-                        onBlur={() => handleSaveField(fullKey)}
+                        onBlur={(e) => handleSaveField(fullKey, e.target.value)}
                     />
                 )}
             </div>
@@ -209,60 +228,61 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
     return (
         <div className="p-3 bg-muted/50 rounded-md border space-y-4">
              {Object.entries(localData).filter(([key]) => key !== 'id').map(([key, value]) => renderField(key, value))}
-            <Button variant="ghost" className="w-full justify-center text-xs text-muted-foreground" onClick={() => handleOpenAddFieldDialog()}>
-                <PlusCircle className="mr-2 h-4 w-4"/> Adicionar Campo
-            </Button>
-            <Dialog open={isAddingField} onOpenChange={setIsAddingField}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Adicionar Novo Campo</DialogTitle>
-                         <DialogDescription>
-                            {suggestedFields.length > 0 ? "Escolha uma sugestão ou adicione um campo personalizado." : "Insira o nome e o valor para o novo campo."}
-                        </DialogDescription>
-                    </DialogHeader>
+             
+             {suggestedFields.length > 0 && (
+                <div className='pt-4 border-t border-dashed'>
+                    <p className="text-xs text-muted-foreground mb-2">Sugestões de Campos:</p>
+                    <div className="flex flex-wrap gap-2">
+                        {suggestedFields.map(field => (
+                             <Button key={field} variant="outline" size="sm" onClick={() => handleAddNewField(field)}>
+                                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar {field}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+             )}
 
-                     {suggestedFields.length > 0 && (
-                        <div className='py-2'>
-                            <Label className="text-sm font-medium">Sugestões de Campos</Label>
-                            <ScrollArea className="h-24 mt-2">
-                                <div className="space-y-2 pr-4">
-                                {suggestedFields.map(field => (
-                                    <Button key={field} variant="outline" size="sm" className="w-full justify-start" onClick={() => handleOpenAddFieldDialog(field)}>
-                                        + {field}
-                                    </Button>
-                                ))}
-                                </div>
-                            </ScrollArea>
-                        </div>
-                    )}
-
-                    <div className="space-y-4 pt-2">
+             <Popover open={isCustomFieldOpen} onOpenChange={setIsCustomFieldOpen}>
+                <PopoverTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-center text-xs text-muted-foreground" onClick={() => setIsCustomFieldOpen(true)}>
+                        <PlusCircle className="mr-2 h-4 w-4"/> Adicionar Campo Personalizado
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                    <div className="grid gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="new-field-key">Nome do Campo (Chave)</Label>
-                            <Input 
-                                id="new-field-key" 
-                                placeholder="ex: chance, cooldown" 
+                            <h4 className="font-medium leading-none">Campo Personalizado</h4>
+                            <p className="text-sm text-muted-foreground">
+                            Adicione um campo que não está nas sugestões.
+                            </p>
+                        </div>
+                        <div className="grid gap-2">
+                            <div className="grid grid-cols-3 items-center gap-4">
+                            <Label htmlFor="width">Chave</Label>
+                            <Input
+                                id="width"
                                 value={newFieldKey}
                                 onChange={(e) => setNewFieldKey(e.target.value)}
-                                disabled={!!fieldToAdd}
+                                className="col-span-2 h-8"
+                                placeholder='ex: cooldown'
                             />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="new-field-value">Valor do Campo</Label>
-                            <Input 
-                                id="new-field-value" 
-                                placeholder="ex: 10, 2.5s, true" 
+                            </div>
+                            <div className="grid grid-cols-3 items-center gap-4">
+                            <Label htmlFor="maxWidth">Valor</Label>
+                            <Input
+                                id="maxWidth"
                                 value={newFieldValue}
                                 onChange={(e) => setNewFieldValue(e.target.value)}
+                                className="col-span-2 h-8"
+                                placeholder='ex: 2s'
                             />
+                            </div>
                         </div>
+                         <Button onClick={() => handleAddNewField(newFieldKey, newFieldValue)}>Salvar Campo</Button>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => { setIsAddingField(false); setFieldToAdd(null); }}>Cancelar</Button>
-                        <Button onClick={handleAddNewField}>Salvar Campo</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </PopoverContent>
+            </Popover>
+
         </div>
     );
 }
@@ -459,7 +479,7 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-4 pt-2 space-y-2">
                 {items.map((item: any) => {
-                    const itemRef = doc(firestore, 'worlds', worldId, subcollectionName, item.id);
+                    const itemRef = doc(firestore!, 'worlds', worldId, subcollectionName, item.id);
                     return (
                         <Collapsible key={item.id}>
                              <div className="flex items-center justify-between group">
