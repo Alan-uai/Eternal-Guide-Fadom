@@ -50,6 +50,8 @@ import { world20Data } from '@/lib/world-20-data';
 import { world21Data } from '@/lib/world-21-data';
 import { world22Data } from '@/lib/world-22-data';
 import Link from 'next/link';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { WorldSubcollections } from '@/components/world-subcollections';
 
 export function WikiManagementView() {
   const firestore = useFirestore();
@@ -360,28 +362,33 @@ export function WikiManagementView() {
                 sortedWorlds?.map(world => {
                   const seedInfo = worldSeedData[world.id];
                   return (
-                    <div key={world.id} className="flex gap-2">
-                      <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref className='w-full'>
-                        <Button variant="outline" className="w-full justify-start">
-                          <Database className="mr-2 h-4 w-4" />
-                          {world.name}
-                        </Button>
-                      </Link>
-                      {seedInfo && (
-                           <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id, `/admin/edit-collection/worlds/${world.id}`)}>
-                                      <Eye className="h-5 w-5" />
-                                  </Button>
-                                </TooltipTrigger>
-                                 <TooltipContent>
-                                  <p>Visualizar dados estáticos</p>
-                                </TooltipContent>
-                              </Tooltip>
-                           </TooltipProvider>
-                      )}
-                    </div>
+                    <Collapsible key={world.id} className="space-y-2">
+                      <div className="flex gap-2">
+                        <CollapsibleTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start">
+                            <Database className="mr-2 h-4 w-4" />
+                            {world.name}
+                          </Button>
+                        </CollapsibleTrigger>
+                        {seedInfo && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id, `/admin/edit-collection/worlds/${world.id}`)}>
+                                  <Eye className="h-5 w-5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Visualizar dados estáticos</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </div>
+                      <CollapsibleContent>
+                        <WorldSubcollections worldId={world.id} />
+                      </CollapsibleContent>
+                    </Collapsible>
                   )
                 })
               )}
