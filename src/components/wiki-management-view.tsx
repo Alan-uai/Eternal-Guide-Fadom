@@ -423,7 +423,7 @@ export function WikiManagementView() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                               <Button variant="outline" size="icon" className="rounded-r-none pr-1 pl-2" onClick={() => handleOpenEditDialog(world)}>
+                               <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pr-1 pl-2" onClick={() => handleOpenEditDialog(world)}>
                                 <Database className="h-5 w-5" />
                               </Button>
                             </TooltipTrigger>
