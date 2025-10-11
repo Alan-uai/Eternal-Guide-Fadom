@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { doc, writeBatch, collection } from 'firebase/firestore';
-import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle } from 'lucide-react';
+import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
@@ -19,6 +19,18 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
@@ -368,7 +380,7 @@ export function WikiManagementView() {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref>
-                                <Button variant="outline" size="icon" className="rounded-r-none border-r-0 px-2">
+                                <Button variant="outline" size="icon" className="rounded-r-none border-r-0 px-1">
                                   <Database className="h-5 w-5" />
                                 </Button>
                               </Link>
@@ -379,7 +391,7 @@ export function WikiManagementView() {
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 px-2">
+                          <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 pl-1">
                             {world.name}
                           </Button>
                         </CollapsibleTrigger>

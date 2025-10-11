@@ -73,7 +73,7 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
 
     if (!items || items.length === 0) {
         return (
-            <Link href={`/wiki/edit/new?collectionPath=worlds/${worldId}/${subcollectionName}`} passHref>
+            <Link href={`/admin/edit-collection/worlds/${worldId}/${subcollectionName}`} passHref>
                 <Button variant="ghost" className="w-full justify-start text-sm capitalize text-muted-foreground">
                     + Adicionar em {subcollectionName}
                 </Button>
@@ -86,9 +86,11 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
     return (
         <Collapsible>
             <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start text-sm capitalize">
-                    - {subcollectionName} ({items.length})
-                </Button>
+                 <Link href={`/admin/edit-collection/${collectionPath}`} passHref>
+                    <Button variant="ghost" className="w-full justify-start text-sm capitalize">
+                        - {subcollectionName} ({items.length})
+                    </Button>
+                </Link>
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-4 pt-2 space-y-1">
                 {items.map((item: any) => (
