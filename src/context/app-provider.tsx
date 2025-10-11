@@ -42,44 +42,21 @@ function AppStateProvider({ children }: { children: ReactNode }) {
 
   // Effect to store the last visited route
   useEffect(() => {
-    // We only store the path if it's not a dynamic editing or creation route
-    // to avoid redirect loops when navigating through the admin panel.
-    const shouldSaveRoute = pathname && 
-                            !pathname.includes('/new') && 
-                            !pathname.includes('/edit-collection');
-
-    if (shouldSaveRoute) {
+    if (pathname) {
       localStorage.setItem(LAST_VISITED_ROUTE_KEY, pathname);
     }
   }, [pathname]);
 
   // Effect to handle initial redirection ONCE
   useEffect(() => {
+    // Wait until we know the user's admin status and the app is ready
     if (!isAdminLoading && isInitialAppLoad) {
       const lastRoute = localStorage.getItem(LAST_VISITED_ROUTE_KEY);
       
-      const adminDefaultRoute = '/admin-chat';
-      const userDefaultRoute = '/';
-      
-      let targetRoute: string | null = null;
-      
-      if (isAdmin) {
-        // Admin should be redirected to their last visited page.
-        // Default to the admin chat if no last route is found.
-        targetRoute = lastRoute || adminDefaultRoute;
-      } else {
-        // Non-admins should be sent to their last non-admin page.
-        // If their last page was an admin one, redirect to the user homepage.
-        if (lastRoute && !lastRoute.startsWith('/admin')) {
-          targetRoute = lastRoute;
-        } else {
-          targetRoute = userDefaultRoute;
-        }
-      }
-
-      // Only redirect if the current page is not already the target destination.
-      if (targetRoute && pathname !== targetRoute) {
-        router.replace(targetRoute);
+      // If a last route exists and we are not already there, go to it.
+      // The page-level guards will handle authorization.
+      if (lastRoute && pathname !== lastRoute) {
+        router.replace(lastRoute);
       }
       
       // Mark initial load as complete to prevent this from running again
