@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFirestore, useCollection, useMemoFirebase, useUser } from '@/firebase';
 import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
-import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles } from 'lucide-react';
+import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -363,11 +364,56 @@ export function WikiManagementView() {
                 Use este botão para popular (ou repopular) todos os artigos da wiki e dados de todos os mundos disponíveis de uma só vez, sincronizando o Firestore com os arquivos base do projeto.
               </CardDescription>
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleSeedAll} disabled={loadingStates.all || !firestore}>
+            <CardFooter className="flex items-center gap-4">
+               <Button onClick={handleSeedAll} disabled={loadingStates.all || !firestore}>
                 {loadingStates.all && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {loadingStates.all ? 'Populando Tudo...' : 'Popular Todos os Dados'}
               </Button>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" size="icon"><HelpCircle className="h-5 w-5"/></Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-xl">
+                        <DialogHeader>
+                        <DialogTitle>Guia de Gerenciamento de Mundos</DialogTitle>
+                        <DialogDescription>
+                            Entenda como os dados dos mundos alimentam a IA.
+                        </DialogDescription>
+                        </DialogHeader>
+                        <div className="text-sm text-muted-foreground space-y-4">
+                            <p>A seção **"Dados de Jogo por Mundo"** é a fonte da verdade para a IA quando se trata de estatísticas precisas.</p>
+                            <ul className="list-disc pl-5 space-y-2">
+                                <li><strong className="text-foreground">O que são os dados?</strong> São os documentos e subcoleções (powers, npcs, pets) no Firestore. A IA usa a ferramenta `getGameData` para buscar esses dados brutos e fazer cálculos exatos.</li>
+                                <li><strong className="text-foreground">Popular Dados (Ícone de <Database className="inline h-4 w-4"/>):</strong> Esta ação lê os arquivos de dados estáticos do projeto (ex: `src/lib/world-1-data.ts`) e os escreve no Firestore. Use isso para (re)sincronizar um mundo com sua fonte de dados original.</li>
+                                <li><strong className="text-foreground">Smart Seeding:</strong> Ao criar um "Novo Mundo", você pode enviar um arquivo. A IA processará esse arquivo para popular o novo mundo automaticamente, poupando o trabalho manual.</li>
+                            </ul>
+                            <p>Manter esses dados estruturados e corretos é crucial para a IA fornecer respostas numéricas precisas.</p>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+                <Dialog>
+                    <DialogTrigger asChild>
+                         <Button variant="outline" size="icon"><HelpCircle className="h-5 w-5"/></Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-xl">
+                        <DialogHeader>
+                        <DialogTitle>Guia de Gerenciamento da Wiki</DialogTitle>
+                        <DialogDescription>
+                            Entenda como os artigos da Wiki e os dados do jogo trabalham juntos.
+                        </DialogDescription>
+                        </DialogHeader>
+                        <div className="text-sm text-muted-foreground space-y-4">
+                             <p>As seções **"Artigos da Wiki"** e **"Dados de Jogo por Mundo"** são separadas, mas complementares.</p>
+                             <h4 className="font-semibold text-foreground">Fluxo de Trabalho Recomendado:</h4>
+                            <ol className="list-decimal pl-5 space-y-2">
+                                <li><strong className="text-foreground">Crie ou Popule um Mundo:</strong> Primeiro, certifique-se de que os dados estruturados de um mundo (ex: Mundo 23) existem no Firestore, seja criando via "Novo Mundo" ou populando um existente.</li>
+                                <li><strong className="text-foreground">Gere o Artigo (Ícone de <Sparkles className="inline h-4 w-4"/>):</strong> Visualize os dados do mundo recém-criado e clique no botão "Gerar Artigo da Wiki". A IA lerá todos os dados (poderes, npcs, etc.) e criará um artigo completo para você.</li>
+                                <li><strong className="text-foreground">Revise e Salve:</strong> Você será redirecionado para o editor da Wiki com o artigo gerado pela IA já preenchido. Revise, adicione qualquer contexto extra e salve.</li>
+                            </ol>
+                            <p>Este fluxo garante que sua Wiki seja um reflexo textual preciso dos dados do jogo, permitindo que a IA compreenda tanto o contexto (`wikiContent`) quanto os detalhes numéricos (`worlds` data).</p>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </CardFooter>
           </Card>
 
@@ -612,3 +658,5 @@ export function WikiManagementView() {
     </>
   );
 }
+
+    
