@@ -99,11 +99,6 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                             </Button>
                         </Link>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Link href={`/wiki/edit/${item.id}?collectionPath=${collectionPath}`} passHref>
-                                <Button variant="ghost" size="icon" className="h-7 w-7">
-                                   <Pencil className="h-4 w-4"/>
-                                </Button>
-                             </Link>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
