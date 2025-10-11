@@ -19,7 +19,7 @@ import { useState } from 'react';
 const suggestionSchema = z.object({
   title: z.string().min(5, 'O título deve ter pelo menos 5 caracteres.').max(100, 'O título não pode exceder 100 caracteres.'),
   content: z.string().min(20, 'A descrição deve ter pelo menos 20 caracteres.').max(5000, 'A descrição não pode exceder 5000 caracteres.'),
-  attachment: z.any().optional(),
+  attachments: z.any().optional(),
 });
 
 export default function SuggestContentPage() {
@@ -28,6 +28,7 @@ export default function SuggestContentPage() {
   const { firestore, firebaseApp } = useFirebase();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const storage = firebaseApp ? getStorage(firebaseApp) : null;
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
 
   const form = useForm<z.infer<typeof suggestionSchema>>({
@@ -38,7 +39,15 @@ export default function SuggestContentPage() {
     },
   });
 
-  const fileRef = form.register("attachment");
+  const fileRef = form.register("attachments");
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFiles(Array.from(e.target.files));
+    } else {
+      setSelectedFiles([]);
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof suggestionSchema>) {
     if (!user || !firestore || !storage) {
@@ -51,13 +60,16 @@ export default function SuggestContentPage() {
     }
     setIsSubmitting(true);
     try {
-        let attachmentURL = null;
-        const file = values.attachment?.[0];
+        const attachmentURLs: string[] = [];
+        const files = values.attachments as FileList | null;
 
-        if (file) {
-            const storageRef = ref(storage, `suggestions/${user.uid}/${Date.now()}-${file.name}`);
-            const uploadResult = await uploadBytes(storageRef, file);
-            attachmentURL = await getDownloadURL(uploadResult.ref);
+        if (files && files.length > 0) {
+            for (const file of Array.from(files)) {
+                const storageRef = ref(storage, `suggestions/${user.uid}/${Date.now()}-${file.name}`);
+                const uploadResult = await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(uploadResult.ref);
+                attachmentURLs.push(downloadURL);
+            }
         }
 
         const suggestionsCollection = collection(firestore, 'contentSuggestions');
@@ -66,7 +78,7 @@ export default function SuggestContentPage() {
             userEmail: user.email,
             title: values.title,
             content: values.content,
-            attachmentURL: attachmentURL,
+            attachmentURLs: attachmentURLs,
             status: 'pending',
             createdAt: serverTimestamp(),
         });
@@ -76,6 +88,7 @@ export default function SuggestContentPage() {
         description: 'Obrigado por sua contribuição para a Wiki. Sua sugestão será revisada em breve.',
         });
         form.reset();
+        setSelectedFiles([]);
     } catch (error) {
         console.error("Erro ao enviar sugestão: ", error);
         toast({
@@ -138,18 +151,23 @@ export default function SuggestContentPage() {
                 />
                  <FormField
                   control={form.control}
-                  name="attachment"
+                  name="attachments"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Anexo (Opcional)</FormLabel>
+                      <FormLabel>Anexos (Opcional)</FormLabel>
                       <FormControl>
                         <div className="relative">
-                            <Input id="attachment" type="file" className="pl-12" {...fileRef} />
+                            <Input id="attachments" type="file" className="pl-12" {...fileRef} multiple onChange={handleFileChange}/>
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <Upload className="h-5 w-5 text-gray-400" />
                             </div>
                         </div>
                       </FormControl>
+                      {selectedFiles.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                            {selectedFiles.length} arquivo(s) selecionado(s): {selectedFiles.map(f => f.name).join(', ')}
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

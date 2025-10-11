@@ -5,13 +5,14 @@ import { collection, query, orderBy } from 'firebase/firestore';
 import { useAdmin } from '@/hooks/use-admin';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ShieldAlert, Inbox, Download, User } from 'lucide-react';
+import { Loader2, ShieldAlert, Inbox, Download, User, Image as ImageIcon } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Head from 'next/head';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 interface Suggestion {
   id: string;
@@ -19,7 +20,7 @@ interface Suggestion {
   userEmail: string;
   title: string;
   content: string;
-  attachmentURL?: string;
+  attachmentURLs?: string[];
   status: 'pending' | 'approved' | 'rejected';
   createdAt: {
     seconds: number;
@@ -82,16 +83,33 @@ function AdminSuggestionsPage() {
                   <CardContent className="p-6">
                     <p className="text-sm text-foreground/80 whitespace-pre-wrap">{suggestion.content}</p>
                   </CardContent>
-                  {suggestion.attachmentURL && (
+                  {suggestion.attachmentURLs && suggestion.attachmentURLs.length > 0 && (
                     <>
                       <Separator />
                       <CardFooter className="p-4 bg-card/30">
-                        <a href={suggestion.attachmentURL} target="_blank" rel="noopener noreferrer">
-                          <Button variant="outline" size="sm">
-                            <Download className="mr-2 h-4 w-4" />
-                            Baixar Anexo
-                          </Button>
-                        </a>
+                        <div className="space-y-2">
+                            <h4 className="text-sm font-medium">Anexos</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {suggestion.attachmentURLs.map((url, index) => {
+                                    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+                                    if (isImage) {
+                                        return (
+                                            <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="relative h-20 w-20 rounded-md overflow-hidden border">
+                                                <Image src={url} alt={`Anexo ${index + 1}`} layout="fill" objectFit="cover" />
+                                            </a>
+                                        );
+                                    }
+                                    return (
+                                        <a key={index} href={url} target="_blank" rel="noopener noreferrer">
+                                            <Button variant="outline" size="sm">
+                                                <Download className="mr-2 h-4 w-4" />
+                                                Anexo {index + 1}
+                                            </Button>
+                                        </a>
+                                    );
+                                })}
+                            </div>
+                        </div>
                       </CardFooter>
                     </>
                   )}
