@@ -1,10 +1,10 @@
 'use client';
 
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   AlertDialog,
@@ -17,13 +17,31 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { useRouter } from 'next/navigation';
 
-const SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
+// Hardcoded list represents the default or common subcollections.
+// The UI will also display any other subcollections found.
+const DEFAULT_SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
 
-export function WorldSubcollections({ worldId }: { worldId: string }) {
+export function WorldSubcollections({ worldId, fetchedSubcollections }: { worldId: string, fetchedSubcollections: string[] }) {
     const firestore = useFirestore();
+    const router = useRouter();
     const { toast } = useToast();
+    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
     const handleDelete = async (subcollectionName: string, itemId: string) => {
         if (!firestore) return;
@@ -36,10 +54,27 @@ export function WorldSubcollections({ worldId }: { worldId: string }) {
             toast({ variant: 'destructive', title: "Erro ao Remover", description: error.message });
         }
     };
+    
+    const handleCreateCategory = () => {
+      if (!newCategoryName.trim()) {
+        toast({ variant: 'destructive', title: 'Nome Inválido', description: 'O nome da categoria não pode estar vazio.' });
+        return;
+      }
+      setIsCreatingCategory(true);
+      const slug = newCategoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const newPath = `/wiki/edit/new?collectionPath=worlds/${worldId}/${slug}`;
+      router.push(newPath);
+      setIsAddCategoryOpen(false);
+      setNewCategoryName('');
+      setIsCreatingCategory(false);
+    }
+
+    // Combine default and fetched collections, removing duplicates
+    const allSubcollections = Array.from(new Set([...DEFAULT_SUBCOLLECTIONS, ...fetchedSubcollections]));
 
     return (
         <div className="pl-4 pt-2 space-y-2">
-            {SUBCOLLECTIONS.map(subcollectionName => (
+            {allSubcollections.map(subcollectionName => (
                 <SubcollectionItems 
                     key={subcollectionName} 
                     worldId={worldId} 
@@ -47,6 +82,41 @@ export function WorldSubcollections({ worldId }: { worldId: string }) {
                     onDelete={handleDelete}
                 />
             ))}
+             <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+                <Button variant="ghost" className="w-full justify-start text-sm capitalize text-muted-foreground" onClick={() => setIsAddCategoryOpen(true)}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Adicionar Nova Categoria
+                </Button>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                    <DialogTitle>Criar Nova Categoria</DialogTitle>
+                    <DialogDescription>
+                        Dê um nome para a nova categoria de dados dentro deste mundo (ex: "missões", "itens").
+                    </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex items-center space-x-2 py-4">
+                        <div className="grid flex-1 gap-2">
+                            <Label htmlFor="category-name" className="sr-only">
+                                Nome da Categoria
+                            </Label>
+                            <Input
+                                id="category-name"
+                                placeholder="ex: missoes"
+                                value={newCategoryName}
+                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleCreateCategory()}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setIsAddCategoryOpen(false)}>Cancelar</Button>
+                        <Button type="submit" onClick={handleCreateCategory} disabled={isCreatingCategory}>
+                          {isCreatingCategory && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Criar e Adicionar Item
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
@@ -59,6 +129,7 @@ interface SubcollectionItemsProps {
 
 function SubcollectionItems({ worldId, subcollectionName, onDelete }: SubcollectionItemsProps) {
     const firestore = useFirestore();
+    // This hook is now primarily for getting the *items* within a known subcollection.
     const subcollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'worlds', worldId, subcollectionName) : null, [firestore, worldId, subcollectionName]);
     const { data: items, isLoading } = useCollection(subcollectionRef as any);
 

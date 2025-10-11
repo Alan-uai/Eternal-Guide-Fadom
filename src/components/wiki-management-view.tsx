@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { doc, writeBatch, collection, updateDoc } from 'firebase/firestore';
+import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -18,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
 import {
@@ -68,6 +67,30 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { WorldSubcollections } from '@/components/world-subcollections';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+
+// Firestore doesn't have a native "list subcollections" API for clients.
+// This is a workaround to get the subcollections by checking the backend.json.
+// In a real app, this might be a dedicated metadata doc in Firestore.
+import backendConfig from '@/../docs/backend.json';
+
+const getSubcollectionsForWorld = (worldId: string): string[] => {
+    if (!backendConfig.firestore || !backendConfig.firestore.structure) {
+        return [];
+    }
+    const worldPathPrefix = `/worlds/${worldId}/`;
+    const subcollections = new Set<string>();
+
+    for (const item of backendConfig.firestore.structure) {
+        if (item.path.startsWith(worldPathPrefix)) {
+            const pathParts = item.path.substring(worldPathPrefix.length).split('/');
+            if (pathParts[0]) {
+                subcollections.add(pathParts[0]);
+            }
+        }
+    }
+    return Array.from(subcollections);
+};
+
 
 export function WikiManagementView() {
   const firestore = useFirestore();
@@ -417,6 +440,7 @@ export function WikiManagementView() {
               ) : (
                 sortedWorlds?.map(world => {
                   const seedInfo = worldSeedData[world.id];
+                  const fetchedSubcollections = getSubcollectionsForWorld(world.id);
                   return (
                     <Collapsible key={world.id} className="space-y-2">
                       <div className="flex w-full">
@@ -433,7 +457,7 @@ export function WikiManagementView() {
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 pl-2">
+                            <Button variant="outline" className="w-full justify-start rounded-l-none pl-2">
                                 {world.name}
                             </Button>
                         </CollapsibleTrigger>
@@ -453,7 +477,7 @@ export function WikiManagementView() {
                         )}
                       </div>
                       <CollapsibleContent>
-                        <WorldSubcollections worldId={world.id} />
+                        <WorldSubcollections worldId={world.id} fetchedSubcollections={fetchedSubcollections} />
                       </CollapsibleContent>
                     </Collapsible>
                   )
