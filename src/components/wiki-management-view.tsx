@@ -380,7 +380,7 @@ export function WikiManagementView() {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref>
-                                <Button variant="outline" size="icon" className="rounded-r-none border-r-0 px-1">
+                                <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pl-2 pr-1">
                                   <Database className="h-5 w-5" />
                                 </Button>
                               </Link>
@@ -391,7 +391,7 @@ export function WikiManagementView() {
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 pl-1">
+                          <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 pl-2">
                             {world.name}
                           </Button>
                         </CollapsibleTrigger>
