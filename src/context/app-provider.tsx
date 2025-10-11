@@ -60,11 +60,9 @@ function AppStateProvider({ children }: { children: ReactNode }) {
       let targetRoute: string | null = null;
       
       if (isAdmin) {
-        if (lastRoute && lastRoute.startsWith('/admin')) {
-          targetRoute = lastRoute;
-        } else {
-          targetRoute = '/admin-chat';
-        }
+        // Admin should be redirected to their last visited page, regardless of whether it's an admin page or not.
+        // Default to /admin-chat if no last route is found.
+        targetRoute = lastRoute || '/admin-chat';
       } else {
         // For non-admins, ensure they don't land on an admin page.
         // If their last route was an admin one, redirect to home.
