@@ -87,11 +87,9 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
     return (
         <Collapsible>
             <CollapsibleTrigger asChild>
-                 <Link href={`/admin/edit-collection/${collectionPath}`} passHref>
-                    <Button variant="ghost" className="w-full justify-start text-sm capitalize">
-                        - {subcollectionName} ({items.length})
-                    </Button>
-                </Link>
+                <Button variant="ghost" className="w-full justify-start text-sm capitalize">
+                    - {subcollectionName} ({items.length})
+                </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-4 pt-2 space-y-1">
                 {items.map((item: any) => (

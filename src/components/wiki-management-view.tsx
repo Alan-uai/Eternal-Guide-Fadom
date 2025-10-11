@@ -401,7 +401,7 @@ export function WikiManagementView() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Dados de Jogo por Mundo</CardTitle>
-              <Link href="/admin/edit-collection/worlds/new" passHref>
+              <Link href="/wiki/edit/new?collectionPath=worlds" passHref>
                 <Button variant="outline" size="sm">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Novo Mundo
@@ -423,7 +423,7 @@ export function WikiManagementView() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pr-1 pl-2" onClick={() => handleOpenEditDialog(world)}>
+                               <Button variant="outline" size="icon" className="rounded-r-none pr-1 pl-2" onClick={() => handleOpenEditDialog(world)}>
                                 <Database className="h-5 w-5" />
                               </Button>
                             </TooltipTrigger>
@@ -433,17 +433,15 @@ export function WikiManagementView() {
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                           <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref className='flex-1'>
-                                <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 pl-2">
-                                    {world.name}
-                                </Button>
-                           </Link>
+                            <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 pl-2">
+                                {world.name}
+                            </Button>
                         </CollapsibleTrigger>
                         {seedInfo && (
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id, `/admin/edit-collection/worlds/${world.id}`)}>
+                                <Button variant="ghost" size="icon" onClick={() => handleViewContent(seedInfo.data.name, seedInfo.data, world.id, `/wiki/edit/${world.id}?collectionPath=worlds`)}>
                                   <Eye className="h-5 w-5" />
                                 </Button>
                               </TooltipTrigger>
