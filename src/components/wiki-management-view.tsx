@@ -364,9 +364,22 @@ export function WikiManagementView() {
                   return (
                     <Collapsible key={world.id} className="space-y-2">
                       <div className="flex gap-2">
+                        <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <Database className="h-5 w-5" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Gerenciar {world.name}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </Link>
                         <CollapsibleTrigger asChild>
                           <Button variant="outline" className="w-full justify-start">
-                            <Database className="mr-2 h-4 w-4" />
                             {world.name}
                           </Button>
                         </CollapsibleTrigger>
