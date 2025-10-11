@@ -235,8 +235,16 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
                 <div className="flex flex-wrap gap-2">
                     {suggestedFields.map(field => {
                         const propertySchema = entitySchema?.properties?.[field];
+                        let defaultValue = '';
+                        if (propertySchema?.enum) {
+                            defaultValue = propertySchema.enum[0];
+                        } else if (propertySchema?.type === 'array') {
+                            defaultValue = [];
+                        } else if (propertySchema?.type === 'object') {
+                             defaultValue = {};
+                        }
                         return (
-                            <Button key={field} variant="outline" size="sm" onClick={() => handleAddNewField(field, propertySchema?.enum ? propertySchema.enum[0] : '')}>
+                            <Button key={field} variant="outline" size="sm" onClick={() => handleAddNewField(field, defaultValue)}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar {field}
                             </Button>
                         )
@@ -500,8 +508,7 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                                 </CollapsibleTrigger>
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
-                                    {/* #devem ficar sempre visíveis em mobile (nunca hover). */}
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity data-[state=open]:opacity-100">
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive transition-opacity data-[state=open]:opacity-100 md:opacity-0 md:group-hover:opacity-100">
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
                                   </AlertDialogTrigger>
