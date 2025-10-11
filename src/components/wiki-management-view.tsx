@@ -363,28 +363,26 @@ export function WikiManagementView() {
                   const seedInfo = worldSeedData[world.id];
                   return (
                     <Collapsible key={world.id} className="space-y-2">
-                      <div className="flex gap-2">
-                        <div className="flex w-full">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref>
-                                  <Button variant="outline" size="icon" className="rounded-r-none border-r-0">
-                                    <Database className="h-5 w-5" />
-                                  </Button>
-                                </Link>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Gerenciar {world.name}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <CollapsibleTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start rounded-l-none">
-                              {world.name}
-                            </Button>
-                          </CollapsibleTrigger>
-                        </div>
+                      <div className="flex w-full">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref>
+                                <Button variant="outline" size="icon" className="rounded-r-none border-r-0">
+                                  <Database className="h-5 w-5" />
+                                </Button>
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Gerenciar {world.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <CollapsibleTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start rounded-l-none">
+                            {world.name}
+                          </Button>
+                        </CollapsibleTrigger>
                         {seedInfo && (
                           <TooltipProvider>
                             <Tooltip>
