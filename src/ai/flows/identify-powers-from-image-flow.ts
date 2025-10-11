@@ -20,7 +20,7 @@ const allWorldsData = [world1Data, world2Data, world3Data, world4Data, world20Da
 
 // Gera um contexto de string com todos os poderes conhecidos para a IA.
 const powerKnowledgeContext = allWorldsData.map(world => 
-    `Mundo: ${world.name}\nPoderes:\n${world.powers.map(power => {
+    `Mundo: ${world.name}\nPoderes:\n${(world.powers || []).map(power => {
         const statsString = (power.stats && Array.isArray(power.stats))
             ? `\n  Status:\n${power.stats.map(stat => 
                 `  - ${stat.name} (Raridade: ${stat.rarity})`
@@ -65,15 +65,15 @@ Regras Estritas:
 1.  **Analise a Imagem:** Inspecione cuidadosamente cada poder nos screenshots.
 2.  **Extraia o Nome:** Identifique o nome de cada poder.
 3.  **Determine a Raridade:**
-    *   A raridade geralmente é indicada pela cor da borda do ícone do poder. Mapeie as cores para as raridades:
+    *   A raridade é indicada pela cor da borda do ícone do poder. Mapeie as cores para as raridades com precisão:
         *   Cinza: Common
         *   Verde: Uncommon
         *   Azul: Rare
-        *   Roxo/Magenta: Epic
+        *   Roxo/Magenta (cor sólida, sem brilho intenso): Epic
         *   Amarelo/Dourado: Legendary
         *   Vermelho: Mythic
-        *   Rosa Forte/Fúcsia (com brilho): Phantom
-        *   Laranja/Arco-íris (com brilho): Supreme
+        *   Rosa Forte/Fúcsia (com um brilho visível e vibrante): Phantom
+        *   Laranja/Arco-íris (borda com gradiente de várias cores): Supreme
     *   Se a cor não for clara, use o nome do poder (ex: "Super Saiyan 3" é Supreme) e o conhecimento abaixo para determinar a raridade correta.
 4.  **Determine o Mundo:** Usando o "CONHECIMENTO DE PODERES" abaixo, encontre a qual mundo cada poder pertence. Se um poder não estiver na lista de conhecimento, marque o mundo como "Desconhecido".
 5.  **Formato de Saída:** Retorne uma lista JSON de objetos, onde cada objeto representa um poder identificado. Não inclua duplicatas na lista final.
