@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
-import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles, HelpCircle } from 'lucide-react';
+import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles, HelpCircle, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
@@ -20,6 +20,7 @@ import {
   DialogDescription,
   DialogClose,
   DialogTrigger,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -67,6 +68,9 @@ import { world19Data } from '@/lib/world-19-data';
 import { world20Data } from '@/lib/world-20-data';
 import { world21Data } from '@/lib/world-21-data';
 import { world22Data } from '@/lib/world-22-data';
+import { seedWorldData } from '@/ai/flows/seed-world-data-flow';
+import { extractTextFromFile } from '@/ai/flows/extract-text-from-file-flow';
+import { formatTextToJson } from '@/ai/flows/format-text-to-json-flow';
 
 
 // Firestore doesn't have a native "list subcollections" API for clients.
@@ -118,6 +122,117 @@ const getSubcollectionsForWorld = (worldId: string): string[] => {
 };
 
 
+function SmartSeedDialog({ world, onOpenChange, open }: { world: { id: string, name: string }, onOpenChange: (open: boolean) => void, open: boolean }) {
+    const { toast } = useToast();
+    const router = useRouter();
+    const [isSeeding, setIsSeeding] = useState(false);
+    const [fileCount, setFileCount] = useState(0);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        setFileCount(files ? files.length : 0);
+    };
+
+    const handleSeedData = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const files = fileInputRef.current?.files;
+        if (!files || files.length === 0) {
+            toast({ variant: 'destructive', title: 'Nenhum Arquivo Selecionado', description: 'Por favor, selecione um ou mais arquivos para semear.' });
+            return;
+        }
+
+        setIsSeeding(true);
+        try {
+            toast({ title: 'Processando Arquivos...', description: 'A IA está lendo e estruturando os dados. Isso pode levar um momento.' });
+
+            let allExtractedText = '';
+            for (const file of Array.from(files)) {
+                const reader = new FileReader();
+                const filePromise = new Promise<string>((resolve, reject) => {
+                    reader.onload = async () => {
+                        try {
+                            const fileDataUri = reader.result as string;
+                            const extractionType = file.type.startsWith('image/') || file.type === 'application/pdf' ? 'json' : 'markdown';
+                            const rawTextResult = await extractTextFromFile({ fileDataUri, extractionType: 'markdown' });
+                            if (!rawTextResult || typeof rawTextResult.extractedText === 'undefined') {
+                                throw new Error(`A IA não conseguiu extrair texto do arquivo: ${file.name}`);
+                            }
+                            resolve(rawTextResult.extractedText);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsDataURL(file);
+                });
+                allExtractedText += (await filePromise) + '\n\n';
+            }
+
+            if (!allExtractedText.trim()) {
+                throw new Error("A IA não conseguiu extrair nenhum texto dos arquivos fornecidos.");
+            }
+
+            const jsonResult = await formatTextToJson({ rawText: allExtractedText });
+            if (!jsonResult || !jsonResult.jsonString || jsonResult.jsonString === '[]') {
+                throw new Error("A IA não conseguiu formatar os dados para JSON a partir dos textos combinados.");
+            }
+
+            toast({ title: 'Semeando Dados...', description: 'Os dados foram estruturados. Agora, salvando no banco de dados.' });
+            const seedResult = await seedWorldData({ worldName: world.name, worldDataJson: jsonResult.jsonString });
+            
+            if (seedResult) {
+                toast({ title: 'Dados Semeados!', description: `Os novos dados para "${world.name}" foram adicionados com sucesso.` });
+                onOpenChange(false);
+                // Optionally, refresh data by re-fetching or using a state management trick
+            } else {
+                throw new Error("Falha ao salvar os dados do mundo no Firestore.");
+            }
+
+        } catch (error: any) {
+            console.error("Erro ao semear dados:", error);
+            toast({ variant: 'destructive', title: "Erro na Semeadura", description: error.message });
+        } finally {
+            setIsSeeding(false);
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Smart Seeding para "{world.name}"</DialogTitle>
+                    <DialogDescription>
+                        Envie arquivos (imagens de tabelas, PDFs, JSON) para adicionar ou atualizar dados neste mundo. A IA irá processá-los e salvá-los no Firestore.
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSeedData}>
+                    <div className="py-4 space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="world-data-file">Arquivos de Dados</Label>
+                            <div className="relative">
+                                <Input id="world-data-file" type="file" multiple className="pl-12 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" ref={fileInputRef} onChange={handleFileChange} />
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <UploadCloud className="h-5 w-5 text-gray-400" />
+                                </div>
+                            </div>
+                            {fileCount > 0 && <p className="text-xs text-muted-foreground mt-2">{fileCount} arquivo(s) selecionado(s).</p>}
+                        </div>
+                    </div>
+                    <DialogFooter>
+                       <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+                        <Button type="submit" disabled={isSeeding || fileCount === 0}>
+                            {isSeeding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                            {isSeeding ? 'Processando...' : 'Iniciar Semeadura'}
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+
 export function WikiManagementView() {
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -125,6 +240,8 @@ export function WikiManagementView() {
   
   const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, isWorld: boolean } | null>(null);
   const [editingWorld, setEditingWorld] = useState<{ id: string, name: string } | null>(null);
+  const [seedingWorld, setSeedingWorld] = useState<{ id: string, name: string } | null>(null);
+
   const [newWorldName, setNewWorldName] = useState('');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [isGeneratingArticle, setIsGeneratingArticle] = useState(false);
@@ -266,7 +383,7 @@ export function WikiManagementView() {
                                     <li><strong className="text-foreground">O que são os dados?</strong> São os documentos e subcoleções (powers, npcs, pets) no Firestore. A IA usa a ferramenta `getGameData` para buscar esses dados brutos e fazer cálculos exatos.</li>
                                     <li><strong className="text-foreground">Renomear Mundo (Ícone de <Database className="inline h-4 w-4"/>):</strong> Esta ação permite que você altere o nome de exibição de um mundo diretamente no Firestore.</li>
                                     <li><strong className="text-foreground">Editar Itens:</strong> Você pode expandir cada mundo para ver suas subcoleções e editar cada item individualmente. Todas as alterações são salvas automaticamente no Firestore.</li>
-                                    <li><strong className="text-foreground">Smart Seeding:</strong> Ao criar um "Novo Mundo", você pode enviar um arquivo. A IA processará esse arquivo para popular o novo mundo automaticamente, poupando o trabalho manual.</li>
+                                    <li><strong className="text-foreground">Smart Seeding (Ícone de <UploadCloud className="inline h-4 w-4" />):</strong> Permite enviar arquivos (imagens de tabelas, PDFs) para popular ou atualizar em massa os dados de um mundo, poupando o trabalho manual.</li>
                                 </ul>
                                 <p>Manter esses dados estruturados e corretos é crucial para a IA fornecer respostas numéricas precisas.</p>
                             </div>
@@ -399,7 +516,7 @@ export function WikiManagementView() {
                   const fetchedSubcollections = getSubcollectionsForWorld(world.id);
                   return (
                     <Collapsible key={world.id} className="space-y-2">
-                      <div className="flex w-full">
+                      <div className="flex w-full items-center">
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -413,10 +530,22 @@ export function WikiManagementView() {
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start rounded-l-none pl-2 border-l-0">
+                            <Button variant="outline" className="w-full justify-start rounded-l-none rounded-r-none pl-2 border-l-0 border-r-0">
                                 {world.name}
                             </Button>
                         </CollapsibleTrigger>
+                         <TooltipProvider>
+                           <Tooltip>
+                            <TooltipTrigger asChild>
+                               <Button variant="outline" size="icon" className="rounded-l-none pl-2 pr-2 border-l-0" onClick={() => setSeedingWorld(world)}>
+                                <UploadCloud className="h-5 w-5" />
+                              </Button>
+                            </TooltipTrigger>
+                             <TooltipContent>
+                              <p>Smart Seed: Adicionar/Atualizar Dados para {world.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -506,6 +635,15 @@ export function WikiManagementView() {
         </DialogContent>
     </Dialog>
 
+    {seedingWorld && (
+        <SmartSeedDialog
+            open={!!seedingWorld}
+            onOpenChange={(isOpen) => {
+                if (!isOpen) setSeedingWorld(null);
+            }}
+            world={seedingWorld}
+        />
+    )}
     </>
   );
 }
