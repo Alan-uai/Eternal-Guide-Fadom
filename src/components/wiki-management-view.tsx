@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { useFirestore, useCollection, useMemoFirebase, useUser } from '@/firebase';
-import { doc, writeBatch, collection, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { useState, useMemo } from 'react';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -19,7 +19,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -36,11 +35,9 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 import type { WikiArticle } from '@/lib/types';
 import { allWikiArticles } from '@/lib/wiki-data';
-import { accessories, worldNameToId } from '@/lib/accessory-data';
+import { accessories } from '@/lib/accessory-data';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { WorldSubcollections } from '@/components/world-subcollections';
@@ -77,9 +74,8 @@ export function WikiManagementView() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const router = useRouter();
-  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  
   const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, editPath?: string } | null>(null);
-
   const [editingWorld, setEditingWorld] = useState<{ id: string, name: string } | null>(null);
   const [newWorldName, setNewWorldName] = useState('');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
@@ -92,6 +88,12 @@ export function WikiManagementView() {
   const articlesCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'wikiContent') : null, [firestore]);
   const { data: articles, isLoading: areArticlesLoading } = useCollection<WikiArticle>(articlesCollectionRef as any);
 
+  const combinedArticles = useMemo(() => {
+    const firestoreIds = new Set(articles?.map(a => a.id));
+    const staticArticlesToAdd = allWikiArticles.filter(sa => !firestoreIds.has(sa.id));
+    return [...(articles || []), ...staticArticlesToAdd];
+  }, [articles]);
+
   const sortedWorlds = useMemo(() => {
     if (!worlds) return [];
     return [...worlds].sort((a, b) => {
@@ -100,10 +102,6 @@ export function WikiManagementView() {
       return numA - numB;
     });
   }, [worlds]);
-
-  const handleLoading = (key: string, value: boolean) => {
-    setLoadingStates(prev => ({ ...prev, [key]: value }));
-  };
 
   const handleViewContent = (title: string, data: any, id?: string, editPath?: string) => {
     setViewingContent({ title, data, id, editPath });
@@ -148,8 +146,9 @@ export function WikiManagementView() {
     setIsGeneratingArticle(true);
     toast({ title: 'Gerando Artigo...', description: 'A IA está escrevendo o artigo da Wiki. Isso pode levar um momento.' });
     try {
+        if (!firestore) throw new Error("Firestore não está disponível.");
         // Fetch the most up-to-date name from Firestore before generating
-        const worldRef = doc(firestore!, 'worlds', worldData.id);
+        const worldRef = doc(firestore, 'worlds', worldData.id);
         const worldSnap = await getDoc(worldRef);
         const currentWorldName = worldSnap.exists() ? worldSnap.data().name : worldName;
 
@@ -174,18 +173,6 @@ export function WikiManagementView() {
         setViewingContent(null);
     }
   };
-
-  async function handleSeedAccessories() {
-     // This function is no longer connected to the UI but kept for potential future use or manual triggering.
-  }
-
-  async function handleSeedArticle(article: WikiArticle, loadingKey: string) {
-     // This function is no longer connected to the UI but kept for potential future use or manual triggering.
-  }
-
-  async function handleSeedAll() {
-     // This function is no longer connected to the UI but kept for potential future use or manual triggering.
-  }
 
   return (
     <>
@@ -273,7 +260,7 @@ export function WikiManagementView() {
                     <span className="ml-3 text-muted-foreground">Carregando artigos...</span>
                   </div>
               ) : (
-                articles?.map((article) => (
+                combinedArticles?.map((article) => (
                   <div key={article.id} className="flex w-full">
                     <Link href={`/wiki/edit/${article.id}`} passHref className='w-full'>
                       <Button variant="outline" className="w-full justify-start">
@@ -289,7 +276,7 @@ export function WikiManagementView() {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Visualizar dados do Firestore</p>
+                          <p>Visualizar dados</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -311,7 +298,7 @@ export function WikiManagementView() {
             </CardHeader>
              <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                <div className="flex gap-2">
-                  <Button onClick={() => toast({title: "Ação Removida", description: "A função de popular foi removida."})} disabled={true} className="w-full justify-start">
+                  <Button disabled={true} className="w-full justify-start">
                     <Database className="mr-2 h-4 w-4" />
                     Acessórios
                   </Button>
