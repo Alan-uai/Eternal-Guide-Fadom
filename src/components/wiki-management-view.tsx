@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -29,7 +30,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
 import { ScrollArea } from '@/components/ui/scroll-area';
