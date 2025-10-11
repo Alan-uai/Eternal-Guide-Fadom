@@ -148,8 +148,13 @@ export function WikiManagementView() {
     setIsGeneratingArticle(true);
     toast({ title: 'Gerando Artigo...', description: 'A IA está escrevendo o artigo da Wiki. Isso pode levar um momento.' });
     try {
+        // Fetch the most up-to-date name from Firestore before generating
+        const worldRef = doc(firestore!, 'worlds', worldData.id);
+        const worldSnap = await getDoc(worldRef);
+        const currentWorldName = worldSnap.exists() ? worldSnap.data().name : worldName;
+
         const result = await generateWikiArticleFromData({
-            worldName: worldName,
+            worldName: currentWorldName,
             worldDataJson: JSON.stringify(worldData)
         });
 
@@ -170,16 +175,12 @@ export function WikiManagementView() {
     }
   };
 
-  async function seedWorldGeneric(worldId: string, worldData: any, loadingKey: string) {
-    // This function is no longer connected to the UI but kept for potential future use or manual triggering.
-  }
-
   async function handleSeedAccessories() {
      // This function is no longer connected to the UI but kept for potential future use or manual triggering.
   }
 
   async function handleSeedArticle(article: WikiArticle, loadingKey: string) {
-    // This function is no longer connected to the UI but kept for potential future use or manual triggering.
+     // This function is no longer connected to the UI but kept for potential future use or manual triggering.
   }
 
   async function handleSeedAll() {
@@ -204,10 +205,6 @@ export function WikiManagementView() {
               </CardDescription>
             </CardContent>
             <CardFooter className="flex items-center gap-4">
-               <Button onClick={() => toast({title: "Ação Removida", description: "A função de popular todos os dados foi removida para evitar conflitos."})} disabled={true}>
-                <Database className="mr-2 h-4 w-4" />
-                Popular Todos os Dados
-              </Button>
                 <Dialog>
                     <DialogTrigger asChild>
                         <Button variant="outline" size="icon"><HelpCircle className="h-5 w-5"/></Button>
@@ -223,7 +220,7 @@ export function WikiManagementView() {
                             <p>A seção **"Dados de Jogo por Mundo"** é a fonte da verdade para a IA quando se trata de estatísticas precisas. O Firestore é a única fonte da verdade.</p>
                             <ul className="list-disc pl-5 space-y-2">
                                 <li><strong className="text-foreground">O que são os dados?</strong> São os documentos e subcoleções (powers, npcs, pets) no Firestore. A IA usa a ferramenta `getGameData` para buscar esses dados brutos e fazer cálculos exatos.</li>
-                                <li><strong className="text-foreground">Renomear Mundo (Ícone de <Database className="inline h-4 w-4"/>):</strong> Esta ação permite que você altere o nome de exibição de um mundo.</li>
+                                <li><strong className="text-foreground">Renomear Mundo (Ícone de <Database className="inline h-4 w-4"/>):</strong> Esta ação permite que você altere o nome de exibição de um mundo diretamente no Firestore.</li>
                                 <li><strong className="text-foreground">Editar Itens:</strong> Você pode expandir cada mundo para ver suas subcoleções e editar cada item individualmente. Todas as alterações são salvas automaticamente no Firestore.</li>
                                 <li><strong className="text-foreground">Smart Seeding:</strong> Ao criar um "Novo Mundo", você pode enviar um arquivo. A IA processará esse arquivo para popular o novo mundo automaticamente, poupando o trabalho manual.</li>
                             </ul>
