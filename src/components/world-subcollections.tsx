@@ -1,6 +1,6 @@
 'use client';
 
-import { useFirestore, useMemoFirebase, useCollection } from '@/firebase';
+import { useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, doc, deleteDoc, updateDoc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { Button } from './ui/button';
@@ -26,7 +26,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { useToast } from '@/hooks/use-toast';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useRouter } from 'next/navigation';
@@ -36,6 +36,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { nanoid } from 'nanoid';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { useCollection } from '@/firebase/firestore/use-collection';
 
 
 const DEFAULT_SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
@@ -78,9 +79,9 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
     }, [entitySchema, localData]);
 
     // Update local state if the external item data changes
-    useState(() => {
+    useEffect(() => {
       setLocalData(item);
-    });
+    }, [item]);
 
     const handleFieldChange = (key: string, value: any) => {
         if (key.includes('.')) {
@@ -229,18 +230,19 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
         <div className="p-3 bg-muted/50 rounded-md border space-y-4">
              {Object.entries(localData).filter(([key]) => key !== 'id').map(([key, value]) => renderField(key, value))}
              
-             {suggestedFields.length > 0 && (
-                <div className='pt-4 border-t border-dashed'>
-                    <p className="text-xs text-muted-foreground mb-2">Sugestões de Campos:</p>
-                    <div className="flex flex-wrap gap-2">
-                        {suggestedFields.map(field => (
-                             <Button key={field} variant="outline" size="sm" onClick={() => handleAddNewField(field)}>
+             <div className='pt-4 border-t border-dashed'>
+                <p className="text-xs text-muted-foreground mb-2">Sugestões de Campos:</p>
+                <div className="flex flex-wrap gap-2">
+                    {suggestedFields.map(field => {
+                        const propertySchema = entitySchema?.properties?.[field];
+                        return (
+                            <Button key={field} variant="outline" size="sm" onClick={() => handleAddNewField(field, propertySchema?.enum ? propertySchema.enum[0] : '')}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar {field}
                             </Button>
-                        ))}
-                    </div>
+                        )
+                    })}
                 </div>
-             )}
+            </div>
 
              <Popover open={isCustomFieldOpen} onOpenChange={setIsCustomFieldOpen}>
                 <PopoverTrigger asChild>
@@ -297,7 +299,14 @@ function AddNewItemDialog({ subcollectionName, subcollectionRef, triggerButton }
       if (!newItemName.trim() || !subcollectionRef) return;
   
       setIsCreating(true);
-      const newItemId = nanoid();
+      const newItemId = newItemName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+      if (!newItemId) {
+        toast({ variant: 'destructive', title: 'Nome Inválido', description: 'Por favor, insira um nome que possa ser convertido em um ID.' });
+        setIsCreating(false);
+        return;
+      }
+
       const newItemRef = doc(subcollectionRef, newItemId);
   
       try {
