@@ -57,23 +57,27 @@ function AppStateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isAdminLoading && isInitialAppLoad) {
       const lastRoute = localStorage.getItem(LAST_VISITED_ROUTE_KEY);
+      
+      const adminDefaultRoute = '/admin-chat';
+      const userDefaultRoute = '/';
+      
       let targetRoute: string | null = null;
       
       if (isAdmin) {
-        // Admin should be redirected to their last visited page, regardless of whether it's an admin page or not.
-        // Default to /admin-chat if no last route is found.
-        targetRoute = lastRoute || '/admin-chat';
+        // Admin should be redirected to their last visited page.
+        // Default to the admin chat if no last route is found.
+        targetRoute = lastRoute || adminDefaultRoute;
       } else {
-        // For non-admins, ensure they don't land on an admin page.
-        // If their last route was an admin one, redirect to home.
-        // Otherwise, send them to their last visited non-admin page.
+        // Non-admins should be sent to their last non-admin page.
+        // If their last page was an admin one, redirect to the user homepage.
         if (lastRoute && !lastRoute.startsWith('/admin')) {
-            targetRoute = lastRoute;
+          targetRoute = lastRoute;
         } else {
-            targetRoute = '/';
+          targetRoute = userDefaultRoute;
         }
       }
 
+      // Only redirect if the current page is not already the target destination.
       if (targetRoute && pathname !== targetRoute) {
         router.replace(targetRoute);
       }
