@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFirestore, useCollection, useMemoFirebase, useUser } from '@/firebase';
 import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
-import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check } from 'lucide-react';
+import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
@@ -67,6 +67,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { WorldSubcollections } from '@/components/world-subcollections';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { useRouter } from 'next/navigation';
+import { generateWikiArticleFromData } from '@/ai/flows/generate-wiki-from-data-flow';
 
 // Firestore doesn't have a native "list subcollections" API for clients.
 // This is a workaround to get the subcollections by checking the backend.json.
@@ -95,12 +97,14 @@ const getSubcollectionsForWorld = (worldId: string): string[] => {
 export function WikiManagementView() {
   const firestore = useFirestore();
   const { toast } = useToast();
+  const router = useRouter();
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, editPath?: string } | null>(null);
 
   const [editingWorld, setEditingWorld] = useState<{ id: string, name: string } | null>(null);
   const [newWorldName, setNewWorldName] = useState('');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
+  const [isGeneratingArticle, setIsGeneratingArticle] = useState(false);
 
 
   const worldsCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'worlds') : null, [firestore]);
@@ -158,6 +162,32 @@ export function WikiManagementView() {
       });
     } finally {
       setIsUpdatingName(false);
+    }
+  };
+
+  const handleGenerateArticle = async (worldName: string, worldData: any) => {
+    setIsGeneratingArticle(true);
+    toast({ title: 'Gerando Artigo...', description: 'A IA está escrevendo o artigo da Wiki. Isso pode levar um momento.' });
+    try {
+        const result = await generateWikiArticleFromData({
+            worldName: worldName,
+            worldDataJson: JSON.stringify(worldData)
+        });
+
+        if (result && result.wikiArticleJson) {
+            // Armazene o artigo gerado para ser pego pela página de edição
+            sessionStorage.setItem('generated-wiki-article', result.wikiArticleJson);
+            router.push('/wiki/edit/new?from-generation=true');
+        } else {
+            throw new Error('A IA não retornou um artigo válido.');
+        }
+
+    } catch (error: any) {
+        console.error('Erro ao gerar artigo da wiki:', error);
+        toast({ variant: 'destructive', title: 'Erro ao Gerar Artigo', description: error.message });
+    } finally {
+        setIsGeneratingArticle(false);
+        setViewingContent(null);
     }
   };
 
@@ -522,6 +552,18 @@ export function WikiManagementView() {
                                 </TooltipTrigger>
                                 <TooltipContent>
                                 <p>Renomear {viewingContent.title}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                         <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon" onClick={() => handleGenerateArticle(viewingContent.title, viewingContent.data)} disabled={isGeneratingArticle}>
+                                        {isGeneratingArticle ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                <p>Gerar Artigo da Wiki com IA</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>

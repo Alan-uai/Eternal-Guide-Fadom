@@ -70,6 +70,8 @@ function EditPageContent() {
   
   const articleIdParam = Array.isArray(params.articleId) ? params.articleId[0] : params.articleId;
   const collectionPath = searchParams.get('collectionPath');
+  const fromGeneration = searchParams.get('from-generation') === 'true';
+
   const isGenericCollection = !!collectionPath;
 
   const isNewArticle = articleIdParam === 'new';
@@ -124,6 +126,34 @@ function EditPageContent() {
       setImagePreview(null);
     }
   }, [imageUrlValue]);
+
+  // Handle pre-filling form from sessionStorage if redirected from generation
+  useEffect(() => {
+      if (isNewArticle && fromGeneration) {
+          const generatedArticleJson = sessionStorage.getItem('generated-wiki-article');
+          if (generatedArticleJson) {
+              try {
+                  const generatedArticle = JSON.parse(generatedArticleJson);
+                  // Use the generated ID or create a new one
+                  setArticleId(generatedArticle.id || nanoid());
+                  form.reset({
+                      title: generatedArticle.title || '',
+                      summary: generatedArticle.summary || '',
+                      content: generatedArticle.content || '',
+                      tags: Array.isArray(generatedArticle.tags) ? generatedArticle.tags.join(', ') : generatedArticle.tags || '',
+                      imageUrl: generatedArticle.imageUrl || '',
+                      tables: generatedArticle.tables ? JSON.stringify(generatedArticle.tables, null, 2) : '',
+                  });
+                  // Clean up sessionStorage
+                  sessionStorage.removeItem('generated-wiki-article');
+              } catch (error) {
+                  console.error("Erro ao analisar artigo gerado:", error);
+                  toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível carregar o artigo gerado pela IA.' });
+              }
+          }
+      }
+  }, [isNewArticle, fromGeneration, form, toast]);
+
 
   // When doc data loads, populate the form
   useEffect(() => {
@@ -327,7 +357,7 @@ function EditPageContent() {
       toast({ title: 'Sucesso!', description: `O item foi ${isNewArticle ? 'criado' : 'atualizado'}.` });
       
       if (isNewArticle) {
-        router.push(isGenericCollection && collectionPath ? `/admin/edit-collection/${collectionPath}` : '/admin-chat');
+        router.push(isGenericCollection && collectionPath ? `/admin/manage-content` : '/admin-chat');
       }
     } catch (error) {
       console.error('Erro ao salvar:', error);
@@ -368,7 +398,7 @@ function EditPageContent() {
   }
 
   const formTitle = isNewArticle 
-    ? `Criando Novo Item em ${isGenericCollection ? collectionPath : 'Wiki'}`
+    ? (fromGeneration ? `Revisar Artigo Gerado pela IA` : `Criando Novo Item em ${isGenericCollection ? collectionPath : 'Wiki'}`)
     : `Editando: ${article?.name || article?.title || 'Carregando...'}`;
 
   return (

@@ -7,6 +7,7 @@ import '@/ai/flows/generate-tags-flow.ts';
 import '@/ai/flows/extract-text-from-file-flow.ts';
 import '@/ai/flows/format-text-to-json-flow.ts';
 import '@/ai/flows/seed-world-data-flow.ts';
+import '@/ai/flows/generate-wiki-from-data-flow.ts';
 import '@/firebase/firestore/data.ts';
 // This server-side seeding approach is not viable with default security rules.
 // Seeding will now be handled on the client.
