@@ -4,7 +4,7 @@ import { useFirestore, useMemoFirebase, useCollection } from '@/firebase';
 import { collection, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Loader2, PlusCircle, Trash2, ChevronRight } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, ChevronRight, Check } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   AlertDialog,
@@ -37,15 +37,43 @@ const DEFAULT_SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows',
 function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
     const { toast } = useToast();
     const [localData, setLocalData] = useState(item);
+    const [isAddingField, setIsAddingField] = useState(false);
+    const [newFieldKey, setNewFieldKey] = useState('');
+    const [newFieldValue, setNewFieldValue] = useState('');
 
-    const handleFieldChange = (key: string, value: string | number | boolean | object) => {
-        setLocalData({ ...localData, [key]: value });
+    const handleFieldChange = (key: string, value: any) => {
+        // Handle nested keys
+        if (key.includes('.')) {
+            const keys = key.split('.');
+            setLocalData((prev: any) => {
+                const newData = { ...prev };
+                let current = newData;
+                for (let i = 0; i < keys.length - 1; i++) {
+                    current = current[keys[i]];
+                }
+                current[keys[keys.length - 1]] = value;
+                return newData;
+            });
+        } else {
+            setLocalData({ ...localData, [key]: value });
+        }
     };
 
     const handleSaveField = async (key: string) => {
-        const newValue = localData[key];
+        let valueToSave;
+        if (key.includes('.')) {
+            const keys = key.split('.');
+            let current = localData;
+            for (const k of keys) {
+                current = current[k];
+            }
+            valueToSave = current;
+        } else {
+            valueToSave = localData[key];
+        }
+       
         try {
-            await updateDoc(itemRef, { [key]: newValue });
+            await updateDoc(itemRef, { [key]: valueToSave });
             toast({
                 title: 'Campo Atualizado!',
                 description: `O campo "${key}" foi salvo com sucesso.`,
@@ -53,18 +81,37 @@ function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
         } catch (error: any) {
             console.error("Erro ao atualizar campo:", error);
             toast({ variant: 'destructive', title: "Erro ao Salvar", description: error.message });
-            // Revert local state on error
-            setLocalData(item);
+            setLocalData(item); // Revert local state on error
+        }
+    };
+    
+    const handleAddNewField = async () => {
+        if (!newFieldKey.trim()) {
+            toast({ variant: 'destructive', title: 'Erro', description: 'O nome do campo não pode ser vazio.' });
+            return;
+        }
+        try {
+            await updateDoc(itemRef, { [newFieldKey]: newFieldValue });
+            toast({ title: 'Campo Adicionado!', description: `O campo "${newFieldKey}" foi adicionado.` });
+            setLocalData({ ...localData, [newFieldKey]: newFieldValue });
+            setNewFieldKey('');
+            setNewFieldValue('');
+            setIsAddingField(false);
+        } catch (error: any) {
+             console.error("Erro ao adicionar campo:", error);
+            toast({ variant: 'destructive', title: "Erro ao Adicionar", description: error.message });
         }
     };
 
-    const renderField = (key: string, value: any) => {
+    const renderField = (key: string, value: any, prefix = '') => {
+        const fullKey = prefix ? `${prefix}.${key}` : key;
+        
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
              return (
-                <div key={key} className="space-y-2 p-2 border rounded-md bg-background/50">
+                <div key={fullKey} className="space-y-2 p-2 border rounded-md bg-background/50">
                     <Label className="font-semibold capitalize text-primary">{key}</Label>
                     <div className="pl-4 space-y-2">
-                        {Object.entries(value).map(([subKey, subValue]) => renderField(`${key}.${subKey}`, subValue))}
+                        {Object.entries(value).map(([subKey, subValue]) => renderField(subKey, subValue, fullKey))}
                     </div>
                 </div>
              )
@@ -73,21 +120,21 @@ function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
         if (typeof value === 'object' && value !== null && Array.isArray(value)) {
             const jsonString = JSON.stringify(value, null, 2);
              return (
-                <div key={key} className="space-y-2">
-                    <Label htmlFor={key} className="capitalize">{key}</Label>
+                <div key={fullKey} className="space-y-2">
+                    <Label htmlFor={fullKey} className="capitalize">{key}</Label>
                     <Textarea
-                        id={key}
+                        id={fullKey}
                         value={jsonString}
                         className="font-mono text-xs min-h-[100px]"
                         onChange={(e) => {
                              try {
                                 const parsed = JSON.parse(e.target.value);
-                                handleFieldChange(key, parsed);
+                                handleFieldChange(fullKey, parsed);
                             } catch (err) {
-                                // Handle invalid JSON if needed, maybe just update string
+                               // Silently ignore invalid JSON during typing
                             }
                         }}
-                        onBlur={() => handleSaveField(key)}
+                        onBlur={() => handleSaveField(fullKey)}
                     />
                 </div>
             )
@@ -96,22 +143,22 @@ function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
         const isLongText = typeof value === 'string' && value.length > 70;
 
         return (
-            <div key={key} className="space-y-2">
-                <Label htmlFor={key} className="capitalize">{key}</Label>
+            <div key={fullKey} className="space-y-2">
+                <Label htmlFor={fullKey} className="capitalize">{key}</Label>
                  {isLongText ? (
                     <Textarea
-                        id={key}
-                        value={localData[key]}
-                        onChange={(e) => handleFieldChange(key, e.target.value)}
-                        onBlur={() => handleSaveField(key)}
+                        id={fullKey}
+                        value={value}
+                        onChange={(e) => handleFieldChange(fullKey, e.target.value)}
+                        onBlur={() => handleSaveField(fullKey)}
                     />
                 ) : (
                     <Input
-                        id={key}
-                        type="text"
-                        value={localData[key]}
-                        onChange={(e) => handleFieldChange(key, e.target.value)}
-                        onBlur={() => handleSaveField(key)}
+                        id={fullKey}
+                        type={typeof value === 'number' ? 'number' : 'text'}
+                        value={value}
+                        onChange={(e) => handleFieldChange(fullKey, e.target.value)}
+                        onBlur={() => handleSaveField(fullKey)}
                     />
                 )}
             </div>
@@ -121,6 +168,43 @@ function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
     return (
         <div className="p-3 bg-muted/50 rounded-md border space-y-4">
              {Object.entries(localData).filter(([key]) => key !== 'id').map(([key, value]) => renderField(key, value))}
+            <Button variant="ghost" className="w-full justify-center text-xs text-muted-foreground" onClick={() => setIsAddingField(true)}>
+                <PlusCircle className="mr-2 h-4 w-4"/> Adicionar Campo
+            </Button>
+            <Dialog open={isAddingField} onOpenChange={setIsAddingField}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Adicionar Novo Campo</DialogTitle>
+                        <DialogDescription>
+                            Insira o nome e o valor para o novo campo a ser adicionado a este item.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="new-field-key">Nome do Campo (Chave)</Label>
+                            <Input 
+                                id="new-field-key" 
+                                placeholder="ex: chance, cooldown" 
+                                value={newFieldKey}
+                                onChange={(e) => setNewFieldKey(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="new-field-value">Valor do Campo</Label>
+                            <Input 
+                                id="new-field-value" 
+                                placeholder="ex: 10, 2.5s, true" 
+                                value={newFieldValue}
+                                onChange={(e) => setNewFieldValue(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsAddingField(false)}>Cancelar</Button>
+                        <Button onClick={handleAddNewField}>Salvar Campo</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
@@ -256,36 +340,34 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                     const itemRef = doc(firestore, 'worlds', worldId, subcollectionName, item.id);
                     return (
                         <Collapsible key={item.id}>
-                            <div className="flex items-center justify-between group">
-                               <CollapsibleTrigger asChild>
+                             <div className="flex items-center justify-between group">
+                                <CollapsibleTrigger asChild>
                                    <Button variant="ghost" className="w-full justify-start text-xs h-8">
                                        <ChevronRight className="mr-2 h-3 w-3 transform transition-transform duration-200 group-data-[state=open]:rotate-90"/>
                                        {item.name || item.id}
                                    </Button>
-                               </CollapsibleTrigger>
-                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                   <AlertDialog>
-                                     <AlertDialogTrigger asChild>
-                                       <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
-                                         <Trash2 className="h-4 w-4" />
-                                       </Button>
-                                     </AlertDialogTrigger>
-                                     <AlertDialogContent>
-                                       <AlertDialogHeader>
-                                         <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                         <AlertDialogDescription>
-                                           Esta ação não pode ser desfeita. Isso excluirá permanentemente o item
-                                           <span className='font-bold text-foreground'> {item.name || item.id} </span>
-                                           do banco de dados.
-                                         </AlertDialogDescription>
-                                       </AlertDialogHeader>
-                                       <AlertDialogFooter>
-                                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                         <AlertDialogAction onClick={() => onDelete(subcollectionName, item.id)}>Excluir</AlertDialogAction>
-                                       </AlertDialogFooter>
-                                     </AlertDialogContent>
-                                   </AlertDialog>
-                               </div>
+                                </CollapsibleTrigger>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity data-[state=open]:opacity-100">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Esta ação não pode ser desfeita. Isso excluirá permanentemente o item
+                                        <span className='font-bold text-foreground'> {item.name || item.id} </span>
+                                        do banco de dados.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => onDelete(subcollectionName, item.id)}>Excluir</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                             </div>
                              <CollapsibleContent className="pl-6 pr-2 py-2">
                                 <InlineItemEditor item={item} itemRef={itemRef} />
