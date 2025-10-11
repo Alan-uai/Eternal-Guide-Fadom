@@ -45,11 +45,59 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useRouter } from 'next/navigation';
 import { generateWikiArticleFromData } from '@/ai/flows/generate-wiki-from-data-flow';
+import { world1Data } from '@/lib/world-1-data';
+import { world2Data } from '@/lib/world-2-data';
+import { world3Data } from '@/lib/world-3-data';
+import { world4Data } from '@/lib/world-4-data';
+import { world5Data } from '@/lib/world-5-data';
+import { world6Data } from '@/lib/world-6-data';
+import { world7Data } from '@/lib/world-7-data';
+import { world8Data } from '@/lib/world-8-data';
+import { world9Data } from '@/lib/world-9-data';
+import { world10Data } from '@/lib/world-10-data';
+import { world11Data } from '@/lib/world-11-data';
+import { world12Data } from '@/lib/world-12-data';
+import { world13Data } from '@/lib/world-13-data';
+import { world14Data } from '@/lib/world-14-data';
+import { world15Data } from '@/lib/world-15-data';
+import { world16Data } from '@/lib/world-16-data';
+import { world17Data } from '@/lib/world-17-data';
+import { world18Data } from '@/lib/world-18-data';
+import { world19Data } from '@/lib/world-19-data';
+import { world20Data } from '@/lib/world-20-data';
+import { world21Data } from '@/lib/world-21-data';
+import { world22Data } from '@/lib/world-22-data';
+
 
 // Firestore doesn't have a native "list subcollections" API for clients.
 // This is a workaround to get the subcollections by checking the backend.json.
 // In a real app, this might be a dedicated metadata doc in Firestore.
 import backendConfig from '@/../docs/backend.json';
+
+const staticWorldDataMap: Record<string, any> = {
+    'world-1': world1Data,
+    'world-2': world2Data,
+    'world-3': world3Data,
+    'world-4': world4Data,
+    'world-5': world5Data,
+    'world-6': world6Data,
+    'world-7': world7Data,
+    'world-8': world8Data,
+    'world-9': world9Data,
+    'world-10': world10Data,
+    'world-11': world11Data,
+    'world-12': world12Data,
+    'world-13': world13Data,
+    'world-14': world14Data,
+    'world-15': world15Data,
+    'world-16': world16Data,
+    'world-17': world17Data,
+    'world-18': world18Data,
+    'world-19': world19Data,
+    'world-20': world20Data,
+    'world-21': world21Data,
+    'world-22': world22Data,
+  };
 
 const getSubcollectionsForWorld = (worldId: string): string[] => {
     if (!backendConfig.firestore || !backendConfig.firestore.structure) {
@@ -103,9 +151,19 @@ export function WikiManagementView() {
     });
   }, [worlds]);
 
-  const handleViewContent = (title: string, data: any, id?: string, editPath?: string) => {
-    setViewingContent({ title, data, id, editPath });
-  };
+    const handleViewContent = (title: string, data: any, id?: string, editPath?: string) => {
+        let finalData = data;
+        // Se for um mundo (tem id), mescla com os dados estáticos da lib
+        if (id && staticWorldDataMap[id]) {
+            // Deep merge logic
+            const staticData = staticWorldDataMap[id];
+            // A simple spread isn't enough for deep merge, but for this structure it might be okay.
+            // For a true deep merge, a utility function would be needed.
+            // This assumes sub-collections in Firestore completely override the static ones if they exist.
+            finalData = { ...staticData, ...data };
+        }
+        setViewingContent({ title, data: finalData, id, editPath });
+    };
 
   const handleOpenEditDialog = (world: { id: string, name: string }) => {
     setEditingWorld(world);
@@ -183,62 +241,62 @@ export function WikiManagementView() {
 
       <div className="p-1 md:p-4 space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Controle Geral de Dados</CardTitle>
+             <CardHeader className="flex flex-row items-start justify-between">
+                <div>
+                    <CardTitle>Controle Geral de Dados</CardTitle>
+                    <CardDescription>
+                    Utilize os botões de guia para entender como gerenciar os dados do jogo e os artigos da wiki.
+                    </CardDescription>
+                </div>
+                <div className='flex items-center gap-2'>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="icon"><HelpCircle className="h-5 w-5"/></Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-xl">
+                            <DialogHeader>
+                            <DialogTitle>Guia de Gerenciamento de Mundos</DialogTitle>
+                            <DialogDescription>
+                                Entenda como os dados dos mundos alimentam a IA.
+                            </DialogDescription>
+                            </DialogHeader>
+                            <div className="text-sm text-muted-foreground space-y-4">
+                                <p>A seção **"Dados de Jogo por Mundo"** é a fonte da verdade para a IA quando se trata de estatísticas precisas. O Firestore é a única fonte da verdade.</p>
+                                <ul className="list-disc pl-5 space-y-2">
+                                    <li><strong className="text-foreground">O que são os dados?</strong> São os documentos e subcoleções (powers, npcs, pets) no Firestore. A IA usa a ferramenta `getGameData` para buscar esses dados brutos e fazer cálculos exatos.</li>
+                                    <li><strong className="text-foreground">Renomear Mundo (Ícone de <Database className="inline h-4 w-4"/>):</strong> Esta ação permite que você altere o nome de exibição de um mundo diretamente no Firestore.</li>
+                                    <li><strong className="text-foreground">Editar Itens:</strong> Você pode expandir cada mundo para ver suas subcoleções e editar cada item individualmente. Todas as alterações são salvas automaticamente no Firestore.</li>
+                                    <li><strong className="text-foreground">Smart Seeding:</strong> Ao criar um "Novo Mundo", você pode enviar um arquivo. A IA processará esse arquivo para popular o novo mundo automaticamente, poupando o trabalho manual.</li>
+                                </ul>
+                                <p>Manter esses dados estruturados e corretos é crucial para a IA fornecer respostas numéricas precisas.</p>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="icon"><HelpCircle className="h-5 w-5"/></Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-xl">
+                            <DialogHeader>
+                            <DialogTitle>Guia de Gerenciamento da Wiki</DialogTitle>
+                            <DialogDescription>
+                                Entenda como os artigos da Wiki e os dados do jogo trabalham juntos.
+                            </DialogDescription>
+                            </DialogHeader>
+                            <div className="text-sm text-muted-foreground space-y-4">
+                                <p>As seções **"Artigos da Wiki"** e **"Dados de Jogo por Mundo"** são separadas, mas complementares.</p>
+                                <h4 className="font-semibold text-foreground">Fluxo de Trabalho Recomendado:</h4>
+                                <ol className="list-decimal pl-5 space-y-2">
+                                    <li><strong className="text-foreground">Crie ou Edite um Mundo:</strong> Primeiro, certifique-se de que os dados estruturados de um mundo (ex: Mundo 23) existem no Firestore, seja criando via "Novo Mundo" ou editando um existente.</li>
+                                    <li><strong className="text-foreground">Gere o Artigo (Ícone de <Sparkles className="inline h-4 w-4"/>):</strong> Visualize os dados do mundo recém-criado e clique no botão "Gerar Artigo da Wiki". A IA lerá todos os dados (poderes, npcs, etc.) e criará um artigo completo para você.</li>
+                                    <li><strong className="text-foreground">Revise e Salve:</strong> Você será redirecionado para o editor da Wiki com o artigo gerado pela IA já preenchido. Revise, adicione qualquer contexto extra e salve.</li>
+                                </ol>
+                                <p>Este fluxo garante que sua Wiki seja um reflexo textual preciso dos dados do jogo, permitindo que a IA compreenda tanto o contexto (`wikiContent`) quanto os detalhes numéricos (`worlds` data).</p>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </CardHeader>
-            <CardContent>
-              <CardDescription>
-                 Utilize os botões de guia para entender como gerenciar os dados do jogo e os artigos da wiki.
-              </CardDescription>
-            </CardContent>
-            <CardFooter className="flex items-center gap-4">
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="icon"><HelpCircle className="h-5 w-5"/></Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-xl">
-                        <DialogHeader>
-                        <DialogTitle>Guia de Gerenciamento de Mundos</DialogTitle>
-                        <DialogDescription>
-                            Entenda como os dados dos mundos alimentam a IA.
-                        </DialogDescription>
-                        </DialogHeader>
-                        <div className="text-sm text-muted-foreground space-y-4">
-                            <p>A seção **"Dados de Jogo por Mundo"** é a fonte da verdade para a IA quando se trata de estatísticas precisas. O Firestore é a única fonte da verdade.</p>
-                            <ul className="list-disc pl-5 space-y-2">
-                                <li><strong className="text-foreground">O que são os dados?</strong> São os documentos e subcoleções (powers, npcs, pets) no Firestore. A IA usa a ferramenta `getGameData` para buscar esses dados brutos e fazer cálculos exatos.</li>
-                                <li><strong className="text-foreground">Renomear Mundo (Ícone de <Database className="inline h-4 w-4"/>):</strong> Esta ação permite que você altere o nome de exibição de um mundo diretamente no Firestore.</li>
-                                <li><strong className="text-foreground">Editar Itens:</strong> Você pode expandir cada mundo para ver suas subcoleções e editar cada item individualmente. Todas as alterações são salvas automaticamente no Firestore.</li>
-                                <li><strong className="text-foreground">Smart Seeding:</strong> Ao criar um "Novo Mundo", você pode enviar um arquivo. A IA processará esse arquivo para popular o novo mundo automaticamente, poupando o trabalho manual.</li>
-                            </ul>
-                            <p>Manter esses dados estruturados e corretos é crucial para a IA fornecer respostas numéricas precisas.</p>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-                <Dialog>
-                    <DialogTrigger asChild>
-                         <Button variant="outline" size="icon"><HelpCircle className="h-5 w-5"/></Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-xl">
-                        <DialogHeader>
-                        <DialogTitle>Guia de Gerenciamento da Wiki</DialogTitle>
-                        <DialogDescription>
-                            Entenda como os artigos da Wiki e os dados do jogo trabalham juntos.
-                        </DialogDescription>
-                        </DialogHeader>
-                        <div className="text-sm text-muted-foreground space-y-4">
-                             <p>As seções **"Artigos da Wiki"** e **"Dados de Jogo por Mundo"** são separadas, mas complementares.</p>
-                             <h4 className="font-semibold text-foreground">Fluxo de Trabalho Recomendado:</h4>
-                            <ol className="list-decimal pl-5 space-y-2">
-                                <li><strong className="text-foreground">Crie ou Edite um Mundo:</strong> Primeiro, certifique-se de que os dados estruturados de um mundo (ex: Mundo 23) existem no Firestore, seja criando via "Novo Mundo" ou editando um existente.</li>
-                                <li><strong className="text-foreground">Gere o Artigo (Ícone de <Sparkles className="inline h-4 w-4"/>):</strong> Visualize os dados do mundo recém-criado e clique no botão "Gerar Artigo da Wiki". A IA lerá todos os dados (poderes, npcs, etc.) e criará um artigo completo para você.</li>
-                                <li><strong className="text-foreground">Revise e Salve:</strong> Você será redirecionado para o editor da Wiki com o artigo gerado pela IA já preenchido. Revise, adicione qualquer contexto extra e salve.</li>
-                            </ol>
-                            <p>Este fluxo garante que sua Wiki seja um reflexo textual preciso dos dados do jogo, permitindo que a IA compreenda tanto o contexto (`wikiContent`) quanto os detalhes numéricos (`worlds` data).</p>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            </CardFooter>
           </Card>
 
           <Separator />
