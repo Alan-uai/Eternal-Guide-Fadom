@@ -423,7 +423,7 @@ export function WikiManagementView() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pl-2 pr-1" onClick={() => handleOpenEditDialog(world)}>
+                              <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pr-1 pl-2" onClick={() => handleOpenEditDialog(world)}>
                                 <Database className="h-5 w-5" />
                               </Button>
                             </TooltipTrigger>
@@ -467,17 +467,7 @@ export function WikiManagementView() {
       <Dialog open={!!viewingContent} onOpenChange={(isOpen) => !isOpen && setViewingContent(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-                <DialogTitle>{viewingContent?.title}</DialogTitle>
-                {viewingContent?.editPath && (
-                  <Link href={viewingContent.editPath} passHref>
-                    <Button variant="ghost" size="sm">
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Editar
-                    </Button>
-                  </Link>
-                )}
-            </div>
+            <DialogTitle>{viewingContent?.title}</DialogTitle>
             <DialogDescription>
               Visualizando os dados JSON. Para artigos, estes são os dados do Firestore. Para mundos e acessórios, estes são os dados estáticos usados para popular.
             </DialogDescription>
