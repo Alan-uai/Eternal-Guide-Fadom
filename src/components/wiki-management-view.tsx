@@ -361,13 +361,26 @@ export function WikiManagementView() {
                   </div>
               ) : (
                 articles?.map((article) => (
-                    <div key={article.id} className="flex gap-2">
+                  <div key={article.id} className="flex w-full">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline" size="icon" className="rounded-r-none pl-3 pr-2 border-r-0" onClick={() => handleSeedArticle(article, article.id)} disabled={loadingStates[article.id] || !firestore}>
+                            {loadingStates[article.id] ? <Loader2 className="h-5 w-5 animate-spin" /> : <Database className="h-5 w-5" />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Popular dados para {article.title}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
                     <Link href={`/wiki/edit/${article.id}`} passHref className='w-full'>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Pencil className="mr-2 h-4 w-4" />
+                      <Button variant="outline" className="w-full justify-start rounded-l-none pl-2 border-l-0">
                         {article.title}
                       </Button>
                     </Link>
+                    
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -498,6 +511,22 @@ export function WikiManagementView() {
                     Visualizando os dados JSON.
                     </DialogDescription>
                 </div>
+                 {viewingContent?.id && (
+                    <div className="flex items-center gap-2">
+                         <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon" onClick={() => handleOpenEditDialog({id: viewingContent.id!, name: viewingContent.title })}>
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                <p>Renomear {viewingContent.title}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                )}
             </div>
           </DialogHeader>
           <ScrollArea className="h-[70vh] mt-4">
