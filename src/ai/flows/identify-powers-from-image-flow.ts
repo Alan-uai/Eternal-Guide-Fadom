@@ -61,22 +61,19 @@ const prompt = ai.definePrompt({
 
 Use o seguinte "CONHECIMENTO DE PODERES" como sua fonte de verdade para mapear os nomes dos poderes aos seus mundos de origem.
 
-Regras Estritas:
-1.  **Analise a Imagem:** Inspecione cuidadosamente cada poder nos screenshots.
-2.  **Extraia o Nome:** Identifique o nome de cada poder.
-3.  **Determine a Raridade:**
-    *   A raridade é indicada pela cor da borda do ícone do poder. Mapeie as cores para as raridades com precisão:
-        *   Cinza: Common
-        *   Verde: Uncommon
-        *   Azul: Rare
-        *   Magenta (um roxo mais claro, rosado): Epic
-        *   Amarelo/Dourado: Legendary
-        *   Vermelho: Mythic
-        *   Roxo (um roxo escuro e sólido): Phantom
-        *   Laranja/Arco-íris (borda com gradiente de várias cores): Supreme
-    *   Se a cor não for clara, use o nome do poder (ex: "Super Saiyan 3" é Supreme) e o conhecimento abaixo para determinar a raridade correta.
-4.  **Determine o Mundo:** Usando o "CONHECIMENTO DE PODERES" abaixo, encontre a qual mundo cada poder pertence. Se um poder não estiver na lista de conhecimento, marque o mundo como "Desconhecido".
-5.  **Formato de Saída:** Retorne uma lista JSON de objetos, onde cada objeto representa um poder identificado. Não inclua duplicatas na lista final.
+Regras Estritas para Identificação de Raridade por Cor:
+1.  **Analise a Cor da Borda:** Inspecione a cor predominante e os efeitos da borda de cada poder.
+2.  **Use este Manual de Cores preciso:**
+    *   **Common:** Borda cinza, com textura pontilhada.
+    *   **Uncommon:** Borda verde-limão brilhante.
+    *   **Rare:** Borda ciano/azul-claro brilhante.
+    *   **Epic:** Borda magenta/lilás sólida com um brilho interno mais claro.
+    *   **Legendary:** Borda amarela/dourada sólida com um brilho interno mais claro.
+    *   **Mythic:** Borda vermelha sólida com um brilho interno laranja/claro.
+    *   **Phantom:** Borda roxa escura com um brilho interno fúcsia/magenta vibrante.
+    *   **Supreme:** Borda com gradiente de várias cores (arco-íris), geralmente laranja/rosa/amarelo, com um brilho intenso.
+3.  **Determine o Mundo:** Usando o "CONHECIMENTO DE PODERES" abaixo, encontre a qual mundo cada poder pertence. Se um poder não estiver na lista de conhecimento, marque o mundo como "Desconhecido".
+4.  **Formato de Saída:** Retorne uma lista JSON de objetos, onde cada objeto representa um poder identificado. Não inclua duplicatas na lista final.
 
 ---
 INÍCIO DO CONHECIMENTO DE PODERES
