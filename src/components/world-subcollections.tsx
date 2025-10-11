@@ -98,7 +98,7 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                                 -- {item.name || item.id}
                             </Button>
                         </Link>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
