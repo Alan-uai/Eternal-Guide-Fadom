@@ -66,8 +66,13 @@ function AppStateProvider({ children }: { children: ReactNode }) {
           targetRoute = '/admin-chat';
         }
       } else {
-        if (pathname.startsWith('/admin')) {
-          targetRoute = '/';
+        // For non-admins, ensure they don't land on an admin page.
+        // If their last route was an admin one, redirect to home.
+        // Otherwise, send them to their last visited non-admin page.
+        if (lastRoute && !lastRoute.startsWith('/admin')) {
+            targetRoute = lastRoute;
+        } else {
+            targetRoute = '/';
         }
       }
 
