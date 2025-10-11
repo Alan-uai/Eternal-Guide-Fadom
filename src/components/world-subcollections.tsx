@@ -1,6 +1,6 @@
 'use client';
 
-import { useFirestore, useMemoFirebase } from '@/firebase';
+import { useFirestore, useMemoFirebase, useCollection } from '@/firebase';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { Button } from './ui/button';
