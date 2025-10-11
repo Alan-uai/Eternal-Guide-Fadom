@@ -123,7 +123,7 @@ export function WikiManagementView() {
   const { toast } = useToast();
   const router = useRouter();
   
-  const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, editPath?: string } | null>(null);
+  const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, isWorld: boolean } | null>(null);
   const [editingWorld, setEditingWorld] = useState<{ id: string, name: string } | null>(null);
   const [newWorldName, setNewWorldName] = useState('');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
@@ -151,7 +151,7 @@ export function WikiManagementView() {
     });
   }, [worlds]);
 
-    const handleViewContent = (title: string, data: any, id?: string, editPath?: string) => {
+    const handleViewContent = (title: string, data: any, id?: string, isWorld: boolean = false) => {
         let finalData = data;
         // Se for um mundo (tem id), mescla com os dados estáticos da lib
         if (id && staticWorldDataMap[id]) {
@@ -162,7 +162,7 @@ export function WikiManagementView() {
             // This assumes sub-collections in Firestore completely override the static ones if they exist.
             finalData = { ...staticData, ...data };
         }
-        setViewingContent({ title, data: finalData, id, editPath });
+        setViewingContent({ title, data: finalData, id, isWorld });
     };
 
   const handleOpenEditDialog = (world: { id: string, name: string }) => {
@@ -329,7 +329,7 @@ export function WikiManagementView() {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                           <Button variant="ghost" size="icon" onClick={() => handleViewContent(article.title, article, article.id, `/wiki/edit/${article.id}`)}>
+                           <Button variant="ghost" size="icon" onClick={() => handleViewContent(article.title, article, article.id, false)}>
                             <Eye className="h-5 w-5" />
                           </Button>
                         </TooltipTrigger>
@@ -363,7 +363,7 @@ export function WikiManagementView() {
                    <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleViewContent("Acessórios", accessories)}>
+                            <Button variant="ghost" size="icon" onClick={() => handleViewContent("Acessórios", accessories, undefined, false)}>
                                 <Eye className="h-5 w-5" />
                             </Button>
                         </TooltipTrigger>
@@ -420,7 +420,7 @@ export function WikiManagementView() {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={() => handleViewContent(world.name, world, world.id)}>
+                                <Button variant="ghost" size="icon" onClick={() => handleViewContent(world.name, world, world.id, true)}>
                                   <Eye className="h-5 w-5" />
                                 </Button>
                               </TooltipTrigger>
@@ -450,7 +450,7 @@ export function WikiManagementView() {
                     Visualizando os dados JSON.
                     </DialogDescription>
                 </div>
-                 {viewingContent?.id && (
+                 {viewingContent?.isWorld && (
                     <div className="flex items-center gap-2">
                          <TooltipProvider>
                             <Tooltip>
