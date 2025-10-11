@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useFirestore, useCollection, useMemoFirebase, useUser } from '@/firebase';
-import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, writeBatch, collection, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -201,11 +201,24 @@ export function WikiManagementView() {
         return;
     }
 
-    const batch = writeBatch(firestore);
     const worldRef = doc(firestore, 'worlds', worldId);
-    batch.set(worldRef, { name: worldData.name });
+    let currentWorldName = worldData.name;
 
-    const allDataForBatch: Record<string, any> = { [worldRef.path]: { name: worldData.name } };
+    try {
+        const worldDocSnap = await getDoc(worldRef);
+        if (worldDocSnap.exists()) {
+            currentWorldName = worldDocSnap.data().name || worldData.name;
+        }
+    } catch (error) {
+        console.error("Erro ao buscar nome do mundo:", error);
+    }
+    
+    const batch = writeBatch(firestore);
+    
+    // Use set with merge:true to preserve the name and other top-level fields
+    batch.set(worldRef, { name: currentWorldName }, { merge: true });
+
+    const allDataForBatch: Record<string, any> = { [worldRef.path]: { name: currentWorldName } };
 
     const seedSubcollection = (subcollectionName: string, items: any[]) => {
       if (items && items.length > 0) {
@@ -237,7 +250,7 @@ export function WikiManagementView() {
     seedSubcollection('stands', worldData.stands);
     
     await batch.commit().then(() => {
-        toast({ title: 'Sucesso!', description: `Os dados do ${worldData.name} foram populados.` });
+        toast({ title: 'Sucesso!', description: `Os dados do ${currentWorldName} foram populados.` });
     }).catch(() => {
         const permissionError = new FirestorePermissionError({
             path: `worlds/${worldId} e subcoleções`, operation: 'write', requestResourceData: allDataForBatch,
@@ -658,5 +671,3 @@ export function WikiManagementView() {
     </>
   );
 }
-
-    
