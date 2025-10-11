@@ -1,7 +1,7 @@
 'use client';
 
 import { useFirestore, useMemoFirebase, useCollection } from '@/firebase';
-import { collection, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, deleteDoc, updateDoc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Loader2, PlusCircle, Trash2, ChevronRight, Check } from 'lucide-react';
@@ -33,6 +33,8 @@ import { useRouter } from 'next/navigation';
 import { Textarea } from './ui/textarea';
 import backendSchema from '@/../docs/backend.json';
 import { ScrollArea } from './ui/scroll-area';
+import { nanoid } from 'nanoid';
+
 
 const DEFAULT_SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
 
@@ -265,6 +267,66 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
     );
 }
 
+function AddNewItemDialog({ subcollectionName, subcollectionRef, triggerButton }: { subcollectionName: string; subcollectionRef: any; triggerButton: React.ReactNode; }) {
+    const { toast } = useToast();
+    const [isOpen, setIsOpen] = useState(false);
+    const [newItemName, setNewItemName] = useState('');
+    const [isCreating, setIsCreating] = useState(false);
+  
+    const handleCreateItem = async () => {
+      if (!newItemName.trim() || !subcollectionRef) return;
+  
+      setIsCreating(true);
+      const newItemId = nanoid();
+      const newItemRef = doc(subcollectionRef, newItemId);
+  
+      try {
+        await setDoc(newItemRef, { name: newItemName, id: newItemId });
+        toast({ title: "Item Criado!", description: `O item "${newItemName}" foi adicionado a ${subcollectionName}.` });
+        setNewItemName('');
+        setIsOpen(false);
+      } catch (error: any) {
+        console.error("Erro ao criar item:", error);
+        toast({ variant: "destructive", title: "Erro ao Criar", description: error.message });
+      } finally {
+        setIsCreating(false);
+      }
+    };
+  
+    return (
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <div onClick={() => setIsOpen(true)}>
+          {triggerButton}
+        </div>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Adicionar em <span className='capitalize text-primary'>{subcollectionName}</span></DialogTitle>
+            <DialogDescription>
+              Dê um nome para o novo item. Você poderá adicionar mais detalhes depois.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="item-name">Nome do Item</Label>
+            <Input
+              id="item-name"
+              placeholder={`ex: Poder do Trovão`}
+              value={newItemName}
+              onChange={(e) => setNewItemName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreateItem()}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancelar</Button>
+            <Button type="submit" onClick={handleCreateItem} disabled={isCreating}>
+              {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Criar Item
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
 export function WorldSubcollections({ worldId, fetchedSubcollections }: { worldId: string, fetchedSubcollections: string[] }) {
     const firestore = useFirestore();
     const router = useRouter();
@@ -293,6 +355,9 @@ export function WorldSubcollections({ worldId, fetchedSubcollections }: { worldI
       setIsCreatingCategory(true);
       const slug = newCategoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       const newPath = `/wiki/edit/new?collectionPath=worlds/${worldId}/${slug}`;
+      // Instead of navigating, we'll just close the dialog. The new category will appear.
+      // We might need a way to refresh the subcollection list though. For now, let's keep it simple.
+      toast({ title: "Ação necessária", description: `Agora adicione um item à sua nova categoria "${slug}" para que ela apareça.` });
       router.push(newPath);
       setIsAddCategoryOpen(false);
       setNewCategoryName('');
@@ -371,17 +436,18 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
     }
 
     if (!items || items.length === 0) {
-        const newPath = `/wiki/edit/new?collectionPath=worlds/${worldId}/${subcollectionName}`;
         return (
-            <Link href={newPath} passHref>
-                <Button variant="ghost" className="w-full justify-start text-sm capitalize text-muted-foreground">
-                    + Adicionar em {subcollectionName}
-                </Button>
-            </Link>
+            <AddNewItemDialog
+                subcollectionName={subcollectionName}
+                subcollectionRef={subcollectionRef}
+                triggerButton={
+                    <Button variant="ghost" className="w-full justify-start text-sm capitalize text-muted-foreground">
+                        + Adicionar em {subcollectionName}
+                    </Button>
+                }
+            />
         );
     }
-
-    const collectionPath = `worlds/${worldId}/${subcollectionName}`;
 
     return (
         <Collapsible>
@@ -431,11 +497,15 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                         </Collapsible>
                     )
                 })}
-                 <Link href={`/wiki/edit/new?collectionPath=${collectionPath}`} passHref>
-                    <Button variant="ghost" className="w-full justify-start text-xs text-muted-foreground">
-                        <PlusCircle className="mr-2 h-4 w-4"/> Adicionar Novo
-                    </Button>
-                </Link>
+                <AddNewItemDialog
+                    subcollectionName={subcollectionName}
+                    subcollectionRef={subcollectionRef}
+                    triggerButton={
+                        <Button variant="ghost" className="w-full justify-start text-xs text-muted-foreground">
+                            <PlusCircle className="mr-2 h-4 w-4"/> Adicionar Novo
+                        </Button>
+                    }
+                />
             </CollapsibleContent>
         </Collapsible>
     );

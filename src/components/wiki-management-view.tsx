@@ -424,7 +424,7 @@ export function WikiManagementView() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Dados de Jogo por Mundo</CardTitle>
-              <Link href="/wiki/edit/new?collectionPath=worlds" passHref>
+              <Link href="/admin/edit-collection/worlds/new" passHref>
                 <Button variant="outline" size="sm">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Novo Mundo
@@ -498,27 +498,6 @@ export function WikiManagementView() {
                     Visualizando os dados JSON.
                     </DialogDescription>
                 </div>
-                {viewingContent?.id && (
-                    <TooltipProvider>
-                        <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                                handleOpenEditDialog({ id: viewingContent!.id!, name: viewingContent!.title });
-                                setViewingContent(null);
-                            }}
-                            >
-                            <Pencil className="h-5 w-5" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Renomear {viewingContent.title}</p>
-                        </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                )}
             </div>
           </DialogHeader>
           <ScrollArea className="h-[70vh] mt-4">
