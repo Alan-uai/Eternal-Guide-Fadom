@@ -1,10 +1,10 @@
 'use client';
 
 import { useFirestore, useMemoFirebase, useCollection } from '@/firebase';
-import { collection, doc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Loader2, PlusCircle, Trash2 } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   AlertDialog,
@@ -30,10 +30,100 @@ import { useState } from 'react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useRouter } from 'next/navigation';
+import { Textarea } from './ui/textarea';
 
-// Hardcoded list represents the default or common subcollections.
-// The UI will also display any other subcollections found.
 const DEFAULT_SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
+
+function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
+    const { toast } = useToast();
+    const [localData, setLocalData] = useState(item);
+
+    const handleFieldChange = (key: string, value: string | number | boolean | object) => {
+        setLocalData({ ...localData, [key]: value });
+    };
+
+    const handleSaveField = async (key: string) => {
+        const newValue = localData[key];
+        try {
+            await updateDoc(itemRef, { [key]: newValue });
+            toast({
+                title: 'Campo Atualizado!',
+                description: `O campo "${key}" foi salvo com sucesso.`,
+            });
+        } catch (error: any) {
+            console.error("Erro ao atualizar campo:", error);
+            toast({ variant: 'destructive', title: "Erro ao Salvar", description: error.message });
+            // Revert local state on error
+            setLocalData(item);
+        }
+    };
+
+    const renderField = (key: string, value: any) => {
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+             return (
+                <div key={key} className="space-y-2 p-2 border rounded-md bg-background/50">
+                    <Label className="font-semibold capitalize text-primary">{key}</Label>
+                    <div className="pl-4 space-y-2">
+                        {Object.entries(value).map(([subKey, subValue]) => renderField(`${key}.${subKey}`, subValue))}
+                    </div>
+                </div>
+             )
+        }
+        
+        if (typeof value === 'object' && value !== null && Array.isArray(value)) {
+            const jsonString = JSON.stringify(value, null, 2);
+             return (
+                <div key={key} className="space-y-2">
+                    <Label htmlFor={key} className="capitalize">{key}</Label>
+                    <Textarea
+                        id={key}
+                        value={jsonString}
+                        className="font-mono text-xs min-h-[100px]"
+                        onChange={(e) => {
+                             try {
+                                const parsed = JSON.parse(e.target.value);
+                                handleFieldChange(key, parsed);
+                            } catch (err) {
+                                // Handle invalid JSON if needed, maybe just update string
+                            }
+                        }}
+                        onBlur={() => handleSaveField(key)}
+                    />
+                </div>
+            )
+        }
+
+        const isLongText = typeof value === 'string' && value.length > 70;
+
+        return (
+            <div key={key} className="space-y-2">
+                <Label htmlFor={key} className="capitalize">{key}</Label>
+                 {isLongText ? (
+                    <Textarea
+                        id={key}
+                        value={localData[key]}
+                        onChange={(e) => handleFieldChange(key, e.target.value)}
+                        onBlur={() => handleSaveField(key)}
+                    />
+                ) : (
+                    <Input
+                        id={key}
+                        type="text"
+                        value={localData[key]}
+                        onChange={(e) => handleFieldChange(key, e.target.value)}
+                        onBlur={() => handleSaveField(key)}
+                    />
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-3 bg-muted/50 rounded-md border space-y-4">
+             {Object.entries(localData).filter(([key]) => key !== 'id').map(([key, value]) => renderField(key, value))}
+        </div>
+    );
+}
 
 export function WorldSubcollections({ worldId, fetchedSubcollections }: { worldId: string, fetchedSubcollections: string[] }) {
     const firestore = useFirestore();
@@ -69,7 +159,6 @@ export function WorldSubcollections({ worldId, fetchedSubcollections }: { worldI
       setIsCreatingCategory(false);
     }
 
-    // Combine default and fetched collections, removing duplicates
     const allSubcollections = Array.from(new Set([...DEFAULT_SUBCOLLECTIONS, ...fetchedSubcollections]));
 
     return (
@@ -129,7 +218,6 @@ interface SubcollectionItemsProps {
 
 function SubcollectionItems({ worldId, subcollectionName, onDelete }: SubcollectionItemsProps) {
     const firestore = useFirestore();
-    // This hook is now primarily for getting the *items* within a known subcollection.
     const subcollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'worlds', worldId, subcollectionName) : null, [firestore, worldId, subcollectionName]);
     const { data: items, isLoading } = useCollection(subcollectionRef as any);
 
@@ -158,46 +246,56 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
     return (
         <Collapsible>
             <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start text-sm capitalize">
-                    - {subcollectionName} ({items.length})
+                <Button variant="ghost" className="w-full justify-between text-sm capitalize">
+                   <span>{subcollectionName} ({items.length})</span>
+                   <ChevronRight className="h-4 w-4 transform transition-transform duration-200 group-data-[state=open]:rotate-90"/>
                 </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="pl-4 pt-2 space-y-1">
-                {items.map((item: any) => (
-                    <div key={item.id} className="flex items-center justify-between group">
-                         <Link href={`/wiki/edit/${item.id}?collectionPath=${collectionPath}`} passHref className='flex-1'>
-                            <Button variant="ghost" className="w-full justify-start text-xs h-8">
-                                -- {item.name || item.id}
-                            </Button>
-                        </Link>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity md:opacity-100">
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Esta ação não pode ser desfeita. Isso excluirá permanentemente o item
-                                    <span className='font-bold text-foreground'> {item.name || item.id} </span>
-                                    do banco de dados.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => onDelete(subcollectionName, item.id)}>Excluir</AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    </div>
-                ))}
+            <CollapsibleContent className="pl-4 pt-2 space-y-2">
+                {items.map((item: any) => {
+                    const itemRef = doc(firestore, 'worlds', worldId, subcollectionName, item.id);
+                    return (
+                        <Collapsible key={item.id}>
+                            <div className="flex items-center justify-between group">
+                               <CollapsibleTrigger asChild>
+                                   <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                                       <ChevronRight className="mr-2 h-3 w-3 transform transition-transform duration-200 group-data-[state=open]:rotate-90"/>
+                                       {item.name || item.id}
+                                   </Button>
+                               </CollapsibleTrigger>
+                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                   <AlertDialog>
+                                     <AlertDialogTrigger asChild>
+                                       <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
+                                         <Trash2 className="h-4 w-4" />
+                                       </Button>
+                                     </AlertDialogTrigger>
+                                     <AlertDialogContent>
+                                       <AlertDialogHeader>
+                                         <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                         <AlertDialogDescription>
+                                           Esta ação não pode ser desfeita. Isso excluirá permanentemente o item
+                                           <span className='font-bold text-foreground'> {item.name || item.id} </span>
+                                           do banco de dados.
+                                         </AlertDialogDescription>
+                                       </AlertDialogHeader>
+                                       <AlertDialogFooter>
+                                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                         <AlertDialogAction onClick={() => onDelete(subcollectionName, item.id)}>Excluir</AlertDialogAction>
+                                       </AlertDialogFooter>
+                                     </AlertDialogContent>
+                                   </AlertDialog>
+                               </div>
+                            </div>
+                             <CollapsibleContent className="pl-6 pr-2 py-2">
+                                <InlineItemEditor item={item} itemRef={itemRef} />
+                            </CollapsibleContent>
+                        </Collapsible>
+                    )
+                })}
                  <Link href={`/wiki/edit/new?collectionPath=${collectionPath}`} passHref>
                     <Button variant="ghost" className="w-full justify-start text-xs text-muted-foreground">
-                        + Adicionar Novo
+                        <PlusCircle className="mr-2 h-4 w-4"/> Adicionar Novo
                     </Button>
                 </Link>
             </CollapsibleContent>
