@@ -26,23 +26,54 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useRouter } from 'next/navigation';
 import { Textarea } from './ui/textarea';
+import backendSchema from '@/../docs/backend.json';
+import { ScrollArea } from './ui/scroll-area';
 
 const DEFAULT_SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
 
-function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
+function getEntitySchemaForSubcollection(subcollectionName: string) {
+    if (!backendSchema.firestore || !backendSchema.firestore.structure) return null;
+
+    const singularName = subcollectionName.endsWith('s') ? subcollectionName.slice(0, -1) : subcollectionName;
+    
+    // Find the definition in the firestore structure
+    const structureDef = backendSchema.firestore.structure.find(s => {
+        const pathEnd = s.path.split('/').slice(-2)[0];
+        // e.g. /worlds/{worldId}/powers/{powerId} -> 'powers'
+        return pathEnd === subcollectionName;
+    });
+
+    const entityName = structureDef?.definition.entityName;
+
+    if (!entityName || !(entityName in backendSchema.entities)) {
+        return null;
+    }
+
+    return (backendSchema.entities as Record<string, any>)[entityName];
+}
+
+function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, itemRef: any, subcollectionName: string }) {
     const { toast } = useToast();
     const [localData, setLocalData] = useState(item);
     const [isAddingField, setIsAddingField] = useState(false);
     const [newFieldKey, setNewFieldKey] = useState('');
     const [newFieldValue, setNewFieldValue] = useState('');
+    const [fieldToAdd, setFieldToAdd] = useState<string | null>(null);
+
+    const entitySchema = useMemo(() => getEntitySchemaForSubcollection(subcollectionName), [subcollectionName]);
+    
+    const suggestedFields = useMemo(() => {
+        if (!entitySchema || !entitySchema.properties) return [];
+        const existingKeys = Object.keys(localData);
+        return Object.keys(entitySchema.properties).filter(propKey => !existingKeys.includes(propKey));
+    }, [entitySchema, localData]);
 
     const handleFieldChange = (key: string, value: any) => {
-        // Handle nested keys
         if (key.includes('.')) {
             const keys = key.split('.');
             setLocalData((prev: any) => {
@@ -81,26 +112,34 @@ function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
         } catch (error: any) {
             console.error("Erro ao atualizar campo:", error);
             toast({ variant: 'destructive', title: "Erro ao Salvar", description: error.message });
-            setLocalData(item); // Revert local state on error
+            setLocalData(item);
         }
     };
     
     const handleAddNewField = async () => {
-        if (!newFieldKey.trim()) {
+        const keyToAdd = fieldToAdd || newFieldKey;
+        if (!keyToAdd.trim()) {
             toast({ variant: 'destructive', title: 'Erro', description: 'O nome do campo não pode ser vazio.' });
             return;
         }
         try {
-            await updateDoc(itemRef, { [newFieldKey]: newFieldValue });
-            toast({ title: 'Campo Adicionado!', description: `O campo "${newFieldKey}" foi adicionado.` });
-            setLocalData({ ...localData, [newFieldKey]: newFieldValue });
+            await updateDoc(itemRef, { [keyToAdd]: newFieldValue });
+            toast({ title: 'Campo Adicionado!', description: `O campo "${keyToAdd}" foi adicionado.` });
+            setLocalData({ ...localData, [keyToAdd]: newFieldValue });
             setNewFieldKey('');
             setNewFieldValue('');
             setIsAddingField(false);
+            setFieldToAdd(null);
         } catch (error: any) {
              console.error("Erro ao adicionar campo:", error);
             toast({ variant: 'destructive', title: "Erro ao Adicionar", description: error.message });
         }
+    };
+
+    const handleOpenAddFieldDialog = (fieldName: string | null = null) => {
+        setFieldToAdd(fieldName);
+        setNewFieldKey(fieldName || '');
+        setIsAddingField(true);
     };
 
     const renderField = (key: string, value: any, prefix = '') => {
@@ -168,18 +207,34 @@ function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
     return (
         <div className="p-3 bg-muted/50 rounded-md border space-y-4">
              {Object.entries(localData).filter(([key]) => key !== 'id').map(([key, value]) => renderField(key, value))}
-            <Button variant="ghost" className="w-full justify-center text-xs text-muted-foreground" onClick={() => setIsAddingField(true)}>
+            <Button variant="ghost" className="w-full justify-center text-xs text-muted-foreground" onClick={() => handleOpenAddFieldDialog()}>
                 <PlusCircle className="mr-2 h-4 w-4"/> Adicionar Campo
             </Button>
             <Dialog open={isAddingField} onOpenChange={setIsAddingField}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Adicionar Novo Campo</DialogTitle>
-                        <DialogDescription>
-                            Insira o nome e o valor para o novo campo a ser adicionado a este item.
+                         <DialogDescription>
+                            {suggestedFields.length > 0 ? "Escolha uma sugestão ou adicione um campo personalizado." : "Insira o nome e o valor para o novo campo."}
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
+
+                     {suggestedFields.length > 0 && (
+                        <div className='py-2'>
+                            <Label className="text-sm font-medium">Sugestões de Campos</Label>
+                            <ScrollArea className="h-24 mt-2">
+                                <div className="space-y-2 pr-4">
+                                {suggestedFields.map(field => (
+                                    <Button key={field} variant="outline" size="sm" className="w-full justify-start" onClick={() => handleOpenAddFieldDialog(field)}>
+                                        + {field}
+                                    </Button>
+                                ))}
+                                </div>
+                            </ScrollArea>
+                        </div>
+                    )}
+
+                    <div className="space-y-4 pt-2">
                         <div className="space-y-2">
                             <Label htmlFor="new-field-key">Nome do Campo (Chave)</Label>
                             <Input 
@@ -187,6 +242,7 @@ function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
                                 placeholder="ex: chance, cooldown" 
                                 value={newFieldKey}
                                 onChange={(e) => setNewFieldKey(e.target.value)}
+                                disabled={!!fieldToAdd}
                             />
                         </div>
                         <div className="space-y-2">
@@ -200,7 +256,7 @@ function InlineItemEditor({ item, itemRef }: { item: any, itemRef: any }) {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsAddingField(false)}>Cancelar</Button>
+                        <Button variant="outline" onClick={() => { setIsAddingField(false); setFieldToAdd(null); }}>Cancelar</Button>
                         <Button onClick={handleAddNewField}>Salvar Campo</Button>
                     </DialogFooter>
                 </DialogContent>
@@ -370,7 +426,7 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                                 </AlertDialog>
                             </div>
                              <CollapsibleContent className="pl-6 pr-2 py-2">
-                                <InlineItemEditor item={item} itemRef={itemRef} />
+                                <InlineItemEditor item={item} itemRef={itemRef} subcollectionName={subcollectionName} />
                             </CollapsibleContent>
                         </Collapsible>
                     )
