@@ -14,6 +14,7 @@ import { identifyPowersFromImage, type IdentifiedPower } from '@/ai/flows/identi
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 const profileCategories = [
     { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection },
