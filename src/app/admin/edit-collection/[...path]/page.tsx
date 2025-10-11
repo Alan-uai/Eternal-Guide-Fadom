@@ -34,12 +34,11 @@ function NewWorldForm() {
     const [worldName, setWorldName] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [fileName, setFileName] = useState<string | null>(null);
-
+    const [fileCount, setFileCount] = useState(0);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        setFileName(file ? file.name : null);
+        const files = event.target.files;
+        setFileCount(files ? files.length : 0);
     };
 
     const handleCreateWorld = async (e: React.FormEvent) => {
@@ -47,11 +46,11 @@ function NewWorldForm() {
         if (!worldName.trim() || !firestore) return;
 
         setIsCreating(true);
-        const file = fileInputRef.current?.files?.[0];
+        const files = fileInputRef.current?.files;
 
         try {
-            // Case 1: No file, just create the world document
-            if (!file) {
+            // Case 1: No files, just create the world document
+            if (!files || files.length === 0) {
                 const worldId = worldName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
                 if (!worldId) {
                     toast({ variant: 'destructive', title: 'Nome Inválido', description: 'Por favor, insira um nome de mundo válido.' });
@@ -65,40 +64,54 @@ function NewWorldForm() {
                 return;
             }
 
-            // Case 2: File provided, start the Smart Seeding process
-            toast({ title: 'Processando Arquivo...', description: 'A IA está lendo e estruturando os dados. Isso pode levar um momento.' });
+            // Case 2: Files provided, start the Smart Seeding process
+            toast({ title: 'Processando Arquivos...', description: 'A IA está lendo e estruturando os dados. Isso pode levar um momento.' });
 
-            // Step 1: Extract text from file (works for images, PDFs, and plain text)
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                const fileDataUri = reader.result as string;
-                const extractionType = file.type.startsWith('image/') || file.type === 'application/pdf' ? 'json' : 'markdown';
+            let allExtractedText = '';
+            
+            for (const file of Array.from(files)) {
+                const reader = new FileReader();
+                const filePromise = new Promise<string>((resolve, reject) => {
+                    reader.onload = async () => {
+                        try {
+                            const fileDataUri = reader.result as string;
+                            const extractionType = file.type.startsWith('image/') || file.type === 'application/pdf' ? 'json' : 'markdown';
+                            
+                            const rawTextResult = await extractTextFromFile({ fileDataUri, extractionType: 'markdown' });
+                            if (!rawTextResult || typeof rawTextResult.extractedText === 'undefined') {
+                                throw new Error(`A IA não conseguiu extrair texto do arquivo: ${file.name}`);
+                            }
+                            resolve(rawTextResult.extractedText);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsDataURL(file);
+                });
                 
-                const rawTextResult = await extractTextFromFile({ fileDataUri, extractionType: 'markdown' });
-                if (!rawTextResult || !rawTextResult.extractedText) {
-                    throw new Error("A IA não conseguiu extrair texto do arquivo.");
-                }
-                
-                // Step 2: Format the extracted text into a structured JSON
-                const jsonResult = await formatTextToJson({ rawText: rawTextResult.extractedText });
-                 if (!jsonResult || !jsonResult.jsonString || jsonResult.jsonString === '[]') {
-                    throw new Error("A IA não conseguiu formatar os dados para JSON.");
-                }
+                allExtractedText += (await filePromise) + '\n\n';
+            }
+            
+            if (!allExtractedText.trim()) {
+                throw new Error("A IA não conseguiu extrair nenhum texto dos arquivos fornecidos.");
+            }
 
-                // Step 3: Seed the data into Firestore using the new flow
-                toast({ title: 'Semeando Dados...', description: 'Os dados foram estruturados. Agora, salvando no banco de dados.' });
-                const seedResult = await seedWorldData({ worldName, worldDataJson: jsonResult.jsonString });
-                
-                if (seedResult) {
-                    toast({ title: 'Mundo Criado e Populado!', description: `O mundo "${worldName}" e seus dados foram criados com sucesso.` });
-                    router.push('/admin/manage-content');
-                } else {
-                    throw new Error("Falha ao salvar os dados do mundo no Firestore.");
-                }
-            };
-            reader.onerror = (error) => {
-                throw error;
+            // Step 2: Format the combined extracted text into a structured JSON
+            const jsonResult = await formatTextToJson({ rawText: allExtractedText });
+             if (!jsonResult || !jsonResult.jsonString || jsonResult.jsonString === '[]') {
+                throw new Error("A IA não conseguiu formatar os dados para JSON a partir dos textos combinados.");
+            }
+
+            // Step 3: Seed the data into Firestore using the new flow
+            toast({ title: 'Semeando Dados...', description: 'Os dados foram estruturados. Agora, salvando no banco de dados.' });
+            const seedResult = await seedWorldData({ worldName, worldDataJson: jsonResult.jsonString });
+            
+            if (seedResult) {
+                toast({ title: 'Mundo Criado e Populado!', description: `O mundo "${worldName}" e seus dados foram criados com sucesso.` });
+                router.push('/admin/manage-content');
+            } else {
+                throw new Error("Falha ao salvar os dados do mundo no Firestore.");
             }
 
         } catch (error: any) {
@@ -115,7 +128,7 @@ function NewWorldForm() {
                 <CardHeader>
                     <CardTitle>Criar Novo Mundo</CardTitle>
                     <CardDescription>
-                       Dê um nome ao seu novo mundo. Opcionalmente, envie um arquivo de dados (.json, imagem, pdf) para populá-lo automaticamente (Smart Seeding).
+                       Dê um nome ao seu novo mundo. Opcionalmente, envie um ou mais arquivos de dados (.json, imagem, pdf) para populá-lo automaticamente (Smart Seeding).
                     </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleCreateWorld}>
@@ -131,14 +144,14 @@ function NewWorldForm() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="world-data-file">Arquivo de Dados (Opcional)</Label>
+                            <Label htmlFor="world-data-file">Arquivos de Dados (Opcional)</Label>
                             <div className="relative">
-                                <Input id="world-data-file" type="file" className="pl-12 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" ref={fileInputRef} onChange={handleFileChange} />
+                                <Input id="world-data-file" type="file" multiple className="pl-12 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" ref={fileInputRef} onChange={handleFileChange} />
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <Upload className="h-5 w-5 text-gray-400" />
                                 </div>
                             </div>
-                             {fileName && <p className="text-xs text-muted-foreground mt-2">Arquivo selecionado: {fileName}</p>}
+                             {fileCount > 0 && <p className="text-xs text-muted-foreground mt-2">{fileCount} arquivo(s) selecionado(s).</p>}
                         </div>
                     </CardContent>
                     <CardFooter>
@@ -230,3 +243,5 @@ export default function EditCollectionPage() {
     </div>
   );
 }
+
+    
