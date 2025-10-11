@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles, HelpCircle, UploadCloud } from 'lucide-react';
