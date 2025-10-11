@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useFirestore, useCollection, useMemoFirebase, useUser } from '@/firebase';
 import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -447,7 +447,8 @@ export function WikiManagementView() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                               <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pl-3 pr-2" onClick={() => seedInfo && seedWorldGeneric(world.id, seedInfo.data, seedInfo.key)} disabled={loadingStates[seedInfo?.key] || !firestore}>
+                               {/* #a borda a direita deve permanecer removida, nunca reintroduzir. */}
+                               <Button variant="outline" size="icon" className="rounded-r-none pl-3 pr-2 border-r-0" onClick={() => seedInfo && seedWorldGeneric(world.id, seedInfo.data, seedInfo.key)} disabled={loadingStates[seedInfo?.key] || !firestore}>
                                 {loadingStates[seedInfo?.key] ? <Loader2 className="h-5 w-5 animate-spin" /> : <Database className="h-5 w-5" />}
                               </Button>
                             </TooltipTrigger>
@@ -457,7 +458,8 @@ export function WikiManagementView() {
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start rounded-l-none pl-2">
+                            {/* #a borda a esquerda deve permanecer removida, nunca reintroduzir. */}
+                            <Button variant="outline" className="w-full justify-start rounded-l-none pl-2 border-l-0">
                                 {world.name}
                             </Button>
                         </CollapsibleTrigger>
