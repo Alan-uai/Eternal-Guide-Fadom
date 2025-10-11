@@ -72,8 +72,9 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
     }
 
     if (!items || items.length === 0) {
+        const newPath = `/wiki/edit/new?collectionPath=worlds/${worldId}/${subcollectionName}`;
         return (
-            <Link href={`/admin/edit-collection/worlds/${worldId}/${subcollectionName}`} passHref>
+            <Link href={newPath} passHref>
                 <Button variant="ghost" className="w-full justify-start text-sm capitalize text-muted-foreground">
                     + Adicionar em {subcollectionName}
                 </Button>
@@ -100,7 +101,7 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                                 -- {item.name || item.id}
                             </Button>
                         </Link>
-                        <div className="flex items-center gap-1 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity md:opacity-100">
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">

@@ -373,27 +373,30 @@ export function WikiManagementView() {
               ) : (
                 sortedWorlds?.map(world => {
                   const seedInfo = worldSeedData[world.id];
+                  const editWorldHref = `/wiki/edit/${world.id}?collectionPath=worlds`;
                   return (
                     <Collapsible key={world.id} className="space-y-2">
                       <div className="flex w-full">
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref>
-                                <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pl-2 pr-1">
+                              <Link href={editWorldHref} passHref>
+                                <Button variant="outline" size="icon" className="rounded-r-none border-r-0 pl-3 pr-1">
                                   <Database className="h-5 w-5" />
                                 </Button>
                               </Link>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Gerenciar {world.name}</p>
+                              <p>Editar nome de {world.name}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
                         <CollapsibleTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 pl-2">
-                            {world.name}
-                          </Button>
+                           <Link href={`/admin/edit-collection/worlds/${world.id}`} passHref className='flex-1'>
+                                <Button variant="outline" className="w-full justify-start rounded-l-none border-l-0 pl-2">
+                                    {world.name}
+                                </Button>
+                           </Link>
                         </CollapsibleTrigger>
                         {seedInfo && (
                           <TooltipProvider>
