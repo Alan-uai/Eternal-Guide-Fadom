@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from './ui/textarea';
 import { Bot, Send, BookOpen } from 'lucide-react';
 import { micromark } from 'micromark';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ScrollArea } from './ui/scroll-area';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+
 
 const userGuide = `
 # Guia de Comandos para a IA
@@ -71,65 +73,69 @@ Ao relatar um bug, descreva o comportamento inesperado e, se possível, o compor
 `;
 
 
-function RulesGuide() {
+function RulesGuideDialog() {
     const htmlContent = useMemo(() => micromark(userGuide), []);
 
     return (
-        <Card className="h-full flex flex-col">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <BookOpen />
-                    Guia de Comandos da IA
-                </CardTitle>
-                <CardDescription>
-                    Use estes exemplos para me dar instruções.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 overflow-hidden">
-                <ScrollArea className="h-full">
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <BookOpen className="h-5 w-5" />
+                    <span className="sr-only">Abrir Guia de Comandos</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+                 <DialogHeader>
+                    <DialogTitle>Guia de Comandos da IA</DialogTitle>
+                    <DialogDescription>
+                        Use estes exemplos para me dar instruções.
+                    </DialogDescription>
+                </DialogHeader>
+                <ScrollArea className="h-[70vh] pr-4">
                     <div
                         className="prose prose-sm dark:prose-invert max-w-none"
                         dangerouslySetInnerHTML={{ __html: htmlContent }}
                     />
                 </ScrollArea>
-            </CardContent>
-        </Card>
+            </DialogContent>
+        </Dialog>
     )
 }
 
 
 export function AdminChatView() {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-            <div className='lg:col-span-1 h-full min-h-0'>
-                <RulesGuide />
-            </div>
-
-            <div className="lg:col-span-1 flex flex-col h-full border rounded-xl overflow-hidden">
-                <header className="p-4 border-b">
-                    <h1 className="text-lg font-semibold tracking-tight font-headline">Canal Direto com a IA</h1>
-                    <p className="text-sm text-muted-foreground">Utilize este painel para me dar instruções e direcionar o desenvolvimento.</p>
+        <div className="flex flex-col h-full">
+            <div className="flex-1 flex flex-col border rounded-xl overflow-hidden max-w-4xl mx-auto w-full">
+                <header className="p-4 border-b flex items-center justify-between">
+                    <div>
+                        <h1 className="text-lg font-semibold tracking-tight font-headline">Canal Direto com a IA</h1>
+                        <p className="text-sm text-muted-foreground">Utilize este painel para me dar instruções e direcionar o desenvolvimento.</p>
+                    </div>
+                    <RulesGuideDialog />
                 </header>
 
                  <div className="flex-1 overflow-auto relative">
-                    <div className="p-4 md:p-6 space-y-6">
-                        <div className="flex items-start gap-4">
-                            <div className="bg-primary/20 text-primary p-2 rounded-full border border-primary/50">
-                                <Bot size={20} />
+                    <ScrollArea className="h-full">
+                        <div className="p-4 md:p-6 space-y-6">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-primary/20 text-primary p-2 rounded-full border border-primary/50">
+                                    <Bot size={20} />
+                                </div>
+                                <Card className="max-w-2xl">
+                                    <CardHeader>
+                                        <CardTitle className='text-lg'>Assistente de Desenvolvimento</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p>Olá! Sou seu parceiro de codificação AI. Estou pronto para ajudar.</p>
+                                        <p className="mt-2 text-sm text-muted-foreground">
+                                            Use o campo abaixo para me dizer o que você precisa. Clique no ícone de livro acima para exemplos.
+                                        </p>
+                                    </CardContent>
+                                </Card>
                             </div>
-                            <Card className="max-w-2xl">
-                                <CardHeader>
-                                    <CardTitle className='text-lg'>Assistente de Desenvolvimento</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p>Olá! Sou seu parceiro de codificação AI. Estou pronto para ajudar.</p>
-                                    <p className="mt-2 text-sm text-muted-foreground">
-                                        Use o campo abaixo para me dizer o que você precisa. Consulte o guia ao lado para exemplos.
-                                    </p>
-                                </CardContent>
-                            </Card>
                         </div>
-                    </div>
+                    </ScrollArea>
                 </div>
 
                 <div className="border-t p-4 bg-background/50">
