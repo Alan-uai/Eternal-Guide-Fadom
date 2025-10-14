@@ -22,7 +22,7 @@ export const world9Data = {
                 },
                 {
                     rank: 'Rank SSS',
-                    rarity: 'Supremo',
+                    rarity: 'Supreme',
                     bonus: '12% Energy',
                 }
             ]

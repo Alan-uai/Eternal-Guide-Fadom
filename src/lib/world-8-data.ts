@@ -24,7 +24,7 @@ export const world8Data = {
                 },
                 {
                     rank: 'Rank SSS',
-                    rarity: 'Supremo',
+                    rarity: 'Supreme',
                     bonus: '12% Damage',
                     cooldown: '2s',
                 }
