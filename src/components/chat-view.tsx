@@ -35,7 +35,6 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         />
     );
 
-    const SECTION_MARKERS = ["INÍCIO", "MEIO", "FIM"];
     const SECTION_TITLES: { [key: string]: string } = {
         "INÍCIO": "Resposta Direta",
         "MEIO": "Justificativa e Detalhes",
@@ -43,64 +42,48 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
     };
 
     const sections = useMemo(() => {
-        const regex = new RegExp(`(\\d+\\.\\s*\\*\\*)(${SECTION_MARKERS.join('|')})(\\*\\*:)`, 'g');
-        const parts = content.split(regex);
-        let intro = '';
-        const collectedSections = [];
+        const sectionsData = [];
+        const inicioMarker = 'INÍCIO:';
+        const meioMarker = 'MEIO:';
+        const fimMarker = 'FIM:';
 
-        if (parts.length > 1) {
-            intro = parts[0].trim();
-            for (let i = 1; i < parts.length; i += 4) {
-                const marker = parts[i+1];
-                let sectionContent = (parts[i+4] || '').trim();
-                
-                // If there's a subsequent section, content ends there. Otherwise, take everything.
-                const nextSectionIndex = i + 4;
-                if (nextSectionIndex < parts.length) {
-                     // This logic is tricky with split, let's simplify.
-                }
+        const inicioIndex = content.indexOf(inicioMarker);
+        const meioIndex = content.indexOf(meioMarker);
+        const fimIndex = content.indexOf(fimMarker);
 
-                collectedSections.push({
-                    title: SECTION_TITLES[marker] || marker,
-                    content: sectionContent,
-                });
-            }
-             // A better way is to find splits and slice the content
-             const sectionsData = [];
-             const introEnd = content.indexOf('1. **INÍCIO**:');
-             const introText = introEnd === -1 ? content : content.substring(0, introEnd).trim();
-
-             const inicioStart = content.indexOf('**INÍCIO**:');
-             const meioStart = content.indexOf('**MEIO**:');
-             const fimStart = content.indexOf('**FIM**:');
-             
-             if (inicioStart !== -1) {
-                 const inicioContent = content.substring(
-                    inicioStart + '**INÍCIO**:'.length,
-                    meioStart !== -1 ? meioStart : fimStart !== -1 ? fimStart : content.length
-                 ).trim();
-                 sectionsData.push({ title: SECTION_TITLES.INÍCIO, content: inicioContent});
-             }
-            
-             if (meioStart !== -1) {
-                 const meioContent = content.substring(
-                    meioStart + '**MEIO**:'.length,
-                    fimStart !== -1 ? fimStart : content.length
-                 ).trim();
-                 sectionsData.push({ title: SECTION_TITLES.MEIO, content: meioContent});
-             }
-
-             if (fimStart !== -1) {
-                const fimContent = content.substring(fimStart + '**FIM**:'.length).trim();
-                sectionsData.push({ title: SECTION_TITLES.FIM, content: fimContent});
-             }
-
-            return { intro: introText, sections: sectionsData };
-
+        // Se nenhum dos marcadores principais for encontrado, trate como texto simples.
+        if (inicioIndex === -1 && meioIndex === -1 && fimIndex === -1) {
+            return { intro: content, sections: [] };
         }
 
-        // Fallback for non-structured content
-        return { intro: content, sections: [] };
+        // Encontra o início do primeiro marcador numerado (ex: "1. **INÍCIO:**")
+        const firstMarkerRegex = /(\d\.\s*\*\*)?INÍCIO:/;
+        const match = content.match(firstMarkerRegex);
+        const introEnd = match ? match.index : -1;
+        const intro = introEnd !== -1 ? content.substring(0, introEnd).trim() : '';
+
+        // Definir os pontos de início e fim de cada seção
+        if (inicioIndex !== -1) {
+            const start = inicioIndex + inicioMarker.length;
+            const end = meioIndex !== -1 ? meioIndex : fimIndex !== -1 ? fimIndex : content.length;
+            const contentPart = content.substring(start, end).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
+            sectionsData.push({ title: SECTION_TITLES.INÍCIO, content: contentPart });
+        }
+
+        if (meioIndex !== -1) {
+            const start = meioIndex + meioMarker.length;
+            const end = fimIndex !== -1 ? fimIndex : content.length;
+            const contentPart = content.substring(start, end).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
+            sectionsData.push({ title: SECTION_TITLES.MEIO, content: contentPart });
+        }
+
+        if (fimIndex !== -1) {
+            const start = fimIndex + fimMarker.length;
+            const contentPart = content.substring(start).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
+            sectionsData.push({ title: SECTION_TITLES.FIM, content: contentPart });
+        }
+        
+        return { intro, sections: sectionsData };
 
     }, [content]);
 
@@ -132,6 +115,7 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
             
             <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
                 {sections.sections.map((part, index) => {
+                    if (!part.content) return null; // Não renderizar seções vazias
                     const itemKey = `item-${index}`;
                     return (
                         <AccordionItem value={itemKey} key={index}>
@@ -182,6 +166,17 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
     }
 
     const lowerCasePrompt = prompt.toLowerCase();
+    
+    // Prioritize direct title matches or substring matches
+    const directTitleMatch = articles.find(article => 
+      article.title.toLowerCase().includes(lowerCasePrompt) || 
+      lowerCasePrompt.includes(article.title.toLowerCase())
+    );
+
+    if (directTitleMatch) {
+       return `Title: ${directTitleMatch.title}\nSummary: ${directTitleMatch.summary}\nContent: ${directTitleMatch.content}\nTables: ${JSON.stringify(directTitleMatch.tables || {})}`;
+    }
+
 
     const scoredArticles = articles.map(article => {
         let score = 0;
