@@ -1,11 +1,12 @@
+
 'use client';
 
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { useFirestore, useCollection, useMemoFirebase, useUser } from '@/firebase';
+import { collection, query, orderBy, doc, updateDoc, increment } from 'firebase/firestore';
 import { useAdmin } from '@/hooks/use-admin';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ShieldAlert, Inbox, Download, User, Image as ImageIcon, ThumbsDown, Bot, MessageSquare } from 'lucide-react';
+import { Loader2, ShieldAlert, Inbox, Download, User, Image as ImageIcon, ThumbsDown, Bot, MessageSquare, AlertTriangle, Check, Eye } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Head from 'next/head';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +16,8 @@ import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { micromark } from 'micromark';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Suggestion {
   id: string;
@@ -42,6 +44,8 @@ interface NegativeFeedback {
     seconds: number;
     nanoseconds: number;
   };
+  status: 'pending' | 'reviewing' | 'fixed';
+  reviewedBy?: string;
 }
 
 function ContentSuggestionsTab() {
@@ -134,12 +138,56 @@ function ContentSuggestionsTab() {
 }
 
 function NegativeFeedbackTab() {
-  const firestore = useFirestore();
+  const { user } = useUser();
+  const { firestore } = useFirebase();
+  const { toast } = useToast();
+  const [updatingFeedback, setUpdatingFeedback] = useState<string | null>(null);
+
   const feedbackQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return query(collection(firestore, 'negativeFeedback'), orderBy('createdAt', 'desc'));
   }, [firestore]);
   const { data: feedbacks, isLoading } = useCollection<NegativeFeedback>(feedbackQuery as any);
+
+  const handleUpdateStatus = async (feedbackItem: NegativeFeedback, newStatus: 'reviewing' | 'fixed') => {
+    if (!firestore || !user) return;
+    setUpdatingFeedback(feedbackItem.id);
+    const feedbackRef = doc(firestore, 'negativeFeedback', feedbackItem.id);
+    const userRef = doc(firestore, 'users', feedbackItem.userId);
+
+    try {
+        await updateDoc(feedbackRef, {
+            status: newStatus,
+            reviewedBy: user.email,
+        });
+
+        if (newStatus === 'fixed' && feedbackItem.status !== 'fixed') {
+            await updateDoc(userRef, {
+                reputationPoints: increment(1)
+            });
+        }
+
+        toast({
+            title: 'Status Atualizado!',
+            description: `O feedback foi marcado como "${newStatus}".`,
+        });
+
+    } catch (error: any) {
+        console.error("Erro ao atualizar status:", error);
+        toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível atualizar o status do feedback.' });
+    } finally {
+        setUpdatingFeedback(null);
+    }
+  };
+  
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+        case 'reviewing': return <Badge variant="secondary" className='bg-yellow-500/20 text-yellow-500 border-yellow-500/30'><Eye className="mr-1 h-3 w-3"/>Em Revisão</Badge>;
+        case 'fixed': return <Badge variant="secondary" className='bg-green-500/20 text-green-500 border-green-500/30'><Check className="mr-1 h-3 w-3"/>Resolvido</Badge>;
+        default: return <Badge variant="outline">Pendente</Badge>;
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -165,11 +213,14 @@ function NegativeFeedbackTab() {
       <div className="space-y-6 pr-4">
         {feedbacks.map((feedback) => (
           <Card key={feedback.id}>
-            <CardHeader>
-              <CardDescription className="flex items-center justify-between text-xs">
-                <span className='flex items-center gap-2'><User className="h-3 w-3" /> {feedback.userEmail || 'Usuário Anônimo'}</span>
-                <span>{feedback.createdAt ? formatDistanceToNow(new Date(feedback.createdAt.seconds * 1000), { addSuffix: true, locale: ptBR }) : '...'}</span>
+            <CardHeader className="flex flex-row items-start justify-between">
+              <CardDescription className="flex items-center gap-2 text-xs">
+                <User className="h-3 w-3" /> {feedback.userEmail || 'Usuário Anônimo'}
               </CardDescription>
+               <div className='flex items-center gap-2'>
+                {getStatusBadge(feedback.status)}
+                <span className='text-xs text-muted-foreground'>{feedback.createdAt ? formatDistanceToNow(new Date(feedback.createdAt.seconds * 1000), { addSuffix: true, locale: ptBR }) : '...'}</span>
+               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
@@ -186,6 +237,14 @@ function NegativeFeedbackTab() {
                 <p className="text-sm p-4 bg-primary/10 rounded-md border border-primary/20 text-primary-foreground/90">{feedback.aiSuggestion}</p>
               </div>
             </CardContent>
+            <CardFooter className='justify-end gap-2'>
+                <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(feedback, 'reviewing')} disabled={updatingFeedback === feedback.id}>
+                    {updatingFeedback === feedback.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <AlertTriangle className="h-4 w-4 text-yellow-500" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(feedback, 'fixed')} disabled={updatingFeedback === feedback.id}>
+                     {updatingFeedback === feedback.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check className="h-4 w-4 text-green-500" />}
+                </Button>
+            </CardFooter>
           </Card>
         ))}
       </div>

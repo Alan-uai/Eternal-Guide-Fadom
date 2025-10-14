@@ -141,6 +141,10 @@
           "type": "string",
           "description": "Timestamp indicating when the user account was created.",
           "format": "date-time"
+        },
+        "reputationPoints": {
+            "type": "number",
+            "description": "Points awarded to a user for helpful feedback."
         }
       },
       "required": [
@@ -321,9 +325,18 @@
         "question": { "type": "string", "description": "The original user question." },
         "negativeResponse": { "type": "string", "description": "The AI response that was marked as negative." },
         "aiSuggestion": { "type": "string", "description": "An AI-generated suggestion on how to improve the response." },
-        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of the feedback." }
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of the feedback." },
+        "status": {
+            "type": "string",
+            "enum": ["pending", "reviewing", "fixed"],
+            "description": "The review status of the feedback."
+        },
+        "reviewedBy": {
+            "type": "string",
+            "description": "The email of the admin who reviewed the feedback."
+        }
       },
-      "required": ["id", "userId", "question", "negativeResponse", "createdAt"]
+      "required": ["id", "userId", "question", "negativeResponse", "createdAt", "status"]
     }
   },
   "auth": {

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -5,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -13,8 +13,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useUser, useAuth } from '@/firebase';
 import { useApp } from '@/context/app-provider';
-import { LogIn, LogOut, User } from 'lucide-react';
+import { LogIn, LogOut, User, UserCircle } from 'lucide-react';
 import { signOut } from 'firebase/auth';
+import Link from 'next/link';
 
 export function UserNav() {
   const { user } = useUser();
@@ -56,6 +57,15 @@ export function UserNav() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+                <Link href="/profile">
+                    <DropdownMenuItem>
+                        <UserCircle className="mr-2 h-4 w-4" />
+                        <span>Meu Perfil</span>
+                    </DropdownMenuItem>
+                </Link>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Sair</span>
@@ -71,3 +81,5 @@ export function UserNav() {
     </DropdownMenu>
   );
 }
+
+    

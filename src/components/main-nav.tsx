@@ -1,8 +1,9 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, Calculator, HeartPulse, Database } from 'lucide-react';
+import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, HeartPulse, Database } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import { cn } from '@/lib/utils';
 import {
@@ -15,7 +16,6 @@ import {
 const navItems = [
   { href: '/', icon: BotMessageSquare, label: 'Chat IA' },
   { href: '/tips', icon: HeartPulse, label: 'Dicas' },
-  { href: '/calculator', icon: Calculator, label: 'Calculadora' },
   { href: '/saved', icon: Bookmark, label: 'Salvas' },
   { href: '/suggest', icon: Lightbulb, label: 'Sugerir' },
 ];
@@ -71,3 +71,5 @@ export function MainNav() {
     </TooltipProvider>
   );
 }
+
+    
