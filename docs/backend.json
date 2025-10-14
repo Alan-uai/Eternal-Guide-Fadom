@@ -309,6 +309,21 @@
         }
       },
       "required": ["version", "lastUpdatedAt"]
+    },
+    "NegativeFeedback": {
+      "title": "NegativeFeedback",
+      "type": "object",
+      "description": "Stores a user's negative feedback on an AI response for admin review.",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string", "description": "ID of the user who gave feedback." },
+        "userEmail": { "type": "string", "description": "Email of the user." },
+        "question": { "type": "string", "description": "The original user question." },
+        "negativeResponse": { "type": "string", "description": "The AI response that was marked as negative." },
+        "aiSuggestion": { "type": "string", "description": "An AI-generated suggestion on how to improve the response." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of the feedback." }
+      },
+      "required": ["id", "userId", "question", "negativeResponse", "createdAt"]
     }
   },
   "auth": {
@@ -342,6 +357,14 @@
           "entityName": "ContentSuggestion",
           "schema": { "$ref": "#/backend/entities/ContentSuggestion" },
           "description": "Stores content suggestions made by the user for the Wiki."
+        }
+      },
+       {
+        "path": "/negativeFeedback/{feedbackId}",
+        "definition": {
+          "entityName": "NegativeFeedback",
+          "schema": { "$ref": "#/backend/entities/NegativeFeedback" },
+          "description": "Stores negative AI response feedback for admin review."
         }
       },
       {

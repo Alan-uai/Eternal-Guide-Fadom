@@ -18,6 +18,10 @@ import { useToast } from '@/hooks/use-toast';
 import { micromark } from 'micromark';
 import { Card, CardContent } from './ui/card';
 import { nanoid } from 'nanoid';
+import { useUser, useFirebase } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
+
 
 const chatSchema = z.object({
   prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
@@ -114,6 +118,9 @@ export function ChatView() {
 
   const { toast } = useToast();
   const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading, gameDataVersion } = useApp();
+  const { user } = useUser();
+  const { firestore } = useFirebase();
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof chatSchema>>({
@@ -130,10 +137,11 @@ export function ChatView() {
 
       const cachedQuestions = window.localStorage.getItem(CACHE_STORAGE_KEY);
        if (cachedQuestions) {
-        const parsedCache = JSON.parse(cachedQuestions);
+        const parsedCache: Record<string, CachedItem> = JSON.parse(cachedQuestions);
         setQuestionCache(parsedCache);
+        
         const initialFeedback: Record<string, 'positive' | 'negative' | null> = {};
-        Object.values(parsedCache).forEach((item: any) => {
+        Object.values(parsedCache).forEach((item: CachedItem) => {
             if (item?.message?.id) {
                 initialFeedback[item.message.id] = item.feedback;
             }
@@ -169,27 +177,49 @@ export function ChatView() {
     scrollToBottom();
   }, [messages, isLoading]);
   
-  const handleFeedback = (messageId: string, prompt: string, newFeedback: 'positive' | 'negative') => {
-      const currentFeedback = feedback[messageId];
-      const updatedFeedback = currentFeedback === newFeedback ? null : newFeedback;
-      
-      setFeedback(prev => ({...prev, [messageId]: updatedFeedback}));
+  const handleFeedback = async (messageId: string, prompt: string, response: string, newFeedback: 'positive' | 'negative') => {
+    const currentFeedback = feedback[messageId];
+    const updatedFeedback = currentFeedback === newFeedback ? null : newFeedback;
+    
+    setFeedback(prev => ({ ...prev, [messageId]: updatedFeedback }));
 
-      const normalizedPrompt = prompt.trim().toLowerCase();
-      const updatedCache = { ...questionCache };
-      if (updatedCache[normalizedPrompt]) {
-          updatedCache[normalizedPrompt].feedback = updatedFeedback;
-          setQuestionCache(updatedCache);
-          window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(updatedCache));
-      }
+    const normalizedPrompt = prompt.trim().toLowerCase();
+    const updatedCache = { ...questionCache };
 
-      // If feedback is negative, regenerate the response immediately
-      if (updatedFeedback === 'negative') {
-          // Remove the bad answer from the current chat view
-          setMessages(prevMessages => prevMessages.filter(msg => msg.id !== messageId));
-          // Call the AI again for the same prompt
-          callAI(prompt, messages.filter(msg => msg.id !== messageId));
-      }
+    if (updatedCache[normalizedPrompt]) {
+        updatedCache[normalizedPrompt].feedback = updatedFeedback;
+        setQuestionCache(updatedCache);
+        window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(updatedCache));
+    }
+
+    if (updatedFeedback === 'negative') {
+        toast({ title: "Feedback enviado", description: "Obrigado! Gerando uma nova resposta e enviando a anterior para revisão." });
+        
+        // 1. Submit for review in the background
+        if (firestore && user) {
+             try {
+                const analysisResult = await analyzeNegativeFeedback({ question: prompt, negativeResponse: response });
+                const feedbackCollection = collection(firestore, 'negativeFeedback');
+                await addDoc(feedbackCollection, {
+                    userId: user.uid,
+                    userEmail: user.email,
+                    question: prompt,
+                    negativeResponse: response,
+                    aiSuggestion: analysisResult.suggestion,
+                    createdAt: serverTimestamp(),
+                });
+            } catch (error) {
+                console.error("Erro ao salvar feedback negativo:", error);
+            }
+        }
+
+        // 2. Remove the bad answer from the current chat view
+        setMessages(prevMessages => prevMessages.filter(msg => msg.id !== messageId));
+        
+        // 3. Call the AI again for the same prompt
+        const history = messages.filter(msg => msg.id !== messageId && msg.role !== 'assistant');
+        callAI(prompt, history);
+    }
   };
 
 
@@ -280,18 +310,19 @@ export function ChatView() {
     if (cachedItem && cachedItem.message && cachedItem.feedback !== 'negative' && cachedItem.dataVersion === gameDataVersion) {
         const cachedAnswerWithId = {
             ...cachedItem.message,
-            id: cachedItem.message.id || nanoid(),
+            id: cachedItem.message.id || nanoid(), // Ensure it has an ID
             fromCache: true,
             question: values.prompt,
         };
         setMessages((prev) => [...prev, cachedAnswerWithId]);
+        // Ensure feedback state is also applied from cache
         if(cachedAnswerWithId.id) {
             setFeedback(prev => ({...prev, [cachedAnswerWithId.id]: cachedItem.feedback }));
         }
         return; // Stop execution, cache was served.
     }
   
-    // If no valid cache, call the AI.
+    // If no valid cache, or if cache is stale/negative, call the AI.
     callAI(values.prompt, newMessages);
   }
 
@@ -380,7 +411,7 @@ export function ChatView() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-primary"
-                            onClick={() => handleFeedback(message.id, message.question || '', 'positive')}
+                            onClick={() => handleFeedback(message.id, message.question || '', message.content, 'positive')}
                           >
                             <ThumbsUp className={cn('h-4 w-4', feedback[message.id] === 'positive' && 'fill-primary text-primary')} />
                           </Button>
@@ -388,7 +419,7 @@ export function ChatView() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                            onClick={() => handleFeedback(message.id, message.question || '', 'negative')}
+                            onClick={() => handleFeedback(message.id, message.question || '', message.content, 'negative')}
                           >
                             <ThumbsDown className={cn('h-4 w-4', feedback[message.id] === 'negative' && 'fill-destructive text-destructive')} />
                           </Button>

@@ -82,7 +82,7 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
     }
 }
 
-const prompt = ai.definePrompt({
+export const prompt = ai.definePrompt({
   name: 'generateSolutionPrompt',
   input: {schema: GenerateSolutionInputSchema},
   output: {schema: GenerateSolutionOutputSchema},
