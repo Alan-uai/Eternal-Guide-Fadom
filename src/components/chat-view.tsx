@@ -37,49 +37,41 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
 
     const { intro, sections } = useMemo(() => {
         const sectionsData: { title: string; content: string }[] = [];
-        const markerRegex = /(?:\*\*\d+\.\s*)?\*\*(INÍCIO|MEIO|FIM):\*\*/g;
-
-        const firstMarkerMatch = markerRegex.exec(content);
-        if (!firstMarkerMatch) {
+        // Regex para capturar MARCADOR, Título e Conteúdo
+        const markerRegex = /\*\*(INÍCIO|MEIO|FIM):\*\*\s*\*\*(.*?)\*\*/g;
+    
+        const firstMatch = markerRegex.exec(content);
+    
+        if (!firstMatch) {
             return { intro: content, sections: [] };
         }
-
-        const introEnd = firstMarkerMatch.index;
-        const intro = content.substring(0, introEnd).trim();
-        const contentAfterIntro = content.substring(introEnd);
-
-        const parts = contentAfterIntro.split(markerRegex);
+    
+        const introText = content.substring(0, firstMatch.index).trim();
         
+        // Mapeia os marcadores para os títulos finais
         const titleMap: Record<string, string> = {
             'INÍCIO': 'Resposta Direta',
             'MEIO': 'Justificativa e Detalhes',
             'FIM': 'Dicas Adicionais'
         };
-        
-        for (let i = 1; i < parts.length; i += 2) {
-            const marker = parts[i].replace(/\*/g, '').replace(/\d+\.\s*/, '').replace(':', '').trim();
-            let rawContent = parts[i+1] || '';
+
+        let lastIndex = 0;
+        const parts = Array.from(content.matchAll(markerRegex));
+
+        parts.forEach((part, i) => {
+            const marker = part[1]; // INÍCIO, MEIO, FIM
+            const title = titleMap[marker] || part[2]; // Usa o título mapeado ou o capturado
             
-            // Clean the content: remove any subtitle that might be at the start
-            const subtitleMatch = rawContent.match(/^\s*.*?\.\*\*\s*/);
-            if (subtitleMatch) {
-                 rawContent = rawContent.substring(subtitleMatch[0].length).trim();
-            }
-
-            // Also clean up any potential marker for the *next* section at the end
-            const nextMarkerIndex = rawContent.search(/(?:\*\*\d+\.\s*)?\*\*(INÍCIO|MEIO|FIM):\*\*/);
-            if (nextMarkerIndex !== -1) {
-                rawContent = rawContent.substring(0, nextMarkerIndex).trim();
-            }
+            const contentStartIndex = part.index + part[0].length;
+            const nextPart = parts[i + 1];
+            const contentEndIndex = nextPart ? nextPart.index : content.length;
             
-            const title = titleMap[marker] || marker;
+            const rawContent = content.substring(contentStartIndex, contentEndIndex).trim();
 
-            if (title && rawContent) {
-                 sectionsData.push({ title, content: rawContent });
-            }
-        }
+            sectionsData.push({ title, content: rawContent });
+        });
 
-        return { intro, sections: sectionsData };
+        return { intro: introText, sections: sectionsData };
     }, [content]);
 
 
