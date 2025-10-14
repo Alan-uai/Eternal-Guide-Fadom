@@ -1,4 +1,3 @@
-
 // src/firebase/firestore/data.ts
 'use server';
 
@@ -17,8 +16,6 @@ export async function getGameData(worldName: string, category: string, itemName?
     let worldQuery;
     const lowerCaseWorldName = worldName.toLowerCase();
     
-    // Create a query to find the world document.
-    // This is more flexible than a static map.
     const worldsRef = collection(firestore, 'worlds');
     worldQuery = query(worldsRef, where('name', '>=', worldName), where('name', '<=', worldName + '\uf8ff'));
 
@@ -27,13 +24,10 @@ export async function getGameData(worldName: string, category: string, itemName?
     let targetWorldDoc;
 
     if (!worldQuerySnapshot.empty) {
-        // Find the best match if multiple documents are returned (e.g., "World 1" and "World 10" for query "World 1")
         targetWorldDoc = worldQuerySnapshot.docs.find(doc => doc.data().name.toLowerCase().startsWith(lowerCaseWorldName));
         if (!targetWorldDoc) {
-             // If no perfect start-of-string match, maybe it's a substring match like "windmill" for "World 2 - Windmill Island"
              targetWorldDoc = worldQuerySnapshot.docs.find(doc => doc.data().name.toLowerCase().includes(lowerCaseWorldName));
         }
-        // Fallback to the first result if no better match is found
         if (!targetWorldDoc) {
             targetWorldDoc = worldQuerySnapshot.docs[0];
         }
@@ -47,7 +41,6 @@ export async function getGameData(worldName: string, category: string, itemName?
     
     let itemQuery;
     if (itemName) {
-      // Be more flexible with item names as well
       const lowerCaseItemName = itemName.toLowerCase();
       const allItemsSnapshot = await getDocs(categoryCollectionRef);
       const matchedDocs = allItemsSnapshot.docs.filter(doc => doc.data().name.toLowerCase().includes(lowerCaseItemName));
@@ -55,7 +48,6 @@ export async function getGameData(worldName: string, category: string, itemName?
       if(matchedDocs.length === 0) {
         return { error: `No items found in category "${category}" with name containing "${itemName}" for world "${targetWorldDoc.data().name}".` };
       }
-      // "Fake" a snapshot to continue the flow
       itemQuery = matchedDocs;
 
     } else {
@@ -71,14 +63,12 @@ export async function getGameData(worldName: string, category: string, itemName?
     for (const itemDoc of itemQuery) {
         const itemData = { id: itemDoc.id, ...itemDoc.data() };
         
-        // Fetch sub-collections like 'stats' for a power
         if (category === 'powers' && itemDoc.ref) {
             const statsCollectionRef = collection(itemDoc.ref, 'stats');
             const statsSnapshot = await getDocs(statsCollectionRef);
             if (!statsSnapshot.empty) {
                 const statsData = statsSnapshot.docs.map(d => ({id: d.id, ...d.data()}));
                 
-                // Sort stats by multiplier in ascending order
                 statsData.sort((a, b) => parseMultiplier(a.multiplier) - parseMultiplier(b.multiplier));
 
                 (itemData as any)['stats'] = statsData;
@@ -96,7 +86,40 @@ export async function getGameData(worldName: string, category: string, itemName?
   }
 }
 
-// Kept for backwards compatibility if needed by other parts of the app, but new logic should use getGameData
-export async function getRaceStats(raceName: string) {
-  return getGameData("World1", "races", raceName);
+export async function getAllGameData() {
+    const { firestore } = initializeFirebaseServer();
+    try {
+        const worldsSnapshot = await getDocs(collection(firestore, 'worlds'));
+        const worldsData = worldsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const subcollectionNames = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
+
+        const allDataPromises = worldsData.map(async (world) => {
+            const worldWithSubcollections: any = { ...world };
+            for (const subcollectionName of subcollectionNames) {
+                const subcollectionSnapshot = await getDocs(collection(firestore, 'worlds', world.id, subcollectionName));
+                if (!subcollectionSnapshot.empty) {
+                    const subcollectionData = await Promise.all(subcollectionSnapshot.docs.map(async (doc) => {
+                        const docData:any = { id: doc.id, ...doc.data() };
+                        if (subcollectionName === 'powers') {
+                             const statsSnapshot = await getDocs(collection(doc.ref, 'stats'));
+                             if (!statsSnapshot.empty) {
+                                docData.stats = statsSnapshot.docs.map(statDoc => ({ id: statDoc.id, ...statDoc.data() }));
+                             }
+                        }
+                        return docData;
+                    }));
+                    worldWithSubcollections[subcollectionName] = subcollectionData;
+                }
+            }
+            return worldWithSubcollections;
+        });
+
+        const allData = await Promise.all(allDataPromises);
+        return allData;
+
+    } catch (error) {
+        console.error('Error fetching all game data:', error);
+        return { error: 'An error occurred while fetching all game data from Firestore.' };
+    }
 }

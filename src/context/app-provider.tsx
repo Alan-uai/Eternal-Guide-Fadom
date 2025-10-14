@@ -9,6 +9,7 @@ import { collection, doc, deleteDoc, setDoc, serverTimestamp } from 'firebase/fi
 import { usePathname, useRouter } from 'next/navigation';
 import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
+import { getAllGameData } from '@/firebase/firestore/data';
 
 
 interface AppContextType {
@@ -20,11 +21,14 @@ interface AppContextType {
   isAuthDialogOpen: boolean;
   setAuthDialogOpen: (open: boolean) => void;
   gameDataVersion: string;
+  allGameData: any[];
+  isGameDataLoading: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const WIKI_CACHE_STORAGE_KEY = 'eternal-guide-wiki-cache';
+const GAME_DATA_CACHE_KEY = 'eternal-guide-game-data-cache';
 const LAST_VISITED_ROUTE_KEY = 'eternal-guide-last-route';
 
 function AppStateProvider({ children }: { children: ReactNode }) {
@@ -36,7 +40,9 @@ function AppStateProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   
   const [wikiArticles, setWikiArticles] = useState<WikiArticle[]>([]);
+  const [allGameData, setAllGameData] = useState<any[]>([]);
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
+  const [isGameDataLoading, setIsGameDataLoading] = useState(true);
   
   const [isInitialAppLoad, setIsInitialAppLoad] = useState(true);
 
@@ -75,6 +81,39 @@ function AppStateProvider({ children }: { children: ReactNode }) {
   const { data: gameMetadata, isLoading: isMetadataLoading } = useDoc(gameDataRef);
   
   const gameDataVersion = useMemo(() => gameMetadata?.version || '1.0.0', [gameMetadata]);
+
+  useEffect(() => {
+    const loadGameData = async () => {
+        setIsGameDataLoading(true);
+        try {
+            const cachedData = localStorage.getItem(GAME_DATA_CACHE_KEY);
+            if (cachedData) {
+                const { version, data } = JSON.parse(cachedData);
+                if (version === gameDataVersion) {
+                    setAllGameData(data);
+                    setIsGameDataLoading(false);
+                    return;
+                }
+            }
+
+            // If no cache or version mismatch, fetch fresh data
+            const freshData = await getAllGameData();
+            if (freshData && !freshData.error) {
+                setAllGameData(freshData);
+                localStorage.setItem(GAME_DATA_CACHE_KEY, JSON.stringify({ version: gameDataVersion, data: freshData }));
+            }
+        } catch (error) {
+            console.error("Failed to load all game data:", error);
+        } finally {
+            setIsGameDataLoading(false);
+        }
+    };
+    
+    if (gameDataVersion !== '1.0.0' || !isMetadataLoading) {
+      loadGameData();
+    }
+
+  }, [gameDataVersion, isMetadataLoading]);
 
   useEffect(() => {
     try {
@@ -151,9 +190,11 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     isAuthDialogOpen,
     setAuthDialogOpen,
     gameDataVersion,
+    allGameData,
+    isGameDataLoading,
   };
   
-  if (isInitialAppLoad || isAdminLoading) {
+  if (isInitialAppLoad || isAdminLoading || (isGameDataLoading && allGameData.length === 0)) {
       return (
           <div className="flex h-screen w-screen items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -183,5 +224,3 @@ export function useApp() {
   }
   return context;
 }
-
-    
