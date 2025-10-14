@@ -1,6 +1,6 @@
 
 export const world2Data = {
-    name: 'Windmill Island',
+    name: 'World 2 - Windmill Island',
     powers: [
       {
         id: 'red-emperor-power',

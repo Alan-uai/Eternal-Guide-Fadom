@@ -1,3 +1,4 @@
+
 export const world1Data = {
     name: 'World 1',
     powers: [
