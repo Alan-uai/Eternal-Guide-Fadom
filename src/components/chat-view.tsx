@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
@@ -27,45 +28,35 @@ const chatSchema = z.object({
   prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
 });
 
+interface ParsedSection {
+    title: string;
+    content: string;
+}
+
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
     const { intro, sections } = useMemo(() => {
-        const parts = content.split(/\*\*(INÍCIO:|MEIO:|FIM:)\*\*/).filter(Boolean);
-        if (parts.length <= 1) {
-            return { intro: content, sections: [] };
-        }
+        if (!content) return { intro: '', sections: [] };
 
-        let introText = parts[0].trim().replace(/\*\*\d\.\s*/, ''); // Clean up intro text
-        const sectionsData: { title: string, content: string }[] = [];
-        const titleMap: Record<string, string> = {
-            'INÍCIO:': 'Resposta Direta',
-            'MEIO:': 'Justificativa e Detalhes',
-            'FIM:': 'Dicas Adicionais'
-        };
-        
-        for (let i = 1; i < parts.length; i += 2) {
-            const marker = parts[i];
-            let sectionContent = parts[i + 1] || '';
-            
-            const firstLineEnd = sectionContent.indexOf('\n');
-            const title = sectionContent.substring(0, firstLineEnd).replace(/[.**]/g, '').trim();
-            const restOfContent = sectionContent.substring(firstLineEnd + 1).trim();
+        const parts = content.split(/\n---\n/);
+        const introText = parts[0] || '';
+        const parsedSections: ParsedSection[] = [];
 
-            sectionsData.push({
-                title: title,
-                content: restOfContent
-            });
+        if (parts.length > 1) {
+            for (let i = 1; i < parts.length; i++) {
+                const sectionContent = parts[i];
+                const firstLineEnd = sectionContent.indexOf('\n');
+                
+                if (firstLineEnd !== -1) {
+                    const title = sectionContent.substring(0, firstLineEnd).replace(/\*\*/g, '').trim();
+                    const restOfContent = sectionContent.substring(firstLineEnd + 1).trim();
+                    if (title && restOfContent) {
+                        parsedSections.push({ title, content: restOfContent });
+                    }
+                }
+            }
         }
         
-        // Sometimes the intro text might be part of the first section if there's no text before "INÍCIO"
-        if (!introText.replace(/\s/g, '').length) {
-          const firstSection = sectionsData.shift();
-          if (firstSection) {
-            introText = firstSection.title;
-          }
-        }
-
-
-        return { intro: introText, sections: sectionsData };
+        return { intro: introText, sections: parsedSections };
     }, [content]);
 
     return (
@@ -76,16 +67,16 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                 </span>
             )}
             
-            {intro && <div className="mb-4 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(intro) }} />}
+            {intro && <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(intro) }} />}
 
             {sections.length > 0 && (
-                <Accordion type="multiple" defaultValue={['item-0']} className="w-full">
+                <Accordion type="multiple" defaultValue={['item-0']} className="w-full mt-4 border-t pt-4">
                     {sections.map((section, index) => (
                         <AccordionItem value={`item-${index}`} key={index}>
                             <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
                                 {section.title}
                             </AccordionTrigger>
-                            <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6">
+                            <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6 pb-4">
                                 <div dangerouslySetInnerHTML={{ __html: micromark(section.content) }} />
                             </AccordionContent>
                         </AccordionItem>
