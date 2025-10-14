@@ -35,54 +35,48 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         />
     );
 
-    const SECTION_TITLES: { [key: string]: string } = {
-        "INÍCIO": "Resposta Direta",
-        "MEIO": "Justificativa e Detalhes",
-        "FIM": "Dicas Adicionais",
-    };
-
     const sections = useMemo(() => {
         const sectionsData: { title: string; content: string }[] = [];
-        const markers = Object.keys(SECTION_TITLES);
         
-        const markerRegex = new RegExp(`(?:\\*\\*\\d*\\.?\\s*)?(${markers.join('|')}):`, 'g');
-        const firstMarkerMatch = content.match(markerRegex);
+        // Regex to find markers like **1. INÍCIO:** or **INÍCIO:**
+        const markerRegex = /(?:\*\*\d+\.\s*)?(\*\*(INÍCIO|MEIO|FIM):\*\*\s*)/g;
+        
+        const firstMarkerMatch = markerRegex.exec(content);
 
+        // If no markers are found, render the whole content simply.
         if (!firstMarkerMatch) {
             return { intro: content, sections: [] };
         }
 
-        const introEnd = content.indexOf(firstMarkerMatch[0]);
-        let intro = content.substring(0, introEnd).trim();
-        // Remove the numeric markdown from the intro, e.g. "**1. "
-        intro = intro.replace(/\*\*\d+\.?\s*/, '').trim();
+        // Text before the first marker is the introduction.
+        const introEnd = firstMarkerMatch.index;
+        const intro = content.substring(0, introEnd).trim();
 
         const contentAfterIntro = content.substring(introEnd);
+        
+        // Split the content by the main markers (INÍCIO, MEIO, FIM)
         const parts = contentAfterIntro.split(markerRegex);
         
-        for (let i = 1; i < parts.length; i += 2) {
-            const marker = parts[i].replace(':', '').trim(); // "INÍCIO"
-            let text = parts[i+1] || '';
-            const title = SECTION_TITLES[marker as keyof typeof SECTION_TITLES];
+        // The parts array will have a structure like:
+        // ['', '**INÍCIO:**', 'INÍCIO', 'Resposta Direta.** ...content... **2. MEIO:**', ...]
+        for (let i = 3; i < parts.length; i += 4) {
+            let sectionContent = parts[i] || '';
+            
+            // The title is what comes right after the marker until the next stars
+            const titleMatch = sectionContent.match(/^(.+?)\.\*\*\s*/);
+            let title = titleMatch ? titleMatch[1] : '';
+            
+            // Clean the content: remove the title and any subsequent markers
+            let cleanedContent = titleMatch ? sectionContent.substring(titleMatch[0].length).trim() : sectionContent.trim();
+            
+            // Find the next section marker and cut the content before it
+            const nextMarkerIndex = cleanedContent.search(/(?:\*\*\d+\.\s*)?(\*\*(INÍCIO|MEIO|FIM):\*\*)/);
+            if (nextMarkerIndex !== -1) {
+                cleanedContent = cleanedContent.substring(0, nextMarkerIndex).trim();
+            }
 
-            if (title) {
-                // Remove the title itself (and any markdown) from the start of the content
-                 const titleRegex = new RegExp(`^\\s*\\*\\*${title}\\*\\*\\s*`, 'i');
-                 let cleanedText = text.trim().replace(titleRegex, '');
-                 // Also specifically remove "Resposta Direta.**" and similar patterns
-                 cleanedText = cleanedText.replace(/^Resposta Direta\.\*\*\s*/i, '');
-
-
-                // Remove the next section's marker from the end of the current content
-                const nextMarkerMatch = cleanedText.match(/(\*\*(\d+\.?\s*)?(INÍCIO|MEIO|FIM):\s*\*)/);
-                if (nextMarkerMatch && nextMarkerMatch.index) {
-                   cleanedText = cleanedText.substring(0, nextMarkerMatch.index).trim();
-                }
-
-                // Also remove any stray numerical markers like "**2." or "**3"
-                 cleanedText = cleanedText.replace(/\s*\*\*\d+\.?\s*$/g, '').trim();
-
-                sectionsData.push({ title: title, content: cleanedText });
+            if (title && cleanedContent) {
+                sectionsData.push({ title: title, content: cleanedContent });
             }
         }
 
