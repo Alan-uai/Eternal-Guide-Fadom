@@ -177,7 +177,7 @@ export function ChatView() {
       const updatedCache = { ...questionCache };
       let cacheUpdated = false;
       for (const key in updatedCache) {
-          if (updatedCache[key].message.id === messageId) {
+          if (updatedCache[key]?.message?.id === messageId) {
               updatedCache[key].feedback = updatedFeedback;
               cacheUpdated = true;
               break;
@@ -231,7 +231,7 @@ export function ChatView() {
   
     try {
       const relevantWikiContext = findRelevantArticles(values.prompt, wikiArticles);
-      const historyForAI = messages.slice(-10).map(({ id, fromCache, ...rest }) => rest);
+      const historyForAI = messages.slice(-10).map(({ id, fromCache, isStreaming, ...rest }) => rest);
   
       generateSolutionStream({
         problemDescription: values.prompt,
