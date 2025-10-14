@@ -132,7 +132,7 @@ export function ChatView() {
         // Initialize feedback state from cache
         const initialFeedback: Record<string, 'positive' | 'negative' | null> = {};
         Object.values(parsedCache).forEach((item: any) => {
-            if (item.message && item.message.id) {
+            if (item?.message?.id) {
                 initialFeedback[item.message.id] = item.feedback;
             }
         });
