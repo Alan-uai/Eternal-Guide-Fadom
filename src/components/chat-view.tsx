@@ -44,9 +44,10 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
     let introText = '';
     let listStartIndex = -1;
 
-    // Find where the numbered list starts
+    // Find where the numbered list starts or if there is a header that should not be part of the accordion
     for (let i = 0; i < contentParts.length; i++) {
-        if (/^\d+\.\s/.test(contentParts[i].trim())) {
+        const line = contentParts[i].trim();
+        if (/^\d+\.\s/.test(line) || /###/.test(line)) {
             listStartIndex = i;
             break;
         }
@@ -71,12 +72,16 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         );
     }
     
+    // Heuristic: The last numbered item is the most likely direct answer.
+    const introHtml = micromark(introText);
     const listContent = contentParts.slice(listStartIndex).join('\n');
+
+    // This regex splits the content by lines that start with a number and a dot (e.g., "1. "),
+    // but it keeps the delimiter as part of the next item.
     const listItems = listContent.split(/\n(?=\d+\.\s)/).map(part => part.trim());
 
-    // Heuristic: The last numbered item is the most likely direct answer.
+    // Heuristic: Default to opening the last item in the list.
     const defaultOpenValue = `item-${toRoman(listItems.length)}`;
-    const introHtml = micromark(introText);
 
     return (
         <div className='relative'>
@@ -162,26 +167,24 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
     const scoredArticles = articles.map(article => {
         let score = 0;
         const lowerCaseTitle = article.title.toLowerCase();
-        const lowerCaseSummary = article.summary.toLowerCase();
         const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
 
-        // High score for matching substrings in the title
+        // Very high score for a direct match or substring in the title
         if (lowerCaseTitle.includes(lowerCasePrompt)) {
-            score += 20;
-        } else if (lowerCasePrompt.split(' ').some(word => word.length > 3 && lowerCaseTitle.includes(word))) {
-            score += 10;
+            score += 50;
         }
+
+        // Check for partial matches of significant words in the title
+        const promptWords = lowerCasePrompt.split(' ').filter(word => word.length > 3);
+        promptWords.forEach(word => {
+            if (lowerCaseTitle.includes(word)) {
+                score += 15; // High score for title word match
+            }
+            if (tagsString.includes(word)) {
+                score += 5; // Medium score for tag match
+            }
+        });
         
-        // Medium score for matching tags
-        if (lowerCasePrompt.split(' ').some(word => word.length > 3 && tagsString.includes(word))) {
-            score += 5;
-        }
-
-        // Low score for summary matches
-        if (lowerCasePrompt.split(' ').some(word => word.length > 3 && lowerCaseSummary.includes(word))) {
-            score += 2;
-        }
-
         return { article, score };
     }).filter(item => item.score > 0)
       .sort((a, b) => b.score - a.score);
@@ -189,7 +192,6 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
     const topArticles = scoredArticles.slice(0, 3);
     
     if (topArticles.length === 0) {
-        // Fallback: If no good matches, provide the getting started guide as a default context.
         const gettingStarted = articles.find(a => a.id === 'getting-started');
         return gettingStarted ? `Title: ${gettingStarted.title}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables)}` : '';
     }
@@ -304,12 +306,14 @@ export function ChatView() {
             }
         }
 
-        // 2. Remove the bad answer from the current chat view
-        setMessages(prevMessages => prevMessages.filter(msg => msg.id !== messageId));
-        
-        // 3. Call the AI again for the same prompt
-        const history = messages.filter(msg => msg.id !== messageId && msg.role !== 'assistant');
-        callAI(prompt, history);
+        // 2. Remove the bad answer from the current chat view and trigger regeneration
+        const userMessageIndex = messages.findIndex(msg => msg.role === 'assistant' && msg.id === messageId) - 1;
+        const userMessageContent = messages[userMessageIndex]?.content;
+
+        if(userMessageContent){
+            setMessages(prevMessages => prevMessages.filter(msg => msg.id !== messageId));
+            callAI(userMessageContent, messages.filter(msg => msg.id !== messageId && msg.role !== 'assistant'));
+        }
     }
   };
 
@@ -413,7 +417,8 @@ export function ChatView() {
     }
   
     // Otherwise (no cache, stale cache, or negative feedback), call the AI.
-    callAI(values.prompt, newMessages);
+    const historyForAI = newMessages.filter(m => m.role === 'user');
+    callAI(values.prompt, historyForAI);
   }
 
   const handleClearChat = () => {
