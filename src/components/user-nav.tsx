@@ -10,11 +10,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { useUser, useAuth } from '@/firebase';
 import { useApp } from '@/context/app-provider';
-import { LogIn, LogOut, User, UserCircle } from 'lucide-react';
+import { LogIn, LogOut, User } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import Link from 'next/link';
 
@@ -32,19 +31,20 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-         <Link href="/profile" passHref>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <Avatar className="h-9 w-9">
-              <AvatarImage
-                src={user?.photoURL ?? undefined}
-                alt={user?.displayName ?? 'Avatar do usuário'}
-              />
-              <AvatarFallback>
-                <User />
-              </AvatarFallback>
-            </Avatar>
-          </Button>
-        </Link>
+        {/* O avatar agora é um Link para o perfil, mas também abre o dropdown */}
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar className="h-9 w-9">
+             <Link href="/profile" passHref>
+                <AvatarImage
+                    src={user?.photoURL ?? undefined}
+                    alt={user?.displayName ?? 'Avatar do usuário'}
+                />
+             </Link>
+            <AvatarFallback>
+              <User />
+            </AvatarFallback>
+          </Avatar>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         {user && !user.isAnonymous ? (
@@ -60,6 +60,7 @@ export function UserNav() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            {/* O item de menu "Sair" apenas executa a ação de logout */}
             <DropdownMenuItem onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Sair</span>
