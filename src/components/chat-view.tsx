@@ -21,28 +21,78 @@ import { nanoid } from 'nanoid';
 import { useUser, useFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-
-const chatSchema = z.object({
-  prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
-});
+function toRoman(num: number): string {
+    const roman: { [key: string]: number } = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+    let str = '';
+    for (let i of Object.keys(roman)) {
+        let q = Math.floor(num / roman[i]);
+        num -= q * roman[i];
+        str += i.repeat(q);
+    }
+    return str;
+}
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-  const htmlContent = useMemo(() => micromark(content), [content]);
+    // Split the content by numbered list items. This regex looks for a number followed by a period and a space.
+    const parts = content.split(/\n(?=\d+\.\s)/).map(part => part.trim());
 
-  return (
-      <div className='relative'>
-        {fromCache && (
-             <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1">
-                <Zap className='h-3 w-3'/> Instantâneo
-            </span>
-        )}
-        <div 
-            className="prose prose-sm dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: htmlContent }} 
-        />
-      </div>
-  );
+    // If there are no numbered sections, render the whole content.
+    if (parts.length <= 1 && !/^\d+\.\s/.test(parts[0])) {
+        const htmlContent = micromark(content);
+        return (
+            <div className='relative'>
+                {fromCache && (
+                    <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1">
+                        <Zap className='h-3 w-3'/> Instantâneo
+                    </span>
+                )}
+                <div
+                    className="prose prose-sm dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                />
+            </div>
+        );
+    }
+    
+    // Find the last numbered item to set it as the default open accordion.
+    // The key is the Roman numeral of the last part's index.
+    const defaultOpenValue = `item-${toRoman(parts.length)}`;
+    
+    return (
+        <div className='relative'>
+            {fromCache && (
+                 <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
+                    <Zap className='h-3 w-3'/> Instantâneo
+                </span>
+            )}
+            <Accordion type="single" collapsible defaultValue={defaultOpenValue} className="w-full">
+                {parts.map((part, index) => {
+                    const romanNumeral = toRoman(index + 1);
+                    // Remove the original number (e.g., "1. ") to use the Roman numeral in the trigger.
+                    const titleMatch = part.match(/^(\d+)\.\s*(.*?)(?=\n|$)/);
+                    const title = titleMatch ? titleMatch[2] : `Passo ${romanNumeral}`;
+                    const restOfContent = titleMatch ? part.substring(titleMatch[0].length).trim() : part;
+                    const htmlContent = micromark(restOfContent);
+
+                    return (
+                        <AccordionItem value={`item-${romanNumeral}`} key={index}>
+                            <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+                                <span className="flex items-center gap-2">
+                                    <span className="font-bold text-primary">{romanNumeral}.</span>
+                                    <span>{title}</span>
+                                </span>
+                            </AccordionTrigger>
+                            <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6">
+                                <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                            </AccordionContent>
+                        </AccordionItem>
+                    );
+                })}
+            </Accordion>
+        </div>
+    );
 }
 
 const TypingIndicator = () => (
@@ -294,7 +344,7 @@ export function ChatView() {
 
   async function onSubmit(values: z.infer<typeof chatSchema>) {
     const userMessage: Message = {
-      id: `user-${Date.now()}`,
+      id: nanoid(),
       role: 'user',
       content: values.prompt,
     };
@@ -302,27 +352,26 @@ export function ChatView() {
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     form.reset();
-
+  
     const normalizedPrompt = values.prompt.trim().toLowerCase();
     const cachedItem = questionCache[normalizedPrompt];
 
-    // Cache validation: check if item exists, is not negative, and data version matches.
+    // If cache exists and is valid, serve it.
     if (cachedItem && cachedItem.message && cachedItem.feedback !== 'negative' && cachedItem.dataVersion === gameDataVersion) {
-        const cachedAnswerWithId = {
-            ...cachedItem.message,
-            id: cachedItem.message.id || nanoid(), // Ensure it has an ID
-            fromCache: true,
-            question: values.prompt,
-        };
-        setMessages((prev) => [...prev, cachedAnswerWithId]);
-        // Ensure feedback state is also applied from cache
-        if(cachedAnswerWithId.id) {
-            setFeedback(prev => ({...prev, [cachedAnswerWithId.id]: cachedItem.feedback }));
-        }
-        return; // Stop execution, cache was served.
+      const cachedAnswerWithId = {
+          ...cachedItem.message,
+          id: cachedItem.message.id || nanoid(),
+          fromCache: true,
+          question: values.prompt,
+      };
+      setMessages((prev) => [...prev, cachedAnswerWithId]);
+      if(cachedAnswerWithId.id) {
+          setFeedback(prev => ({...prev, [cachedAnswerWithId.id]: cachedItem.feedback }));
+      }
+      return;
     }
   
-    // If no valid cache, or if cache is stale/negative, call the AI.
+    // Otherwise (no cache, stale cache, or negative feedback), call the AI.
     callAI(values.prompt, newMessages);
   }
 
@@ -391,7 +440,7 @@ export function ChatView() {
                 )}
                 <div
                   className={cn(
-                    'max-w-xl rounded-lg p-3 text-sm',
+                    'max-w-xl w-full rounded-lg p-3 text-sm',
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-card'
@@ -495,5 +544,3 @@ export function ChatView() {
     </div>
   );
 }
-
-    
