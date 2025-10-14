@@ -178,7 +178,7 @@ export function ChatView() {
       const updatedCache = { ...questionCache };
       let cacheUpdated = false;
       for (const key in updatedCache) {
-          if (updatedCache[key]?.message?.id === messageId) {
+          if (updatedCache[key] && updatedCache[key].message && updatedCache[key].message.id === messageId) {
               updatedCache[key].feedback = updatedFeedback;
               cacheUpdated = true;
               break;
@@ -274,8 +274,8 @@ export function ChatView() {
     const normalizedPrompt = values.prompt.trim().toLowerCase();
     const cachedItem = questionCache[normalizedPrompt];
 
-    // Cache Check: Use cache ONLY if it exists and is NOT disliked.
-    if (cachedItem && cachedItem.feedback !== 'negative') {
+    // Cache Check: Use cache ONLY if it exists, has a message, and is NOT disliked.
+    if (cachedItem && cachedItem.message && cachedItem.feedback !== 'negative') {
         const cachedAnswerWithId = {
             ...cachedItem.message,
             id: cachedItem.message.id || nanoid(), // Ensure it has an ID
@@ -290,7 +290,6 @@ export function ChatView() {
     }
   
     // If no valid cache or cache is negative, call the AI.
-    // The `newMessages` array already contains the latest user message.
     callAI(values.prompt, newMessages);
   }
 
