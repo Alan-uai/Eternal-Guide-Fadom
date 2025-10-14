@@ -17,6 +17,7 @@ import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { micromark } from 'micromark';
 import { Card, CardContent } from './ui/card';
+import { nanoid } from 'nanoid';
 
 const chatSchema = z.object({
   prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
@@ -192,7 +193,7 @@ export function ChatView() {
 
   const callAI = async (prompt: string, history: Message[]) => {
     setIsLoading(true);
-    const assistantMessageId = `assistant-${Date.now()}`;
+    const assistantMessageId = nanoid();
     const assistantMessage: Message = {
       id: assistantMessageId,
       role: 'assistant',
@@ -275,18 +276,20 @@ export function ChatView() {
 
     // Cache Check: Use cache ONLY if it exists and is NOT disliked.
     if (cachedItem && cachedItem.feedback !== 'negative') {
-        const cachedAnswer = cachedItem.message;
-        const newCachedAnswer: Message = {
-            ...cachedAnswer,
-            id: `assistant-${Date.now()}`,
+        const cachedAnswerWithId = {
+            ...cachedItem.message,
+            id: cachedItem.message.id || nanoid(), // Ensure it has an ID
             fromCache: true,
         };
-        setMessages((prev) => [...prev, newCachedAnswer]);
-        setFeedback(prev => ({...prev, [newCachedAnswer.id]: cachedItem.feedback }));
+        setMessages((prev) => [...prev, cachedAnswerWithId]);
+        // Set feedback for this specific message instance
+        if(cachedAnswerWithId.id) {
+            setFeedback(prev => ({...prev, [cachedAnswerWithId.id]: cachedItem.feedback }));
+        }
         return; // Stop execution, cache was served.
     }
   
-    // If no valid cache, call the AI.
+    // If no valid cache or cache is negative, call the AI.
     // The `newMessages` array already contains the latest user message.
     callAI(values.prompt, newMessages);
   }
