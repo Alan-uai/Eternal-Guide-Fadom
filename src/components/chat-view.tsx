@@ -42,34 +42,41 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
     };
 
     const sections = useMemo(() => {
-        const sectionsData = [];
-        const markers = ["INÍCIO:", "MEIO:", "FIM:"];
+        const sectionsData: { title: string; content: string }[] = [];
+        const markers = Object.keys(SECTION_TITLES);
         
-        // Regex to find markers, potentially preceded by numbering like "**1. "
-        const markerRegex = new RegExp(`(?:\\*\\*\\d\\.\\s*)?(${markers.join('|')})`);
+        // Regex to find markers like **1. INÍCIO:** or **INÍCIO:**
+        const markerRegex = new RegExp(`(?:\\*\\*\\d*\\.?\\s*)?(${markers.join('|')}):`, 'g');
         const firstMarkerMatch = content.match(markerRegex);
 
-        // If no markers are found, treat as simple text.
         if (!firstMarkerMatch) {
             return { intro: content, sections: [] };
         }
 
-        const introEnd = firstMarkerMatch.index || 0;
+        const introEnd = content.indexOf(firstMarkerMatch[0]);
         const intro = content.substring(0, introEnd).trim();
 
-        // Use a more robust splitting mechanism
-        const parts = content.split(markerRegex);
+        const parts = content.substring(introEnd).split(markerRegex);
         
-        let currentContent = '';
         for (let i = 1; i < parts.length; i += 2) {
-            const marker = parts[i].replace(':', ''); // "INÍCIO"
-            const text = parts[i+1] || '';
+            const marker = parts[i].replace(':', '').trim(); // "INÍCIO"
+            let text = parts[i+1] || '';
             const title = SECTION_TITLES[marker as keyof typeof SECTION_TITLES];
+
             if (title) {
-                // Remove the subsequent marker from the end of the current content
-                const nextMarkerIndex = text.search(markerRegex);
-                const cleanedText = (nextMarkerIndex !== -1 ? text.substring(0, nextMarkerIndex) : text).trim();
-                
+                // Remove the title itself (and any markdown) from the start of the content
+                 const titleRegex = new RegExp(`^\\s*\\*\\*${title}\\*\\*\\s*`, 'i');
+                 let cleanedText = text.trim().replace(titleRegex, '');
+
+                // Remove the next section's marker from the end of the current content
+                const nextMarkerMatch = cleanedText.match(/(\*\*(\d+\.?\s*)?(INÍCIO|MEIO|FIM):\s*\*)/);
+                if (nextMarkerMatch && nextMarkerMatch.index) {
+                   cleanedText = cleanedText.substring(0, nextMarkerMatch.index).trim();
+                }
+
+                // Also remove any stray numerical markers like "**2." or "**3"
+                 cleanedText = cleanedText.replace(/\s*\*\*\d+\.?\s*$/g, '').trim();
+
                 sectionsData.push({ title: title, content: cleanedText });
             }
         }
@@ -102,11 +109,11 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                 </span>
             )}
             
-            {sections.intro && <div className="mb-4">{renderSimple(sections.intro)}</div>}
-            
+            {sections.intro && <div className="mb-4 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(sections.intro) }} />}
+
             <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
                 {sections.sections.map((part, index) => {
-                    if (!part.content) return null; // Não renderizar seções vazias
+                    if (!part.content) return null;
                     const itemKey = `item-${index}`;
                     return (
                         <AccordionItem value={itemKey} key={index}>
