@@ -55,7 +55,9 @@ const CACHE_STORAGE_KEY = 'eternal-guide-question-cache';
 interface CachedItem {
   message: Message;
   feedback: 'positive' | 'negative' | null;
+  dataVersion: string; // Track the game data version
 }
+
 
 const suggestedPrompts = [
     'Qual o melhor poder para o Mundo 4?',
@@ -111,7 +113,7 @@ export function ChatView() {
   const [feedback, setFeedback] = useState<Record<string, 'positive' | 'negative' | null>>({});
 
   const { toast } = useToast();
-  const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading } = useApp();
+  const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading, gameDataVersion } = useApp();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof chatSchema>>({
@@ -130,7 +132,6 @@ export function ChatView() {
        if (cachedQuestions) {
         const parsedCache = JSON.parse(cachedQuestions);
         setQuestionCache(parsedCache);
-        // Initialize feedback state from cache
         const initialFeedback: Record<string, 'positive' | 'negative' | null> = {};
         Object.values(parsedCache).forEach((item: any) => {
             if (item?.message?.id) {
@@ -168,28 +169,29 @@ export function ChatView() {
     scrollToBottom();
   }, [messages, isLoading]);
   
-  const handleFeedback = (messageId: string, newFeedback: 'positive' | 'negative') => {
+  const handleFeedback = (messageId: string, prompt: string, newFeedback: 'positive' | 'negative') => {
       const currentFeedback = feedback[messageId];
       const updatedFeedback = currentFeedback === newFeedback ? null : newFeedback;
-
+      
       setFeedback(prev => ({...prev, [messageId]: updatedFeedback}));
 
-      // Update cache
+      const normalizedPrompt = prompt.trim().toLowerCase();
       const updatedCache = { ...questionCache };
-      let cacheUpdated = false;
-      for (const key in updatedCache) {
-          if (updatedCache[key] && updatedCache[key].message && updatedCache[key].message.id === messageId) {
-              updatedCache[key].feedback = updatedFeedback;
-              cacheUpdated = true;
-              break;
-          }
+      if (updatedCache[normalizedPrompt]) {
+          updatedCache[normalizedPrompt].feedback = updatedFeedback;
+          setQuestionCache(updatedCache);
+          window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(updatedCache));
       }
 
-      if (cacheUpdated) {
-        setQuestionCache(updatedCache);
-        window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(updatedCache));
+      // If feedback is negative, regenerate the response immediately
+      if (updatedFeedback === 'negative') {
+          // Remove the bad answer from the current chat view
+          setMessages(prevMessages => prevMessages.filter(msg => msg.id !== messageId));
+          // Call the AI again for the same prompt
+          callAI(prompt, messages.filter(msg => msg.id !== messageId));
       }
   };
+
 
   const callAI = async (prompt: string, history: Message[]) => {
     setIsLoading(true);
@@ -199,13 +201,14 @@ export function ChatView() {
       role: 'assistant',
       content: '',
       isStreaming: true,
+      question: prompt,
     };
     setMessages((prev) => [...prev, assistantMessage]);
     setFeedback(prev => ({...prev, [assistantMessageId]: null}));
 
     try {
       const relevantWikiContext = findRelevantArticles(prompt, wikiArticles);
-      const historyForAI = history.map(({ id, fromCache, isStreaming, ...rest }) => rest);
+      const historyForAI = history.map(({ id, fromCache, isStreaming, question, ...rest }) => rest);
 
       const stream = await generateSolutionStream({
         problemDescription: prompt,
@@ -226,13 +229,13 @@ export function ChatView() {
         if (done) {
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
+              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: accumulatedContent } : msg
             )
           );
           setIsLoading(false);
           
-          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent };
-          const newCacheItem: CachedItem = { message: finalMessage, feedback: null };
+          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent, question: prompt };
+          const newCacheItem: CachedItem = { message: finalMessage, feedback: null, dataVersion: gameDataVersion };
           const normalizedPrompt = prompt.trim().toLowerCase();
           const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
           setQuestionCache(newCache);
@@ -266,7 +269,6 @@ export function ChatView() {
       content: values.prompt,
     };
     
-    // Add user message to state and reset form immediately
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     form.reset();
@@ -274,22 +276,22 @@ export function ChatView() {
     const normalizedPrompt = values.prompt.trim().toLowerCase();
     const cachedItem = questionCache[normalizedPrompt];
 
-    // Cache Check: Use cache ONLY if it exists, has a message, and is NOT disliked.
-    if (cachedItem && cachedItem.message && cachedItem.feedback !== 'negative') {
+    // Cache validation: check if item exists, is not negative, and data version matches.
+    if (cachedItem && cachedItem.message && cachedItem.feedback !== 'negative' && cachedItem.dataVersion === gameDataVersion) {
         const cachedAnswerWithId = {
             ...cachedItem.message,
-            id: cachedItem.message.id || nanoid(), // Ensure it has an ID
+            id: cachedItem.message.id || nanoid(),
             fromCache: true,
+            question: values.prompt,
         };
         setMessages((prev) => [...prev, cachedAnswerWithId]);
-        // Set feedback for this specific message instance
         if(cachedAnswerWithId.id) {
             setFeedback(prev => ({...prev, [cachedAnswerWithId.id]: cachedItem.feedback }));
         }
         return; // Stop execution, cache was served.
     }
   
-    // If no valid cache or cache is negative, call the AI.
+    // If no valid cache, call the AI.
     callAI(values.prompt, newMessages);
   }
 
@@ -378,7 +380,7 @@ export function ChatView() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-primary"
-                            onClick={() => handleFeedback(message.id, 'positive')}
+                            onClick={() => handleFeedback(message.id, message.question || '', 'positive')}
                           >
                             <ThumbsUp className={cn('h-4 w-4', feedback[message.id] === 'positive' && 'fill-primary text-primary')} />
                           </Button>
@@ -386,7 +388,7 @@ export function ChatView() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                            onClick={() => handleFeedback(message.id, 'negative')}
+                            onClick={() => handleFeedback(message.id, message.question || '', 'negative')}
                           >
                             <ThumbsDown className={cn('h-4 w-4', feedback[message.id] === 'negative' && 'fill-destructive text-destructive')} />
                           </Button>
@@ -462,3 +464,5 @@ export function ChatView() {
     </div>
   );
 }
+
+    

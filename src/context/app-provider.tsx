@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useState, useEffect, useMemo } from 'react';
 import type { Message, SavedAnswer, WikiArticle } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { FirebaseClientProvider, useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
+import { FirebaseClientProvider, useCollection, useFirestore, useMemoFirebase, useUser, useDoc } from '@/firebase';
 import { collection, doc, deleteDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAdmin } from '@/hooks/use-admin';
@@ -19,6 +19,7 @@ interface AppContextType {
   isWikiLoading: boolean;
   isAuthDialogOpen: boolean;
   setAuthDialogOpen: (open: boolean) => void;
+  gameDataVersion: string;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -37,36 +38,25 @@ function AppStateProvider({ children }: { children: ReactNode }) {
   const [wikiArticles, setWikiArticles] = useState<WikiArticle[]>([]);
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
   
-  // State to manage initial app load and redirection logic
   const [isInitialAppLoad, setIsInitialAppLoad] = useState(true);
 
-  // Effect to store the last visited route
   useEffect(() => {
-    // We don't want to store admin-only routes as the "last route" for non-admins
     if (pathname && !pathname.startsWith('/admin')) {
       localStorage.setItem(LAST_VISITED_ROUTE_KEY, pathname);
     }
   }, [pathname]);
 
-  // Effect to handle initial redirection ONCE
   useEffect(() => {
-    // Wait until we know the user's admin status and the app is ready
     if (!isAdminLoading && isInitialAppLoad) {
       const lastRoute = localStorage.getItem(LAST_VISITED_ROUTE_KEY);
-      
-      // If a last route exists and we are not already there, go to it.
-      // The page-level guards will handle authorization.
       if (lastRoute && pathname !== lastRoute && !pathname.startsWith('/admin')) {
         router.replace(lastRoute);
       }
-      
-      // Mark initial load as complete to prevent this from running again
       setIsInitialAppLoad(false);
     }
   }, [isAdmin, isAdminLoading, isInitialAppLoad, router, pathname]);
 
 
-  // Firestore listeners
   const wikiCollectionRef = useMemoFirebase(() => {
     return firestore ? collection(firestore, 'wikiContent') : null;
   }, [firestore]);
@@ -75,8 +65,16 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     return firestore && user && !user.isAnonymous ? collection(firestore, `users/${user.uid}/savedAnswers`) : null;
   }, [firestore, user]);
 
+  const gameDataRef = useMemoFirebase(() => {
+    return firestore ? doc(firestore, 'metadata', 'gameData') : null;
+  }, [firestore]);
+
+
   const { data: firestoreWikiArticles, isLoading: isFirestoreWikiLoading } = useCollection<WikiArticle>(wikiCollectionRef as any);
   const { data: savedAnswers, isLoading: areSavedAnswersLoading } = useCollection<SavedAnswer>(savedAnswersCollectionRef as any);
+  const { data: gameMetadata, isLoading: isMetadataLoading } = useDoc(gameDataRef);
+  
+  const gameDataVersion = useMemo(() => gameMetadata?.version || '1.0.0', [gameMetadata]);
 
   useEffect(() => {
     try {
@@ -132,7 +130,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
       await setDoc(answerRef, {
         id: answer.id,
         userId: user.uid,
-        question: '', // This could be improved by tracking the preceding user message
+        question: answer.question || '',
         answer: answer.content,
         createdAt: serverTimestamp(),
       });
@@ -149,12 +147,12 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     toggleSaveAnswer, 
     isAnswerSaved,
     wikiArticles: wikiArticles || [],
-    isWikiLoading: (isFirestoreWikiLoading || areSavedAnswersLoading) && wikiArticles.length === 0,
+    isWikiLoading: (isFirestoreWikiLoading || areSavedAnswersLoading || isMetadataLoading) && wikiArticles.length === 0,
     isAuthDialogOpen,
     setAuthDialogOpen,
+    gameDataVersion,
   };
   
-  // While the initial redirection logic is running, show a full-screen loader.
   if (isInitialAppLoad || isAdminLoading) {
       return (
           <div className="flex h-screen w-screen items-center justify-center">
@@ -185,3 +183,5 @@ export function useApp() {
   }
   return context;
 }
+
+    

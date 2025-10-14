@@ -292,6 +292,23 @@
         "energy_bonus": { "type": "string", "description": "The energy bonus provided by the Stand." }
       },
       "required": ["id", "name", "rarity", "energy_bonus"]
+    },
+     "GameMetadata": {
+      "title": "GameMetadata",
+      "type": "object",
+      "description": "Stores metadata about the game data version.",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "A version string, e.g., '1.0.1'. Incremented on data changes."
+        },
+        "lastUpdatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last data update."
+        }
+      },
+      "required": ["version", "lastUpdatedAt"]
     }
   },
   "auth": {
@@ -333,6 +350,14 @@
           "entityName": "WikiContent",
           "schema": { "$ref": "#/backend/entities/WikiContent" },
           "description": "Stores general wiki articles. This is for high-level guides, not detailed game data."
+        }
+      },
+      {
+        "path": "/metadata/gameData",
+        "definition": {
+            "entityName": "GameMetadata",
+            "schema": { "$ref": "#/backend/entities/GameMetadata" },
+            "description": "A singleton document to track game data version for cache invalidation."
         }
       },
       {

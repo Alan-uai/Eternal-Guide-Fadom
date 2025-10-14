@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { doc, writeBatch, collection, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, writeBatch, collection, updateDoc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles, HelpCircle, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -124,6 +124,7 @@ const getSubcollectionsForWorld = (worldId: string): string[] => {
 
 function SmartSeedDialog({ world, onOpenChange, open }: { world: { id: string, name: string }, onOpenChange: (open: boolean) => void, open: boolean }) {
     const { toast } = useToast();
+    const firestore = useFirestore();
     const router = useRouter();
     const [isSeeding, setIsSeeding] = useState(false);
     const [fileCount, setFileCount] = useState(0);
@@ -132,6 +133,22 @@ function SmartSeedDialog({ world, onOpenChange, open }: { world: { id: string, n
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         setFileCount(files ? files.length : 0);
+    };
+
+    const incrementDataVersion = async () => {
+        if (!firestore) return;
+        const metadataRef = doc(firestore, 'metadata', 'gameData');
+        const docSnap = await getDoc(metadataRef);
+        let newVersion = '1.0.1'; // Start with 1.0.1 if it doesn't exist
+
+        if (docSnap.exists()) {
+            const currentVersion = docSnap.data()?.version || '1.0.0';
+            const versionParts = currentVersion.split('.').map(Number);
+            versionParts[2]++; // Increment patch version
+            newVersion = versionParts.join('.');
+        }
+
+        await setDoc(metadataRef, { version: newVersion, lastUpdatedAt: serverTimestamp() }, { merge: true });
     };
 
     const handleSeedData = async (e: React.FormEvent) => {
@@ -182,9 +199,9 @@ function SmartSeedDialog({ world, onOpenChange, open }: { world: { id: string, n
             const seedResult = await seedWorldData({ worldName: world.name, worldDataJson: jsonResult.jsonString });
             
             if (seedResult) {
-                toast({ title: 'Dados Semeados!', description: `Os novos dados para "${world.name}" foram adicionados com sucesso.` });
+                await incrementDataVersion();
+                toast({ title: 'Dados Semeados!', description: `Os novos dados para "${world.name}" foram adicionados com sucesso. A versão dos dados foi atualizada.` });
                 onOpenChange(false);
-                // Optionally, refresh data by re-fetching or using a state management trick
             } else {
                 throw new Error("Falha ao salvar os dados do mundo no Firestore.");
             }
@@ -270,14 +287,8 @@ export function WikiManagementView() {
 
     const handleViewContent = (title: string, data: any, id?: string, isWorld: boolean = false) => {
         let finalData = data;
-        // Se for um mundo (tem id), mescla com os dados estáticos da lib
         if (id && staticWorldDataMap[id]) {
-            // Deep merge logic
-            const staticData = staticWorldDataMap[id];
-            // A simple spread isn't enough for deep merge, but for this structure it might be okay.
-            // For a true deep merge, a utility function would be needed.
-            // This assumes sub-collections in Firestore completely override the static ones if they exist.
-            finalData = { ...staticData, ...data };
+            finalData = { ...staticWorldDataMap[id], ...data };
         }
         setViewingContent({ title, data: finalData, id, isWorld });
     };
@@ -322,7 +333,6 @@ export function WikiManagementView() {
     toast({ title: 'Gerando Artigo...', description: 'A IA está escrevendo o artigo da Wiki. Isso pode levar um momento.' });
     try {
         if (!firestore) throw new Error("Firestore não está disponível.");
-        // Fetch the most up-to-date name from Firestore before generating
         const worldRef = doc(firestore, 'worlds', worldData.id);
         const worldSnap = await getDoc(worldRef);
         const currentWorldName = worldSnap.exists() ? worldSnap.data().name : worldName;
@@ -333,7 +343,6 @@ export function WikiManagementView() {
         });
 
         if (result && result.wikiArticleJson) {
-            // Armazene o artigo gerado para ser pego pela página de edição
             sessionStorage.setItem('generated-wiki-article', result.wikiArticleJson);
             router.push('/wiki/edit/new?from-generation=true');
         } else {
@@ -647,3 +656,5 @@ export function WikiManagementView() {
     </>
   );
 }
+
+    

@@ -4,6 +4,7 @@ export interface Message {
   content: string;
   isStreaming?: boolean;
   fromCache?: boolean;
+  question?: string; // The original user question that prompted this assistant message
 }
 
 export interface SavedAnswer {
@@ -30,3 +31,5 @@ export interface WikiArticle {
   tables?: Record<string, WikiArticleTable>;
   createdAt: any; // Firestore Timestamp
 }
+
+    
