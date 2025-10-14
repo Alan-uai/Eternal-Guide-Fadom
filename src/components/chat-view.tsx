@@ -40,18 +40,23 @@ function toRoman(num: number): string {
 }
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-    const renderSimple = () => (
+    const renderSimple = (text: string) => (
         <div
             className="prose prose-sm dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: micromark(content) }}
+            dangerouslySetInnerHTML={{ __html: micromark(text) }}
         />
     );
 
     // Regex para dividir por títulos em negrito (ex: **Título:**) ou cabeçalhos markdown (### Título)
     const sections = content.split(/\n(?=\*\*.*?\*\*|###\s.*)/).map(s => s.trim());
+    
+    const introTextMatch = content.match(/^([\s\S]*?)(?=\n\*\*.*?\*\*|\n###\s.*)/);
+    const introText = introTextMatch ? introTextMatch[1].trim() : '';
+
+    const accordionSections = introText ? sections.slice(1) : sections;
 
     // Se não houver seções (ou for uma resposta curta), renderiza normalmente
-    if (sections.length <= 1) {
+    if (accordionSections.length <= 1 && !introText) {
         return (
              <div className='relative'>
                  {fromCache && (
@@ -59,15 +64,14 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                         <Zap className='h-3 w-3'/> Instantâneo
                     </span>
                 )}
-                {renderSimple()}
+                {renderSimple(content)}
             </div>
         )
     }
 
-    const defaultOpenValue = `item-${sections.length - 1}`;
+    const defaultOpenValue = 'item-0'; // Open the first item by default
     
-    // Check for numbered list pattern to decide on Roman numerals
-    const isNumberedList = sections.every(sec => /^\d+\.\s/.test(sec));
+    const isNumberedList = accordionSections.every(sec => /^\d+\.\s/.test(sec));
 
     return (
         <div className='relative'>
@@ -77,8 +81,10 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                 </span>
             )}
             
+            {introText && <div className="mb-4">{renderSimple(introText)}</div>}
+            
             <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
-                {sections.map((part, index) => {
+                {accordionSections.map((part, index) => {
                     const titleMatch = part.match(/^(\d+\.\s*|###\s*|\*\*)(.*?)(?::|\*\*)/);
                     let title = titleMatch ? titleMatch[2].trim() : `Seção ${index + 1}`;
                     const restOfContent = titleMatch ? part.substring(part.indexOf(title) + title.length + (titleMatch[0].endsWith(':') ? 1 : 2)).trim() : part;
