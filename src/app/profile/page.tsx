@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
@@ -21,9 +21,22 @@ import { collection, query, where, orderBy, doc, setDoc } from 'firebase/firesto
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
 
+const RarityBadge = ({ rarity, className }: { rarity: string, className?: string }) => {
+    const rarityClasses: Record<string, string> = {
+        Common: 'bg-gray-500 text-white border-gray-600',
+        Uncommon: 'bg-green-500 text-white border-green-600',
+        Rare: 'bg-blue-500 text-white border-blue-600',
+        Epic: 'bg-purple-500 text-white border-purple-600',
+        Legendary: 'bg-yellow-500 text-black border-yellow-600',
+        Mythic: 'bg-red-600 text-white border-red-700',
+        Phantom: 'bg-fuchsia-700 text-white border-fuchsia-800',
+        Supreme: 'bg-gradient-to-r from-orange-400 to-rose-400 text-white border-transparent',
+    };
+    return <Badge className={cn('text-xs', rarityClasses[rarity] || 'bg-gray-400', className)}>{rarity}</Badge>;
+};
+
 // Generic Component for Profile Sections
 function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }: { subcollectionName: string, sectionTitle: string, sectionDescription: string }) {
-    const { isAdmin } = useAdmin();
     const { toast } = useToast();
     const { user } = useUser();
     const { firestore } = useFirebase();
@@ -89,12 +102,17 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                     // Find the full item data from the local cache
                     let fullItemData: any = { ...identifiedItem }; // Start with what the AI gave us
                     const lowerCaseName = identifiedItem.name.toLowerCase();
-
                     const worldData = allGameData.find(world => world.name === identifiedItem.world);
-                    if (worldData && worldData[subcollectionName]) {
-                        const cachedItem = worldData[subcollectionName].find((item: any) => item.name.toLowerCase() === lowerCaseName);
-                        if (cachedItem) {
-                            fullItemData = { ...fullItemData, ...cachedItem };
+
+                    if (worldData) {
+                        const allSubcollections = Object.keys(worldData);
+                        const category = allSubcollections.find(cat => Array.isArray(worldData[cat]) && worldData[cat].some((item: any) => item.name.toLowerCase() === lowerCaseName));
+
+                        if (category) {
+                            const cachedItem = worldData[category].find((item: any) => item.name.toLowerCase() === lowerCaseName);
+                            if (cachedItem) {
+                                fullItemData = { ...fullItemData, ...cachedItem };
+                            }
                         }
                     }
                     
@@ -126,19 +144,6 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
         }
     };
     
-    const RarityBadge = ({ rarity }: { rarity: string }) => {
-        const rarityClasses: Record<string, string> = {
-            Common: 'bg-gray-500 text-white',
-            Uncommon: 'bg-green-500 text-white',
-            Rare: 'bg-blue-500 text-white',
-            Epic: 'bg-purple-500 text-white',
-            Legendary: 'bg-yellow-500 text-black',
-            Mythic: 'bg-red-600 text-white',
-            Phantom: 'bg-fuchsia-700 text-white',
-            Supreme: 'bg-gradient-to-r from-orange-400 to-rose-400 text-white',
-        };
-        return <Badge className={cn('text-xs', rarityClasses[rarity] || 'bg-gray-400')}>{rarity}</Badge>;
-    };
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -236,20 +241,20 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
 const PowersProfileSection = () => <ProfileSection subcollectionName="powers" sectionTitle="Poderes" sectionDescription="Adicione seus poderes enviando um screenshot da sua tela de poderes no jogo. A IA irá identificá-los e salvá-los no seu perfil." />;
 const AurasProfileSection = () => <ProfileSection subcollectionName="auras" sectionTitle="Auras" sectionDescription="Adicione suas auras enviando um screenshot. A IA irá identificá-las e salvá-las no seu perfil." />;
 const PetsProfileSection = () => <ProfileSection subcollectionName="pets" sectionTitle="Pets" sectionDescription="Adicione seus pets enviando um screenshot. A IA irá identificá-los e salvá-los no seu perfil." />;
-const WeaponsProfileSection = () => <ProfileSection subcollectionName="weapons" sectionTitle="Armas" sectionDescription="Adicione suas armas enviando um screenshot. A IA irá identificá-las e salvá-las no seu perfil." />;
+const WeaponsProfileSection = () => <ProfileSection subcollectionName="weapons" sectionTitle="Armas" sectionDescription="Adicione suas armas enviando um screenshot. A IA irá identificá-las e salvá-los no seu perfil." />;
 const IndexProfileSection = () => <ProfileSection subcollectionName="index" sectionTitle="Index" sectionDescription="Adicione seus tiers de avatares e pets enviando um screenshot. A IA irá identificá-los e salvá-los no seu perfil." />;
 const ObelisksProfileSection = () => <ProfileSection subcollectionName="obelisks" sectionTitle="Obeliscos" sectionDescription="Adicione seu progresso nos obeliscos enviando um screenshot. A IA irá identificá-lo e salvá-lo no seu perfil." />;
 const RankProfileSection = () => <ProfileSection subcollectionName="rank" sectionTitle="Rank" sectionDescription="Adicione seu rank atual enviando um screenshot. A IA irá identificá-lo e salvá-lo no seu perfil." />;
 
 
 const profileCategories = [
-    { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection },
-    { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', component: AurasProfileSection },
-    { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', component: PetsProfileSection },
-    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', component: WeaponsProfileSection },
-    { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', component: IndexProfileSection },
-    { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', component: ObelisksProfileSection },
-    { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', component: RankProfileSection },
+    { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection, subcollectionName: 'powers' },
+    { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', component: AurasProfileSection, subcollectionName: 'auras' },
+    { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', component: PetsProfileSection, subcollectionName: 'pets' },
+    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', component: WeaponsProfileSection, subcollectionName: 'weapons' },
+    { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', component: IndexProfileSection, subcollectionName: 'index' },
+    { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', component: ObelisksProfileSection, subcollectionName: 'obelisks' },
+    { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', component: RankProfileSection, subcollectionName: 'rank' },
 ];
 
 
@@ -259,7 +264,6 @@ function UserFeedbackSection() {
 
     const userFeedbackQuery = useMemoFirebase(() => {
         if (!firestore || !user) return null;
-        // This query now targets a user-specific subcollection, which is more secure and efficient.
         return query(
             collection(firestore, 'users', user.uid, 'negativeFeedback'),
             orderBy('createdAt', 'desc')
@@ -331,6 +335,46 @@ function ReputationSection() {
     );
 }
 
+function CategoryDisplay({ subcollectionName }: { subcollectionName: string }) {
+    const { user } = useUser();
+    const firestore = useFirebase().firestore;
+
+    const itemsQuery = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return query(collection(firestore, 'users', user.uid, subcollectionName), orderBy('name', 'asc'));
+    }, [firestore, user, subcollectionName]);
+
+    const { data: items, isLoading } = useCollection(itemsQuery);
+    
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-full w-full">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+        );
+    }
+    
+    if (!items || items.length === 0) {
+         return (
+            <div className='flex items-center justify-center h-full w-full text-muted-foreground'>
+                <p className="text-xs">Nenhum item salvo.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="grid grid-cols-5 gap-2 w-full">
+            {items.map(item => (
+                <div key={item.id} className="aspect-square bg-muted/50 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border">
+                    <p className="text-[10px] font-bold leading-tight text-center z-10">{(item as any).name}</p>
+                    <RarityBadge rarity={(item as any).rarity} className="absolute bottom-1 right-1 text-[8px] px-1 py-0 h-4" />
+                </div>
+            ))}
+        </div>
+    );
+}
+
+
 export default function ProfilePage() {
     const auth = useAuth();
     const { isUserLoading } = useUser();
@@ -397,9 +441,9 @@ export default function ProfilePage() {
                                 </CardTitle>
                                 <CardDescription>{category.description}</CardDescription>
                             </CardHeader>
-                            <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0'>
-                                 <div className='flex items-center justify-center h-24 w-24 rounded-full bg-muted/50 border-2 border-dashed mb-4'>
-                                     <category.icon className='h-8 w-8 text-muted-foreground'/>
+                            <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
+                                <div className='h-48 w-full rounded-md bg-muted/20 border-2 border-dashed flex items-center justify-center p-2'>
+                                    <CategoryDisplay subcollectionName={category.subcollectionName} />
                                 </div>
                                  {category.component && <category.component />}
                             </CardContent>
@@ -410,3 +454,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+    
