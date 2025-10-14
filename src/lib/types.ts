@@ -3,6 +3,7 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   isStreaming?: boolean;
+  fromCache?: boolean;
 }
 
 export interface SavedAnswer {

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { generateSolutionStream } from '@/ai/flows/generate-solution';
-import { Bot, User, Send, Bookmark, Trash2 } from 'lucide-react';
+import { Bot, User, Send, Bookmark, Trash2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -22,14 +22,21 @@ const chatSchema = z.object({
   prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
 });
 
-function AssistantMessage({ content }: { content: string }) {
+function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
   const htmlContent = useMemo(() => micromark(content), [content]);
 
   return (
-      <div 
-        className="prose prose-sm dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: htmlContent }} 
-      />
+      <div className='relative'>
+        {fromCache && (
+             <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1">
+                <Zap className='h-3 w-3'/> Instantâneo
+            </span>
+        )}
+        <div 
+            className="prose prose-sm dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: htmlContent }} 
+        />
+      </div>
   );
 }
 
@@ -42,6 +49,8 @@ const TypingIndicator = () => (
 );
 
 const CHAT_STORAGE_KEY = 'eternal-guide-chat-history';
+const CACHE_STORAGE_KEY = 'eternal-guide-question-cache';
+
 
 const suggestedPrompts = [
     'Qual o melhor poder para o Mundo 4?',
@@ -102,6 +111,7 @@ export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [questionCache, setQuestionCache] = useState<Record<string, Message>>({});
   const { toast } = useToast();
   const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading } = useApp();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -113,12 +123,17 @@ export function ChatView() {
   
   useEffect(() => {
     try {
-      const item = window.localStorage.getItem(CHAT_STORAGE_KEY);
-      if (item) {
-        setMessages(JSON.parse(item));
+      const chatHistory = window.localStorage.getItem(CHAT_STORAGE_KEY);
+      if (chatHistory) {
+        setMessages(JSON.parse(chatHistory));
+      }
+
+      const cachedQuestions = window.localStorage.getItem(CACHE_STORAGE_KEY);
+       if (cachedQuestions) {
+        setQuestionCache(JSON.parse(cachedQuestions));
       }
     } catch (error) {
-      console.error("Falha ao carregar histórico do chat do armazenamento local", error);
+      console.error("Falha ao carregar dados do armazenamento local", error);
     }
     setIsMounted(true);
   }, []);
@@ -152,11 +167,25 @@ export function ChatView() {
       role: 'user',
       content: values.prompt,
     };
-  
-    const currentMessages = [...messages, userMessage];
-    setMessages(currentMessages);
-    setIsLoading(true);
+    
+    setMessages((prev) => [...prev, userMessage]);
     form.reset();
+
+    // Cache Check
+    const normalizedPrompt = values.prompt.trim().toLowerCase();
+    if (questionCache[normalizedPrompt]) {
+        const cachedAnswer = questionCache[normalizedPrompt];
+        const newCachedAnswer: Message = {
+            ...cachedAnswer,
+            id: `assistant-${Date.now()}`,
+            fromCache: true, // Mark as from cache
+        };
+        setMessages((prev) => [...prev, newCachedAnswer]);
+        return;
+    }
+  
+    // If not in cache, proceed with AI call
+    setIsLoading(true);
   
     const assistantMessageId = `assistant-${Date.now()}`;
     const assistantMessage: Message = {
@@ -168,13 +197,12 @@ export function ChatView() {
     setMessages((prev) => [...prev, assistantMessage]);
   
     try {
-      // Find relevant context instead of using the whole wiki
       const relevantWikiContext = findRelevantArticles(values.prompt, wikiArticles);
-      const historyForAI = currentMessages.slice(0, -1).map(({ id, ...rest }) => rest);
+      const historyForAI = messages.slice(-10).map(({ id, fromCache, ...rest }) => rest);
   
       generateSolutionStream({
         problemDescription: values.prompt,
-        wikiContext: relevantWikiContext, // Use the smaller, relevant context
+        wikiContext: relevantWikiContext,
         history: historyForAI,
       }).then(async (stream) => {
         if (!stream) {
@@ -195,6 +223,13 @@ export function ChatView() {
                 )
               );
               setIsLoading(false);
+              
+              // Save to cache after stream is complete
+              const finalMessage = { id: assistantMessageId, role: 'assistant' as const, content: accumulatedContent };
+              const newCache = { ...questionCache, [normalizedPrompt]: finalMessage };
+              setQuestionCache(newCache);
+              window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(newCache));
+
               break;
             }
             accumulatedContent += decoder.decode(value, { stream: true });
@@ -208,7 +243,6 @@ export function ChatView() {
         await processText();
 
       }).catch(error => {
-        // This catch block will handle errors from the generateSolutionStream promise itself (e.g., network issues)
         console.error('Erro ao iniciar o stream da solução:', error);
         toast({
           variant: 'destructive',
@@ -220,7 +254,6 @@ export function ChatView() {
       });
   
     } catch (error) {
-      // This catch block handles synchronous errors before the promise starts
       console.error('Erro ao gerar solução:', error);
       toast({
         variant: 'destructive',
@@ -306,7 +339,7 @@ export function ChatView() {
                   {message.isStreaming && !message.content ? (
                     <TypingIndicator />
                   ) : message.role === 'assistant' ? (
-                    <AssistantMessage content={message.content} />
+                    <AssistantMessage content={message.content} fromCache={message.fromCache} />
                   ) : (
                     <p className="whitespace-pre-wrap">{message.content}</p>
                   )}
@@ -383,5 +416,3 @@ export function ChatView() {
     </div>
   );
 }
-
-    

@@ -42,7 +42,8 @@ function AppStateProvider({ children }: { children: ReactNode }) {
 
   // Effect to store the last visited route
   useEffect(() => {
-    if (pathname) {
+    // We don't want to store admin-only routes as the "last route" for non-admins
+    if (pathname && !pathname.startsWith('/admin')) {
       localStorage.setItem(LAST_VISITED_ROUTE_KEY, pathname);
     }
   }, [pathname]);
@@ -55,7 +56,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
       
       // If a last route exists and we are not already there, go to it.
       // The page-level guards will handle authorization.
-      if (lastRoute && pathname !== lastRoute) {
+      if (lastRoute && pathname !== lastRoute && !pathname.startsWith('/admin')) {
         router.replace(lastRoute);
       }
       
@@ -141,7 +142,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
         description: "Encontre-a na seção 'Respostas Salvas'.",
       });
     }
-  }, [user, firestore, isAnswerSaved, toast]);
+  }, [user, firestore, isAnswerSaved, toast, setAuthDialogOpen]);
   
   const value = { 
     savedAnswers: savedAnswers || [], 
@@ -184,5 +185,3 @@ export function useApp() {
   }
   return context;
 }
-
-    
