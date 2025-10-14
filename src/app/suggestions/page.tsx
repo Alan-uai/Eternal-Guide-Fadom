@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useFirestore, useCollection, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, orderBy, doc, updateDoc, increment } from 'firebase/firestore';
+import { useFirestore, useCollection, useMemoFirebase, useUser, useFirebase } from '@/firebase';
+import { collection, query, orderBy, doc, updateDoc, increment, setDoc } from 'firebase/firestore';
 import { useAdmin } from '@/hooks/use-admin';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -152,14 +152,30 @@ function NegativeFeedbackTab() {
   const handleUpdateStatus = async (feedbackItem: NegativeFeedback, newStatus: 'reviewing' | 'fixed') => {
     if (!firestore || !user) return;
     setUpdatingFeedback(feedbackItem.id);
+    
+    // Reference to the public feedback document
     const feedbackRef = doc(firestore, 'negativeFeedback', feedbackItem.id);
+
+    // Reference to the user-specific feedback document
+    const userFeedbackRef = doc(firestore, 'users', feedbackItem.userId, 'negativeFeedback', feedbackItem.id);
+    
+    // Reference to the user's main profile document
     const userRef = doc(firestore, 'users', feedbackItem.userId);
 
     try {
-        await updateDoc(feedbackRef, {
+        const updatePayload = {
             status: newStatus,
             reviewedBy: user.email,
-        });
+        };
+
+        // Update both the public and user-specific feedback documents
+        await updateDoc(feedbackRef, updatePayload);
+        await setDoc(userFeedbackRef, {
+            ...updatePayload, 
+            question: feedbackItem.question,
+            createdAt: feedbackItem.createdAt
+        }, { merge: true });
+
 
         if (newStatus === 'fixed' && feedbackItem.status !== 'fixed') {
             await updateDoc(userRef, {
@@ -239,7 +255,7 @@ function NegativeFeedbackTab() {
             </CardContent>
             <CardFooter className='justify-end gap-2'>
                 <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(feedback, 'reviewing')} disabled={updatingFeedback === feedback.id}>
-                    {updatingFeedback === feedback.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <AlertTriangle className="h-4 w-4 text-yellow-500" />}
+                    {updatingFeedback === feedback.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <Eye className="h-4 w-4 text-yellow-500" />}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(feedback, 'fixed')} disabled={updatingFeedback === feedback.id}>
                      {updatingFeedback === feedback.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check className="h-4 w-4 text-green-500" />}
@@ -308,5 +324,3 @@ export default function SuggestionsPage() {
 
   return <AdminSuggestionsPage />;
 }
-
-    

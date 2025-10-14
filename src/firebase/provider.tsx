@@ -1,8 +1,9 @@
+
 'use client';
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore';
+import { Firestore, doc, getDoc } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { handleUserLogin } from '@/lib/auth-actions';
@@ -82,8 +83,20 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       auth,
       async (firebaseUser) => { // Auth state determined
         if (firebaseUser) {
-            // Se o usuário não for anônimo, crie/atualize o documento dele no Firestore
+            
+            let userProfile = { ...firebaseUser };
+
             if (!firebaseUser.isAnonymous) {
+              const userRef = doc(firestore, 'users', firebaseUser.uid);
+              const userSnap = await getDoc(userRef);
+
+              if (userSnap.exists()) {
+                 // Merge firestore profile data into the user object
+                 userProfile = { ...userProfile, ...userSnap.data() };
+              } else {
+                // If doc doesn't exist, it means handleUserLogin will create it.
+                // We can proceed with the default user object for now.
+              }
               
               // Determine if the user is new on the client side
               const isNewUser = firebaseUser.metadata.creationTime === firebaseUser.metadata.lastSignInTime;
@@ -98,7 +111,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
               await handleUserLogin(userData);
             }
-            setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
+            setUserAuthState({ user: userProfile as User, isUserLoading: false, userError: null });
         } else {
             // No user is signed in, so sign in anonymously.
             try {
@@ -117,7 +130,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       }
     );
     return () => unsubscribe(); // Cleanup
-  }, [auth]); // Depends on the auth instance
+  }, [auth, firestore]); // Depends on the auth instance
 
   // Memoize the context value
   const contextValue = useMemo((): FirebaseContextState => {

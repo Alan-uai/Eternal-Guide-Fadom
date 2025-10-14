@@ -16,14 +16,14 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useAuth, useCollection, useFirebase, useMemoFirebase, useUser } from '@/firebase';
-import { signOut, getAuth } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { collection, query, where, orderBy } from 'firebase/firestore';
 
 const profileCategories = [
     { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection },
     { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.' },
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.' },
-    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.' },
+    { name: 'Armas', icon: Swords, description: 'Espadas, foices и outros equipamentos.' },
     { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.' },
     { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.' },
     { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.' },
@@ -291,9 +291,36 @@ function UserFeedbackSection() {
     )
 }
 
+function ReputationSection() {
+    const { user, isUserLoading } = useUser();
+
+    const reputationPoints = (user as any)?.reputationPoints || 0;
+
+    return (
+        <Card className='lg:col-span-2'>
+            <CardHeader>
+                <CardTitle className='flex items-center gap-3'><Award /> Reputação</CardTitle>
+            </CardHeader>
+            <CardContent className='flex flex-col items-center justify-center text-center p-6'>
+                {isUserLoading ? (
+                    <Loader2 className='h-8 w-8 animate-spin text-primary'/>
+                ) : (
+                    <>
+                        <div className='relative flex items-center justify-center h-24 w-24 rounded-full bg-primary/10 border-2 border-primary/20 mb-4'>
+                            <Sparkles className='h-12 w-12 text-primary opacity-20 absolute' />
+                            <span className='text-4xl font-bold text-primary z-10'>{reputationPoints}</span>
+                        </div>
+                        <p className='text-sm text-muted-foreground'>Você tem {reputationPoints} pontos de reputação por ajudar a melhorar a IA.</p>
+                    </>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function ProfilePage() {
     const auth = useAuth();
-    const { user, isUserLoading } = useUser();
+    const { isUserLoading } = useUser();
     const { toast } = useToast();
 
     const handleSignOut = async () => {
@@ -337,20 +364,9 @@ export default function ProfilePage() {
                 </header>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <Card className='lg:col-span-2'>
-                        <CardHeader>
-                            <CardTitle className='flex items-center gap-3'><Award /> Reputação</CardTitle>
-                        </CardHeader>
-                        <CardContent className='flex flex-col items-center justify-center text-center p-6'>
-                            <div className='flex items-center justify-center h-24 w-24 rounded-full bg-muted/50 border-2 border-dashed mb-4'>
-                                 <Construction className='h-8 w-8 text-muted-foreground'/>
-                            </div>
-                             <p className='text-sm text-muted-foreground'>Seus pontos de reputação por ajudar a melhorar a IA aparecerão aqui em breve.</p>
-                        </CardContent>
-                    </Card>
+                    <ReputationSection />
 
                     <UserFeedbackSection />
-
                 </div>
 
                 <div className="space-y-2">
@@ -385,5 +401,3 @@ export default function ProfilePage() {
         </>
     );
 }
-
-    

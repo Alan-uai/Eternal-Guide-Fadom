@@ -317,7 +317,7 @@
     "NegativeFeedback": {
       "title": "NegativeFeedback",
       "type": "object",
-      "description": "Stores a user's negative feedback on an AI response for admin review.",
+      "description": "Stores a user's negative feedback on an AI response for admin review. Can be in a top-level collection or a user's subcollection.",
       "properties": {
         "id": { "type": "string" },
         "userId": { "type": "string", "description": "ID of the user who gave feedback." },
@@ -336,7 +336,7 @@
             "description": "The email of the admin who reviewed the feedback."
         }
       },
-      "required": ["id", "userId", "question", "negativeResponse", "createdAt", "status"]
+      "required": ["id", "userId", "question", "createdAt", "status"]
     }
   },
   "auth": {
@@ -372,12 +372,20 @@
           "description": "Stores content suggestions made by the user for the Wiki."
         }
       },
+      {
+        "path": "/users/{userId}/negativeFeedback/{feedbackId}",
+        "definition": {
+          "entityName": "NegativeFeedback",
+          "schema": { "$ref": "#/backend/entities/NegativeFeedback" },
+          "description": "A user-specific copy of their negative feedback for display in their profile."
+        }
+      },
        {
         "path": "/negativeFeedback/{feedbackId}",
         "definition": {
           "entityName": "NegativeFeedback",
           "schema": { "$ref": "#/backend/entities/NegativeFeedback" },
-          "description": "Stores negative AI response feedback for admin review."
+          "description": "A global collection for all negative AI response feedback for admin review."
         }
       },
       {
@@ -472,5 +480,3 @@
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
-
-    
