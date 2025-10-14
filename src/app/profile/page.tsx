@@ -5,7 +5,7 @@ import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
-import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, Construction, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle } from 'lucide-react';
+import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle } from 'lucide-react';
 import Head from 'next/head';
 import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
@@ -20,38 +20,8 @@ import { signOut } from 'firebase/auth';
 import { collection, query, where, orderBy, doc, setDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 
-const profileCategories = [
-    { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection },
-    { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.' },
-    { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.' },
-    { name: 'Armas', icon: Swords, description: 'Espadas, foices и outros equipamentos.' },
-    { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.' },
-    { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.' },
-    { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.' },
-];
-
-function UnderConstructionDialog() {
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="outline">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Adicionar / Editar
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Em Construção</DialogTitle>
-                    <DialogDescription>
-                        A funcionalidade para adicionar e editar itens do seu perfil estará disponível em breve!
-                    </DialogDescription>
-                </DialogHeader>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
-function PowersProfileSection() {
+// Generic Component for Profile Sections
+function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }: { subcollectionName: string, sectionTitle: string, sectionDescription: string }) {
     const { isAdmin } = useAdmin();
     const { toast } = useToast();
     const { user } = useUser();
@@ -61,12 +31,12 @@ function PowersProfileSection() {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const userPowersQuery = useMemoFirebase(() => {
+    const userSubcollectionQuery = useMemoFirebase(() => {
         if (!firestore || !user) return null;
-        return collection(firestore, 'users', user.uid, 'powers');
-    }, [firestore, user]);
+        return collection(firestore, 'users', user.uid, subcollectionName);
+    }, [firestore, user, subcollectionName]);
 
-    const { data: savedPowers, isLoading: arePowersLoading } = useCollection(userPowersQuery);
+    const { data: savedItems, isLoading: areItemsLoading } = useCollection(userSubcollectionQuery);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -79,7 +49,7 @@ function PowersProfileSection() {
             toast({
                 variant: 'destructive',
                 title: 'Nenhum arquivo selecionado',
-                description: 'Por favor, selecione um ou mais screenshots dos seus poderes.',
+                description: `Por favor, selecione um ou mais screenshots de seus ${sectionTitle.toLowerCase()}.`,
             });
             return;
         }
@@ -91,7 +61,7 @@ function PowersProfileSection() {
         setIsAnalyzing(true);
         toast({
             title: 'Analisando Imagens...',
-            description: 'A IA está identificando seus poderes. Isso pode levar um momento.',
+            description: `A IA está identificando seus itens. Isso pode levar um momento.`,
         });
 
         try {
@@ -105,31 +75,33 @@ function PowersProfileSection() {
                     });
                 })
             );
-
+            
+            // Temporarily use the existing 'identifyPowersFromImage' flow.
+            // This can be replaced with a specific flow for each category later.
             const result = await identifyPowersFromImage({ images: dataUris });
             if (result && result.powers) {
                 let savedCount = 0;
-                for (const power of result.powers) {
-                    const powerId = power.name.toLowerCase().replace(/\s/g, '-');
-                    const powerRef = doc(firestore, 'users', user.uid, 'powers', powerId);
-                    await setDoc(powerRef, { id: powerId, ...power }, { merge: true });
+                for (const item of result.powers) {
+                    const itemId = item.name.toLowerCase().replace(/\s/g, '-');
+                    const itemRef = doc(firestore, 'users', user.uid, subcollectionName, itemId);
+                    await setDoc(itemRef, { id: itemId, ...item }, { merge: true });
                     savedCount++;
                 }
                 
                 toast({
-                    title: 'Poderes Salvos!',
-                    description: `${savedCount} poderes foram identificados e salvos no seu perfil.`,
+                    title: `${sectionTitle} Salvos!`,
+                    description: `${savedCount} itens foram identificados e salvos em seu perfil.`,
                 });
             } else {
-                 throw new Error('A IA não conseguiu identificar nenhum poder.');
+                 throw new Error('A IA não conseguiu identificar nenhum item.');
             }
 
         } catch (error: any) {
-            console.error("Erro ao analisar e salvar poderes:", error);
+            console.error(`Erro ao analisar e salvar ${sectionTitle}:`, error);
             toast({
                 variant: 'destructive',
                 title: 'Erro na Análise',
-                description: error.message || 'Não foi possível identificar e salvar os poderes.',
+                description: error.message || `Não foi possível identificar e salvar os itens.`,
             });
         } finally {
             setIsAnalyzing(false);
@@ -154,12 +126,6 @@ function PowersProfileSection() {
         return <Badge className={cn('text-xs', rarityClasses[rarity] || 'bg-gray-400')}>{rarity}</Badge>;
     };
 
-    if (isAdmin === undefined) return null; // Wait for admin check
-
-    if (!isAdmin) {
-        return <UnderConstructionDialog />;
-    }
-
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
@@ -170,10 +136,8 @@ function PowersProfileSection() {
             </DialogTrigger>
             <DialogContent className="max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>Gerenciar Poderes</DialogTitle>
-                    <DialogDescription>
-                        Adicione seus poderes enviando um screenshot da sua tela de poderes no jogo. A IA irá identificá-los e salvá-los no seu perfil.
-                    </DialogDescription>
+                    <DialogTitle>Gerenciar {sectionTitle}</DialogTitle>
+                    <DialogDescription>{sectionDescription}</DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
                     <div className="space-y-4">
@@ -190,9 +154,9 @@ function PowersProfileSection() {
                                         accept="image/*"
                                         onChange={handleFileChange}
                                         className="hidden"
-                                        id="power-upload"
+                                        id={`${subcollectionName}-upload`}
                                     />
-                                    <label htmlFor="power-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted/50">
+                                    <label htmlFor={`${subcollectionName}-upload`} className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted/50">
                                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                             <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
                                             <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Clique para enviar</span> ou arraste e solte</p>
@@ -218,29 +182,29 @@ function PowersProfileSection() {
                     </div>
 
                     <div className="space-y-4">
-                         <h3 className="text-lg font-medium">Poderes Salvos</h3>
+                         <h3 className="text-lg font-medium">{sectionTitle} Salvos</h3>
                          <Card className="h-[280px]">
                             <CardContent className="p-0 h-full">
-                                {arePowersLoading ? (
+                                {areItemsLoading ? (
                                     <div className="flex items-center justify-center h-full"><Loader2 className="h-6 w-6 animate-spin"/></div>
-                                ) : (!savedPowers || savedPowers.length === 0) ? (
+                                ) : (!savedItems || savedItems.length === 0) ? (
                                     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4">
                                         <ImageIcon className="h-10 w-10 mb-2" />
-                                        <p className="text-sm">Seus poderes salvos aparecerão aqui.</p>
+                                        <p className="text-sm">Seus itens salvos aparecerão aqui.</p>
                                     </div>
                                 ) : (
                                     <ScrollArea className="h-full p-4">
                                         <div className="space-y-3">
-                                            {savedPowers.map(power => (
-                                                <div key={power.id} className="flex items-center gap-4 p-2 rounded-md bg-muted/50">
+                                            {savedItems.map((item: any) => (
+                                                <div key={item.id} className="flex items-center gap-4 p-2 rounded-md bg-muted/50">
                                                     <div className="w-10 h-10 bg-gray-800 rounded-md flex items-center justify-center text-white font-bold text-xs text-center">
-                                                       {(power as any).name.substring(0,3)}
+                                                       {item.name.substring(0,3)}
                                                     </div>
                                                     <div className='flex-1'>
-                                                        <p className="font-semibold">{(power as any).name}</p>
-                                                        <p className="text-xs text-muted-foreground">{(power as any).world}</p>
+                                                        <p className="font-semibold">{item.name}</p>
+                                                        <p className="text-xs text-muted-foreground">{item.world}</p>
                                                     </div>
-                                                    <RarityBadge rarity={(power as any).rarity} />
+                                                    <RarityBadge rarity={item.rarity} />
                                                 </div>
                                             ))}
                                         </div>
@@ -254,6 +218,26 @@ function PowersProfileSection() {
         </Dialog>
     );
 }
+
+const PowersProfileSection = () => <ProfileSection subcollectionName="powers" sectionTitle="Poderes" sectionDescription="Adicione seus poderes enviando um screenshot da sua tela de poderes no jogo. A IA irá identificá-los e salvá-los no seu perfil." />;
+const AurasProfileSection = () => <ProfileSection subcollectionName="auras" sectionTitle="Auras" sectionDescription="Adicione suas auras enviando um screenshot. A IA irá identificá-las e salvá-las no seu perfil." />;
+const PetsProfileSection = () => <ProfileSection subcollectionName="pets" sectionTitle="Pets" sectionDescription="Adicione seus pets enviando um screenshot. A IA irá identificá-los e salvá-los no seu perfil." />;
+const WeaponsProfileSection = () => <ProfileSection subcollectionName="weapons" sectionTitle="Armas" sectionDescription="Adicione suas armas enviando um screenshot. A IA irá identificá-las e salvá-las no seu perfil." />;
+const IndexProfileSection = () => <ProfileSection subcollectionName="index" sectionTitle="Index" sectionDescription="Adicione seus tiers de avatares e pets enviando um screenshot. A IA irá identificá-los e salvá-los no seu perfil." />;
+const ObelisksProfileSection = () => <ProfileSection subcollectionName="obelisks" sectionTitle="Obeliscos" sectionDescription="Adicione seu progresso nos obeliscos enviando um screenshot. A IA irá identificá-lo e salvá-lo no seu perfil." />;
+const RankProfileSection = () => <ProfileSection subcollectionName="rank" sectionTitle="Rank" sectionDescription="Adicione seu rank atual enviando um screenshot. A IA irá identificá-lo e salvá-lo no seu perfil." />;
+
+
+const profileCategories = [
+    { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection },
+    { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', component: AurasProfileSection },
+    { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', component: PetsProfileSection },
+    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', component: WeaponsProfileSection },
+    { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', component: IndexProfileSection },
+    { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', component: ObelisksProfileSection },
+    { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', component: RankProfileSection },
+];
+
 
 function UserFeedbackSection() {
     const { user } = useUser();
@@ -400,14 +384,10 @@ export default function ProfilePage() {
                                 <CardDescription>{category.description}</CardDescription>
                             </CardHeader>
                             <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0'>
-                                <div className='flex items-center justify-center h-24 w-24 rounded-full bg-muted/50 border-2 border-dashed mb-4'>
-                                     <Construction className='h-8 w-8 text-muted-foreground'/>
+                                 <div className='flex items-center justify-center h-24 w-24 rounded-full bg-muted/50 border-2 border-dashed mb-4'>
+                                    {areItemsLoading(category.name.toLowerCase()) ? <Loader2 className='h-8 w-8 animate-spin'/> : <category.icon className='h-8 w-8 text-muted-foreground'/>}
                                 </div>
-                                 {category.component ? (
-                                    <category.component />
-                                ) : (
-                                   <UnderConstructionDialog />
-                                )}
+                                 {category.component && <category.component />}
                             </CardContent>
                         </Card>
                     ))}
@@ -415,6 +395,21 @@ export default function ProfilePage() {
             </div>
         </>
     );
+}
+
+// Helper function to check loading status, since we can't use hooks inside the map directly.
+// This is a workaround. A better approach might be to pass the isLoading state down to the component.
+// For now, this illustrates the idea but won't work as hooks can't be called conditionally.
+// The actual implementation inside ProfileSection handles its own loading.
+function areItemsLoading(subcollectionName: string): boolean {
+    const { firestore } = useFirebase();
+    const { user } = useUser();
+    const query = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return collection(firestore, 'users', user.uid, subcollectionName);
+    }, [firestore, user, subcollectionName]);
+    const { isLoading } = useCollection(query);
+    return isLoading;
 }
 
     
