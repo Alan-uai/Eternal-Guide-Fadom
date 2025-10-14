@@ -94,7 +94,7 @@ Sua principal estratégia é:
 2.  **USE A FERRAMENTA 'getGameData' SEMPRE QUE POSSÍVEL.** Após ter uma compreensão do tópico com base na Wiki, **você DEVE OBRIGATORIAMENTE usar a ferramenta 'getGameData' para buscar estatísticas detalhadas de itens do mundo relevante.** Não dê sugestões genéricas como "pegue poderes melhores". Em vez disso, use a ferramenta para listar OS NOMES ESPECÍFICOS dos poderes, acessórios, pets, etc., daquele mundo que podem ajudar o jogador. Seja específico.
 3.  **Use o histórico da conversa (history) para entender o contexto principal (como o mundo em que o jogador está) e para resolver pronomes (como "ela" ou "isso").** No entanto, sua resposta deve focar-se estritamente na pergunta mais recente do usuário. Não repita dicas de perguntas anteriores, a menos que sejam diretamente relevantes para a nova pergunta. Por exemplo, se a pergunta anterior era sobre "dano" e a nova é sobre "poder", foque sua resposta apenas em "poder".
 4.  **Pense Estrategicamente:** Ao responder a uma pergunta sobre a "melhor" maneira de fazer algo (ex: "melhor poder para o Mundo 4"), não se limite apenas às opções desse mundo. Se houver um poder, arma, gamepass ou item significativamente superior no mundo seguinte (ex: Mundo 5) e o jogador estiver próximo de avançar, ofereça uma dica estratégica. Sugira que pode valer a pena focar em avançar de mundo para obter esse item melhor, explicando o porquê.
-5.  **Regra da Comunidade para Avançar de Mundo:** Se o usuário perguntar sobre o "DPS para sair do mundo" ou algo similar, entenda que ele quer saber o dano necessário para avançar para o próximo mundo. A regra da comunidade é: **pegar a vida (HP) do NPC de Rank S do mundo atual e dividir por 10**. Explique essa regra ao usuário. Como você não tem o HP dos NPCs na sua base de dados, instrua o usuário a encontrar o NPC de Rank S no jogo, verificar o HP dele e fazer o cálculo.
+5.  **Regra da Comunidade para Avançar de Mundo:** Se o usuário perguntar sobre o "DPS para sair do mundo" ou algo similar, entenda que ele quer saber o dano necessário para avançar para o próximo mundo. A regra da comunidade é: **pegar a vida (HP) do NPC de Rank S do mundo atual и dividir por 10**. Explique essa regra ao usuário. Como você não tem o HP dos NPCs na sua base de dados, instrua o usuário a encontrar o NPC de Rank S no jogo, verificar o HP dele e fazer o cálculo.
 
 ### REGRAS DE CÁLCULO E FORMATAÇÃO (OBRIGATÓRIO)
 
@@ -119,7 +119,7 @@ Sua principal estratégia é:
 
 Se a resposta não estiver nas ferramentas ou no wiki, diga que você não tem informações suficientes para responder.
 
-INÍCIO DO CONTEÚDO DO WIKI
+INÍCIO DO CONTEúdo DO WIKI
 {{{wikiContext}}}
 FIM DO CONTEÚDO DO WIKI
 
@@ -143,7 +143,7 @@ const generateSolutionFlow = ai.defineFlow(
     try {
       const {output} = await prompt(input);
       if (!output || !output.potentialSolution) {
-        // Fallback in case the AI returns an empty object or misses the field.
+        // Fallback in case the AI returns an empty object, null, or misses the field.
         return { potentialSolution: "Desculpe, não consegui gerar uma resposta. Por favor, tente reformular sua pergunta." };
       }
       return output;
