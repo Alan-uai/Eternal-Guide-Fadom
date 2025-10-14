@@ -20,7 +20,7 @@ import { micromark } from 'micromark';
 import { Card, CardContent } from './ui/card';
 import { nanoid } from 'nanoid';
 import { useUser, useFirebase } from '@/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, doc } from 'firebase/firestore';
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -46,6 +46,7 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
   }, [content]);
 
   const introSection = parsedContent.find(s => s.marcador === 'texto_introdutorio');
+  const mainAnswerSection = parsedContent.find(s => s.marcador === 'inicio');
   const accordionSections = parsedContent.filter(s => s.marcador === 'meio' || s.marcador === 'fim');
 
   // Determina qual item do acordeão deve vir aberto por padrão.
@@ -62,10 +63,18 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
       {/* Renderiza a parte introdutória */}
       {introSection && (
         <div
-          className="prose prose-sm dark:prose-invert max-w-none"
+          className="prose prose-sm dark:prose-invert max-w-none mb-4"
           dangerouslySetInnerHTML={{ __html: micromark(introSection.conteudo) }}
         />
       )}
+      
+      {/* Renderiza a resposta principal (inicio) */}
+      {mainAnswerSection && (
+         <div className="prose prose-sm dark:prose-invert max-w-none font-semibold">
+           <div dangerouslySetInnerHTML={{ __html: micromark(mainAnswerSection.conteudo) }} />
+         </div>
+      )}
+
 
       {/* Renderiza o acordeão para as seções restantes */}
       {accordionSections.length > 0 && (
@@ -263,13 +272,17 @@ export function ChatView() {
         if (firestore && user) {
              try {
                 const analysisResult = await analyzeNegativeFeedback({ question: prompt, negativeResponse: response });
-                const feedbackCollection = collection(firestore, 'negativeFeedback');
-                await addDoc(feedbackCollection, {
+                
+                // Save to the user-specific subcollection
+                const feedbackRef = doc(collection(firestore, 'users', user.uid, 'negativeFeedback'));
+
+                await addDoc(collection(firestore, 'negativeFeedback'), {
                     userId: user.uid,
                     userEmail: user.email,
                     question: prompt,
                     negativeResponse: response,
                     aiSuggestion: analysisResult.suggestion,
+                    status: 'pending',
                     createdAt: serverTimestamp(),
                 });
             } catch (error) {
@@ -561,3 +574,5 @@ export function ChatView() {
     </div>
   );
 }
+
+    

@@ -246,9 +246,9 @@ function UserFeedbackSection() {
 
     const userFeedbackQuery = useMemoFirebase(() => {
         if (!firestore || !user) return null;
+        // This query now targets a user-specific subcollection, which is more secure and efficient.
         return query(
-            collection(firestore, 'negativeFeedback'),
-            where('userId', '==', user.uid),
+            collection(firestore, 'users', user.uid, 'negativeFeedback'),
             orderBy('createdAt', 'desc')
         );
     }, [firestore, user]);
@@ -385,3 +385,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+    
