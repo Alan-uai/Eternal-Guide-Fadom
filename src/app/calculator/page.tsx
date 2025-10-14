@@ -20,7 +20,7 @@ const profileCategories = [
     { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection },
     { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.' },
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.' },
-    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.' },
+    { name: 'Armas', icon: Swords, description: 'Espadas, foices и outros equipamentos.' },
     { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.' },
     { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.' },
     { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.' },
