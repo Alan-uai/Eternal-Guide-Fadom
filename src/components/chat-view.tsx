@@ -40,15 +40,25 @@ function toRoman(num: number): string {
 }
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-    // Split the content by numbered list items. This regex looks for a number followed by a period and a space.
-    const parts = content.split(/\n(?=\d+\.\s)/).map(part => part.trim());
+    const contentParts = content.split('\n');
+    let introText = '';
+    let listStartIndex = -1;
 
-    // If there are no numbered sections, render the whole content.
-    if (parts.length <= 1 && !/^\d+\.\s/.test(parts[0])) {
+    // Find where the numbered list starts
+    for (let i = 0; i < contentParts.length; i++) {
+        if (/^\d+\.\s/.test(contentParts[i].trim())) {
+            listStartIndex = i;
+            break;
+        }
+        introText += contentParts[i] + '\n';
+    }
+
+    // If no numbered list is found, render the whole content normally
+    if (listStartIndex === -1) {
         const htmlContent = micromark(content);
         return (
             <div className='relative'>
-                {fromCache && (
+                 {fromCache && (
                     <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1">
                         <Zap className='h-3 w-3'/> Instantâneo
                     </span>
@@ -61,21 +71,33 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         );
     }
     
-    // Find the last numbered item to set it as the default open accordion.
-    // The key is the Roman numeral of the last part's index.
-    const defaultOpenValue = `item-${toRoman(parts.length)}`;
-    
+    const listContent = contentParts.slice(listStartIndex).join('\n');
+    const listItems = listContent.split(/\n(?=\d+\.\s)/).map(part => part.trim());
+
+    // Heuristic: The last numbered item is the most likely direct answer.
+    const defaultOpenValue = `item-${toRoman(listItems.length)}`;
+    const introHtml = micromark(introText);
+
     return (
         <div className='relative'>
             {fromCache && (
-                 <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
+                <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
                     <Zap className='h-3 w-3'/> Instantâneo
                 </span>
             )}
+            
+            {/* Render intro text if it exists */}
+            {introText.trim() && (
+                 <div
+                    className="prose prose-sm dark:prose-invert max-w-none mb-4"
+                    dangerouslySetInnerHTML={{ __html: introHtml }}
+                />
+            )}
+
             <Accordion type="single" collapsible defaultValue={defaultOpenValue} className="w-full">
-                {parts.map((part, index) => {
+                {listItems.map((part, index) => {
                     const romanNumeral = toRoman(index + 1);
-                    // Remove the original number (e.g., "1. ") to use the Roman numeral in the trigger.
+                    // Extract title and the rest of the content
                     const titleMatch = part.match(/^(\d+)\.\s*(.*?)(?=\n|$)/);
                     const title = titleMatch ? titleMatch[2] : `Passo ${romanNumeral}`;
                     const restOfContent = titleMatch ? part.substring(titleMatch[0].length).trim() : part;
@@ -84,7 +106,7 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                     return (
                         <AccordionItem value={`item-${romanNumeral}`} key={index}>
                             <AccordionTrigger className="text-sm font-semibold hover:no-underline">
-                                <span className="flex items-center gap-2">
+                                <span className="flex items-center gap-2 text-left">
                                     <span className="font-bold text-primary">{romanNumeral}.</span>
                                     <span>{title}</span>
                                 </span>
@@ -136,25 +158,22 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
         let score = 0;
         const lowerCaseTitle = article.title.toLowerCase();
         const lowerCaseSummary = article.summary.toLowerCase();
-        const lowerCaseContent = article.content.toLowerCase();
         const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
 
-        // Exact match in title (high score)
+        // High score for matching substrings in the title
         if (lowerCaseTitle.includes(lowerCasePrompt)) {
             score += 20;
-        }
-        // Partial match in title
-        if (lowerCasePrompt.split(' ').some(word => lowerCaseTitle.includes(word) && word.length > 2)) {
+        } else if (lowerCasePrompt.split(' ').some(word => word.length > 3 && lowerCaseTitle.includes(word))) {
             score += 10;
         }
-
-        // Match in tags
-        if (lowerCasePrompt.split(' ').some(word => tagsString.includes(word) && word.length > 2)) {
+        
+        // Medium score for matching tags
+        if (lowerCasePrompt.split(' ').some(word => word.length > 3 && tagsString.includes(word))) {
             score += 5;
         }
 
-        // Match in summary
-        if (lowerCasePrompt.split(' ').some(word => lowerCaseSummary.includes(word) && word.length > 2)) {
+        // Low score for summary matches
+        if (lowerCasePrompt.split(' ').some(word => word.length > 3 && lowerCaseSummary.includes(word))) {
             score += 2;
         }
 
@@ -171,7 +190,7 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
     }
 
     return topArticles
-        .map(({ article }) => `Title: ${article.title}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`)
+        .map(({ article }) => `Title: ${article.title}\nSummary: ${article.summary}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`)
         .join('\n\n---\n\n');
 }
 
