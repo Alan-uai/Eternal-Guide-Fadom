@@ -190,35 +190,8 @@ export function ChatView() {
       }
   };
 
-  async function onSubmit(values: z.infer<typeof chatSchema>) {
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: values.prompt,
-    };
-    
-    setMessages((prev) => [...prev, userMessage]);
-    form.reset();
-
-    const normalizedPrompt = values.prompt.trim().toLowerCase();
-    const cachedItem = questionCache[normalizedPrompt];
-
-    // Cache Check: only use cache if it exists and is not disliked
-    if (cachedItem && cachedItem.feedback !== 'negative') {
-        const cachedAnswer = cachedItem.message;
-        const newCachedAnswer: Message = {
-            ...cachedAnswer,
-            id: `assistant-${Date.now()}`,
-            fromCache: true, // Mark as from cache
-        };
-        setMessages((prev) => [...prev, newCachedAnswer]);
-        // Set initial feedback for the newly displayed cached message
-        setFeedback(prev => ({...prev, [newCachedAnswer.id]: cachedItem.feedback }));
-        return;
-    }
-  
+  const callAI = async (prompt: string, history: Message[]) => {
     setIsLoading(true);
-  
     const assistantMessageId = `assistant-${Date.now()}`;
     const assistantMessage: Message = {
       id: assistantMessageId,
@@ -227,65 +200,52 @@ export function ChatView() {
       isStreaming: true,
     };
     setMessages((prev) => [...prev, assistantMessage]);
-    setFeedback(prev => ({...prev, [assistantMessageId]: null})); // Initialize feedback for new message
-  
+    setFeedback(prev => ({...prev, [assistantMessageId]: null}));
+
     try {
-      const relevantWikiContext = findRelevantArticles(values.prompt, wikiArticles);
-      const historyForAI = messages.slice(-10).map(({ id, fromCache, isStreaming, ...rest }) => rest);
-  
-      generateSolutionStream({
-        problemDescription: values.prompt,
+      const relevantWikiContext = findRelevantArticles(prompt, wikiArticles);
+      const historyForAI = history.map(({ id, fromCache, isStreaming, ...rest }) => rest);
+
+      const stream = await generateSolutionStream({
+        problemDescription: prompt,
         wikiContext: relevantWikiContext,
         history: historyForAI,
-      }).then(async (stream) => {
-        if (!stream) {
-          throw new Error('A resposta da IA está vazia.');
-        }
-
-        const reader = stream.getReader();
-        const decoder = new TextDecoder();
-        let accumulatedContent = '';
-
-        const processText = async () => {
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) {
-              setMessages((prev) =>
-                prev.map((msg) =>
-                  msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
-                )
-              );
-              setIsLoading(false);
-              
-              const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent };
-              const newCacheItem: CachedItem = { message: finalMessage, feedback: null };
-              const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
-              setQuestionCache(newCache);
-              window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(newCache));
-
-              break;
-            }
-            accumulatedContent += decoder.decode(value, { stream: true });
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
-              )
-            );
-          }
-        };
-        await processText();
-
-      }).catch(error => {
-        console.error('Erro ao iniciar o stream da solução:', error);
-        toast({
-          variant: 'destructive',
-          title: 'Erro de Conexão',
-          description: 'Não foi possível conectar com a IA. Por favor, verifique sua conexão e tente novamente.',
-        });
-        setMessages((prev) => prev.filter(msg => msg.id !== userMessage.id && msg.id !== assistantMessageId));
-        setIsLoading(false);
       });
-  
+
+      if (!stream) {
+        throw new Error('A resposta da IA está vazia.');
+      }
+
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedContent = '';
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
+            )
+          );
+          setIsLoading(false);
+          
+          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent };
+          const newCacheItem: CachedItem = { message: finalMessage, feedback: null };
+          const normalizedPrompt = prompt.trim().toLowerCase();
+          const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
+          setQuestionCache(newCache);
+          window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(newCache));
+
+          break;
+        }
+        accumulatedContent += decoder.decode(value, { stream: true });
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
+          )
+        );
+      }
     } catch (error) {
       console.error('Erro ao gerar solução:', error);
       toast({
@@ -293,9 +253,42 @@ export function ChatView() {
         title: 'Erro',
         description: 'Falha ao obter uma resposta da IA. Por favor, tente novamente.',
       });
-      setMessages((prev) => prev.filter(msg => msg.id !== userMessage.id && msg.id !== assistantMessageId));
+      setMessages((prev) => prev.filter(msg => msg.id !== assistantMessageId));
       setIsLoading(false);
     }
+  }
+
+  async function onSubmit(values: z.infer<typeof chatSchema>) {
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: values.prompt,
+    };
+    
+    // Add user message to state and reset form immediately
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    form.reset();
+
+    const normalizedPrompt = values.prompt.trim().toLowerCase();
+    const cachedItem = questionCache[normalizedPrompt];
+
+    // Cache Check: Use cache ONLY if it exists and is NOT disliked.
+    if (cachedItem && cachedItem.feedback !== 'negative') {
+        const cachedAnswer = cachedItem.message;
+        const newCachedAnswer: Message = {
+            ...cachedAnswer,
+            id: `assistant-${Date.now()}`,
+            fromCache: true,
+        };
+        setMessages((prev) => [...prev, newCachedAnswer]);
+        setFeedback(prev => ({...prev, [newCachedAnswer.id]: cachedItem.feedback }));
+        return; // Stop execution, cache was served.
+    }
+  
+    // If no valid cache, call the AI.
+    // The `newMessages` array already contains the latest user message.
+    callAI(values.prompt, newMessages);
   }
 
   const handleClearChat = () => {
