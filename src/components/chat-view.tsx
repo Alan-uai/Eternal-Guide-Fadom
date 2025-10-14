@@ -45,7 +45,6 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         const sectionsData: { title: string; content: string }[] = [];
         const markers = Object.keys(SECTION_TITLES);
         
-        // Regex to find markers like **1. INÍCIO:** or **INÍCIO:**
         const markerRegex = new RegExp(`(?:\\*\\*\\d*\\.?\\s*)?(${markers.join('|')}):`, 'g');
         const firstMarkerMatch = content.match(markerRegex);
 
@@ -54,9 +53,12 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         }
 
         const introEnd = content.indexOf(firstMarkerMatch[0]);
-        const intro = content.substring(0, introEnd).trim();
+        let intro = content.substring(0, introEnd).trim();
+        // Remove the numeric markdown from the intro, e.g. "**1. "
+        intro = intro.replace(/\*\*\d+\.?\s*/, '').trim();
 
-        const parts = content.substring(introEnd).split(markerRegex);
+        const contentAfterIntro = content.substring(introEnd);
+        const parts = contentAfterIntro.split(markerRegex);
         
         for (let i = 1; i < parts.length; i += 2) {
             const marker = parts[i].replace(':', '').trim(); // "INÍCIO"
@@ -67,6 +69,9 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                 // Remove the title itself (and any markdown) from the start of the content
                  const titleRegex = new RegExp(`^\\s*\\*\\*${title}\\*\\*\\s*`, 'i');
                  let cleanedText = text.trim().replace(titleRegex, '');
+                 // Also specifically remove "Resposta Direta.**" and similar patterns
+                 cleanedText = cleanedText.replace(/^Resposta Direta\.\*\*\s*/i, '');
+
 
                 // Remove the next section's marker from the end of the current content
                 const nextMarkerMatch = cleanedText.match(/(\*\*(\d+\.?\s*)?(INÍCIO|MEIO|FIM):\s*\*)/);
