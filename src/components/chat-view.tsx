@@ -28,77 +28,72 @@ const chatSchema = z.object({
 });
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-  const { intro, sections } = useMemo(() => {
-    // Split by the `**` marker used to separate sections.
-    const parts = content.split('**').map(p => p.trim()).filter(Boolean);
-
-    if (parts.length <= 1) {
-      return { intro: content, sections: [] };
-    }
-
-    const introText = parts.shift() || '';
-    const sectionsData = [];
-
-    for (const part of parts) {
-      // Find the first occurrence of a period or newline to separate title from content
-      const titleMatch = part.match(/^([^.\n]+[.\n])/);
-      if (titleMatch) {
-        const title = titleMatch[1].replace(/[.**]/g, '').trim();
-        const content = part.substring(titleMatch[0].length).trim();
-        if (title && content) {
-          sectionsData.push({ title, content });
+    const { intro, sections } = useMemo(() => {
+        const parts = content.split(/\*\*(INÍCIO:|MEIO:|FIM:)\*\*/).filter(Boolean);
+        if (parts.length <= 1) {
+            return { intro: content, sections: [] };
         }
-      }
-    }
-    
-    // If parsing fails, fall back to a simpler split
-    if (sectionsData.length === 0 && parts.length > 0) {
-        return { intro: introText, sections: parts.map(p => ({ title: "Detalhes", content: p })) };
-    }
 
-    return { intro: introText, sections: sectionsData };
-  }, [content]);
+        let introText = parts[0].trim().replace(/\*\*\d\.\s*/, ''); // Clean up intro text
+        const sectionsData: { title: string, content: string }[] = [];
+        const titleMap: Record<string, string> = {
+            'INÍCIO:': 'Resposta Direta',
+            'MEIO:': 'Justificativa e Detalhes',
+            'FIM:': 'Dicas Adicionais'
+        };
+        
+        for (let i = 1; i < parts.length; i += 2) {
+            const marker = parts[i];
+            let sectionContent = parts[i + 1] || '';
+            
+            const firstLineEnd = sectionContent.indexOf('\n');
+            const title = sectionContent.substring(0, firstLineEnd).replace(/[.**]/g, '').trim();
+            const restOfContent = sectionContent.substring(firstLineEnd + 1).trim();
 
-  if (sections.length === 0) {
+            sectionsData.push({
+                title: title,
+                content: restOfContent
+            });
+        }
+        
+        // Sometimes the intro text might be part of the first section if there's no text before "INÍCIO"
+        if (!introText.replace(/\s/g, '').length) {
+          const firstSection = sectionsData.shift();
+          if (firstSection) {
+            introText = firstSection.title;
+          }
+        }
+
+
+        return { intro: introText, sections: sectionsData };
+    }, [content]);
+
     return (
-      <div className='relative'>
-        {fromCache && (
-          <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1">
-            <Zap className='h-3 w-3'/> Instantâneo
-          </span>
-        )}
-        <div
-          className="prose prose-sm dark:prose-invert max-w-none"
-          dangerouslySetInnerHTML={{ __html: micromark(intro) }}
-        />
-      </div>
+        <div className='relative'>
+            {fromCache && (
+                <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
+                    <Zap className='h-3 w-3'/> Instantâneo
+                </span>
+            )}
+            
+            {intro && <div className="mb-4 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(intro) }} />}
+
+            {sections.length > 0 && (
+                <Accordion type="multiple" defaultValue={['item-0']} className="w-full">
+                    {sections.map((section, index) => (
+                        <AccordionItem value={`item-${index}`} key={index}>
+                            <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
+                                {section.title}
+                            </AccordionTrigger>
+                            <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6">
+                                <div dangerouslySetInnerHTML={{ __html: micromark(section.content) }} />
+                            </AccordionContent>
+                        </AccordionItem>
+                    ))}
+                </Accordion>
+            )}
+        </div>
     );
-  }
-
-  return (
-    <div className='relative'>
-      {fromCache && (
-        <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
-          <Zap className='h-3 w-3'/> Instantâneo
-        </span>
-      )}
-      
-      {intro && <div className="mb-4 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(intro) }} />}
-
-      <Accordion type="multiple" defaultValue={['item-0']} className="w-full">
-        {sections.map((section, index) => (
-          <AccordionItem value={`item-${index}`} key={index}>
-            <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
-              {section.title}
-            </AccordionTrigger>
-            <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6">
-              <div dangerouslySetInnerHTML={{ __html: micromark(section.content) }} />
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </div>
-  );
 }
 
 
