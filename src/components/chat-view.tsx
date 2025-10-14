@@ -24,6 +24,10 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
+const chatSchema = z.object({
+  prompt: z.string().min(1, 'A pergunta não pode estar vazia.'),
+});
+
 interface ParsedSection {
     title: string;
     content: string;
@@ -559,3 +563,5 @@ export function ChatView() {
     </div>
   );
 }
+
+    
