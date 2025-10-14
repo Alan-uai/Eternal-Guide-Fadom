@@ -6,9 +6,6 @@ import './globals.css';
 import { AppProvider } from '@/context/app-provider';
 import { MainNav } from '@/components/main-nav';
 import { Toaster } from '@/components/ui/toaster';
-import { Bot } from 'lucide-react';
-import Link from 'next/link';
-import { UserNav } from '@/components/user-nav';
 import { AuthDialog } from '@/components/auth-dialog';
 
 // We can't export metadata from a client component.
@@ -36,11 +33,8 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <AppProvider>
           <div className="flex min-h-screen w-full flex-col">
-            <header className="sticky top-0 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm z-50">
+            <header className="sticky top-0 flex h-14 items-center border-b bg-background/80 px-4 backdrop-blur-sm z-50">
               <MainNav />
-              <div className="ml-auto flex items-center gap-4">
-                <UserNav />
-              </div>
             </header>
             <main className="flex flex-1 flex-col p-4 md:p-6">
               {children}

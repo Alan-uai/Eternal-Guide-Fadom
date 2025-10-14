@@ -7,6 +7,12 @@ import { useUser } from '@/firebase';
 import { useApp } from '@/context/app-provider';
 import { LogIn, User } from 'lucide-react';
 import Link from 'next/link';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export function UserNav() {
   const { user } = useUser();
@@ -14,19 +20,26 @@ export function UserNav() {
 
   if (user && !user.isAnonymous) {
      return (
-        <Link href="/profile" passHref>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-9 w-9">
-                    <AvatarImage
-                        src={user?.photoURL ?? undefined}
-                        alt={user?.displayName ?? 'Avatar do usuário'}
-                    />
-                    <AvatarFallback>
-                    <User />
-                    </AvatarFallback>
-                </Avatar>
-            </Button>
-        </Link>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Link href="/profile" passHref>
+                        <Button variant="ghost" className="relative h-9 w-9 rounded-full md:h-8 md:w-8">
+                            <Avatar className="h-9 w-9 md:h-8 md:w-8">
+                                <AvatarImage
+                                    src={user?.photoURL ?? undefined}
+                                    alt={user?.displayName ?? 'Avatar do usuário'}
+                                />
+                                <AvatarFallback>
+                                <User />
+                                </AvatarFallback>
+                            </Avatar>
+                        </Button>
+                    </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Perfil</TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     );
   }
 
