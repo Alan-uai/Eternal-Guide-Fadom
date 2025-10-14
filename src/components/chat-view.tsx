@@ -47,16 +47,14 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         />
     );
 
-    // Regex para dividir por títulos em negrito (ex: **Título:**) ou cabeçalhos markdown (### Título)
-    const sections = content.split(/\n(?=\*\*.*?\*\*|###\s.*)/).map(s => s.trim());
+    const sections = useMemo(() => content.split(/\n(?=\d+\.\s*\*?INÍCIO|\d+\.\s*\*?MEIO|\d+\.\s*\*?FIM|\*\*.*?\*\*|###\s.*)/).map(s => s.trim()).filter(Boolean), [content]);
     
-    const introTextMatch = content.match(/^([\s\S]*?)(?=\n\*\*.*?\*\*|\n###\s.*)/);
+    const introTextMatch = useMemo(() => content.match(/^([\s\S]*?)(?=\n\d+\.\s*\*?INÍCIO|\n\d+\.\s*\*?MEIO|\n\d+\s*\*?FIM|\n\*\*.*?\*\*|\n###\s.*)/), [content]);
     const introText = introTextMatch ? introTextMatch[1].trim() : '';
 
-    const accordionSections = introText ? sections.slice(1) : sections;
-
-    // Se não houver seções (ou for uma resposta curta), renderiza normalmente
-    if (accordionSections.length <= 1 && !introText) {
+    const accordionSections = introText ? sections : sections.slice(1);
+    
+    if (sections.length <= 1 && !introText) {
         return (
              <div className='relative'>
                  {fromCache && (
@@ -70,7 +68,6 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
     }
 
     const defaultOpenValue = 'item-0'; // Open the first item by default
-    
     const isNumberedList = accordionSections.every(sec => /^\d+\.\s/.test(sec));
 
     return (
@@ -85,9 +82,9 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
             
             <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
                 {accordionSections.map((part, index) => {
-                    const titleMatch = part.match(/^(\d+\.\s*|###\s*|\*\*)(.*?)(?::|\*\*)/);
+                    const titleMatch = part.match(/^(\d+\.\s*\*?|\*\*|###\s)(.*?)(?:\*\*|:)/);
                     let title = titleMatch ? titleMatch[2].trim() : `Seção ${index + 1}`;
-                    const restOfContent = titleMatch ? part.substring(part.indexOf(title) + title.length + (titleMatch[0].endsWith(':') ? 1 : 2)).trim() : part;
+                    const restOfContent = titleMatch ? part.substring(part.indexOf(title) + title.length).replace(/^(\*\*|:)\s*/, '').trim() : part;
                     
                     const itemKey = `item-${index}`;
                     const displayIndex = isNumberedList ? toRoman(index + 1) : null;
