@@ -94,13 +94,18 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                 />
             )}
 
-            <Accordion type="single" collapsible defaultValue={defaultOpenValue} className="w-full">
+            <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
                 {listItems.map((part, index) => {
                     const romanNumeral = toRoman(index + 1);
                     // Extract title and the rest of the content
                     const titleMatch = part.match(/^(\d+)\.\s*(.*?)(?=\n|$)/);
-                    const title = titleMatch ? titleMatch[2] : `Passo ${romanNumeral}`;
+                    let title = titleMatch ? titleMatch[2] : `Passo ${romanNumeral}`;
                     const restOfContent = titleMatch ? part.substring(titleMatch[0].length).trim() : part;
+                    
+                    if (title.endsWith(':')) {
+                        title = title.slice(0, -1);
+                    }
+
                     const htmlContent = micromark(restOfContent);
 
                     return (
