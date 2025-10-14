@@ -24,10 +24,6 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-const chatSchema = z.object({
-  prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
-});
-
 interface ParsedSection {
     title: string;
     content: string;
@@ -37,25 +33,26 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
     const { intro, sections } = useMemo(() => {
         if (!content) return { intro: '', sections: [] };
 
-        const parts = content.split(/\n---\n/);
+        const parts = content.split('---');
         const introText = parts[0] || '';
-        const parsedSections: ParsedSection[] = [];
+        const accordionParts = parts.slice(1);
 
-        if (parts.length > 1) {
-            for (let i = 1; i < parts.length; i++) {
-                const sectionContent = parts[i];
-                const firstLineEnd = sectionContent.indexOf('\n');
-                
-                if (firstLineEnd !== -1) {
-                    const title = sectionContent.substring(0, firstLineEnd).replace(/\*\*/g, '').trim();
-                    const restOfContent = sectionContent.substring(firstLineEnd + 1).trim();
-                    if (title && restOfContent) {
-                        parsedSections.push({ title, content: restOfContent });
-                    }
-                }
+        const parsedSections: ParsedSection[] = accordionParts.map(part => {
+            const trimmedPart = part.trim();
+            const firstLineEnd = trimmedPart.indexOf('\n');
+            
+            if (firstLineEnd !== -1) {
+                // Título é a primeira linha, limpo de **
+                const title = trimmedPart.substring(0, firstLineEnd).replace(/\*\*/g, '').trim();
+                // Conteúdo é o resto
+                const content = trimmedPart.substring(firstLineEnd + 1).trim();
+                return { title, content };
             }
-        }
-        
+            
+            // Fallback se não houver quebra de linha (seção só com título)
+            return { title: trimmedPart.replace(/\*\*/g, '').trim(), content: '' };
+        }).filter(section => section.title); // Garante que seções vazias não sejam criadas
+
         return { intro: introText, sections: parsedSections };
     }, [content]);
 

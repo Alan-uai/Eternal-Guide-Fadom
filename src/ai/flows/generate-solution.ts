@@ -91,7 +91,7 @@ export const prompt = ai.definePrompt({
 
 **ESTRUTURA DA RESPOSTA (OBRIGATÓRIO):**
 Sua resposta DEVE SEMPRE seguir a estrutura "Conclusão Primeiro".
-1.  **RESPOSTA DIRETA:** Comece com a resposta final e direta à pergunta do usuário. Seja conciso e vá direto ao ponto. Não use nenhum marcador, apenas o texto.
+1.  **RESPOSTA DIRETA:** Comece com a resposta final e direta à pergunta do usuário. Este é o conteúdo principal e não deve ter nenhum marcador ou título.
 2.  **SEÇÕES ADICIONAIS:** Após a resposta direta, use '---' (três hífens) para separar cada nova seção. O título de cada nova seção DEVE estar em negrito (ex: '**Justificativa e Detalhes**' ou '**Dicas Adicionais**'). O conteúdo abaixo do título não deve ter marcações especiais.
 
 ### Estratégia Principal de Raciocínio
