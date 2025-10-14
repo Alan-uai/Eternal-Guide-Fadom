@@ -17,7 +17,8 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useAuth, useCollection, useFirebase, useMemoFirebase, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
-import { collection, query, where, orderBy } from 'firebase/firestore';
+import { collection, query, where, orderBy, doc, setDoc } from 'firebase/firestore';
+import { nanoid } from 'nanoid';
 
 const profileCategories = [
     { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection },
@@ -53,11 +54,19 @@ function UnderConstructionDialog() {
 function PowersProfileSection() {
     const { isAdmin } = useAdmin();
     const { toast } = useToast();
+    const { user } = useUser();
+    const { firestore } = useFirebase();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [identifiedPowers, setIdentifiedPowers] = useState<IdentifiedPower[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const userPowersQuery = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return collection(firestore, 'users', user.uid, 'powers');
+    }, [firestore, user]);
+
+    const { data: savedPowers, isLoading: arePowersLoading } = useCollection(userPowersQuery);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -72,6 +81,10 @@ function PowersProfileSection() {
                 title: 'Nenhum arquivo selecionado',
                 description: 'Por favor, selecione um ou mais screenshots dos seus poderes.',
             });
+            return;
+        }
+        if (!firestore || !user) {
+            toast({ variant: 'destructive', title: 'Erro', description: 'Usuário não autenticado.' });
             return;
         }
 
@@ -95,28 +108,28 @@ function PowersProfileSection() {
 
             const result = await identifyPowersFromImage({ images: dataUris });
             if (result && result.powers) {
-                // Combine and remove duplicates
-                const uniquePowers = [...identifiedPowers];
-                result.powers.forEach(newPower => {
-                    if (!uniquePowers.some(existing => existing.name === newPower.name)) {
-                        uniquePowers.push(newPower);
-                    }
-                });
-                setIdentifiedPowers(uniquePowers);
+                let savedCount = 0;
+                for (const power of result.powers) {
+                    const powerId = power.name.toLowerCase().replace(/\s/g, '-');
+                    const powerRef = doc(firestore, 'users', user.uid, 'powers', powerId);
+                    await setDoc(powerRef, { id: powerId, ...power }, { merge: true });
+                    savedCount++;
+                }
+                
                 toast({
-                    title: 'Poderes Identificados!',
-                    description: `${result.powers.length} novos poderes foram encontrados e adicionados ao seu perfil.`,
+                    title: 'Poderes Salvos!',
+                    description: `${savedCount} poderes foram identificados e salvos no seu perfil.`,
                 });
             } else {
                  throw new Error('A IA não conseguiu identificar nenhum poder.');
             }
 
         } catch (error: any) {
-            console.error("Erro ao analisar poderes:", error);
+            console.error("Erro ao analisar e salvar poderes:", error);
             toast({
                 variant: 'destructive',
                 title: 'Erro na Análise',
-                description: error.message || 'Não foi possível identificar os poderes da imagem.',
+                description: error.message || 'Não foi possível identificar e salvar os poderes.',
             });
         } finally {
             setIsAnalyzing(false);
@@ -159,7 +172,7 @@ function PowersProfileSection() {
                 <DialogHeader>
                     <DialogTitle>Gerenciar Poderes</DialogTitle>
                     <DialogDescription>
-                        Adicione seus poderes enviando um screenshot da sua tela de poderes no jogo. A IA irá identificá-los para você.
+                        Adicione seus poderes enviando um screenshot da sua tela de poderes no jogo. A IA irá identificá-los e salvá-los no seu perfil.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
@@ -198,34 +211,36 @@ function PowersProfileSection() {
                                 </div>
                                 <Button onClick={handleAnalyzeClick} disabled={isAnalyzing || selectedFiles.length === 0} className="w-full">
                                     {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                                    Analisar Imagens
+                                    Analisar e Salvar
                                 </Button>
                             </CardContent>
                         </Card>
                     </div>
 
                     <div className="space-y-4">
-                         <h3 className="text-lg font-medium">Poderes Identificados</h3>
+                         <h3 className="text-lg font-medium">Poderes Salvos</h3>
                          <Card className="h-[280px]">
                             <CardContent className="p-0 h-full">
-                                {identifiedPowers.length === 0 ? (
+                                {arePowersLoading ? (
+                                    <div className="flex items-center justify-center h-full"><Loader2 className="h-6 w-6 animate-spin"/></div>
+                                ) : (!savedPowers || savedPowers.length === 0) ? (
                                     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4">
                                         <ImageIcon className="h-10 w-10 mb-2" />
-                                        <p className="text-sm">Seus poderes aparecerão aqui após a análise.</p>
+                                        <p className="text-sm">Seus poderes salvos aparecerão aqui.</p>
                                     </div>
                                 ) : (
                                     <ScrollArea className="h-full p-4">
                                         <div className="space-y-3">
-                                            {identifiedPowers.map(power => (
-                                                <div key={power.name} className="flex items-center gap-4 p-2 rounded-md bg-muted/50">
+                                            {savedPowers.map(power => (
+                                                <div key={power.id} className="flex items-center gap-4 p-2 rounded-md bg-muted/50">
                                                     <div className="w-10 h-10 bg-gray-800 rounded-md flex items-center justify-center text-white font-bold text-xs text-center">
-                                                       {power.name.substring(0,3)}
+                                                       {(power as any).name.substring(0,3)}
                                                     </div>
                                                     <div className='flex-1'>
-                                                        <p className="font-semibold">{power.name}</p>
-                                                        <p className="text-xs text-muted-foreground">{power.world}</p>
+                                                        <p className="font-semibold">{(power as any).name}</p>
+                                                        <p className="text-xs text-muted-foreground">{(power as any).world}</p>
                                                     </div>
-                                                    <RarityBadge rarity={power.rarity} />
+                                                    <RarityBadge rarity={(power as any).rarity} />
                                                 </div>
                                             ))}
                                         </div>
@@ -401,3 +416,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+    
