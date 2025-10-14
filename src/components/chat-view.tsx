@@ -57,33 +57,42 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         }
 
         // Encontra o início do primeiro marcador numerado (ex: "1. **INÍCIO:**")
-        const firstMarkerRegex = /(\d\.\s*\*\*)?INÍCIO:/;
+        const firstMarkerRegex = /(\*\*1\.\s*)?INÍCIO:/;
         const match = content.match(firstMarkerRegex);
         const introEnd = match ? match.index : -1;
         const intro = introEnd !== -1 ? content.substring(0, introEnd).trim() : '';
+        
+        // Remove a numeração inicial como "**1." do texto introdutório.
+        const cleanedIntro = intro.replace(/\*\*\d\.\s*/, '').trim();
+
+        // Função para limpar o conteúdo de cada seção
+        const cleanContent = (text: string) => {
+            // Remove o título repetido e a formatação markdown do início
+            return text.replace(/^(Resposta Direta|Justificativa e Detalhes|Dicas Adicionais)\.\*\*\s*/, '').trim();
+        };
 
         // Definir os pontos de início e fim de cada seção
         if (inicioIndex !== -1) {
             const start = inicioIndex + inicioMarker.length;
             const end = meioIndex !== -1 ? meioIndex : fimIndex !== -1 ? fimIndex : content.length;
             const contentPart = content.substring(start, end).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
-            sectionsData.push({ title: SECTION_TITLES.INÍCIO, content: contentPart });
+            sectionsData.push({ title: SECTION_TITLES.INÍCIO, content: cleanContent(contentPart) });
         }
 
         if (meioIndex !== -1) {
             const start = meioIndex + meioMarker.length;
             const end = fimIndex !== -1 ? fimIndex : content.length;
             const contentPart = content.substring(start, end).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
-            sectionsData.push({ title: SECTION_TITLES.MEIO, content: contentPart });
+            sectionsData.push({ title: SECTION_TITLES.MEIO, content: cleanContent(contentPart) });
         }
 
         if (fimIndex !== -1) {
             const start = fimIndex + fimMarker.length;
             const contentPart = content.substring(start).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
-            sectionsData.push({ title: SECTION_TITLES.FIM, content: contentPart });
+            sectionsData.push({ title: SECTION_TITLES.FIM, content: cleanContent(contentPart) });
         }
         
-        return { intro, sections: sectionsData };
+        return { intro: cleanedIntro, sections: sectionsData };
 
     }, [content]);
 
