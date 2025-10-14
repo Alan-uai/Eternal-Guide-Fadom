@@ -10,19 +10,15 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { world1Data } from '@/lib/world-1-data';
-import { world2Data } from '@/lib/world-2-data';
-import { world3Data } from '@/lib/world-3-data';
-import { world4Data } from '@/lib/world-4-data';
-import { world20Data } from '@/lib/world-20-data';
+import { useApp } from '@/context/app-provider';
+import { allGameData } from '@/lib/game-data-context';
 
-const allWorldsData = [world1Data, world2Data, world3Data, world4Data, world20Data];
 
-// Gera um contexto de string com todos os poderes conhecidos para a IA.
-const powerKnowledgeContext = allWorldsData.map(world => 
-    `Mundo: ${world.name}\nPoderes:\n${(world.powers || []).map(power => {
+// Gera um contexto de string com todos os poderes conhecidos para a IA para que ela possa associar o mundo.
+const powerKnowledgeContext = allGameData.map(world => 
+    `Mundo: ${world.name}\nPoderes:\n${(world.powers || []).map((power: any) => {
         const statsString = (power.stats && Array.isArray(power.stats))
-            ? `\n  Status:\n${power.stats.map(stat => 
+            ? `\n  Status:\n${power.stats.map((stat: any) => 
                 `  - ${stat.name} (Raridade: ${stat.rarity})`
               ).join('\n')}`
             : '';
@@ -53,7 +49,7 @@ export async function identifyPowersFromImage(input: IdentifyPowersInput): Promi
 }
 
 
-const prompt = ai.definePrompt({
+export const prompt = ai.definePrompt({
   name: 'identifyPowersPrompt',
   input: { schema: IdentifyPowersInputSchema },
   output: { schema: IdentifyPowersOutputSchema },

@@ -19,6 +19,7 @@ import { useAuth, useCollection, useFirebase, useMemoFirebase, useUser } from '@
 import { signOut } from 'firebase/auth';
 import { collection, query, where, orderBy, doc, setDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
+import { useApp } from '@/context/app-provider';
 
 // Generic Component for Profile Sections
 function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }: { subcollectionName: string, sectionTitle: string, sectionDescription: string }) {
@@ -26,6 +27,7 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
     const { toast } = useToast();
     const { user } = useUser();
     const { firestore } = useFirebase();
+    const { allGameData } = useApp();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -76,15 +78,27 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                 })
             );
             
-            // Temporarily use the existing 'identifyPowersFromImage' flow.
-            // This can be replaced with a specific flow for each category later.
             const result = await identifyPowersFromImage({ images: dataUris });
+
             if (result && result.powers) {
                 let savedCount = 0;
-                for (const item of result.powers) {
-                    const itemId = item.name.toLowerCase().replace(/\s/g, '-');
+                for (const identifiedItem of result.powers) {
+                    const itemId = identifiedItem.name.toLowerCase().replace(/\s/g, '-');
                     const itemRef = doc(firestore, 'users', user.uid, subcollectionName, itemId);
-                    await setDoc(itemRef, { id: itemId, ...item }, { merge: true });
+
+                    // Find the full item data from the local cache
+                    let fullItemData: any = { ...identifiedItem }; // Start with what the AI gave us
+                    const lowerCaseName = identifiedItem.name.toLowerCase();
+
+                    const worldData = allGameData.find(world => world.name === identifiedItem.world);
+                    if (worldData && worldData[subcollectionName]) {
+                        const cachedItem = worldData[subcollectionName].find((item: any) => item.name.toLowerCase() === lowerCaseName);
+                        if (cachedItem) {
+                            fullItemData = { ...fullItemData, ...cachedItem };
+                        }
+                    }
+                    
+                    await setDoc(itemRef, { id: itemId, ...fullItemData }, { merge: true });
                     savedCount++;
                 }
                 
@@ -385,7 +399,7 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0'>
                                  <div className='flex items-center justify-center h-24 w-24 rounded-full bg-muted/50 border-2 border-dashed mb-4'>
-                                    {areItemsLoading(category.name.toLowerCase()) ? <Loader2 className='h-8 w-8 animate-spin'/> : <category.icon className='h-8 w-8 text-muted-foreground'/>}
+                                     <category.icon className='h-8 w-8 text-muted-foreground'/>
                                 </div>
                                  {category.component && <category.component />}
                             </CardContent>
@@ -396,20 +410,3 @@ export default function ProfilePage() {
         </>
     );
 }
-
-// Helper function to check loading status, since we can't use hooks inside the map directly.
-// This is a workaround. A better approach might be to pass the isLoading state down to the component.
-// For now, this illustrates the idea but won't work as hooks can't be called conditionally.
-// The actual implementation inside ProfileSection handles its own loading.
-function areItemsLoading(subcollectionName: string): boolean {
-    const { firestore } = useFirebase();
-    const { user } = useUser();
-    const query = useMemoFirebase(() => {
-        if (!firestore || !user) return null;
-        return collection(firestore, 'users', user.uid, subcollectionName);
-    }, [firestore, user, subcollectionName]);
-    const { isLoading } = useCollection(query);
-    return isLoading;
-}
-
-    
