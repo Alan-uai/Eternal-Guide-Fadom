@@ -27,18 +27,6 @@ const chatSchema = z.object({
   prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
 });
 
-
-function toRoman(num: number): string {
-    const roman: { [key: string]: number } = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
-    let str = '';
-    for (let i of Object.keys(roman)) {
-        let q = Math.floor(num / roman[i]);
-        num -= q * roman[i];
-        str += i.repeat(q);
-    }
-    return str;
-}
-
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
     const renderSimple = (text: string) => (
         <div
@@ -47,14 +35,77 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         />
     );
 
-    const sections = useMemo(() => content.split(/\n(?=\d+\.\s*\*?INÍCIO|\d+\.\s*\*?MEIO|\d+\.\s*\*?FIM|\*\*.*?\*\*|###\s.*)/).map(s => s.trim()).filter(Boolean), [content]);
-    
-    const introTextMatch = useMemo(() => content.match(/^([\s\S]*?)(?=\n\d+\.\s*\*?INÍCIO|\n\d+\.\s*\*?MEIO|\n\d+\s*\*?FIM|\n\*\*.*?\*\*|\n###\s.*)/), [content]);
-    const introText = introTextMatch ? introTextMatch[1].trim() : '';
+    const SECTION_MARKERS = ["INÍCIO", "MEIO", "FIM"];
+    const SECTION_TITLES: { [key: string]: string } = {
+        "INÍCIO": "Resposta Direta",
+        "MEIO": "Justificativa e Detalhes",
+        "FIM": "Dicas Adicionais",
+    };
 
-    const accordionSections = introText ? sections : sections.slice(1);
-    
-    if (sections.length <= 1 && !introText) {
+    const sections = useMemo(() => {
+        const regex = new RegExp(`(\\d+\\.\\s*\\*\\*)(${SECTION_MARKERS.join('|')})(\\*\\*:)`, 'g');
+        const parts = content.split(regex);
+        let intro = '';
+        const collectedSections = [];
+
+        if (parts.length > 1) {
+            intro = parts[0].trim();
+            for (let i = 1; i < parts.length; i += 4) {
+                const marker = parts[i+1];
+                let sectionContent = (parts[i+4] || '').trim();
+                
+                // If there's a subsequent section, content ends there. Otherwise, take everything.
+                const nextSectionIndex = i + 4;
+                if (nextSectionIndex < parts.length) {
+                     // This logic is tricky with split, let's simplify.
+                }
+
+                collectedSections.push({
+                    title: SECTION_TITLES[marker] || marker,
+                    content: sectionContent,
+                });
+            }
+             // A better way is to find splits and slice the content
+             const sectionsData = [];
+             const introEnd = content.indexOf('1. **INÍCIO**:');
+             const introText = introEnd === -1 ? content : content.substring(0, introEnd).trim();
+
+             const inicioStart = content.indexOf('**INÍCIO**:');
+             const meioStart = content.indexOf('**MEIO**:');
+             const fimStart = content.indexOf('**FIM**:');
+             
+             if (inicioStart !== -1) {
+                 const inicioContent = content.substring(
+                    inicioStart + '**INÍCIO**:'.length,
+                    meioStart !== -1 ? meioStart : fimStart !== -1 ? fimStart : content.length
+                 ).trim();
+                 sectionsData.push({ title: SECTION_TITLES.INÍCIO, content: inicioContent});
+             }
+            
+             if (meioStart !== -1) {
+                 const meioContent = content.substring(
+                    meioStart + '**MEIO**:'.length,
+                    fimStart !== -1 ? fimStart : content.length
+                 ).trim();
+                 sectionsData.push({ title: SECTION_TITLES.MEIO, content: meioContent});
+             }
+
+             if (fimStart !== -1) {
+                const fimContent = content.substring(fimStart + '**FIM**:'.length).trim();
+                sectionsData.push({ title: SECTION_TITLES.FIM, content: fimContent});
+             }
+
+            return { intro: introText, sections: sectionsData };
+
+        }
+
+        // Fallback for non-structured content
+        return { intro: content, sections: [] };
+
+    }, [content]);
+
+
+    if (sections.sections.length === 0) {
         return (
              <div className='relative'>
                  {fromCache && (
@@ -62,13 +113,12 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                         <Zap className='h-3 w-3'/> Instantâneo
                     </span>
                 )}
-                {renderSimple(content)}
+                {renderSimple(sections.intro)}
             </div>
         )
     }
 
-    const defaultOpenValue = 'item-0'; // Open the first item by default
-    const isNumberedList = accordionSections.every(sec => /^\d+\.\s/.test(sec));
+    const defaultOpenValue = 'item-0';
 
     return (
         <div className='relative'>
@@ -78,27 +128,20 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                 </span>
             )}
             
-            {introText && <div className="mb-4">{renderSimple(introText)}</div>}
+            {sections.intro && <div className="mb-4">{renderSimple(sections.intro)}</div>}
             
             <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
-                {accordionSections.map((part, index) => {
-                    const titleMatch = part.match(/^(\d+\.\s*\*?|\*\*|###\s)(.*?)(?:\*\*|:)/);
-                    let title = titleMatch ? titleMatch[2].trim() : `Seção ${index + 1}`;
-                    const restOfContent = titleMatch ? part.substring(part.indexOf(title) + title.length).replace(/^(\*\*|:)\s*/, '').trim() : part;
-                    
+                {sections.sections.map((part, index) => {
                     const itemKey = `item-${index}`;
-                    const displayIndex = isNumberedList ? toRoman(index + 1) : null;
-
                     return (
                         <AccordionItem value={itemKey} key={index}>
                             <AccordionTrigger className="text-sm font-semibold hover:no-underline">
                                 <span className="flex items-center gap-2 text-left">
-                                    {displayIndex && <span className="font-bold text-primary">{displayIndex}.</span>}
-                                    <span>{title}</span>
+                                    <span>{part.title}</span>
                                 </span>
                             </AccordionTrigger>
                             <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6">
-                                <div dangerouslySetInnerHTML={{ __html: micromark(restOfContent) }} />
+                                <div dangerouslySetInnerHTML={{ __html: micromark(part.content) }} />
                             </AccordionContent>
                         </AccordionItem>
                     );
