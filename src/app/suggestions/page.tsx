@@ -16,8 +16,10 @@ import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { micromark } from 'micromark';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+
 
 interface Suggestion {
   id: string;
@@ -40,6 +42,7 @@ interface NegativeFeedback {
   question: string;
   negativeResponse: string;
   aiSuggestion: string;
+  reputationPointsAwarded?: number;
   createdAt: {
     seconds: number;
     nanoseconds: number;
@@ -142,6 +145,8 @@ function NegativeFeedbackTab() {
   const { firestore } = useFirebase();
   const { toast } = useToast();
   const [updatingFeedback, setUpdatingFeedback] = useState<string | null>(null);
+  const [hidingFeedbacks, setHidingFeedbacks] = useState<string[]>([]);
+
 
   const feedbackQuery = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -153,13 +158,8 @@ function NegativeFeedbackTab() {
     if (!firestore || !user) return;
     setUpdatingFeedback(feedbackItem.id);
     
-    // Reference to the public feedback document
     const feedbackRef = doc(firestore, 'negativeFeedback', feedbackItem.id);
-
-    // Reference to the user-specific feedback document
     const userFeedbackRef = doc(firestore, 'users', feedbackItem.userId, 'negativeFeedback', feedbackItem.id);
-    
-    // Reference to the user's main profile document
     const userRef = doc(firestore, 'users', feedbackItem.userId);
 
     try {
@@ -168,7 +168,6 @@ function NegativeFeedbackTab() {
             reviewedBy: user.email,
         };
 
-        // Update both the public and user-specific feedback documents
         await updateDoc(feedbackRef, updatePayload);
         await setDoc(userFeedbackRef, {
             ...updatePayload, 
@@ -178,9 +177,16 @@ function NegativeFeedbackTab() {
 
 
         if (newStatus === 'fixed' && feedbackItem.status !== 'fixed') {
+             // Use the dynamic points from the feedback document, or fallback to 1
+            const pointsToAward = feedbackItem.reputationPointsAwarded || 1;
             await updateDoc(userRef, {
-                reputationPoints: increment(1)
+                reputationPoints: increment(pointsToAward)
             });
+            
+             // Start the 5-second timer to hide the card
+            setTimeout(() => {
+                setHidingFeedbacks(prev => [...prev, feedbackItem.id]);
+            }, 5000);
         }
 
         toast({
@@ -214,7 +220,9 @@ function NegativeFeedbackTab() {
     );
   }
 
-  if (!feedbacks || feedbacks.length === 0) {
+  const visibleFeedbacks = feedbacks?.filter(fb => !hidingFeedbacks.includes(fb.id));
+
+  if (!visibleFeedbacks || visibleFeedbacks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-center text-muted-foreground border-2 border-dashed rounded-lg p-12 h-96">
         <Inbox className="h-16 w-16 mb-4" />
@@ -227,8 +235,8 @@ function NegativeFeedbackTab() {
   return (
      <ScrollArea className="h-[calc(100vh-16rem)]">
       <div className="space-y-6 pr-4">
-        {feedbacks.map((feedback) => (
-          <Card key={feedback.id}>
+        {visibleFeedbacks.map((feedback) => (
+          <Card key={feedback.id} className={cn("transition-opacity duration-500", feedback.status === 'fixed' && 'opacity-50')}>
             <CardHeader className="flex flex-row items-start justify-between">
               <CardDescription className="flex items-center gap-2 text-xs">
                 <User className="h-3 w-3" /> {feedback.userEmail || 'Usuário Anônimo'}
@@ -250,14 +258,17 @@ function NegativeFeedbackTab() {
               <Separator />
                <div className="space-y-2">
                  <h3 className="font-semibold flex items-center gap-2"><Bot className="h-4 w-4 text-primary"/> Sugestão de Melhoria (Gerada por IA)</h3>
-                <p className="text-sm p-4 bg-primary/10 rounded-md border border-primary/20 text-primary-foreground/90">{feedback.aiSuggestion}</p>
+                <p className="text-sm p-4 bg-primary/10 rounded-md border border-primary/20 text-primary-foreground/90">
+                    {feedback.aiSuggestion} 
+                    <span className='block mt-2 text-xs opacity-70'>(Pontos de Reputação Sugeridos: {feedback.reputationPointsAwarded || 1})</span>
+                </p>
               </div>
             </CardContent>
             <CardFooter className='justify-end gap-2'>
-                <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(feedback, 'reviewing')} disabled={updatingFeedback === feedback.id}>
+                <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(feedback, 'reviewing')} disabled={updatingFeedback === feedback.id || feedback.status === 'reviewing' || feedback.status === 'fixed'}>
                     {updatingFeedback === feedback.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <Eye className="h-4 w-4 text-yellow-500" />}
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(feedback, 'fixed')} disabled={updatingFeedback === feedback.id}>
+                <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(feedback, 'fixed')} disabled={updatingFeedback === feedback.id || feedback.status === 'fixed'}>
                      {updatingFeedback === feedback.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check className="h-4 w-4 text-green-500" />}
                 </Button>
             </CardFooter>
@@ -324,3 +335,5 @@ export default function SuggestionsPage() {
 
   return <AdminSuggestionsPage />;
 }
+
+    

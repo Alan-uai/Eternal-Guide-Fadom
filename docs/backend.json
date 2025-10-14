@@ -337,6 +337,7 @@
         "question": { "type": "string", "description": "The original user question." },
         "negativeResponse": { "type": "string", "description": "The AI response that was marked as negative." },
         "aiSuggestion": { "type": "string", "description": "An AI-generated suggestion on how to improve the response." },
+        "reputationPointsAwarded": { "type": "number", "description": "Points the AI suggests awarding for this feedback." },
         "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of the feedback." },
         "status": {
             "type": "string",

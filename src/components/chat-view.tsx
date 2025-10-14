@@ -20,7 +20,7 @@ import { micromark } from 'micromark';
 import { Card, CardContent } from './ui/card';
 import { nanoid } from 'nanoid';
 import { useUser, useFirebase } from '@/firebase';
-import { addDoc, collection, serverTimestamp, doc } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, doc, setDoc } from 'firebase/firestore';
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -273,18 +273,32 @@ export function ChatView() {
              try {
                 const analysisResult = await analyzeNegativeFeedback({ question: prompt, negativeResponse: response });
                 
-                // Save to the user-specific subcollection
-                const feedbackRef = doc(collection(firestore, 'users', user.uid, 'negativeFeedback'));
-
-                await addDoc(collection(firestore, 'negativeFeedback'), {
+                // This ID will be used for both collections to keep them in sync.
+                const feedbackId = nanoid();
+                
+                const feedbackData = {
+                    id: feedbackId,
                     userId: user.uid,
                     userEmail: user.email,
                     question: prompt,
                     negativeResponse: response,
                     aiSuggestion: analysisResult.suggestion,
+                    reputationPointsAwarded: analysisResult.reputationPointsAwarded,
                     status: 'pending',
                     createdAt: serverTimestamp(),
+                };
+
+                // Save to the global collection for admin review
+                await setDoc(doc(firestore, 'negativeFeedback', feedbackId), feedbackData);
+                
+                // Save a copy to the user-specific subcollection for their profile view
+                await setDoc(doc(firestore, 'users', user.uid, 'negativeFeedback', feedbackId), {
+                    question: prompt,
+                    status: 'pending',
+                    createdAt: feedbackData.createdAt,
                 });
+
+
             } catch (error) {
                 console.error("Erro ao salvar feedback negativo:", error);
             }
