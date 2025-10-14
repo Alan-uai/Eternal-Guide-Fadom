@@ -29,63 +29,61 @@ const chatSchema = z.object({
 });
 
 interface ParsedSection {
-    title: string;
-    content: string;
+  marcador: string;
+  titulo: string;
+  conteudo: string;
 }
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-    const { intro, sections } = useMemo(() => {
-        if (!content) return { intro: '', sections: [] };
+  const parsedContent = useMemo(() => {
+    try {
+      // Tenta analisar o JSON. Se falhar, trata o conteúdo como texto simples.
+      return JSON.parse(content) as ParsedSection[];
+    } catch (e) {
+      // Se não for JSON válido, retorna um objeto de fallback para renderização simples.
+      return [{ marcador: 'texto_introdutorio', titulo: '', conteudo: content }];
+    }
+  }, [content]);
 
-        const parts = content.split('---');
-        const introText = parts[0] || '';
-        const accordionParts = parts.slice(1);
+  const introSection = parsedContent.find(s => s.marcador === 'texto_introdutorio');
+  const accordionSections = parsedContent.filter(s => s.marcador === 'meio' || s.marcador === 'fim');
 
-        const parsedSections: ParsedSection[] = accordionParts.map(part => {
-            const trimmedPart = part.trim();
-            const firstLineEnd = trimmedPart.indexOf('\n');
-            
-            if (firstLineEnd !== -1) {
-                // Título é a primeira linha, limpo de **
-                const title = trimmedPart.substring(0, firstLineEnd).replace(/\*\*/g, '').trim();
-                // Conteúdo é o resto
-                const content = trimmedPart.substring(firstLineEnd + 1).trim();
-                return { title, content };
-            }
-            
-            // Fallback se não houver quebra de linha (seção só com título)
-            return { title: trimmedPart.replace(/\*\*/g, '').trim(), content: '' };
-        }).filter(section => section.title); // Garante que seções vazias não sejam criadas
+  // Determina qual item do acordeão deve vir aberto por padrão.
+  const defaultAccordionItem = accordionSections.length > 0 ? 'item-0' : undefined;
 
-        return { intro: introText, sections: parsedSections };
-    }, [content]);
+  return (
+    <div className='relative'>
+      {fromCache && (
+        <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
+          <Zap className='h-3 w-3' /> Instantâneo
+        </span>
+      )}
 
-    return (
-        <div className='relative'>
-            {fromCache && (
-                <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
-                    <Zap className='h-3 w-3'/> Instantâneo
-                </span>
-            )}
-            
-            {intro && <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(intro) }} />}
+      {/* Renderiza a parte introdutória */}
+      {introSection && (
+        <div
+          className="prose prose-sm dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: micromark(introSection.conteudo) }}
+        />
+      )}
 
-            {sections.length > 0 && (
-                <Accordion type="multiple" defaultValue={['item-0']} className="w-full mt-4 border-t pt-4">
-                    {sections.map((section, index) => (
-                        <AccordionItem value={`item-${index}`} key={index}>
-                            <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
-                                {section.title}
-                            </AccordionTrigger>
-                            <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6 pb-4">
-                                <div dangerouslySetInnerHTML={{ __html: micromark(section.content) }} />
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
-            )}
-        </div>
-    );
+      {/* Renderiza o acordeão para as seções restantes */}
+      {accordionSections.length > 0 && (
+        <Accordion type="multiple" defaultValue={defaultAccordionItem ? [defaultAccordionItem] : []} className="w-full mt-4 border-t pt-4">
+          {accordionSections.map((section, index) => (
+            <AccordionItem value={`item-${index}`} key={index}>
+              <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
+                {section.titulo}
+              </AccordionTrigger>
+              <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6 pb-4">
+                <div dangerouslySetInnerHTML={{ __html: micromark(section.conteudo) }} />
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      )}
+    </div>
+  );
 }
 
 
@@ -563,5 +561,3 @@ export function ChatView() {
     </div>
   );
 }
-
-    

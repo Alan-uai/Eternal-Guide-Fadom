@@ -42,8 +42,13 @@ const GenerateSolutionInputSchema = z.object({
 export type GenerateSolutionInput = z.infer<typeof GenerateSolutionInputSchema>;
 
 const GenerateSolutionOutputSchema = z.object({
-  potentialSolution: z.string().describe('A potential solution to the described problem.'),
+  structuredResponse: z
+    .string()
+    .describe(
+      'Uma string JSON de um array de objetos. Cada objeto deve ter: `marcador` ("texto_introdutorio", "inicio", "meio", "fim"), `titulo` (string), e `conteudo` (string, formatado em Markdown).'
+    ),
 });
+
 export type GenerateSolutionOutput = z.infer<typeof GenerateSolutionOutputSchema>;
 
 export async function generateSolution(input: GenerateSolutionInput): Promise<GenerateSolutionOutput> {
@@ -58,7 +63,7 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
             async start(controller) {
                 let previousText = '';
                 for await (const chunk of stream) {
-                    const currentText = chunk.output?.potentialSolution;
+                    const currentText = chunk.output?.structuredResponse;
                     if (currentText) {
                         // Compare the current text with the previous one to find the new part.
                         const newText = currentText.substring(previousText.length);
@@ -75,7 +80,12 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
         console.error("Erro no fluxo de geração de solução (stream):", error);
         return new ReadableStream({
             start(controller) {
-                controller.enqueue(new TextEncoder().encode("Desculpe, não consegui processar sua pergunta. Tente reformulá-la."));
+                const errorJson = JSON.stringify([{
+                  marcador: 'texto_introdutorio',
+                  titulo: 'Erro',
+                  conteudo: 'Desculpe, não consegui processar sua pergunta. Tente reformulá-la.'
+                }]);
+                controller.enqueue(new TextEncoder().encode(errorJson));
                 controller.close();
             }
         });
@@ -89,10 +99,19 @@ export const prompt = ai.definePrompt({
   tools: [getGameDataTool],
   prompt: `Você é um assistente especialista no jogo Anime Eternal e também uma calculadora estratégica. Sua resposta DEVE ser em Português-BR.
 
-**ESTRUTURA DA RESPOSTA (OBRIGATÓRIO):**
-Sua resposta DEVE SEMPRE seguir a estrutura "Conclusão Primeiro".
-1.  **RESPOSTA DIRETA:** Comece com a resposta final e direta à pergunta do usuário. Este é o conteúdo principal e não deve ter nenhum marcador ou título.
-2.  **SEÇÕES ADICIONAIS:** Após a resposta direta, use '---' (três hífens) para separar cada nova seção. O título de cada nova seção DEVE estar em negrito (ex: '**Justificativa e Detalhes**' ou '**Dicas Adicionais**'). O conteúdo abaixo do título não deve ter marcações especiais.
+**ESTRUTURA DA RESPOSTA (JSON OBRIGATÓRIO):**
+Sua resposta DEVE ser uma string JSON de um array de objetos. Cada objeto representa uma seção da resposta.
+
+**Estrutura de cada objeto JSON:**
+- \`marcador\`: Use "texto_introdutorio", "inicio", "meio", ou "fim".
+- \`titulo\`: O título da seção (ex: "Resposta Direta", "Justificativa e Detalhes", "Dicas Adicionais").
+- \`conteudo\`: O conteúdo da seção em formato Markdown.
+
+**REGRAS DE ESTRUTURAÇÃO DO JSON:**
+1.  **SEMPRE** comece com um objeto com \`marcador: "texto_introdutorio"\`. O conteúdo deste objeto é a resposta direta e a solução para a pergunta do usuário. O título pode ser "Solução Direta".
+2.  A seguir, crie um ou mais objetos com \`marcador: "meio"\`. Use estes para a justificativa, os detalhes, os cálculos e as explicações. Dê a eles títulos claros como "Justificativa e Detalhes" ou "Cálculo de Tempo".
+3.  Se aplicável, termine com um ou mais objetos com \`marcador: "fim"\`. Use para dicas extras, estratégias de longo prazo, etc. Dê a eles títulos como "Dicas Adicionais".
+4.  **NÃO USE "INICIO" COMO MARCADOR.** A resposta direta agora está no "texto_introdutorio".
 
 ### Estratégia Principal de Raciocínio
 1.  **Primeiro, analise o CONTEÚDO DO WIKI abaixo para entender profundamente a pergunta do usuário.** Sua tarefa é pesquisar e sintetizar informações de todos os artigos relevantes, não apenas o primeiro que encontrar. Use os resumos (summary) e o conteúdo para fazer conexões entre os termos do usuário e os nomes oficiais no jogo (ex: "Raid Green" é a "Green Planet Raid", "mundo de nanatsu" é o Mundo 13, "Windmill Island" é o "Mundo 2"). Preste atenção especial aos dados nas tabelas ('tables'), pois elas contêm estatísticas detalhadas.
@@ -103,24 +122,7 @@ Sua resposta DEVE SEMPRE seguir a estrutura "Conclusão Primeiro".
 6.  **Regra da Comunidade para Avançar de Mundo:** Se o usuário perguntar sobre o "DPS para sair do mundo" ou algo similar, entenda que ele quer saber o dano necessário para avançar para o próximo mundo. A regra da comunidade é: **pegar a vida (HP) do NPC de Rank S do mundo atual e dividir por 10**. Explique essa regra ao usuário. Como você não tem o HP dos NPCs na sua base de dados, instrua o usuário a encontrar o NPC de Rank S no jogo, verificar o HP dele e fazer o cálculo.
 
 ### REGRAS DE CÁLCULO E FORMATAÇÃO (OBRIGATÓRIO)
-
-**CÁLCULO DE TEMPO:** Se a pergunta do usuário envolver "DPS" (dano por segundo) ou "quanto tempo para derrotar", você **DEVE** apresentar a resposta em cenários de tempo.
-  1.  **Identifique o Alvo:** Use a Wiki para identificar o HP do chefe ou NPC.
-  2.  **Calcule o DPS do Jogador:** Use os dados fornecidos pelo usuário ou estime com base nos itens que ele possui.
-  3.  **Apresente os 3 Cenários:**
-      *   **Tempo Cru:** Calcule o tempo considerando apenas os status base, sem gamepasses ou poderes.
-      *   **Seu Tempo Atual:** Calcule o tempo usando os dados exatos que o jogador forneceu (se disponíveis).
-      *   **Tempo Otimizado:** Compare o DPS do jogador com uma meta considerada boa pela comunidade (**5 minutos para NPCs** e **15 minutos para Chefes**). Informe ao jogador quanto DPS ele precisa para atingir essa meta.
-  4. Explique seu cálculo de forma clara para cada cenário.
-
-**ORDEM DE PRIORIDADE DE GAMEPASS:** Se a pergunta do usuário for sobre "ordem de prioridade das gamepasses", você **DEVE** seguir um formato específico para cada gamepass na lista.
-    1.  **Nome da Gamepass:** O nome exato da gamepass.
-    2.  **Posição e Justificativa:** Explique por que ela está naquela posição (ex: "1º Lugar: Essencial para todos os jogadores").
-    3.  **O Que Faz:** Descreva a mecânica da gamepass de forma clara (ex: "Aumenta seus cliques de 1 por segundo para 4 por segundo").
-    4.  **Exemplo Prático (Com vs. Sem):** Mostre o impacto direto. Exemplo: "Sem esta gamepass, em 10 segundos você causa 100 de dano. Com ela, você causa 400 de dano no mesmo tempo."
-
-**FORMATAÇÃO:**
-- O jogo tem 21 mundos, cada um com conteúdo exclusivo. Você deve entender e usar as seguintes mecânicas de jogo para seus cálculos:
+- O jogo tem 21 mundos, cada um com conteúdo exclusivo.
 - O dano base de um jogador é igual à sua energia total. Isso pode ser modificado por poderes.
 - A gamepass "fast click" dá ao jogador 4 cliques por segundo. O DPS total deve ser calculado como (Dano * 4).
 - Ao apresentar números de energia ou dano, você DEVE usar a notação científica do jogo. Consulte o artigo "Abreviações de Notação Científica" para usar as abreviações corretas (k, M, B, T, qd, etc.).
@@ -129,7 +131,7 @@ Sua resposta DEVE SEMPRE seguir a estrutura "Conclusão Primeiro".
     - Para 'progression': se for 'mixed', liste todos os bônus; para outros, apenas o 'maxBoost'.
     - Para chance de obter um poder, use a propriedade 'probability' e a raridade.
 
-Se a resposta não estiver nas ferramentas ou no wiki, diga que você não tem informações suficientes para responder.
+Se a resposta não estiver nas ferramentas ou no wiki, gere um JSON com um único objeto de erro.
 
 INÍCIO DO CONTEÚDO DO WIKI
 {{{wikiContext}}}
@@ -152,16 +154,21 @@ const generateSolutionFlow = ai.defineFlow(
     outputSchema: GenerateSolutionOutputSchema,
   },
   async input => {
+    const fallbackResponse = JSON.stringify([{
+        marcador: 'texto_introdutorio',
+        titulo: 'Sem Resposta',
+        conteudo: 'Desculpe, não consegui gerar uma resposta. Por favor, tente reformular sua pergunta.'
+    }]);
+
     try {
       const {output} = await prompt(input);
-      if (!output || !output.potentialSolution) {
-        // Fallback in case the AI returns an empty object, null, or misses the field.
-        return { potentialSolution: "Desculpe, não consegui gerar uma resposta. Por favor, tente reformular sua pergunta." };
+      if (!output || !output.structuredResponse) {
+        return { structuredResponse: fallbackResponse };
       }
       return output;
     } catch (error) {
       console.error("Erro no fluxo de geração de solução:", error);
-      return { potentialSolution: "Desculpe, não consegui encontrar uma resposta para sua pergunta. Por favor, tente reformular a pergunta ou verifique se as informações existem no wiki ou nos dados do jogo." };
+      return { structuredResponse: fallbackResponse };
     }
   }
 );
