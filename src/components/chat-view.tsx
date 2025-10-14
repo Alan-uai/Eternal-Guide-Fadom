@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { generateSolutionStream } from '@/ai/flows/generate-solution';
-import { Bot, User, Send, Bookmark, Trash2, Zap } from 'lucide-react';
+import { Bot, User, Send, Bookmark, Trash2, Zap, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -51,6 +51,10 @@ const TypingIndicator = () => (
 const CHAT_STORAGE_KEY = 'eternal-guide-chat-history';
 const CACHE_STORAGE_KEY = 'eternal-guide-question-cache';
 
+interface CachedItem {
+  message: Message;
+  feedback: 'positive' | 'negative' | null;
+}
 
 const suggestedPrompts = [
     'Qual o melhor poder para o Mundo 4?',
@@ -59,12 +63,6 @@ const suggestedPrompts = [
     'Quanto de DPS preciso para o Mundo 10?',
 ];
 
-/**
- * Finds the most relevant wiki articles based on the user's prompt.
- * @param prompt The user's question.
- * @param articles The full list of wiki articles.
- * @returns A string containing the content of the most relevant articles.
- */
 function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
     if (!prompt || !articles || articles.length === 0) {
         return '';
@@ -81,26 +79,23 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
         const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
 
         keywords.forEach(keyword => {
-            if (lowerCaseTitle.includes(keyword)) score += 5; // Title match is most important
-            if (tagsString.includes(keyword)) score += 3; // Tags are very relevant
-            if (lowerCaseSummary.includes(keyword)) score += 2; // Summary is good
-            if (lowerCaseContent.includes(keyword)) score += 1; // Content match is least important to avoid long, irrelevant articles
+            if (lowerCaseTitle.includes(keyword)) score += 5;
+            if (tagsString.includes(keyword)) score += 3;
+            if (lowerCaseSummary.includes(keyword)) score += 2;
+            if (lowerCaseContent.includes(keyword)) score += 1;
         });
         
         return { article, score };
     }).filter(item => item.score > 0)
       .sort((a, b) => b.score - a.score);
 
-    // Take the top 3 most relevant articles
     const topArticles = scoredArticles.slice(0, 3);
     
-    // If no relevant articles are found, maybe return a generic "getting started" context or empty
     if (topArticles.length === 0) {
         const gettingStarted = articles.find(a => a.id === 'getting-started');
         return gettingStarted ? `Title: ${gettingStarted.title}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables)}` : '';
     }
 
-    // Build the context string from the top articles
     return topArticles
         .map(({ article }) => `Title: ${article.title}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`)
         .join('\n\n---\n\n');
@@ -111,7 +106,9 @@ export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [questionCache, setQuestionCache] = useState<Record<string, Message>>({});
+  const [questionCache, setQuestionCache] = useState<Record<string, CachedItem>>({});
+  const [feedback, setFeedback] = useState<Record<string, 'positive' | 'negative' | null>>({});
+
   const { toast } = useToast();
   const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading } = useApp();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -130,8 +127,17 @@ export function ChatView() {
 
       const cachedQuestions = window.localStorage.getItem(CACHE_STORAGE_KEY);
        if (cachedQuestions) {
-        setQuestionCache(JSON.parse(cachedQuestions));
-      }
+        const parsedCache = JSON.parse(cachedQuestions);
+        setQuestionCache(parsedCache);
+        // Initialize feedback state from cache
+        const initialFeedback: Record<string, 'positive' | 'negative' | null> = {};
+        Object.values(parsedCache).forEach((item: any) => {
+            if (item.message && item.message.id) {
+                initialFeedback[item.message.id] = item.feedback;
+            }
+        });
+        setFeedback(initialFeedback);
+       }
     } catch (error) {
       console.error("Falha ao carregar dados do armazenamento local", error);
     }
@@ -160,6 +166,29 @@ export function ChatView() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
+  
+  const handleFeedback = (messageId: string, newFeedback: 'positive' | 'negative') => {
+      const currentFeedback = feedback[messageId];
+      const updatedFeedback = currentFeedback === newFeedback ? null : newFeedback;
+
+      setFeedback(prev => ({...prev, [messageId]: updatedFeedback}));
+
+      // Update cache
+      const updatedCache = { ...questionCache };
+      let cacheUpdated = false;
+      for (const key in updatedCache) {
+          if (updatedCache[key].message.id === messageId) {
+              updatedCache[key].feedback = updatedFeedback;
+              cacheUpdated = true;
+              break;
+          }
+      }
+
+      if (cacheUpdated) {
+        setQuestionCache(updatedCache);
+        window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(updatedCache));
+      }
+  };
 
   async function onSubmit(values: z.infer<typeof chatSchema>) {
     const userMessage: Message = {
@@ -171,20 +200,23 @@ export function ChatView() {
     setMessages((prev) => [...prev, userMessage]);
     form.reset();
 
-    // Cache Check
     const normalizedPrompt = values.prompt.trim().toLowerCase();
-    if (questionCache[normalizedPrompt]) {
-        const cachedAnswer = questionCache[normalizedPrompt];
+    const cachedItem = questionCache[normalizedPrompt];
+
+    // Cache Check: only use cache if it exists and is not disliked
+    if (cachedItem && cachedItem.feedback !== 'negative') {
+        const cachedAnswer = cachedItem.message;
         const newCachedAnswer: Message = {
             ...cachedAnswer,
             id: `assistant-${Date.now()}`,
             fromCache: true, // Mark as from cache
         };
         setMessages((prev) => [...prev, newCachedAnswer]);
+        // Set initial feedback for the newly displayed cached message
+        setFeedback(prev => ({...prev, [newCachedAnswer.id]: cachedItem.feedback }));
         return;
     }
   
-    // If not in cache, proceed with AI call
     setIsLoading(true);
   
     const assistantMessageId = `assistant-${Date.now()}`;
@@ -195,6 +227,7 @@ export function ChatView() {
       isStreaming: true,
     };
     setMessages((prev) => [...prev, assistantMessage]);
+    setFeedback(prev => ({...prev, [assistantMessageId]: null})); // Initialize feedback for new message
   
     try {
       const relevantWikiContext = findRelevantArticles(values.prompt, wikiArticles);
@@ -224,9 +257,9 @@ export function ChatView() {
               );
               setIsLoading(false);
               
-              // Save to cache after stream is complete
-              const finalMessage = { id: assistantMessageId, role: 'assistant' as const, content: accumulatedContent };
-              const newCache = { ...questionCache, [normalizedPrompt]: finalMessage };
+              const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent };
+              const newCacheItem: CachedItem = { message: finalMessage, feedback: null };
+              const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
               setQuestionCache(newCache);
               window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(newCache));
 
@@ -345,14 +378,32 @@ export function ChatView() {
                   )}
                   
                   {message.role === 'assistant' && !message.isStreaming && message.content && (
-                     <Button
-                        variant="ghost"
-                        size="icon"
-                        className="mt-2 h-7 w-7 text-muted-foreground hover:text-primary"
-                        onClick={() => toggleSaveAnswer(message)}
-                      >
-                        <Bookmark className={cn('h-4 w-4', isAnswerSaved(message.id) && 'fill-primary text-primary')} />
-                      </Button>
+                     <div className="flex items-center gap-1 mt-2 -ml-2">
+                         <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-primary"
+                            onClick={() => handleFeedback(message.id, 'positive')}
+                          >
+                            <ThumbsUp className={cn('h-4 w-4', feedback[message.id] === 'positive' && 'fill-primary text-primary')} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                            onClick={() => handleFeedback(message.id, 'negative')}
+                          >
+                            <ThumbsDown className={cn('h-4 w-4', feedback[message.id] === 'negative' && 'fill-destructive text-destructive')} />
+                          </Button>
+                         <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-primary"
+                            onClick={() => toggleSaveAnswer(message)}
+                          >
+                            <Bookmark className={cn('h-4 w-4', isAnswerSaved(message.id) && 'fill-primary text-primary')} />
+                          </Button>
+                     </div>
                   )}
                 </div>
                 {message.role === 'user' && (
@@ -416,5 +467,3 @@ export function ChatView() {
     </div>
   );
 }
-
-    
