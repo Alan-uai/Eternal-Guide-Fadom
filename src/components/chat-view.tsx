@@ -43,56 +43,38 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
 
     const sections = useMemo(() => {
         const sectionsData = [];
-        const inicioMarker = 'INÍCIO:';
-        const meioMarker = 'MEIO:';
-        const fimMarker = 'FIM:';
+        const markers = ["INÍCIO:", "MEIO:", "FIM:"];
+        
+        // Regex to find markers, potentially preceded by numbering like "**1. "
+        const markerRegex = new RegExp(`(?:\\*\\*\\d\\.\\s*)?(${markers.join('|')})`);
+        const firstMarkerMatch = content.match(markerRegex);
 
-        const inicioIndex = content.indexOf(inicioMarker);
-        const meioIndex = content.indexOf(meioMarker);
-        const fimIndex = content.indexOf(fimMarker);
-
-        // Se nenhum dos marcadores principais for encontrado, trate como texto simples.
-        if (inicioIndex === -1 && meioIndex === -1 && fimIndex === -1) {
+        // If no markers are found, treat as simple text.
+        if (!firstMarkerMatch) {
             return { intro: content, sections: [] };
         }
 
-        // Encontra o início do primeiro marcador numerado (ex: "1. **INÍCIO:**")
-        const firstMarkerRegex = /(\*\*1\.\s*)?INÍCIO:/;
-        const match = content.match(firstMarkerRegex);
-        const introEnd = match ? match.index : -1;
-        const intro = introEnd !== -1 ? content.substring(0, introEnd).trim() : '';
+        const introEnd = firstMarkerMatch.index || 0;
+        const intro = content.substring(0, introEnd).trim();
+
+        // Use a more robust splitting mechanism
+        const parts = content.split(markerRegex);
         
-        // Remove a numeração inicial como "**1." do texto introdutório.
-        const cleanedIntro = intro.replace(/\*\*\d\.\s*/, '').trim();
-
-        // Função para limpar o conteúdo de cada seção
-        const cleanContent = (text: string) => {
-            // Remove o título repetido e a formatação markdown do início
-            return text.replace(/^(Resposta Direta|Justificativa e Detalhes|Dicas Adicionais)\.\*\*\s*/, '').trim();
-        };
-
-        // Definir os pontos de início e fim de cada seção
-        if (inicioIndex !== -1) {
-            const start = inicioIndex + inicioMarker.length;
-            const end = meioIndex !== -1 ? meioIndex : fimIndex !== -1 ? fimIndex : content.length;
-            const contentPart = content.substring(start, end).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
-            sectionsData.push({ title: SECTION_TITLES.INÍCIO, content: cleanContent(contentPart) });
+        let currentContent = '';
+        for (let i = 1; i < parts.length; i += 2) {
+            const marker = parts[i].replace(':', ''); // "INÍCIO"
+            const text = parts[i+1] || '';
+            const title = SECTION_TITLES[marker as keyof typeof SECTION_TITLES];
+            if (title) {
+                // Remove the subsequent marker from the end of the current content
+                const nextMarkerIndex = text.search(markerRegex);
+                const cleanedText = (nextMarkerIndex !== -1 ? text.substring(0, nextMarkerIndex) : text).trim();
+                
+                sectionsData.push({ title: title, content: cleanedText });
+            }
         }
 
-        if (meioIndex !== -1) {
-            const start = meioIndex + meioMarker.length;
-            const end = fimIndex !== -1 ? fimIndex : content.length;
-            const contentPart = content.substring(start, end).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
-            sectionsData.push({ title: SECTION_TITLES.MEIO, content: cleanContent(contentPart) });
-        }
-
-        if (fimIndex !== -1) {
-            const start = fimIndex + fimMarker.length;
-            const contentPart = content.substring(start).replace(/^\s*\d\.\s*\*\*/, '').replace(/\*\*:/, '').trim();
-            sectionsData.push({ title: SECTION_TITLES.FIM, content: cleanContent(contentPart) });
-        }
-        
-        return { intro: cleanedIntro, sections: sectionsData };
+        return { intro: intro, sections: sectionsData };
 
     }, [content]);
 
