@@ -28,91 +28,79 @@ const chatSchema = z.object({
 });
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-    const renderSimple = (text: string) => (
-        <div
-            className="prose prose-sm dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: micromark(text) }}
-        />
-    );
+  const { intro, sections } = useMemo(() => {
+    // Split by the `**` marker used to separate sections.
+    const parts = content.split('**').map(p => p.trim()).filter(Boolean);
 
-    const { intro, sections } = useMemo(() => {
-        const sectionsData: { title: string; content: string }[] = [];
-        const markerRegex = /\d\.\s*(INÍCIO|MEIO|FIM):\s*/g;
-        
-        const firstMatch = markerRegex.exec(content);
-        
-        if (!firstMatch) {
-            return { intro: content, sections: [] };
-        }
-
-        const introText = content.substring(0, firstMatch.index).trim();
-        
-        const parts = content.split(markerRegex);
-        // parts will look like: [intro, 'INÍCIO', content1, 'MEIO', content2, 'FIM', content3]
-        
-        for (let i = 1; i < parts.length; i += 2) {
-            const marker = parts[i];
-            const rawContent = parts[i + 1] || '';
-            
-            // The actual title is the first line of the content.
-            const contentParts = rawContent.trim().split(/\.\s*\n/);
-            const title = contentParts.shift()?.replace(/\.$/, '').trim() || marker;
-            const restOfContent = contentParts.join('.\n').trim();
-
-            sectionsData.push({ title, content: restOfContent });
-        }
-
-        return { intro: introText, sections: sectionsData };
-
-    }, [content]);
-
-
-    if (sections.length === 0) {
-        return (
-             <div className='relative'>
-                 {fromCache && (
-                    <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1">
-                        <Zap className='h-3 w-3'/> Instantâneo
-                    </span>
-                )}
-                {renderSimple(intro)}
-            </div>
-        )
+    if (parts.length <= 1) {
+      return { intro: content, sections: [] };
     }
 
-    const defaultOpenValue = 'item-0';
+    const introText = parts.shift() || '';
+    const sectionsData = [];
 
+    for (const part of parts) {
+      // Find the first occurrence of a period or newline to separate title from content
+      const titleMatch = part.match(/^([^.\n]+[.\n])/);
+      if (titleMatch) {
+        const title = titleMatch[1].replace(/[.**]/g, '').trim();
+        const content = part.substring(titleMatch[0].length).trim();
+        if (title && content) {
+          sectionsData.push({ title, content });
+        }
+      }
+    }
+    
+    // If parsing fails, fall back to a simpler split
+    if (sectionsData.length === 0 && parts.length > 0) {
+        return { intro: introText, sections: parts.map(p => ({ title: "Detalhes", content: p })) };
+    }
+
+    return { intro: introText, sections: sectionsData };
+  }, [content]);
+
+  if (sections.length === 0) {
     return (
-        <div className='relative'>
-            {fromCache && (
-                <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
-                    <Zap className='h-3 w-3'/> Instantâneo
-                </span>
-            )}
-            
-            {intro && <div className="mb-4 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(intro) }} />}
-
-            <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
-                {sections.map((part, index) => {
-                    if (!part.content) return null;
-                    const itemKey = `item-${index}`;
-                    return (
-                        <AccordionItem value={itemKey} key={index}>
-                            <AccordionTrigger className="text-sm font-semibold hover:no-underline">
-                                <span className="flex items-center gap-2 text-left">
-                                    <span>{part.title}</span>
-                                </span>
-                            </AccordionTrigger>
-                            <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6">
-                                <div dangerouslySetInnerHTML={{ __html: micromark(part.content) }} />
-                            </AccordionContent>
-                        </AccordionItem>
-                    );
-                })}
-            </Accordion>
-        </div>
+      <div className='relative'>
+        {fromCache && (
+          <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1">
+            <Zap className='h-3 w-3'/> Instantâneo
+          </span>
+        )}
+        <div
+          className="prose prose-sm dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: micromark(intro) }}
+        />
+      </div>
     );
+  }
+
+  return (
+    <div className='relative'>
+      {fromCache && (
+        <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
+          <Zap className='h-3 w-3'/> Instantâneo
+        </span>
+      )}
+      
+      {intro && <div className="mb-4 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(intro) }} />}
+
+      <Accordion type="multiple" defaultValue={['item-0']} className="w-full">
+        {sections.map((section, index) => (
+          <AccordionItem value={`item-${index}`} key={index}>
+            <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
+              {section.title}
+            </AccordionTrigger>
+            <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6">
+              <div dangerouslySetInnerHTML={{ __html: micromark(section.content) }} />
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </div>
+  );
 }
+
 
 const TypingIndicator = () => (
     <div className="flex items-center space-x-1.5 p-2">
