@@ -37,41 +37,33 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
 
     const { intro, sections } = useMemo(() => {
         const sectionsData: { title: string; content: string }[] = [];
-        // Regex para capturar MARCADOR, Título e Conteúdo
-        const markerRegex = /\*\*(INÍCIO|MEIO|FIM):\*\*\s*\*\*(.*?)\*\*/g;
-    
+        const markerRegex = /\d\.\s*(INÍCIO|MEIO|FIM):\s*/g;
+        
         const firstMatch = markerRegex.exec(content);
-    
+        
         if (!firstMatch) {
             return { intro: content, sections: [] };
         }
-    
+
         const introText = content.substring(0, firstMatch.index).trim();
         
-        // Mapeia os marcadores para os títulos finais
-        const titleMap: Record<string, string> = {
-            'INÍCIO': 'Resposta Direta',
-            'MEIO': 'Justificativa e Detalhes',
-            'FIM': 'Dicas Adicionais'
-        };
-
-        let lastIndex = 0;
-        const parts = Array.from(content.matchAll(markerRegex));
-
-        parts.forEach((part, i) => {
-            const marker = part[1]; // INÍCIO, MEIO, FIM
-            const title = titleMap[marker] || part[2]; // Usa o título mapeado ou o capturado
+        const parts = content.split(markerRegex);
+        // parts will look like: [intro, 'INÍCIO', content1, 'MEIO', content2, 'FIM', content3]
+        
+        for (let i = 1; i < parts.length; i += 2) {
+            const marker = parts[i];
+            const rawContent = parts[i + 1] || '';
             
-            const contentStartIndex = part.index + part[0].length;
-            const nextPart = parts[i + 1];
-            const contentEndIndex = nextPart ? nextPart.index : content.length;
-            
-            const rawContent = content.substring(contentStartIndex, contentEndIndex).trim();
+            // The actual title is the first line of the content.
+            const contentParts = rawContent.trim().split(/\.\s*\n/);
+            const title = contentParts.shift()?.replace(/\.$/, '').trim() || marker;
+            const restOfContent = contentParts.join('.\n').trim();
 
-            sectionsData.push({ title, content: rawContent });
-        });
+            sectionsData.push({ title, content: restOfContent });
+        }
 
         return { intro: introText, sections: sectionsData };
+
     }, [content]);
 
 
