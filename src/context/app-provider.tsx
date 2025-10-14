@@ -16,7 +16,6 @@ interface AppContextType {
   toggleSaveAnswer: (answer: Message) => void;
   isAnswerSaved: (answerId: string) => boolean;
   wikiArticles: WikiArticle[];
-  wikiContext: string;
   isWikiLoading: boolean;
   isAuthDialogOpen: boolean;
   setAuthDialogOpen: (open: boolean) => void;
@@ -36,7 +35,6 @@ function AppStateProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   
   const [wikiArticles, setWikiArticles] = useState<WikiArticle[]>([]);
-  const [wikiContext, setWikiContext] = useState('');
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
   
   // State to manage initial app load and redirection logic
@@ -104,16 +102,6 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     }
   }, [firestoreWikiArticles, wikiArticles]);
 
-  // Effect to build the wiki context string whenever wikiArticles changes
-  useEffect(() => {
-    if (wikiArticles && wikiArticles.length > 0) {
-      const contextString = wikiArticles.map(article => `Title: ${article.title}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`).join('\n\n---\n\n');
-      setWikiContext(contextString);
-    } else {
-      setWikiContext('');
-    }
-  }, [wikiArticles]);
-
   const isAnswerSaved = useCallback((answerId: string) => {
     return !!savedAnswers && savedAnswers.some((saved) => saved.id === answerId);
   }, [savedAnswers]);
@@ -160,7 +148,6 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     toggleSaveAnswer, 
     isAnswerSaved,
     wikiArticles: wikiArticles || [],
-    wikiContext,
     isWikiLoading: (isFirestoreWikiLoading || areSavedAnswersLoading) && wikiArticles.length === 0,
     isAuthDialogOpen,
     setAuthDialogOpen,
@@ -197,3 +184,5 @@ export function useApp() {
   }
   return context;
 }
+
+    

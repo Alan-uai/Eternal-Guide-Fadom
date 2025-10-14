@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useApp } from '@/context/app-provider';
-import type { Message } from '@/lib/types';
+import type { Message, WikiArticle } from '@/lib/types';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { micromark } from 'micromark';
@@ -50,13 +50,60 @@ const suggestedPrompts = [
     'Quanto de DPS preciso para o Mundo 10?',
 ];
 
+/**
+ * Finds the most relevant wiki articles based on the user's prompt.
+ * @param prompt The user's question.
+ * @param articles The full list of wiki articles.
+ * @returns A string containing the content of the most relevant articles.
+ */
+function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
+    if (!prompt || !articles || articles.length === 0) {
+        return '';
+    }
+
+    const keywords = prompt.toLowerCase().split(/\s+/).filter(word => word.length > 2);
+    if (keywords.length === 0) keywords.push(prompt.toLowerCase());
+
+    const scoredArticles = articles.map(article => {
+        let score = 0;
+        const lowerCaseTitle = article.title.toLowerCase();
+        const lowerCaseSummary = article.summary.toLowerCase();
+        const lowerCaseContent = article.content.toLowerCase();
+        const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
+
+        keywords.forEach(keyword => {
+            if (lowerCaseTitle.includes(keyword)) score += 5; // Title match is most important
+            if (tagsString.includes(keyword)) score += 3; // Tags are very relevant
+            if (lowerCaseSummary.includes(keyword)) score += 2; // Summary is good
+            if (lowerCaseContent.includes(keyword)) score += 1; // Content match is least important to avoid long, irrelevant articles
+        });
+        
+        return { article, score };
+    }).filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score);
+
+    // Take the top 3 most relevant articles
+    const topArticles = scoredArticles.slice(0, 3);
+    
+    // If no relevant articles are found, maybe return a generic "getting started" context or empty
+    if (topArticles.length === 0) {
+        const gettingStarted = articles.find(a => a.id === 'getting-started');
+        return gettingStarted ? `Title: ${gettingStarted.title}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables)}` : '';
+    }
+
+    // Build the context string from the top articles
+    return topArticles
+        .map(({ article }) => `Title: ${article.title}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`)
+        .join('\n\n---\n\n');
+}
+
 
 export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
-  const { toggleSaveAnswer, isAnswerSaved, wikiContext, isWikiLoading } = useApp();
+  const { toggleSaveAnswer, isAnswerSaved, wikiArticles, isWikiLoading } = useApp();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof chatSchema>>({
@@ -121,11 +168,13 @@ export function ChatView() {
     setMessages((prev) => [...prev, assistantMessage]);
   
     try {
+      // Find relevant context instead of using the whole wiki
+      const relevantWikiContext = findRelevantArticles(values.prompt, wikiArticles);
       const historyForAI = currentMessages.slice(0, -1).map(({ id, ...rest }) => rest);
   
       generateSolutionStream({
         problemDescription: values.prompt,
-        wikiContext,
+        wikiContext: relevantWikiContext, // Use the smaller, relevant context
         history: historyForAI,
       }).then(async (stream) => {
         if (!stream) {
@@ -334,3 +383,5 @@ export function ChatView() {
     </div>
   );
 }
+
+    
