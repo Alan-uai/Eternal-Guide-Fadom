@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, HeartPulse, Database, User, LogOut } from 'lucide-react';
+import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, Database, User, LogOut, HeartPulse } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import { cn } from '@/lib/utils';
 import {
@@ -53,63 +53,57 @@ export function MainNav() {
 
   return (
     <TooltipProvider>
-      <nav className="flex w-full items-center justify-between">
-        <div className="flex items-center gap-2">
-            {navItems.map((item) => (
-            <Tooltip key={item.href}>
-                <TooltipTrigger asChild>
-                <Link
-                    href={item.href}
-                    className={cn(
-                    'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
-                    pathname === item.href && 'bg-accent text-accent-foreground'
-                    )}
-                >
-                    <item.icon className="h-5 w-5" />
-                    <span className="sr-only">{item.label}</span>
-                </Link>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">{item.label}</TooltipContent>
-            </Tooltip>
-            ))}
-        </div>
+      <nav className="flex w-full items-center justify-center gap-2">
+        {navItems.map((item) => (
+        <Tooltip key={item.href}>
+            <TooltipTrigger asChild>
+            <Link
+                href={item.href}
+                className={cn(
+                'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
+                pathname === item.href && 'bg-accent text-accent-foreground'
+                )}
+            >
+                <item.icon className="h-5 w-5" />
+                <span className="sr-only">{item.label}</span>
+            </Link>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{item.label}</TooltipContent>
+        </Tooltip>
+        ))}
         
-        <div className="flex items-center gap-2">
-            {isAdmin && adminNavItems.map((item) => (
-            <Tooltip key={item.href}>
-                <TooltipTrigger asChild>
-                <Link
-                    href={item.href}
-                    className={cn(
-                    'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
-                    pathname.startsWith(item.href) && 'bg-accent text-accent-foreground'
-                    )}
-                >
-                    <item.icon className="h-5 w-5" />
-                    <span className="sr-only">{item.label}</span>
-                </Link>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">{item.label}</TooltipContent>
-            </Tooltip>
-            ))}
-        </div>
+        {isAdmin && adminNavItems.map((item) => (
+        <Tooltip key={item.href}>
+            <TooltipTrigger asChild>
+            <Link
+                href={item.href}
+                className={cn(
+                'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
+                pathname.startsWith(item.href) && 'bg-accent text-accent-foreground'
+                )}
+            >
+                <item.icon className="h-5 w-5" />
+                <span className="sr-only">{item.label}</span>
+            </Link>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{item.label}</TooltipContent>
+        </Tooltip>
+        ))}
         
-        <div className="flex items-center gap-2">
-          {user && !user.isAnonymous && (
-            <>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button onClick={handleSignOut} variant="ghost" size="icon" className='h-9 w-9 md:h-8 md:w-8 text-muted-foreground hover:text-foreground'>
-                        <LogOut className="h-5 w-5" />
-                        <span className="sr-only">Sair</span>
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Sair</TooltipContent>
-              </Tooltip>
-              <UserNav />
-            </>
-          )}
-        </div>
+        {user && !user.isAnonymous && (
+          <>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                  <Button onClick={handleSignOut} variant="ghost" size="icon" className='h-9 w-9 md:h-8 md:w-8 text-muted-foreground hover:text-foreground'>
+                      <LogOut className="h-5 w-5" />
+                      <span className="sr-only">Sair</span>
+                  </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Sair</TooltipContent>
+            </Tooltip>
+            <UserNav />
+          </>
+        )}
       </nav>
     </TooltipProvider>
   );
