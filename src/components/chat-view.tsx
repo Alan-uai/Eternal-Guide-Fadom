@@ -23,6 +23,10 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
+const chatSchema = z.object({
+  prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
+});
+
 function toRoman(num: number): string {
     const roman: { [key: string]: number } = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
     let str = '';
@@ -358,17 +362,17 @@ export function ChatView() {
 
     // If cache exists and is valid, serve it.
     if (cachedItem && cachedItem.message && cachedItem.feedback !== 'negative' && cachedItem.dataVersion === gameDataVersion) {
-      const cachedAnswerWithId = {
-          ...cachedItem.message,
-          id: cachedItem.message.id || nanoid(),
-          fromCache: true,
-          question: values.prompt,
-      };
-      setMessages((prev) => [...prev, cachedAnswerWithId]);
-      if(cachedAnswerWithId.id) {
-          setFeedback(prev => ({...prev, [cachedAnswerWithId.id]: cachedItem.feedback }));
-      }
-      return;
+        const cachedAnswerWithId = {
+            ...cachedItem.message,
+            id: cachedItem.message.id || nanoid(),
+            fromCache: true,
+            question: values.prompt,
+        };
+        setMessages((prev) => [...prev, cachedAnswerWithId]);
+        if(cachedAnswerWithId.id) {
+            setFeedback(prev => ({...prev, [cachedAnswerWithId.id]: cachedItem.feedback }));
+        }
+        return;
     }
   
     // Otherwise (no cache, stale cache, or negative feedback), call the AI.
