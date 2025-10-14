@@ -10,6 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { useUser, useAuth } from '@/firebase';
 import { useApp } from '@/context/app-provider';
@@ -31,17 +32,19 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-9 w-9">
-            <AvatarImage
-              src={user?.photoURL ?? undefined}
-              alt={user?.displayName ?? 'Avatar do usuário'}
-            />
-            <AvatarFallback>
-              <User />
-            </AvatarFallback>
-          </Avatar>
-        </Button>
+         <Link href="/profile" passHref>
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Avatar className="h-9 w-9">
+              <AvatarImage
+                src={user?.photoURL ?? undefined}
+                alt={user?.displayName ?? 'Avatar do usuário'}
+              />
+              <AvatarFallback>
+                <User />
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        </Link>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         {user && !user.isAnonymous ? (
@@ -56,15 +59,6 @@ export function UserNav() {
                 </p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-                <Link href="/profile">
-                    <DropdownMenuItem>
-                        <UserCircle className="mr-2 h-4 w-4" />
-                        <span>Meu Perfil</span>
-                    </DropdownMenuItem>
-                </Link>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
@@ -81,5 +75,3 @@ export function UserNav() {
     </DropdownMenu>
   );
 }
-
-    

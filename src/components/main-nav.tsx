@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, HeartPulse, Database } from 'lucide-react';
+import { BotMessageSquare, Bookmark, Lightbulb, ClipboardList, BrainCircuit, HeartPulse, Database, UserCircle } from 'lucide-react';
 import { useAdmin } from '@/hooks/use-admin';
 import { cn } from '@/lib/utils';
 import {
@@ -18,6 +18,7 @@ const navItems = [
   { href: '/tips', icon: HeartPulse, label: 'Dicas' },
   { href: '/saved', icon: Bookmark, label: 'Salvas' },
   { href: '/suggest', icon: Lightbulb, label: 'Sugerir' },
+  { href: '/profile', icon: UserCircle, label: 'Meu Perfil' },
 ];
 
 const adminNavItems = [
@@ -71,5 +72,3 @@ export function MainNav() {
     </TooltipProvider>
   );
 }
-
-    
