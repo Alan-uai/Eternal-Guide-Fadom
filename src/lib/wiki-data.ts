@@ -28,7 +28,7 @@ No jogo, a cor de fundo do nome de um item indica sua raridade:
 *   **Dungeon do Mundo - Torneio:** Sua primeira dungeon específica do mundo é o Torneio, que vai até a Sala 550.
 *   **Lobby de Dungeons:** Acesse uma variedade de dungeons especiais, que são diferentes das dungeons encontradas em cada mundo. As dungeons de lobby são: **Fácil, Média, Difícil, Insana, Louca, Pesadelo e Folha**. Todas as outras raids e dungeons pertencem a mundos específicos.`,
     tags: ['iniciante', 'guia', 'novo jogador', 'classe', 'mundo 1', 'geral', '1', 'raridade'],
-    imageId: 'wiki-1',
+    imageUrl: 'wiki-1',
 };
 
 export const auraArticle: Omit<WikiArticle, 'createdAt'> = {
@@ -51,7 +51,7 @@ export const auraArticle: Omit<WikiArticle, 'createdAt'> = {
 *   **Mundo 17 (Arama):** Aura de Ghoul (1.0x)
 *   **Mundo 19 (Leonardo):** Aura do Capitão de Fogo (1.5x)`,
     tags: ['aura', 'poder', 'habilidades', 'buffs', 'drop de chefe', 'sistema', 'geral'],
-    imageId: 'wiki-2',
+    imageUrl: 'wiki-2',
 };
 
 export const legendaryWeaponsArticle: Omit<WikiArticle, 'createdAt'> = {
@@ -60,7 +60,7 @@ export const legendaryWeaponsArticle: Omit<WikiArticle, 'createdAt'> = {
     summary: 'Descubra os segredos para forjar as armas mais poderosas do jogo.',
     content: 'Armas lendárias são o auge do equipamento em Anime Eternal. Fabricar uma é uma jornada longa e árdua que requer materiais raros, um alto nível de fabricação e uma forja especial.\n\nOs materiais necessários, conhecidos como "Fragmentos Celestiais", são dropados por chefes de mundo e podem ser encontrados nas masmorras mais profundas. Você precisará de 100 fragmentos, juntamente com outros componentes raros, para tentar uma fabricação. A forja está localizada no pico do Monte Celestia. Cuidado, o caminho é traiçoeiro.',
     tags: ['fabricação', 'armas', 'lendário', 'endgame', 'guia', 'geral'],
-    imageId: 'wiki-3',
+    imageUrl: 'wiki-3',
 };
 
 export const guildWarsArticle: Omit<WikiArticle, 'createdAt'> = {
@@ -69,7 +69,7 @@ export const guildWarsArticle: Omit<WikiArticle, 'createdAt'> = {
     summary: 'Junte-se à sua guilda e lute pela supremacia e recompensas raras.',
     content: 'Guerras de Guildas são eventos semanais onde guildas competem entre si em batalhas PvP em grande escala. Para participar, você deve ser membro de uma guilda com pelo menos 10 membros.\n\nAs guerras ocorrem todo sábado. O objetivo é capturar e manter pontos de controle em um mapa especial. A guilda com mais pontos no final do evento vence. Guildas vitoriosas recebem recompensas exclusivas, incluindo cosméticos raros, equipamentos poderosos e uma quantidade significativa de moeda do jogo.',
     tags: ['guilda', 'pvp', 'evento', 'equipe', 'guia', 'geral'],
-    imageId: 'wiki-4',
+    imageUrl: 'wiki-4',
 };
 
 export const prestigeArticle: Omit<WikiArticle, 'createdAt'> = {
@@ -78,7 +78,7 @@ export const prestigeArticle: Omit<WikiArticle, 'createdAt'> = {
     summary: 'Entenda como prestigiar para aumentar seu limite de nível e ganhar mais poder.',
     content: `O sistema de Prestígio permite que os jogadores resetem seu nível em troca de bônus permanentes poderosos. Veja como funciona:`,
     tags: ['prestígio', 'nível', 'endgame', 'status', 'sistema', 'geral'],
-    imageId: 'wiki-5',
+    imageUrl: 'wiki-5',
     tables: {
       prestigeLevels: {
         headers: ['Prestígio', 'Nível Requerido', 'Novo Limite de Nível', 'Pontos de Status por Nível', 'Multiplicador de Exp'],
@@ -99,7 +99,7 @@ export const rankArticle: Omit<WikiArticle, 'createdAt'> = {
     summary: 'Uma referência para a energia necessária para alcançar cada rank no jogo.',
     content: `Subir de rank é uma parte central da progressão no Anime Eternal. Cada rank requer uma certa quantidade de energia para ser alcançado. Abaixo está uma tabela detalhando a energia necessária para cada rank.`,
     tags: ['rank', 'progressão', 'energia', 'status', 'sistema', 'geral'],
-    imageId: 'wiki-6',
+    imageUrl: 'wiki-6',
     tables: {
       ranks: {
         headers: ['Rank', 'Energia'],
@@ -151,7 +151,7 @@ export const energyGainPerRankArticle: Omit<WikiArticle, 'createdAt'> = {
     summary: 'Uma referência para o ganho de energia base por clique para cada rank no jogo.',
     content: `Esta tabela detalha o ganho de energia base que um jogador recebe por cada clique em um determinado rank. Esse valor pode ser aumentado por vários multiplicadores no jogo.`,
     tags: ['ganho', 'energia', 'rank', 'clique', 'guia', 'geral'],
-    imageId: 'wiki-2',
+    imageUrl: 'wiki-2',
     tables: {
       energyGain: {
         headers: ['Rank', 'Ganho de Energia'],
@@ -277,7 +277,7 @@ export const levelExpArticle: Omit<WikiArticle, 'createdAt'> = {
     summary: 'Uma tabela de referência para a experiência necessária para cada nível do jogo.',
     content: `Esta tabela detalha a quantidade total de experiência necessária para atingir cada nível, até o nível máximo de 270 (Prestígio 5). A experiência necessária aumenta aproximadamente 10% a cada nível.`,
     tags: ['nível', 'experiência', 'exp', 'progressão', 'guia', 'geral'],
-    imageId: 'wiki-5', // Reusing prestige image
+    imageUrl: 'wiki-5', // Reusing prestige image
     tables: {
       levelExp: {
         headers: ['Nível', 'Experiência Necessária'],
@@ -564,7 +564,7 @@ export const worldBossesArticle: Omit<WikiArticle, 'createdAt'> = {
   summary: 'Um guia completo para todos os chefes de mundo, seus status e o HP necessário para derrotá-los.',
   content: `Este guia fornece uma lista de chefes de Rank-SS e SSS, detalhando o HP necessário para um "one-hit kill".`,
   tags: ['chefes', 'guia', 'dps', 'hp', 'recompensas', 'geral', '1', '2', '3', '4', '5', '6', '7', '8', '10', '11', '13', '15', '16', '17', '19', '20'],
-  imageId: 'wiki-7',
+  imageUrl: 'wiki-7',
   tables: {
     ssBosses: {
       headers: ['Mundo', 'Chefe (Rank SS)', 'HP para Hit Kill'],
@@ -607,7 +607,7 @@ export const swordsArticle: Omit<WikiArticle, 'createdAt'> = {
   summary: 'Um guia para as espadas que fornecem um multiplicador de energia, onde encontrá-las e seus status.',
   content: 'Espadas de energia são armas especiais que aumentam sua energia total com base em seu nível. Elas são encontradas em diferentes mundos.',
   tags: ['espadas', 'energia', 'arma', 'guia', 'geral', '3', '5', '15', '19'],
-  imageId: 'wiki-8',
+  imageUrl: 'wiki-8',
   tables: {
     world3: {
       headers: ['Espada (Mundo 3 - Ichige)', 'Stats'],
@@ -656,7 +656,7 @@ export const damageSwordsArticle: Omit<WikiArticle, 'createdAt'> = {
 
 **Nota Especial sobre a Golden Venom Strike:** A Golden Venom Strike foi uma espada de evento da atualização 17, que saiu na atualização 18 e não está mais disponível para obtenção. Ela era adquirida no Mundo 2 ao trocar uma Venomstrike de 3 estrelas (Phantom) por ela. A Golden Venom Strike possui um multiplicador de dano base de 38x e não possui estrelas ou passivas.`,
   tags: ['espadas', 'dano', 'arma', 'guia', 'geral', 'evolução', 'golden venom', 'respiração', 'runa'],
-  imageId: 'wiki-9',
+  imageUrl: 'wiki-9',
   tables: {
     damageSwords: {
       headers: ['Espada', 'Raridade', 'Dano Base (3 Estrelas)', 'Com Respiração Phantom', 'Com Runa de Dano Phantom + Respiração Phantom', 'Com Runa de Dano Supremo + Respiração Phantom'],
@@ -680,7 +680,7 @@ export const world20RaidsArticle: Omit<WikiArticle, 'createdAt'> = {
   summary: 'Requisitos de energia para as raids "Green Planet" e "Suffering" no Mundo 20.',
   content: 'Este guia detalha a quantidade de energia necessária para passar por ondas específicas nas raids do Mundo 20.',
   tags: ['raid', 'guia', 'mundo 20', 'energia', '20', 'geral'],
-  imageId: 'wiki-10',
+  imageUrl: 'wiki-10',
   tables: {
     raids: {
       headers: ['Wave', 'Green Planet Raid', 'Suffering Raid'],
@@ -716,7 +716,7 @@ export const raidRequirementsArticle: Omit<WikiArticle, 'createdAt'> = {
 
 Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a tabela consolidada para as raids mais antigas.`,
   tags: ['raid', 'dungeon', 'energia', 'guia', 'geral', 'solo'],
-  imageId: 'wiki-11',
+  imageUrl: 'wiki-11',
   tables: {
     gleamRaidWorld15: {
       headers: ['Wave', 'HP', 'DPS'],
@@ -782,7 +782,7 @@ Estas são sugestões, não uma lista imposta a seguir.
 
 Estas são as gamepasses que você deve ter no endgame.`,
   tags: ['gamepass', 'tier list', 'endgame', 'compra', 'guia', 'geral'],
-  imageId: 'wiki-12',
+  imageUrl: 'wiki-12',
   tables: {
     newPlayerTiers: {
       headers: ['Tier', 'Gamepass', 'Recomendação'],
@@ -813,7 +813,7 @@ export const scientificNotationArticle: Omit<WikiArticle, 'createdAt'> = {
   summary: 'Um guia de referência para as abreviações de números grandes usadas no jogo.',
   content: 'Entender as abreviações para números grandes é crucial para medir seu poder e o HP dos inimigos. Aqui está um guia completo.',
   tags: ['notação', 'abreviação', 'números', 'guia', 'geral'],
-  imageId: 'wiki-13',
+  imageUrl: 'wiki-13',
   tables: {
     notation1: {
       headers: ['Abreviação', 'Nome', 'Notação Científica'],
@@ -899,7 +899,7 @@ export const scythesArticle: Omit<WikiArticle, 'createdAt'> = {
   summary: 'Um guia para as foices do Mundo 21, as armas mais recentes do jogo, e seus multiplicadores de dano.',
   content: 'As foices são as armas introduzidas no Mundo 21. Elas oferecem multiplicadores de dano significativos que aumentam com a evolução (estrelas). Além disso, as foices podem vir com encantamentos de **Passiva**, que concedem bônus adicionais e também possuem raridades distintas.',
   tags: ['foice', 'arma', 'mundo 21', '21', 'guia', 'geral', 'passiva'],
-  imageId: 'wiki-14',
+  imageUrl: 'wiki-14',
   tables: {
     scythes: {
       headers: ['Foice', 'Stats (Base)', 'Stats (1 Estrela)', 'Stats (2 Estrelas)', 'Stats (3 Estrelas)'],
@@ -923,7 +923,7 @@ export const titansArticle: Omit<WikiArticle, 'createdAt'> = {
   summary: 'Um guia sobre os Titãs, um tipo de "lutador" do Mundo 11, e o dano que eles causam em cada nível de estrela.',
   content: 'Titãs são lutadores especiais encontrados no Mundo 11. O dano deles é uma porcentagem do seu próprio dano total, tornando-os aliados poderosos. O dano aumenta significativamente com a evolução (estrelas).',
   tags: ['titã', 'lutador', 'dano', 'mundo 11', '11', 'guia', 'geral'],
-  imageId: 'wiki-15',
+  imageUrl: 'wiki-15',
   tables: {
     baseTitans: {
       headers: ['Titã (0 Estrelas)', 'Tempo de Ataque', 'Dano de Ataque'],
@@ -982,7 +982,7 @@ export const standsArticle: Omit<WikiArticle, 'createdAt'> = {
   summary: 'Um guia sobre os Stands, um tipo de "lutador" do Mundo 16, e os bônus de energia que eles fornecem.',
   content: 'Stands são lutadores especiais encontrados no Mundo 16. Eles fornecem um bônus percentual à sua energia total, aumentando seu poder. O bônus aumenta com a raridade do Stand.',
   tags: ['stand', 'lutador', 'energia', 'mundo 16', '16', 'guia', 'geral'],
-  imageId: 'wiki-2', // Reusing aura image for now
+  imageUrl: 'wiki-2', // Reusing aura image for now
   tables: {
     stands: {
       headers: ['Stand', 'Raridade', 'Bônus de Energia'],
@@ -1042,7 +1042,7 @@ export const howToGetStrongerArticle: Omit<WikiArticle, 'createdAt'> = {
 Não compensa. É muito melhor comprar o Starter Pack #1 por 300 créditos, que já vem com o avatar top e 1 pet bom.
 `,
   tags: ['guia', 'estratégia', 'dicas', 'forte', 'progressão', 'gamepass', 'geral'],
-  imageId: 'wiki-3', // Reusing a relevant image
+  imageUrl: 'wiki-3', // Reusing a relevant image
 };
 
 export const lobbyDungeonsArticle: Omit<WikiArticle, 'createdAt'> = {
@@ -1051,7 +1051,7 @@ export const lobbyDungeonsArticle: Omit<WikiArticle, 'createdAt'> = {
   summary: 'Um guia completo com horários, vida do chefe e requisitos de dano para as dungeons do lobby.',
   content: 'Este guia detalha as informações essenciais para participar e ter sucesso nas dungeons acessíveis pelo lobby central do jogo. Use esta tabela como referência para saber quando cada dungeon abre e se você tem o dano necessário. O "Tempo Otimizado" refere-se ao tempo de conclusão com rank máximo de velocidade e acessórios de velocidade.',
   tags: ['dungeon', 'lobby', 'guia', 'requisitos', 'dano', 'geral'],
-  imageId: 'wiki-11', // Reusing a relevant image
+  imageUrl: 'wiki-11', // Reusing a relevant image
   tables: {
     lobbySchedule: {
       headers: ['Horário', 'Dificuldade', 'Vida Último Boss', 'Dano Mínimo', 'Dano Recomendado', 'Tempo Otimizado'],
@@ -1068,29 +1068,36 @@ export const lobbyDungeonsArticle: Omit<WikiArticle, 'createdAt'> = {
   },
 };
 
+// Renomeado para imageUrl para consistência
+export const allWikiArticles: Omit<WikiArticle, 'createdAt' | 'tables'>[] = [
+    {...gettingStartedArticle, imageUrl: gettingStartedArticle.imageId},
+    {...auraArticle, imageUrl: auraArticle.imageId},
+    {...legendaryWeaponsArticle, imageUrl: legendaryWeaponsArticle.imageId},
+    {...guildWarsArticle, imageUrl: guildWarsArticle.imageId},
+    {...prestigeArticle, imageUrl: prestigeArticle.imageId},
+    {...rankArticle, imageUrl: rankArticle.imageId},
+    {...energyGainPerRankArticle, imageUrl: energyGainPerRankArticle.imageId},
+    {...levelExpArticle, imageUrl: levelExpArticle.imageId},
+    {...worldBossesArticle, imageUrl: worldBossesArticle.imageId},
+    {...swordsArticle, imageUrl: swordsArticle.imageId},
+    {...damageSwordsArticle, imageUrl: damageSwordsArticle.imageId},
+    {...world20RaidsArticle, imageUrl: world20RaidsArticle.imageId},
+    {...raidRequirementsArticle, imageUrl: raidRequirementsArticle.imageId},
+    {...gamepassTierListArticle, imageUrl: gamepassTierListArticle.imageId},
+    {...scientificNotationArticle, imageUrl: scientificNotationArticle.imageId},
+    {...scythesArticle, imageUrl: scythesArticle.imageId},
+    {...titansArticle, imageUrl: titansArticle.imageId},
+    {...standsArticle, imageUrl: standsArticle.imageId},
+    {...howToGetStrongerArticle, imageUrl: howToGetStrongerArticle.imageId},
+    {...lobbyDungeonsArticle, imageUrl: lobbyDungeonsArticle.imageId},
+].map(({ imageId, ...rest }) => rest);
 
-// A comprehensive list for seeding all articles at once if needed.
-export const allWikiArticles: WikiArticle[] = [
-  {...gettingStartedArticle, createdAt: serverTimestamp()},
-  {...auraArticle, createdAt: serverTimestamp()},
-  {...legendaryWeaponsArticle, createdAt: serverTimestamp()},
-  {...guildWarsArticle, createdAt: serverTimestamp()},
-  {...prestigeArticle, createdAt: serverTimestamp()},
-  {...rankArticle, createdAt: serverTimestamp()},
-  {...energyGainPerRankArticle, createdAt: serverTimestamp()},
-  {...levelExpArticle, createdAt: serverTimestamp()},
-  {...worldBossesArticle, createdAt: serverTimestamp()},
-  {...swordsArticle, createdAt: serverTimestamp()},
-  {...damageSwordsArticle, createdAt: serverTimestamp()},
-  {...world20RaidsArticle, createdAt: serverTimestamp()},
-  {...raidRequirementsArticle, createdAt: serverTimestamp()},
-  {...gamepassTierListArticle, createdAt: serverTimestamp()},
-  {...scientificNotationArticle, createdAt: serverTimestamp()},
-  {...scythesArticle, createdAt: serverTimestamp()},
-  {...titansArticle, createdAt: serverTimestamp()},
-  {...standsArticle, createdAt: serverTimestamp()},
-  {...howToGetStrongerArticle, createdAt: serverTimestamp()},
-  {...lobbyDungeonsArticle, createdAt: serverTimestamp()},
-];
+
+// Adiciona o timestamp do servidor para cada artigo
+export const articlesToSeed = allWikiArticles.map(article => ({
+  ...article,
+  createdAt: serverTimestamp(),
+}));
     
     
+

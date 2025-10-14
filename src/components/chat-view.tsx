@@ -27,6 +27,7 @@ const chatSchema = z.object({
   prompt: z.string().min(1, 'A mensagem não pode estar vazia.'),
 });
 
+
 function toRoman(num: number): string {
     const roman: { [key: string]: number } = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
     let str = '';
@@ -129,8 +130,7 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
         return '';
     }
 
-    const keywords = prompt.toLowerCase().split(/\s+/).filter(word => word.length > 2);
-    if (keywords.length === 0) keywords.push(prompt.toLowerCase());
+    const lowerCasePrompt = prompt.toLowerCase();
 
     const scoredArticles = articles.map(article => {
         let score = 0;
@@ -139,13 +139,25 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
         const lowerCaseContent = article.content.toLowerCase();
         const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
 
-        keywords.forEach(keyword => {
-            if (lowerCaseTitle.includes(keyword)) score += 5;
-            if (tagsString.includes(keyword)) score += 3;
-            if (lowerCaseSummary.includes(keyword)) score += 2;
-            if (lowerCaseContent.includes(keyword)) score += 1;
-        });
-        
+        // Exact match in title (high score)
+        if (lowerCaseTitle.includes(lowerCasePrompt)) {
+            score += 20;
+        }
+        // Partial match in title
+        if (lowerCasePrompt.split(' ').some(word => lowerCaseTitle.includes(word) && word.length > 2)) {
+            score += 10;
+        }
+
+        // Match in tags
+        if (lowerCasePrompt.split(' ').some(word => tagsString.includes(word) && word.length > 2)) {
+            score += 5;
+        }
+
+        // Match in summary
+        if (lowerCasePrompt.split(' ').some(word => lowerCaseSummary.includes(word) && word.length > 2)) {
+            score += 2;
+        }
+
         return { article, score };
     }).filter(item => item.score > 0)
       .sort((a, b) => b.score - a.score);
@@ -153,6 +165,7 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
     const topArticles = scoredArticles.slice(0, 3);
     
     if (topArticles.length === 0) {
+        // Fallback: If no good matches, provide the getting started guide as a default context.
         const gettingStarted = articles.find(a => a.id === 'getting-started');
         return gettingStarted ? `Title: ${gettingStarted.title}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables)}` : '';
     }
