@@ -35,57 +35,55 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         />
     );
 
-    const sections = useMemo(() => {
+    const { intro, sections } = useMemo(() => {
         const sectionsData: { title: string; content: string }[] = [];
-        
-        // Regex to find markers like **1. INÍCIO:** or **INÍCIO:**
-        const markerRegex = /(?:\*\*\d+\.\s*)?(\*\*(INÍCIO|MEIO|FIM):\*\*\s*)/g;
-        
-        const firstMarkerMatch = markerRegex.exec(content);
+        const markerRegex = /(?:\*\*\d+\.\s*)?\*\*(INÍCIO|MEIO|FIM):\*\*/g;
 
-        // If no markers are found, render the whole content simply.
+        const firstMarkerMatch = markerRegex.exec(content);
         if (!firstMarkerMatch) {
             return { intro: content, sections: [] };
         }
 
-        // Text before the first marker is the introduction.
         const introEnd = firstMarkerMatch.index;
         const intro = content.substring(0, introEnd).trim();
-
         const contentAfterIntro = content.substring(introEnd);
-        
-        // Split the content by the main markers (INÍCIO, MEIO, FIM)
+
         const parts = contentAfterIntro.split(markerRegex);
         
-        // The parts array will have a structure like:
-        // ['', '**INÍCIO:**', 'INÍCIO', 'Resposta Direta.** ...content... **2. MEIO:**', ...]
-        for (let i = 3; i < parts.length; i += 4) {
-            let sectionContent = parts[i] || '';
+        const titleMap: Record<string, string> = {
+            'INÍCIO': 'Resposta Direta',
+            'MEIO': 'Justificativa e Detalhes',
+            'FIM': 'Dicas Adicionais'
+        };
+        
+        for (let i = 1; i < parts.length; i += 2) {
+            const marker = parts[i].replace(/\*/g, '').replace(/\d+\.\s*/, '').replace(':', '').trim();
+            let rawContent = parts[i+1] || '';
             
-            // The title is what comes right after the marker until the next stars
-            const titleMatch = sectionContent.match(/^(.+?)\.\*\*\s*/);
-            let title = titleMatch ? titleMatch[1] : '';
-            
-            // Clean the content: remove the title and any subsequent markers
-            let cleanedContent = titleMatch ? sectionContent.substring(titleMatch[0].length).trim() : sectionContent.trim();
-            
-            // Find the next section marker and cut the content before it
-            const nextMarkerIndex = cleanedContent.search(/(?:\*\*\d+\.\s*)?(\*\*(INÍCIO|MEIO|FIM):\*\*)/);
-            if (nextMarkerIndex !== -1) {
-                cleanedContent = cleanedContent.substring(0, nextMarkerIndex).trim();
+            // Clean the content: remove any subtitle that might be at the start
+            const subtitleMatch = rawContent.match(/^\s*.*?\.\*\*\s*/);
+            if (subtitleMatch) {
+                 rawContent = rawContent.substring(subtitleMatch[0].length).trim();
             }
 
-            if (title && cleanedContent) {
-                sectionsData.push({ title: title, content: cleanedContent });
+            // Also clean up any potential marker for the *next* section at the end
+            const nextMarkerIndex = rawContent.search(/(?:\*\*\d+\.\s*)?\*\*(INÍCIO|MEIO|FIM):\*\*/);
+            if (nextMarkerIndex !== -1) {
+                rawContent = rawContent.substring(0, nextMarkerIndex).trim();
+            }
+            
+            const title = titleMap[marker] || marker;
+
+            if (title && rawContent) {
+                 sectionsData.push({ title, content: rawContent });
             }
         }
 
-        return { intro: intro, sections: sectionsData };
-
+        return { intro, sections: sectionsData };
     }, [content]);
 
 
-    if (sections.sections.length === 0) {
+    if (sections.length === 0) {
         return (
              <div className='relative'>
                  {fromCache && (
@@ -93,7 +91,7 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                         <Zap className='h-3 w-3'/> Instantâneo
                     </span>
                 )}
-                {renderSimple(sections.intro)}
+                {renderSimple(intro)}
             </div>
         )
     }
@@ -108,10 +106,10 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                 </span>
             )}
             
-            {sections.intro && <div className="mb-4 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(sections.intro) }} />}
+            {intro && <div className="mb-4 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: micromark(intro) }} />}
 
             <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
-                {sections.sections.map((part, index) => {
+                {sections.map((part, index) => {
                     if (!part.content) return null;
                     const itemKey = `item-${index}`;
                     return (
