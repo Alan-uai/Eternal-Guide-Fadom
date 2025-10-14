@@ -40,48 +40,34 @@ function toRoman(num: number): string {
 }
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-    const contentParts = content.split('\n');
-    let introText = '';
-    let listStartIndex = -1;
+    const renderSimple = () => (
+        <div
+            className="prose prose-sm dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: micromark(content) }}
+        />
+    );
 
-    // Find where the numbered list starts or if there is a header that should not be part of the accordion
-    for (let i = 0; i < contentParts.length; i++) {
-        const line = contentParts[i].trim();
-        if (/^\d+\.\s/.test(line) || /###/.test(line)) {
-            listStartIndex = i;
-            break;
-        }
-        introText += contentParts[i] + '\n';
-    }
+    // Regex para dividir por títulos em negrito (ex: **Título:**) ou cabeçalhos markdown (### Título)
+    const sections = content.split(/\n(?=\*\*.*?\*\*|###\s.*)/).map(s => s.trim());
 
-    // If no numbered list is found, render the whole content normally
-    if (listStartIndex === -1) {
-        const htmlContent = micromark(content);
+    // Se não houver seções (ou for uma resposta curta), renderiza normalmente
+    if (sections.length <= 1) {
         return (
-            <div className='relative'>
+             <div className='relative'>
                  {fromCache && (
                     <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1">
                         <Zap className='h-3 w-3'/> Instantâneo
                     </span>
                 )}
-                <div
-                    className="prose prose-sm dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: htmlContent }}
-                />
+                {renderSimple()}
             </div>
-        );
+        )
     }
+
+    const defaultOpenValue = `item-${sections.length - 1}`;
     
-    // Heuristic: The last numbered item is the most likely direct answer.
-    const introHtml = micromark(introText);
-    const listContent = contentParts.slice(listStartIndex).join('\n');
-
-    // This regex splits the content by lines that start with a number and a dot (e.g., "1. "),
-    // but it keeps the delimiter as part of the next item.
-    const listItems = listContent.split(/\n(?=\d+\.\s)/).map(part => part.trim());
-
-    // Heuristic: Default to opening the last item in the list.
-    const defaultOpenValue = `item-${toRoman(listItems.length)}`;
+    // Check for numbered list pattern to decide on Roman numerals
+    const isNumberedList = sections.every(sec => /^\d+\.\s/.test(sec));
 
     return (
         <div className='relative'>
@@ -91,38 +77,25 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
                 </span>
             )}
             
-            {/* Render intro text if it exists */}
-            {introText.trim() && (
-                 <div
-                    className="prose prose-sm dark:prose-invert max-w-none mb-4"
-                    dangerouslySetInnerHTML={{ __html: introHtml }}
-                />
-            )}
-
             <Accordion type="multiple" defaultValue={[defaultOpenValue]} className="w-full">
-                {listItems.map((part, index) => {
-                    const romanNumeral = toRoman(index + 1);
-                    // Extract title and the rest of the content
-                    const titleMatch = part.match(/^(\d+)\.\s*(.*?)(?=\n|$)/);
-                    let title = titleMatch ? titleMatch[2] : `Passo ${romanNumeral}`;
-                    const restOfContent = titleMatch ? part.substring(titleMatch[0].length).trim() : part;
+                {sections.map((part, index) => {
+                    const titleMatch = part.match(/^(\d+\.\s*|###\s*|\*\*)(.*?)(?::|\*\*)/);
+                    let title = titleMatch ? titleMatch[2].trim() : `Seção ${index + 1}`;
+                    const restOfContent = titleMatch ? part.substring(part.indexOf(title) + title.length + (titleMatch[0].endsWith(':') ? 1 : 2)).trim() : part;
                     
-                    if (title.endsWith(':')) {
-                        title = title.slice(0, -1);
-                    }
-
-                    const htmlContent = micromark(restOfContent);
+                    const itemKey = `item-${index}`;
+                    const displayIndex = isNumberedList ? toRoman(index + 1) : null;
 
                     return (
-                        <AccordionItem value={`item-${romanNumeral}`} key={index}>
+                        <AccordionItem value={itemKey} key={index}>
                             <AccordionTrigger className="text-sm font-semibold hover:no-underline">
                                 <span className="flex items-center gap-2 text-left">
-                                    <span className="font-bold text-primary">{romanNumeral}.</span>
+                                    {displayIndex && <span className="font-bold text-primary">{displayIndex}.</span>}
                                     <span>{title}</span>
                                 </span>
                             </AccordionTrigger>
                             <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6">
-                                <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                                <div dangerouslySetInnerHTML={{ __html: micromark(restOfContent) }} />
                             </AccordionContent>
                         </AccordionItem>
                     );
@@ -170,8 +143,8 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
         const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
 
         // Very high score for a direct match or substring in the title
-        if (lowerCaseTitle.includes(lowerCasePrompt)) {
-            score += 50;
+        if (lowerCaseTitle.includes(lowerCasePrompt) || lowerCasePrompt.includes(lowerCaseTitle)) {
+            score += 100;
         }
 
         // Check for partial matches of significant words in the title
@@ -185,6 +158,11 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
             }
         });
         
+        // Boost score for having table data
+        if(article.tables && Object.keys(article.tables).length > 0) {
+            score += 10;
+        }
+
         return { article, score };
     }).filter(item => item.score > 0)
       .sort((a, b) => b.score - a.score);
@@ -193,7 +171,7 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
     
     if (topArticles.length === 0) {
         const gettingStarted = articles.find(a => a.id === 'getting-started');
-        return gettingStarted ? `Title: ${gettingStarted.title}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables)}` : '';
+        return gettingStarted ? `Title: ${gettingStarted.title}\nSummary: ${gettingStarted.summary}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables)}` : '';
     }
 
     return topArticles
