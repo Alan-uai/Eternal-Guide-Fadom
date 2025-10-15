@@ -10,7 +10,7 @@ import Head from 'next/head';
 import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { identifyPowersFromImage, type IdentifiedPower } from '@/ai/flows/identify-powers-from-image-flow';
+import { identifyPowersFromImage, type IdentifiedItem } from '@/ai/flows/identify-powers-from-image-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -46,11 +46,11 @@ const normalizeString = (str: string | null | undefined): string => {
 };
 
 
-function findItemInGameData(identifiedName: string, allGameData: any[], subcollectionName: string) {
+function findItemInGameData(identifiedName: string, category: string, allGameData: any[]) {
     const normalizedIdentifiedName = normalizeString(identifiedName);
 
     for (const world of allGameData) {
-        const subcollection = world[subcollectionName];
+        const subcollection = world[category];
         if (!Array.isArray(subcollection)) continue;
 
         for (const cachedItem of subcollection) {
@@ -124,7 +124,7 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
             toast({
                 variant: 'destructive',
                 title: 'Nenhum arquivo selecionado',
-                description: `Por favor, selecione um ou mais screenshots de seus ${sectionTitle.toLowerCase()}.`,
+                description: `Por favor, selecione um ou mais screenshots.`,
             });
             return;
         }
@@ -155,25 +155,25 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
             
             const result = await identifyPowersFromImage({ images: dataUris });
 
-            if (result && result.powers) {
+            if (result && result.items) {
                 let savedCount = 0;
                 const notFound: string[] = [];
 
-                for (const identifiedItem of result.powers) {
-                    const fullItemData = findItemInGameData(identifiedItem.name, allGameData, subcollectionName);
+                for (const identifiedItem of result.items) {
+                    const fullItemData = findItemInGameData(identifiedItem.name, identifiedItem.category, allGameData);
 
                     if (fullItemData) {
-                        const itemRef = doc(firestore, 'users', user.uid, subcollectionName, fullItemData.id);
+                        const itemRef = doc(firestore, 'users', user.uid, identifiedItem.category, fullItemData.id);
                         await setDoc(itemRef, fullItemData, { merge: true });
                         savedCount++;
                     } else {
-                        notFound.push(identifiedItem.name);
+                        notFound.push(`${identifiedItem.name} (${identifiedItem.category})`);
                     }
                 }
                 
                 if (savedCount > 0) {
                   toast({
-                      title: `${savedCount} ${sectionTitle} Salvos!`,
+                      title: `${savedCount} ${savedCount > 1 ? 'Itens Salvos' : 'Item Salvo'}!`,
                       description: `Itens foram identificados e salvos em seu perfil.`,
                   });
                 }
@@ -200,7 +200,7 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
             }
 
         } catch (error: any) {
-            console.error(`Erro ao analisar e salvar ${sectionTitle}:`, error);
+            console.error(`Erro ao analisar e salvar itens:`, error);
             toast({
                 variant: 'destructive',
                 title: 'Erro na Análise',
@@ -309,13 +309,13 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
     );
 }
 
-const PowersProfileSection = () => <ProfileSection subcollectionName="powers" sectionTitle="Poderes" sectionDescription="Adicione seus poderes enviando um screenshot da sua tela de poderes no jogo. A IA irá identificá-los e salvá-los no seu perfil." />;
-const AurasProfileSection = () => <ProfileSection subcollectionName="auras" sectionTitle="Auras" sectionDescription="Adicione suas auras enviando um screenshot. A IA irá identificá-las e salvá-las no seu perfil." />;
-const PetsProfileSection = () => <ProfileSection subcollectionName="pets" sectionTitle="Pets" sectionDescription="Adicione seus pets enviando um screenshot. A IA irá identificá-los e salvá-los no seu perfil." />;
-const WeaponsProfileSection = () => <ProfileSection subcollectionName="weapons" sectionTitle="Armas" sectionDescription="Adicione suas armas enviando um screenshot. A IA irá identificá-las e salvá-los no seu perfil." />;
-const IndexProfileSection = () => <ProfileSection subcollectionName="index" sectionTitle="Index" sectionDescription="Adicione seus tiers de avatares e pets enviando um screenshot. A IA irá identificá-los e salvá-los no seu perfil." />;
-const ObelisksProfileSection = () => <ProfileSection subcollectionName="obelisks" sectionTitle="Obeliscos" sectionDescription="Adicione seu progresso nos obeliscos enviando um screenshot. A IA irá identificá-lo e salvá-lo no seu perfil." />;
-const RankProfileSection = () => <ProfileSection subcollectionName="rank" sectionTitle="Rank" sectionDescription="Adicione seu rank atual enviando um screenshot. A IA irá identificá-lo e salvá-lo no seu perfil." />;
+const PowersProfileSection = () => <ProfileSection subcollectionName="powers" sectionTitle="Poderes" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
+const AurasProfileSection = () => <ProfileSection subcollectionName="auras" sectionTitle="Auras" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
+const PetsProfileSection = () => <ProfileSection subcollectionName="pets" sectionTitle="Pets" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
+const WeaponsProfileSection = () => <ProfileSection subcollectionName="weapons" sectionTitle="Armas" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
+const IndexProfileSection = () => <ProfileSection subcollectionName="index" sectionTitle="Index" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
+const ObelisksProfileSection = () => <ProfileSection subcollectionName="obelisks" sectionTitle="Obeliscos" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
+const RankProfileSection = () => <ProfileSection subcollectionName="rank" sectionTitle="Rank" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
 
 
 const profileCategories = [
@@ -525,5 +525,3 @@ export default function ProfilePage() {
         </>
     );
 }
-
-    

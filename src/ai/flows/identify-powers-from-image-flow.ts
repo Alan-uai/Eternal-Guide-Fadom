@@ -1,45 +1,46 @@
 
 'use server';
 /**
- * @fileOverview Um fluxo que identifica poderes do jogo a partir de um screenshot.
+ * @fileOverview Um fluxo que identifica itens do jogo (poderes, armas, pets, etc.) e suas categorias a partir de um screenshot.
  *
  * - identifyPowersFromImage - A função principal que lida com a identificação.
  * - IdentifyPowersInput - O tipo de entrada para a função.
  * - IdentifyPowersOutput - O tipo de retorno para a função.
- * - IdentifiedPower - O tipo para um único poder identificado.
+ * - IdentifiedItem - O tipo para um único item identificado, incluindo seu nome e categoria.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { allGameData } from '@/lib/game-data-context';
 
+// Gera um contexto de string com todos os itens conhecidos para a IA.
+const allItemsKnowledgeContext = allGameData.flatMap(world => {
+    const worldName = world.name;
+    const subcollections = ['powers', 'auras', 'pets', 'weapons', 'index', 'obelisks', 'rank'];
+    return subcollections.flatMap(category => 
+        (world[category] || []).flatMap((item: any) => {
+            if (item.stats && Array.isArray(item.stats)) {
+                return item.stats.map((stat: any) => `${stat.name} (Categoria: ${category}, Mundo: ${worldName})`);
+            }
+            return `${item.name} (Categoria: ${category}, Mundo: ${worldName})`;
+        })
+    );
+}).join('\n');
 
-// Gera um contexto de string com todos os poderes conhecidos para a IA para que ela possa associar o mundo.
-const powerKnowledgeContext = allGameData.map(world => 
-    `Mundo: ${world.name}\nPoderes:\n${(world.powers || []).map((power: any) => {
-        const statsString = (power.stats && Array.isArray(power.stats))
-            ? `\n  Status:\n${power.stats.map((stat: any) => 
-                `  - ${stat.name} (Raridade: ${stat.rarity})`
-              ).join('\n')}`
-            : '';
-        return `- Nome: ${power.name}${statsString}`;
-    }).join('\n')}`
-).join('\n\n');
 
-const IdentifiedPowerSchema = z.object({
-  name: z.string().describe('O nome exato do poder identificado na imagem.'),
-  // A raridade foi removida pois a IA só precisa fornecer o nome.
-  // rarity: z.string().describe('A raridade do poder, inferida pela cor da borda ou pelo nome (ex: "Phantom", "Supreme").'),
+const IdentifiedItemSchema = z.object({
+  name: z.string().describe('O nome exato do item identificado na imagem.'),
+  category: z.string().describe('A categoria do item (ex: "powers", "pets", "auras", "weapons").'),
 });
-export type IdentifiedPower = z.infer<typeof IdentifiedPowerSchema>;
+export type IdentifiedItem = z.infer<typeof IdentifiedItemSchema>;
 
 const IdentifyPowersInputSchema = z.object({
-  images: z.array(z.string()).describe("Uma lista de screenshots da tela de poderes, como data URIs."),
+  images: z.array(z.string()).describe("Uma lista de screenshots do jogo, como data URIs."),
 });
 export type IdentifyPowersInput = z.infer<typeof IdentifyPowersInputSchema>;
 
 const IdentifyPowersOutputSchema = z.object({
-  powers: z.array(IdentifiedPowerSchema).describe('Uma lista de todos os nomes de poderes únicos identificados nas imagens.'),
+  items: z.array(IdentifiedItemSchema).describe('Uma lista de todos os itens únicos identificados nas imagens, com seus nomes e categorias.'),
 });
 export type IdentifyPowersOutput = z.infer<typeof IdentifyPowersOutputSchema>;
 
@@ -50,25 +51,26 @@ export async function identifyPowersFromImage(input: IdentifyPowersInput): Promi
 
 
 export const prompt = ai.definePrompt({
-  name: 'identifyPowersPrompt',
+  name: 'identifyItemsPrompt',
   input: { schema: IdentifyPowersInputSchema },
   output: { schema: IdentifyPowersOutputSchema },
-  prompt: `Você é um especialista em análise de imagem para o jogo Anime Eternal. Sua tarefa é analisar um ou mais screenshots da tela de "Poderes" do jogador e identificar o NOME de cada poder.
+  outputFormat: "json",
+  prompt: `Você é um especialista em análise de imagem para o jogo Anime Eternal. Sua tarefa é analisar um ou mais screenshots da tela de um jogador e identificar o NOME e a CATEGORIA de cada item.
 
 **PROCESSO:**
 
-1.  Para cada poder na imagem, extraia apenas o nome exato do poder.
-2.  Ignore a raridade, a cor da borda ou qualquer outra informação. Foque APENAS no nome.
-3.  Use o **CONHECIMENTO DE PODERES** abaixo como referência para garantir que os nomes extraídos estão corretos e correspondem aos nomes oficiais do jogo.
-4.  Retorne uma lista JSON de objetos, onde cada objeto contém apenas a chave "name". Não inclua duplicatas na lista final.
+1.  Para cada item na imagem, extraia seu nome exato.
+2.  Determine a categoria do item (como "powers", "auras", "pets", "weapons", "index", "obelisks", "rank").
+3.  Use o **CONHECIMENTO DE ITENS** abaixo como referência principal para garantir que os nomes e categorias extraídos estão corretos e correspondem aos itens oficiais do jogo.
+4.  Retorne uma lista JSON de objetos, onde cada objeto contém "name" e "category". Não inclua duplicatas na lista final.
 
 ---
-INÍCIO DO CONHECIMENTO DE PODERES
-${powerKnowledgeContext}
+INÍCIO DO CONHECIMENTO DE ITENS
+${allItemsKnowledgeContext}
 ---
-FIM DO CONHECIMENTO DE PODERES
+FIM DO CONHECIMENTO DE ITENS
 
-Agora, analise as seguintes imagens e extraia apenas os nomes dos poderes:
+Agora, analise as seguintes imagens e extraia os nomes e categorias dos itens:
 {{#each images}}
 {{media url=this}}
 {{/each}}
@@ -78,24 +80,25 @@ Agora, analise as seguintes imagens e extraia apenas os nomes dos poderes:
 
 const identifyPowersFlow = ai.defineFlow(
   {
-    name: 'identifyPowersFlow',
+    name: 'identifyItemsFlow',
     inputSchema: IdentifyPowersInputSchema,
     outputSchema: IdentifyPowersOutputSchema,
   },
   async (input) => {
     try {
       const { output } = await prompt(input);
-      if (!output || !output.powers) {
-        return { powers: [] };
+      if (!output || !Array.isArray(output.items)) {
+         console.warn("⚠️ IA retornou saída inválida, substituindo por lista vazia.");
+        return { items: [] };
       }
       // Simples filtro de duplicatas para garantir
-      const uniquePowers = output.powers.filter(
-        (power, index, self) => index === self.findIndex((p) => p.name === power.name)
+      const uniqueItems = output.items.filter(
+        (item, index, self) => index === self.findIndex((p) => p.name === item.name && p.category === item.category)
       );
-      return { powers: uniquePowers };
+      return { items: uniqueItems };
     } catch (error) {
-      console.error("Erro no fluxo de identificação de poderes:", error);
-      return { powers: [] };
+      console.error("Erro no fluxo de identificação de itens:", error);
+      return { items: [] };
     }
   }
 );
