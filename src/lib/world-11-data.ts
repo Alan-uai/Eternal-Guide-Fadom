@@ -17,6 +17,14 @@ export const world11Data = {
                 { name: 'Yeager Family', multiplier: '12x', rarity: 'Mythic', probability: 0.5 },
                 { name: 'Reiss Family', multiplier: '15x', rarity: 'Phantom', probability: 0.05 },
             ]
+        },
+        {
+            id: 'titan-evolution',
+            name: 'Titan Evolution',
+            type: 'progression',
+            statType: 'mixed',
+            unlockCost: 'N/A',
+            description: 'Evolve os Titãs para 1, 2 ou 3 estrelas para aumentar seu poder.'
         }
     ],
     npcs: [
@@ -27,6 +35,13 @@ export const world11Data = {
         { id: 'world11-a-rank', name: 'A Rank NPC', rank: 'A', exp: 13846, hp: '26NvD', world: 'World 11', drops: { coins: { amount: '2.6NvD', probability: 0.8 } } },
         { id: 'world11-s-rank', name: 'S Rank NPC', rank: 'S', exp: 15231, hp: '131NvD', world: 'World 11', drops: { coins: { amount: '13NvD', probability: 0.8 } } },
         { id: 'eran-boss', name: 'Eran', rank: 'SS', exp: 23040, hp: '655NvD', world: 'World 11', drops: { coins: { amount: '65NvD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+    ],
+    dungeons: [
+        {
+            id: 'titan-defense',
+            name: 'Titan Defense',
+            description: 'Uma raid com 1000 salas (w1k).'
+        }
     ],
     shadows: [
         {
