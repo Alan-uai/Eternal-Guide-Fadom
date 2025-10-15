@@ -231,7 +231,7 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "type": { "type": "string", "enum": ["damage", "energy", "coin"] },
+                  "type": { "type": "string", "enum": ["damage", "energy", "coin", "crit_damage"] },
                   "value": { "type": "string" }
                 }
               }
