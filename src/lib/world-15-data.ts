@@ -1,5 +1,6 @@
 
 export const world15Data = {
+    id: '015',
     name: 'World 15 - Virtual City',
     powers: [
       {
@@ -99,5 +100,3 @@ export const world15Data = {
         }
     ]
 };
-
-    

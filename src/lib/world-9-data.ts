@@ -1,5 +1,6 @@
 
 export const world9Data = {
+    id: '009',
     name: 'World 9 - Spirit Residence',
     powers: [
         {

@@ -1,5 +1,6 @@
 
 export const world7Data = {
+    id: '007',
     name: 'World 7 - Clover Village',
     powers: [
       {
@@ -68,7 +69,7 @@ export const world7Data = {
                 },
                 {
                     rank: 'Rank SSS',
-                    rarity: 'Supreme',
+                    rarity: 'Supremo',
                     bonus: '7.5% Energy',
                 }
             ]

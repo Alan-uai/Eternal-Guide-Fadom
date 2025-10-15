@@ -37,9 +37,10 @@ const seedWorldDataFlow = ai.defineFlow(
     const { firestore } = initializeFirebaseServer();
     const worldData = JSON.parse(worldDataJson);
     
-    const worldId = worldName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    // Use the new numeric ID from the data file as the document ID
+    const worldId = worldData.id;
     if (!worldId) {
-        console.error("Nome de mundo inválido resultou em ID vazio.");
+        console.error("Dados do mundo não contêm um 'id' numérico.");
         return false;
     }
 

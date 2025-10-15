@@ -1,5 +1,6 @@
 
 export const world10Data = {
+    id: '010',
     name: 'World 10 - Magic Hunter City',
     powers: [
         {
@@ -93,5 +94,3 @@ export const world10Data = {
         }
     ]
 };
-
-    

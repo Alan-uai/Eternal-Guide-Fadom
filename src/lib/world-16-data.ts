@@ -1,5 +1,6 @@
 
 export const world16Data = {
+    id: '016',
     name: 'World 16 - Cairo',
     powers: [
       {

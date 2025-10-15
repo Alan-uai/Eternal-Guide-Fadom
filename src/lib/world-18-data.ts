@@ -1,5 +1,6 @@
 
 export const world18Data = {
+    id: '018',
     name: 'World 18 - Chainsaw City',
     powers: [
       {

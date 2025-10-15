@@ -1,4 +1,5 @@
 export const world20Data = {
+    id: '020',
     name: 'World 20 - Green Planet',
     powers: [
       {
@@ -102,5 +103,3 @@ export const world20Data = {
         }
     ]
   };
-
-    

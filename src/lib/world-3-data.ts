@@ -1,5 +1,6 @@
 
 export const world3Data = {
+    id: '003',
     name: 'World 3 - Soul Society',
     powers: [
       {

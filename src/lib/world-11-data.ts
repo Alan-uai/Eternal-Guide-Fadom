@@ -1,5 +1,6 @@
 
 export const world11Data = {
+    id: '011',
     name: 'World 11 - Titan City',
     powers: [
         {

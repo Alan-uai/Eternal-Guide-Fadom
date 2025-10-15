@@ -234,10 +234,11 @@ export function WikiManagementView() {
 
   const sortedWorlds = useMemo(() => {
     if (!worlds) return [];
+    // Sort based on the numeric part of the ID string
     return [...worlds].sort((a, b) => {
-      const numA = parseInt(a.id.split('-').pop() || '0', 10);
-      const numB = parseInt(b.id.split('-').pop() || '0', 10);
-      return numA - numB;
+        const idA = a.id ? parseInt(a.id, 10) : 0;
+        const idB = b.id ? parseInt(b.id, 10) : 0;
+        return idA - idB;
     });
   }, [worlds]);
 
@@ -343,6 +344,8 @@ export function WikiManagementView() {
             if (!worldData || !worldData.name) continue;
             const worldName = worldData.name;
             const worldDataJson = JSON.stringify(worldData);
+            // This function already handles batching internally, but for consistency,
+            // we call it here. It's safe to call it multiple times.
             await seedWorldData({ worldName, worldDataJson });
         }
         

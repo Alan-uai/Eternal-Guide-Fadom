@@ -1,5 +1,6 @@
 
 export const world5Data = {
+    id: '005',
     name: 'World 5 - Slayer Village',
     npcs: [
         { id: 'world5-e-rank', name: 'E Rank NPC', rank: 'E', exp: 75, hp: '14.2Sp', world: 'World 5', drops: { coins: { amount: '1.4Sp', probability: 0.8 } } },

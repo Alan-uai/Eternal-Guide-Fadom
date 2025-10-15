@@ -1,5 +1,6 @@
 
 export const world12Data = {
+    id: '012',
     name: 'World 12 - Village of Sins',
     powers: [
         {

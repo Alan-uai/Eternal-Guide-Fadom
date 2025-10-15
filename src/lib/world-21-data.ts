@@ -1,5 +1,6 @@
 
 export const world21Data = {
+    id: '021',
     name: 'World 21 - Hollow World',
     powers: [
         {

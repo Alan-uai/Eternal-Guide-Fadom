@@ -1,5 +1,6 @@
 
 export const world4Data = {
+    id: '004',
     name: 'World 4 - Cursed School',
     powers: [
       {

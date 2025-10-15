@@ -1,5 +1,6 @@
 
 export const world13Data = {
+    id: '013',
     name: 'World 13 - Kaiju Base',
     powers: [
       {

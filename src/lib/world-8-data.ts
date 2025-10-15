@@ -1,5 +1,6 @@
 
 export const world8Data = {
+    id: '008',
     name: 'World 8 - Leaf Village',
     powers: [
       {

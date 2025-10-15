@@ -1,5 +1,6 @@
 
 export const world19Data = {
+    id: '019',
     name: 'World 19 - Tokyo Empire',
     powers: [
       {

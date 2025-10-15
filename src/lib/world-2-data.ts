@@ -1,5 +1,6 @@
 
 export const world2Data = {
+    id: '002',
     name: 'World 2 - Windmill Island',
     powers: [
       {

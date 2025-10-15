@@ -1,4 +1,5 @@
 export const world6Data = {
+    id: '006',
     name: 'World 6 - Solo Island',
     powers: [
       {
