@@ -8,6 +8,12 @@ export const world1Data = {
         type: 'gacha',
         statType: 'energy',
         unlockCost: '1k',
+        leveling: {
+            token: "Dragon Race Lvl Token",
+            costPerLevel: 40,
+            unlockWorld: 20,
+            description: "Pode ser evoluído no Mundo 20 usando Dragon Race Lvl Tokens."
+        },
         stats: [
           { name: 'Human', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Android', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -24,6 +30,12 @@ export const world1Data = {
         type: 'gacha',
         statType: 'energy',
         unlockCost: '10k',
+        leveling: {
+            token: "Saiyan Lvl Token",
+            costPerLevel: 40,
+            unlockWorld: 20,
+            description: "Pode ser evoluído no Mundo 20 usando Saiyan Lvl Tokens."
+        },
         stats: [
           { name: 'Great Ape', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Super Saiyan Grad 1', multiplier: '3x', rarity: 'Uncommon', probability: 33 },

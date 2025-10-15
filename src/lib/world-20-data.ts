@@ -65,7 +65,13 @@ export const world20Data = {
       { id: 'frezi-final-form-boss', name: 'Frezi Final Form', rank: 'SSS', exp: 24232787, hp: '47qTG', world: 'World 20', drops: { coins: { amount: '4.7qTG', probability: 1 } } },
     ],
     pets: [],
-    dungeons: [],
+    dungeons: [
+        {
+            id: 'dungeon-lobby-2',
+            name: 'Lobby de Dungeons 2',
+            description: 'Um novo lobby de dungeons desbloqueado no Mundo 20. Usa Exchange Tokens 2 e contém as raids: Green, Suffering, Mundo e Hollow.'
+        }
+    ],
     shadows: [
         {
             id: 'goku-ssj-shadow',
