@@ -5,7 +5,7 @@ import { useState, useRef, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
-import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle } from 'lucide-react';
+import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle, Coins, Zap, Wind } from 'lucide-react';
 import Head from 'next/head';
 import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
@@ -269,6 +269,7 @@ const profileCategories = [
     { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras' },
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets' },
     { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons' },
+    { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories' },
     { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index' },
     { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', subcollectionName: 'obelisks' },
     { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', subcollectionName: 'rank' },
@@ -549,6 +550,71 @@ function ObeliskLevelCalculator() {
     );
 }
 
+function BonusDisplay({ items }: { items: any[] }) {
+    const totals = useMemo(() => {
+        const bonusTotals = {
+            damage: 0,
+            energy: 0,
+            coins: 0,
+            exp: 0,
+            movespeed: 0,
+        };
+
+        if (!items) return bonusTotals;
+
+        const parseBonus = (value: string | undefined): number => {
+            if (typeof value !== 'string') return 0;
+            return parseFloat(value.replace(/x|%/g, ''));
+        };
+
+        items.forEach(item => {
+            if (item.damage_bonus) bonusTotals.damage += parseBonus(item.damage_bonus);
+            if (item.energy_bonus) bonusTotals.energy += parseBonus(item.energy_bonus);
+            if (item.coins_bonus) bonusTotals.coins += parseBonus(item.coins_bonus);
+            if (item.exp_bonus) bonusTotals.exp += parseBonus(item.exp_bonus);
+            if (item.movespeed_bonus) bonusTotals.movespeed += parseBonus(item.movespeed_bonus);
+
+            if (item.statType === 'damage' && item.multiplier) bonusTotals.damage += parseBonus(item.multiplier);
+            if (item.statType === 'energy' && item.multiplier) bonusTotals.energy += parseBonus(item.multiplier);
+            if (item.statType === 'coin' && item.multiplier) bonusTotals.coins += parseBonus(item.multiplier);
+        });
+        
+        return bonusTotals;
+
+    }, [items]);
+
+    const bonusConfig = [
+        { key: 'damage', label: 'Dano', icon: Flame, color: 'text-red-500', suffix: 'x' },
+        { key: 'energy', label: 'Energia', icon: Zap, color: 'text-blue-500', suffix: 'x' },
+        { key: 'coins', label: 'Moedas', icon: Coins, color: 'text-yellow-500', suffix: 'x' },
+        { key: 'exp', label: 'EXP', icon: Star, color: 'text-green-500', suffix: '%' },
+        { key: 'movespeed', label: 'Velocidade', icon: Wind, color: 'text-sky-500', suffix: '%' },
+    ] as const;
+
+    const hasAnyBonus = Object.values(totals).some(val => val > 0);
+
+    if (!hasAnyBonus) {
+        return null; // Don't render anything if there are no bonuses
+    }
+
+    return (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 w-full text-center mb-4">
+            {bonusConfig.map(({ key, label, icon: Icon, color, suffix }) => {
+                if (totals[key] > 0) {
+                    return (
+                        <div key={key} className={`flex flex-col items-center p-2 rounded-md bg-muted/50 border`}>
+                            <Icon className={`h-5 w-5 mb-1 ${color}`} />
+                            <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
+                            <span className="text-xs font-bold">{`+${totals[key].toFixed(2)}${suffix}`}</span>
+                        </div>
+                    );
+                }
+                return null;
+            })}
+        </div>
+    )
+}
+
 function CategoryDisplay({ subcollectionName }: { subcollectionName: string }) {
     const { user } = useUser();
     const firestore = useFirebase().firestore;
@@ -584,14 +650,17 @@ function CategoryDisplay({ subcollectionName }: { subcollectionName: string }) {
     }
 
     return (
-        <div className="grid grid-cols-5 gap-2 w-full">
-            {items.map(item => (
-                <div key={item.id} className="aspect-square bg-muted/50 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border">
-                    <p className="text-[10px] font-bold leading-tight text-center z-10">{(item as any).name}</p>
-                    <RarityBadge rarity={(item as any).rarity} className="absolute bottom-1 right-1 text-[8px] px-1 py-0 h-4" />
-                </div>
-            ))}
-        </div>
+        <>
+            <BonusDisplay items={items} />
+            <div className="grid grid-cols-5 gap-2 w-full">
+                {items.map(item => (
+                    <div key={item.id} className="aspect-square bg-muted/50 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border">
+                        <p className="text-[10px] font-bold leading-tight text-center z-10">{(item as any).name}</p>
+                        <RarityBadge rarity={(item as any).rarity} className="absolute bottom-1 right-1 text-[8px] px-1 py-0 h-4" />
+                    </div>
+                ))}
+            </div>
+        </>
     );
 }
 
@@ -666,7 +735,7 @@ export default function ProfilePage() {
                                 <CardDescription>{category.description}</CardDescription>
                             </CardHeader>
                             <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
-                                <div className='h-48 w-full rounded-md bg-muted/20 border-2 border-dashed flex items-center justify-center p-2'>
+                                <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
                                     <CategoryDisplay subcollectionName={category.subcollectionName} />
                                 </div>
                             </CardContent>
@@ -677,3 +746,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+    
