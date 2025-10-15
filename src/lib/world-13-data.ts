@@ -65,5 +65,12 @@ export const world13Data = {
                 }
             ]
         }
+    ],
+    dungeons: [
+      {
+        id: 'kaiju-dungeon',
+        name: 'Kaiju Dungeon',
+        description: 'Vai até a wave 50 (w50). O tempo para derrotá-la é diferente das outras raids.'
+      }
     ]
 };
