@@ -261,10 +261,30 @@
         "description": "Represents a companion pet in a world.",
         "properties": {
             "name": { "type": "string" },
+            "rank": { "type": "string" },
             "rarity": { "type": "string" },
-            "energy_bonus": { "type": "string", "description": "The energy bonus provided by the pet." }
+            "multiplier": { "type": "string", "description": "The energy bonus provided by the pet." }
         },
-        "required": ["name", "rarity", "energy_bonus"]
+        "required": ["name", "rank", "rarity", "multiplier"]
+    },
+    "Avatar": {
+        "title": "Avatar",
+        "type": "object",
+        "description": "Represents a player avatar.",
+        "properties": {
+            "name": { "type": "string" },
+            "rank": { "type": "string" },
+            "rarity": { "type": "string" },
+            "multiplier": { "type": "string", "description": "The energy bonus provided by the avatar." },
+            "leveling": {
+                "type": "object",
+                "properties": {
+                    "maxLevel": { "type": "number" },
+                    "costUnit": { "type": "string" }
+                }
+            }
+        },
+        "required": ["name", "rank", "rarity", "multiplier"]
     },
     "Dungeon": {
         "title": "Dungeon",
