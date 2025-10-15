@@ -40,7 +40,7 @@ export const world11Data = {
         {
             id: 'titan-defense',
             name: 'Titan Defense',
-            description: 'Uma raid com 1000 salas (w1k).'
+            description: 'A raid tem 1000 salas (w1k). Um Titã por sala atravessa o mapa. Se ele chegar ao outro lado, a raid acaba e você é derrotado.'
         }
     ],
     shadows: [
