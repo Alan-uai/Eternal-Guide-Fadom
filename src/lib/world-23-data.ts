@@ -37,7 +37,16 @@ export const world23Data = {
         ],
       },
     ],
-    npcs: [],
+    npcs: [
+      { id: 'world23-e-rank', name: 'E Rank NPC', rank: 'E', exp: 127875993, hp: '', world: 'World 23' },
+      { id: 'world23-d-rank', name: 'D Rank NPC', rank: 'D', exp: 140663592, hp: '', world: 'World 23' },
+      { id: 'world23-c-rank', name: 'C Rank NPC', rank: 'C', exp: 154729952, hp: '', world: 'World 23' },
+      { id: 'world23-b-rank', name: 'B Rank NPC', rank: 'B', exp: 170202947, hp: '', world: 'World 23' },
+      { id: 'world23-a-rank', name: 'A Rank NPC', rank: 'A', exp: 187223241, hp: '', world: 'World 23' },
+      { id: 'world23-s-rank', name: 'S Rank NPC', rank: 'S', exp: 205945566, hp: '', world: 'World 23' },
+      { id: 'world23-ss-rank', name: 'SS Rank NPC', rank: 'SS', exp: 257431957, hp: '', world: 'World 23' },
+      { id: 'world23-sss-rank', name: 'SSS Rank NPC', rank: 'SSS', exp: 386147935, hp: '', world: 'World 23' }
+    ],
     pets: [],
     dungeons: [],
     shadows: [],
