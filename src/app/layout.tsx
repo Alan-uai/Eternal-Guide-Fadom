@@ -38,7 +38,7 @@ export default function RootLayout({
               <MainNav />
             </header>
             <RaidTimer />
-            <main className="flex flex-1 flex-col p-4 md:p-6">
+            <main className="flex flex-1 flex-col p-4 md:p-6 pt-12">
               {children}
             </main>
           </div>
