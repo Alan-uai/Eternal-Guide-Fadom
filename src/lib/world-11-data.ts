@@ -1,5 +1,24 @@
+
 export const world11Data = {
-    name: 'World 11',
+    name: 'World 11 - Titan City',
+    powers: [
+        {
+            id: 'titan-families',
+            name: 'Titan Families',
+            type: 'gacha',
+            statType: 'energy',
+            unlockCost: 'N/A',
+            stats: [
+                { name: 'Grice Family', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+                { name: 'Leonhart Family', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+                { name: 'Braun Family', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+                { name: 'Tybur Family', multiplier: '6x', rarity: 'Epic', probability: 5 },
+                { name: 'Ackerman Family', multiplier: '8x', rarity: 'Legendary', probability: 1 },
+                { name: 'Yeager Family', multiplier: '12x', rarity: 'Mythic', probability: 0.5 },
+                { name: 'Reiss Family', multiplier: '15x', rarity: 'Phantom', probability: 0.05 },
+            ]
+        }
+    ],
     npcs: [
         { id: 'world11-e-rank', name: 'E Rank NPC', rank: 'E', exp: 9457, hp: '41OcD', world: 'World 11', drops: { coins: { amount: '4.1OcD', probability: 0.8 } } },
         { id: 'world11-d-rank', name: 'D Rank NPC', rank: 'D', exp: 10403, hp: '205OcD', world: 'World 11', drops: { coins: { amount: '20OcD', probability: 0.8 } } },
@@ -29,5 +48,3 @@ export const world11Data = {
         }
     ]
 };
-
-    
