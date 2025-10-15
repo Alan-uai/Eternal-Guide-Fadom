@@ -84,8 +84,8 @@ function findItemInGameData(identifiedName: string, category: string, allGameDat
 }
 
 
-// Generic Component for Profile Sections
-function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }: { subcollectionName: string, sectionTitle: string, sectionDescription: string }) {
+// Componente centralizado para upload e análise de itens
+function GeneralItemUploader() {
     const { toast } = useToast();
     const { user } = useUser();
     const { firestore } = useFirebase();
@@ -97,21 +97,17 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
     const [foundItems, setFoundItems] = useState<any[]>([]);
     const [notFoundNames, setNotFoundNames] = useState<string[]>([]);
     
-
     // Reset state when dialog opens
     useEffect(() => {
         if (isDialogOpen) {
+            setSelectedFiles([]);
             setFoundItems([]);
             setNotFoundNames([]);
+             if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
         }
     }, [isDialogOpen]);
-
-    const userSubcollectionQuery = useMemoFirebase(() => {
-        if (!firestore || !user) return null;
-        return collection(firestore, 'users', user.uid, subcollectionName);
-    }, [firestore, user, subcollectionName]);
-
-    const { data: savedItems, isLoading: areItemsLoading } = useCollection(userSubcollectionQuery);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -208,124 +204,70 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
             });
         } finally {
             setIsAnalyzing(false);
-            setSelectedFiles([]);
-             if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
+            // Optionally close dialog on success/error or let user close it
+            // setIsDialogOpen(false); 
         }
     };
-    
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">
+                <Button>
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Adicionar / Editar
+                    Adicionar Itens com IA
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl">
+            <DialogContent className="max-w-lg">
                 <DialogHeader>
-                    <DialogTitle>Gerenciar {sectionTitle}</DialogTitle>
-                    <DialogDescription>{sectionDescription}</DialogDescription>
+                    <DialogTitle>Adicionar Itens ao seu Perfil</DialogTitle>
+                    <DialogDescription>
+                        Envie screenshots dos seus poderes, auras, pets, armas, etc. A IA irá identificá-los e adicioná-los automaticamente ao seu perfil na categoria correta.
+                    </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-                    <div className="space-y-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Fazer Upload</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                     <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        multiple
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                        id={`${subcollectionName}-upload`}
-                                    />
-                                    <label htmlFor={`${subcollectionName}-upload`} className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted/50">
-                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                            <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
-                                            <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Clique para enviar</span> ou arraste e solte</p>
-                                            <p className="text-xs text-muted-foreground">PNG, JPG, etc.</p>
-                                        </div>
-                                    </label>
+                <div className="py-4 space-y-4">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        multiple
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                        id="general-item-upload"
+                    />
+                    <label htmlFor="general-item-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted/50">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
+                            <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Clique para enviar</span> ou arraste e solte</p>
+                            <p className="text-xs text-muted-foreground">PNG, JPG, etc.</p>
+                        </div>
+                    </label>
 
-                                    {selectedFiles.length > 0 && (
-                                        <div className="text-xs text-muted-foreground">
-                                            <p>{selectedFiles.length} arquivo(s) selecionado(s):</p>
-                                            <ul className="list-disc pl-4">
-                                                {selectedFiles.map(f => <li key={f.name}>{f.name}</li>)}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </div>
-                                <Button onClick={handleAnalyzeClick} disabled={isAnalyzing || selectedFiles.length === 0} className="w-full">
-                                    {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                                    Analisar e Salvar
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    <div className="space-y-4">
-                         <h3 className="text-lg font-medium">{sectionTitle} Salvos</h3>
-                         <Card className="h-[280px]">
-                            <CardContent className="p-0 h-full">
-                                {areItemsLoading ? (
-                                    <div className="flex items-center justify-center h-full"><Loader2 className="h-6 w-6 animate-spin"/></div>
-                                ) : (!savedItems || savedItems.length === 0) ? (
-                                    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4">
-                                        <ImageIcon className="h-10 w-10 mb-2" />
-                                        <p className="text-sm">Seus itens salvos aparecerão aqui.</p>
-                                    </div>
-                                ) : (
-                                    <ScrollArea className="h-full p-4">
-                                        <div className="space-y-3">
-                                            {savedItems.map((item: any) => (
-                                                <div key={item.id} className="flex items-center gap-4 p-2 rounded-md bg-muted/50">
-                                                    <div className="w-10 h-10 bg-gray-800 rounded-md flex items-center justify-center text-white font-bold text-xs text-center">
-                                                       {item.name.substring(0,3)}
-                                                    </div>
-                                                    <div className='flex-1'>
-                                                        <p className="font-semibold">{item.name}</p>
-                                                        <p className="text-xs text-muted-foreground">{item.world}</p>
-                                                    </div>
-                                                    <RarityBadge rarity={item.rarity} />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </ScrollArea>
-                                )}
-                            </CardContent>
-                         </Card>
-                    </div>
+                    {selectedFiles.length > 0 && (
+                        <div className="text-xs text-muted-foreground">
+                            <p>{selectedFiles.length} arquivo(s) selecionado(s):</p>
+                            <ul className="list-disc pl-4">
+                                {selectedFiles.map(f => <li key={f.name}>{f.name}</li>)}
+                            </ul>
+                        </div>
+                    )}
                 </div>
+                <Button onClick={handleAnalyzeClick} disabled={isAnalyzing || selectedFiles.length === 0} className="w-full">
+                    {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Analisar e Salvar
+                </Button>
             </DialogContent>
         </Dialog>
-    );
+    )
 }
 
-const PowersProfileSection = () => <ProfileSection subcollectionName="powers" sectionTitle="Poderes" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
-const AurasProfileSection = () => <ProfileSection subcollectionName="auras" sectionTitle="Auras" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
-const PetsProfileSection = () => <ProfileSection subcollectionName="pets" sectionTitle="Pets" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
-const WeaponsProfileSection = () => <ProfileSection subcollectionName="weapons" sectionTitle="Armas" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
-const IndexProfileSection = () => <ProfileSection subcollectionName="index" sectionTitle="Index" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
-const ObelisksProfileSection = () => <ProfileSection subcollectionName="obelisks" sectionTitle="Obeliscos" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
-const RankProfileSection = () => <ProfileSection subcollectionName="rank" sectionTitle="Rank" sectionDescription="Adicione seus poderes, auras, pets e mais. A IA irá identificá-los e salvá-los automaticamente na categoria correta." />;
-
-
 const profileCategories = [
-    { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', component: PowersProfileSection, subcollectionName: 'powers' },
-    { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', component: AurasProfileSection, subcollectionName: 'auras' },
-    { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', component: PetsProfileSection, subcollectionName: 'pets' },
-    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', component: WeaponsProfileSection, subcollectionName: 'weapons' },
-    { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', component: IndexProfileSection, subcollectionName: 'index' },
-    { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', component: ObelisksProfileSection, subcollectionName: 'obelisks' },
-    { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', component: RankProfileSection, subcollectionName: 'rank' },
+    { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', subcollectionName: 'powers' },
+    { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras' },
+    { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets' },
+    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons' },
+    { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index' },
+    { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', subcollectionName: 'obelisks' },
+    { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', subcollectionName: 'rank' },
 ];
 
 
@@ -485,10 +427,13 @@ export default function ProfilePage() {
                             <p className="text-muted-foreground">Gerencie seus dados do jogo, reputação e configurações.</p>
                          </div>
                     </div>
-                    <Button variant="outline" onClick={handleSignOut}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Sair
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <GeneralItemUploader />
+                        <Button variant="outline" onClick={handleSignOut}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Sair
+                        </Button>
+                    </div>
                 </header>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -499,7 +444,7 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                     <h2 className="text-2xl font-bold tracking-tight font-headline">Meu Personagem</h2>
-                    <p className="text-muted-foreground">Construa o perfil do seu personagem com seus poderes, armas, pets e progresso atual.</p>
+                    <p className="text-muted-foreground">Adicione seus itens usando o botão acima. Eles aparecerão aqui automaticamente.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -516,7 +461,6 @@ export default function ProfilePage() {
                                 <div className='h-48 w-full rounded-md bg-muted/20 border-2 border-dashed flex items-center justify-center p-2'>
                                     <CategoryDisplay subcollectionName={category.subcollectionName} />
                                 </div>
-                                 {category.component && <category.component />}
                             </CardContent>
                         </Card>
                     ))}
