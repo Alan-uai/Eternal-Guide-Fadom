@@ -57,17 +57,20 @@ function findItemInGameData(identifiedItem: IdentifiedPower, allGameData: any[],
             // Level 1 Search: Direct name match on the main item
             const normalizedCachedName = normalizeString(cachedItem.name);
             if (normalizedCachedName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedCachedName)) {
-                return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity, id: cachedItem.id || nanoid(), name: identifiedItem.name };
+                 // Found a match at the top level, return the full item data
+                return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity, id: cachedItem.id || nanoid() };
             }
 
             // Level 2 Search: If the main item has a 'stats' array, search inside it
             if (cachedItem.stats && Array.isArray(cachedItem.stats)) {
                 for (const stat of cachedItem.stats) {
-                    const normalizedStatName = normalizeString(stat.name);
-                    if (normalizedStatName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedStatName)) {
-                        // Found a match in the stats array.
-                        // Return the PARENT item's data, but with the identified name and rarity.
-                        return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity, id: stat.id || nanoid(), name: identifiedItem.name };
+                    if (stat.name) {
+                        const normalizedStatName = normalizeString(stat.name);
+                         if (normalizedStatName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedStatName)) {
+                            // Found a match in the stats array.
+                            // Return the PARENT item's data, but with the identified rarity and a unique ID for this specific stat.
+                            return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity, id: stat.id || nanoid() };
+                        }
                     }
                 }
             }
@@ -143,9 +146,7 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                     const fullItemData = findItemInGameData(identifiedItem, allGameData, subcollectionName);
 
                     if (fullItemData) {
-                        const itemId = fullItemData.id || nanoid();
-                        const itemRef = doc(firestore, 'users', user.uid, subcollectionName, itemId);
-                        
+                        const itemRef = doc(firestore, 'users', user.uid, subcollectionName, fullItemData.id);
                         await setDoc(itemRef, fullItemData, { merge: true });
                         savedCount++;
                     } else {
@@ -496,5 +497,3 @@ export default function ProfilePage() {
         </>
     );
 }
-
-    
