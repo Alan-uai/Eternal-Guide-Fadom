@@ -714,7 +714,7 @@ export const raidRequirementsArticle: Omit<WikiArticle, 'createdAt'> = {
 **Raids em Grupo (até 4 Jogadores):**
 *   Todas as outras raids não mencionadas como "solo" permitem a participação de até 4 jogadores.
 
-Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a tabela consolidada para as raids mais antigas.`,
+Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a tabela consolidada para as raids mais antigas. A "Mundo Raid" é desbloqueada junto com o Mundo 21.`,
   tags: ['raid', 'dungeon', 'energia', 'guia', 'geral', 'solo'],
   imageUrl: 'wiki-11',
   tables: {
@@ -897,8 +897,14 @@ export const scythesArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'scythes-world-21',
   title: 'Foices (Mundo 21)',
   summary: 'Um guia para as foices do Mundo 21, as armas mais recentes do jogo, e seus multiplicadores de dano.',
-  content: 'As foices são as armas introduzidas no Mundo 21. Elas oferecem multiplicadores de dano significativos que aumentam com a evolução (estrelas). Além disso, as foices podem vir com encantamentos de **Passiva**, que concedem bônus adicionais e também possuem raridades distintas.',
-  tags: ['foice', 'arma', 'mundo 21', '21', 'guia', 'geral', 'passiva'],
+  content: `As foices são as armas introduzidas no Mundo 21. Elas oferecem multiplicadores de dano significativos que aumentam com a evolução (estrelas), de forma similar aos Titãs. Além disso, as foices podem vir com encantamentos de **Passiva**, que concedem bônus adicionais e também possuem raridades distintas.
+
+### Fabricação (Scythe Exchanger)
+É possível fabricar foices mais poderosas, como a **Stormreaver**. A fabricação requer:
+- 10x Phantom Requiem
+- 10k Exchange Coin 2
+- 1x Item Desconhecido`,
+  tags: ['foice', 'arma', 'mundo 21', '21', 'guia', 'geral', 'passiva', 'fabricação'],
   imageUrl: 'wiki-14',
   tables: {
     scythes: {
@@ -1157,6 +1163,7 @@ export const articlesToSeed = allWikiArticles.map(article => ({
 }));
     
     
+
 
 
 
