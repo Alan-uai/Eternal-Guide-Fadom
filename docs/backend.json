@@ -253,7 +253,7 @@
           }
         }
       },
-      "required": ["name", "rank"]
+      "required": ["name", "rank", "hp", "world"]
     },
     "Pet": {
         "title": "Pet",

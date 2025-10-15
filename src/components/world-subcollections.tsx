@@ -42,9 +42,12 @@ import { useCollection } from '@/firebase/firestore/use-collection';
 const DEFAULT_SUBCOLLECTIONS = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
 
 function getEntitySchemaForSubcollection(subcollectionName: string) {
-    if (!backendSchema.firestore || !backendSchema.firestore.structure) return null;
+    // If the subcollection is 'stats', we know its entity is 'PowerStat'
+    if (subcollectionName === 'stats') {
+        return (backendSchema.entities as Record<string, any>)['PowerStat'];
+    }
 
-    const singularName = subcollectionName.endsWith('s') ? subcollectionName.slice(0, -1) : subcollectionName;
+    if (!backendSchema.firestore || !backendSchema.firestore.structure) return null;
     
     // Find the definition in the firestore structure
     const structureDef = backendSchema.firestore.structure.find(s => {
@@ -372,9 +375,9 @@ export function WorldSubcollections({ worldId, fetchedSubcollections }: { worldI
     const [newCategoryName, setNewCategoryName] = useState('');
     const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
-    const handleDelete = async (subcollectionName: string, itemId: string) => {
+    const handleDelete = async (collectionPath: string, itemId: string) => {
         if (!firestore) return;
-        const itemRef = doc(firestore, 'worlds', worldId, subcollectionName, itemId);
+        const itemRef = doc(firestore, collectionPath, itemId);
         try {
             await deleteDoc(itemRef);
             toast({ title: "Item Removido", description: "O item foi removido com sucesso." });
@@ -410,7 +413,7 @@ export function WorldSubcollections({ worldId, fetchedSubcollections }: { worldI
                     key={subcollectionName} 
                     worldId={worldId} 
                     subcollectionName={subcollectionName}
-                    onDelete={handleDelete}
+                    onDelete={(itemId) => handleDelete(`worlds/${worldId}/${subcollectionName}`, itemId)}
                 />
             ))}
              <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
@@ -455,7 +458,7 @@ export function WorldSubcollections({ worldId, fetchedSubcollections }: { worldI
 interface SubcollectionItemsProps {
     worldId: string;
     subcollectionName: string;
-    onDelete: (subcollectionName: string, itemId: string) => void;
+    onDelete: (itemId: string) => void;
 }
 
 function SubcollectionItems({ worldId, subcollectionName, onDelete }: SubcollectionItemsProps) {
@@ -485,6 +488,11 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
             />
         );
     }
+
+    const hasStatsSubcollection = (item: any) => {
+        // This is a heuristic. In a real app, you might have this in metadata.
+        return subcollectionName === 'powers' && item.type === 'gacha';
+    };
 
     return (
         <Collapsible>
@@ -523,13 +531,25 @@ function SubcollectionItems({ worldId, subcollectionName, onDelete }: Subcollect
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => onDelete(subcollectionName, item.id)}>Excluir</AlertDialogAction>
+                                      <AlertDialogAction onClick={() => onDelete(item.id)}>Excluir</AlertDialogAction>
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
                                 </AlertDialog>
                             </div>
-                             <CollapsibleContent className="pl-6 pr-2 py-2">
-                                <InlineItemEditor item={item} itemRef={itemRef} subcollectionName={subcollectionName} />
+                            <CollapsibleContent className="pl-6 pr-2 py-2">
+                                <div className='space-y-4'>
+                                    <InlineItemEditor item={item} itemRef={itemRef} subcollectionName={subcollectionName} />
+
+                                    {hasStatsSubcollection(item) && (
+                                        <div className='pl-4 border-l-2 border-dashed'>
+                                            <SubcollectionItems
+                                                worldId={worldId}
+                                                subcollectionName={`${subcollectionName}/${item.id}/stats`}
+                                                onDelete={(statId) => onDelete(statId)} // Pass the onDelete down
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </CollapsibleContent>
                         </Collapsible>
                     )
