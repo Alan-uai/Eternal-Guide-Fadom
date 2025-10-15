@@ -152,6 +152,18 @@ export const generalAchievements = [
             { requirement: 'Room 2000', bonus: '200 Créditos'},
         ]
     },
+     {
+        id: 'kaiju-dungeon-total',
+        name: 'Kaiju Dungeon Total',
+        type: 'total_raids',
+        category: 'Dungeon',
+        tiers: [
+            { requirement: '25 Completions', bonus: 'Variação de poder e porcentagem'},
+            { requirement: '50 Completions', bonus: 'Variação de poder e porcentagem'},
+            { requirement: '75 Completions', bonus: 'Variação de poder e porcentagem'},
+            { requirement: '100 Completions', bonus: '550 Créditos'},
+        ]
+    },
   ];
   
   export const allAchievements = [...generalAchievements, ...raidRoomAchievements, ...totalRaidsAchievements];
