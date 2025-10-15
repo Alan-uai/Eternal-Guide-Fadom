@@ -64,7 +64,12 @@ export const world9Data = {
                 }
             ]
         }
+    ],
+    dungeons: [
+      {
+        id: 'progression-raid',
+        name: 'Progression Raid',
+        description: 'Vai até a wave 1000 (w1k).'
+      }
     ]
 };
-
-    
