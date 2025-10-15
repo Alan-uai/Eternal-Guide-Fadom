@@ -1,6 +1,6 @@
 
 export const world3Data = {
-    name: 'World 3',
+    name: 'World 3 - Soul Society',
     powers: [
       {
         id: 'reiatsu-color',
