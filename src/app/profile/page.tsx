@@ -181,7 +181,7 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                 if (notFound.length > 0) {
                     toast({
                         variant: 'destructive',
-                        title: `${notFound.length} itens não encontrados`,
+                        title: `${notFound.length} ${notFound.length > 1 ? 'itens não encontrados' : 'item não encontrado'}`,
                         description: `Não foi possível encontrar dados para: ${notFound.join(', ')}`,
                     });
                 }
@@ -525,3 +525,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+    
