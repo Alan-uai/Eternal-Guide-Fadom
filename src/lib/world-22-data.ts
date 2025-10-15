@@ -86,18 +86,19 @@ export const world22Data = {
       }
     ],
     npcs: [
-        { id: 'world22-e-rank', name: 'E Rank NPC', rank: 'E', exp: 50816596 },
-        { id: 'world22-d-rank', name: 'D Rank NPC', rank: 'D', exp: 55898255 },
-        { id: 'world22-c-rank', name: 'C Rank NPC', rank: 'C', exp: 61488081 },
-        { id: 'world22-b-rank', name: 'B Rank NPC', rank: 'B', exp: 67636889 },
-        { id: 'world22-a-rank', name: 'A Rank NPC', rank: 'A', exp: 74400578 },
-        { id: 'world22-s-rank', name: 'S Rank NPC', rank: 'S', exp: 81840636 },
-        { id: 'world22-ss-rank', name: 'SS Rank NPC', rank: 'SS', exp: 102300794 },
-        { id: 'world22-sss-rank', name: 'SSS Rank NPC', rank: 'SSS', exp: 153451192 },
+        { id: 'world22-e-rank', name: 'E Rank NPC', rank: 'E', exp: 50816596, hp: '3.7ssTG', world: 'World 22', drops: { coins: { amount: '370QnTG', probability: 0.8 } } },
+        { id: 'world22-d-rank', name: 'D Rank NPC', rank: 'D', exp: 55898255, hp: '18ssTG', world: 'World 22', drops: { coins: { amount: '1.8ssTG', probability: 0.8 } } },
+        { id: 'world22-c-rank', name: 'C Rank NPC', rank: 'C', exp: 61488081, hp: '94ssTG', world: 'World 22', drops: { coins: { amount: '9.4ssTG', probability: 0.8 } } },
+        { id: 'world22-b-rank', name: 'B Rank NPC', rank: 'B', exp: 67636889, hp: '470ssTG', world: 'World 22', drops: { coins: { amount: '47ssTG', probability: 0.8 } } },
+        { id: 'world22-a-rank', name: 'A Rank NPC', rank: 'A', exp: 74400578, hp: '2.3SpTG', world: 'World 22', drops: { coins: { amount: '230ssTG', probability: 0.8 } } },
+        { id: 'world22-s-rank', name: 'S Rank NPC', rank: 'S', exp: 81840636, hp: '11SpTG', world: 'World 22', drops: { coins: { amount: '1.1SpTG', probability: 0.8 } } },
+        { id: 'world22-ss-rank', name: 'SS Rank NPC', rank: 'SS', exp: 102300794, hp: '58SpTG', world: 'World 22', drops: { coins: { amount: '5.8SpTG', probability: 1 } } },
+        { id: 'world22-sss-rank', name: 'SSS Rank NPC', rank: 'SSS', exp: 153451192, hp: '292SpTG', world: 'World 22', drops: { coins: { amount: '29SpTG', probability: 1 } } },
     ],
     pets: [],
     dungeons: [],
     shadows: [],
     stands: []
   };
+
 

@@ -1,14 +1,14 @@
 export const world8Data = {
     name: 'World 8',
     npcs: [
-        { id: 'world8-e-rank', name: 'E Rank NPC', rank: 'E', exp: 483 },
-        { id: 'world8-d-rank', name: 'D Rank NPC', rank: 'D', exp: 531 },
-        { id: 'world8-c-rank', name: 'C Rank NPC', rank: 'C', exp: 584 },
-        { id: 'world8-b-rank', name: 'B Rank NPC', rank: 'B', exp: 643 },
-        { id: 'world8-a-rank', name: 'A Rank NPC', rank: 'A', exp: 707 },
-        { id: 'world8-s-rank', name: 'S Rank NPC', rank: 'S', exp: 777 },
-        { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 1920, drops: ['Aura da Folha', 'Akatsuki Cloak', 'Shadow'] },
-        { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 2880, drops: ['Aura da Folha', 'Shadow'] },
+        { id: 'world8-e-rank', name: 'E Rank NPC', rank: 'E', exp: 483, hp: '54dD', world: 'World 8', drops: { coins: { amount: '5.4dD', probability: 0.8 } } },
+        { id: 'world8-d-rank', name: 'D Rank NPC', rank: 'D', exp: 531, hp: '270dD', world: 'World 8', drops: { coins: { amount: '27dD', probability: 0.8 } } },
+        { id: 'world8-c-rank', name: 'C Rank NPC', rank: 'C', exp: 584, hp: '1.3tD', world: 'World 8', drops: { coins: { amount: '130dD', probability: 0.8 } } },
+        { id: 'world8-b-rank', name: 'B Rank NPC', rank: 'B', exp: 643, hp: '6.7tD', world: 'World 8', drops: { coins: { amount: '670dD', probability: 0.8 } } },
+        { id: 'world8-a-rank', name: 'A Rank NPC', rank: 'A', exp: 707, hp: '33tD', world: 'World 8', drops: { coins: { amount: '3.3tD', probability: 0.8 } } },
+        { id: 'world8-s-rank', name: 'S Rank NPC', rank: 'S', exp: 777, hp: '168tD', world: 'World 8', drops: { coins: { amount: '16tD', probability: 0.8 } } },
+        { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 1920, hp: '844tD', world: 'World 8', drops: { coins: { amount: '84tD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 2880, hp: '1.6qdD', world: 'World 8', drops: { coins: { amount: '160tD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     shadows: [
         {

@@ -223,16 +223,37 @@
         "required": ["name"]
     },
     "NPC": {
-        "title": "NPC",
-        "type": "object",
-        "description": "Represents a non-player character in a world.",
-        "properties": {
-            "name": { "type": "string" },
-            "rank": { "type": "string", "description": "The rank of the NPC (e.g., 'E', 'SS')." },
-            "drops": { "type": "array", "items": { "type": "string" }, "description": "List of items dropped by the NPC." },
-            "exp": { "type": "number", "description": "Experience points dropped by the NPC." }
-        },
-        "required": ["name", "rank"]
+      "title": "NPC",
+      "type": "object",
+      "description": "Represents a non-player character in a world.",
+      "properties": {
+        "name": { "type": "string" },
+        "rank": { "type": "string", "description": "The rank of the NPC (e.g., 'E', 'SS')." },
+        "exp": { "type": "number", "description": "Experience points dropped by the NPC." },
+        "hp": { "type": "string", "description": "Health points of the NPC." },
+        "world": { "type": "string", "description": "The world where the NPC is located." },
+        "drops": {
+          "type": "object",
+          "description": "Details about the items dropped by the NPC.",
+          "properties": {
+            "coins": {
+              "type": "object",
+              "properties": {
+                "amount": { "type": "string", "description": "Amount of coins dropped." },
+                "probability": { "type": "number", "description": "Probability of dropping coins (0-1)." }
+              }
+            },
+            "tokens": {
+              "type": "object",
+              "properties": {
+                "amount": { "type": "number", "description": "Amount of tokens dropped." },
+                "probability": { "type": "number", "description": "Probability of dropping tokens (0-1)." }
+              }
+            }
+          }
+        }
+      },
+      "required": ["name", "rank"]
     },
     "Pet": {
         "title": "Pet",
@@ -501,5 +522,3 @@
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
   }
 }
-
-    

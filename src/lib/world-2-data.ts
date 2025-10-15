@@ -81,13 +81,13 @@ export const world2Data = {
       }
     ],
     npcs: [
-        { id: 'world2-e-rank', name: 'E Rank NPC', rank: 'E', exp: 9 },
-        { id: 'world2-d-rank', name: 'D Rank NPC', rank: 'D', exp: 10 },
-        { id: 'world2-c-rank', name: 'C Rank NPC', rank: 'C', exp: 11 },
-        { id: 'world2-b-rank', name: 'B Rank NPC', rank: 'B', exp: 12 },
-        { id: 'world2-a-rank', name: 'A Rank NPC', rank: 'A', exp: 13 },
-        { id: 'world2-s-rank', name: 'S Rank NPC', rank: 'S', exp: 14 },
-        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 30, drops: ['Aura do Imperador Vermelho'] },
+        { id: 'world2-e-rank', name: 'E Rank NPC', rank: 'E', exp: 9, hp: '7.5B', world: 'World 2', drops: { coins: { amount: '750M', probability: 0.8 } } },
+        { id: 'world2-d-rank', name: 'D Rank NPC', rank: 'D', exp: 10, hp: '37.5B', world: 'World 2', drops: { coins: { amount: '3.7B', probability: 0.8 } } },
+        { id: 'world2-c-rank', name: 'C Rank NPC', rank: 'C', exp: 11, hp: '187.5B', world: 'World 2', drops: { coins: { amount: '18B', probability: 0.8 } } },
+        { id: 'world2-b-rank', name: 'B Rank NPC', rank: 'B', exp: 12, hp: '937.5B', world: 'World 2', drops: { coins: { amount: '90B', probability: 0.8 } } },
+        { id: 'world2-a-rank', name: 'A Rank NPC', rank: 'A', exp: 13, hp: '4.6T', world: 'World 2', drops: { coins: { amount: '460B', probability: 0.8 } } },
+        { id: 'world2-s-rank', name: 'S Rank NPC', rank: 'S', exp: 14, hp: '23.4T', world: 'World 2', drops: { coins: { amount: '2.3T', probability: 0.8 } } },
+        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 30, hp: '117T', world: 'World 2', drops: { coins: { amount: '11T', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [
         {

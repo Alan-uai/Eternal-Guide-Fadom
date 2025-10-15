@@ -61,13 +61,13 @@ export const world4Data = {
       }
     ],
     npcs: [
-        { id: 'world4-e-rank', name: 'E Rank NPC', rank: 'E', exp: 39 },
-        { id: 'world4-d-rank', name: 'D Rank NPC', rank: 'D', exp: 41 },
-        { id: 'world4-c-rank', name: 'C Rank NPC', rank: 'C', exp: 43 },
-        { id: 'world4-b-rank', name: 'B Rank NPC', rank: 'B', exp: 45 },
-        { id: 'world4-a-rank', name: 'A Rank NPC', rank: 'A', exp: 47 },
-        { id: 'world4-s-rank', name: 'S Rank NPC', rank: 'S', exp: 50 },
-        { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, drops: ['Aura do Rei do Fogo', 'Cursed Blindfold'] },
+        { id: 'world4-e-rank', name: 'E Rank NPC', rank: 'E', exp: 39, hp: '91Qn', world: 'World 4', drops: { coins: { amount: '9.1Qn', probability: 0.8 } } },
+        { id: 'world4-d-rank', name: 'D Rank NPC', rank: 'D', exp: 41, hp: '455Qn', world: 'World 4', drops: { coins: { amount: '45Qn', probability: 0.8 } } },
+        { id: 'world4-c-rank', name: 'C Rank NPC', rank: 'C', exp: 43, hp: '2.2sx', world: 'World 4', drops: { coins: { amount: '220Qn', probability: 0.8 } } },
+        { id: 'world4-b-rank', name: 'B Rank NPC', rank: 'B', exp: 45, hp: '11.3sx', world: 'World 4', drops: { coins: { amount: '1.1sx', probability: 0.8 } } },
+        { id: 'world4-a-rank', name: 'A Rank NPC', rank: 'A', exp: 47, hp: '56sx', world: 'World 4', drops: { coins: { amount: '5.6sx', probability: 0.8 } } },
+        { id: 'world4-s-rank', name: 'S Rank NPC', rank: 'S', exp: 50, hp: '284sx', world: 'World 4', drops: { coins: { amount: '28sx', probability: 0.8 } } },
+        { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, hp: '1.4Sp', world: 'World 4', drops: { coins: { amount: '140sx', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [],
     dungeons: [

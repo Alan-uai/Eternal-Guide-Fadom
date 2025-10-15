@@ -1,13 +1,13 @@
 export const world7Data = {
     name: 'World 7',
     npcs: [
-        { id: 'world7-e-rank', name: 'E Rank NPC', rank: 'E', exp: 240 },
-        { id: 'world7-d-rank', name: 'D Rank NPC', rank: 'D', exp: 264 },
-        { id: 'world7-c-rank', name: 'C Rank NPC', rank: 'C', exp: 290 },
-        { id: 'world7-b-rank', name: 'B Rank NPC', rank: 'B', exp: 319 },
-        { id: 'world7-a-rank', name: 'A Rank NPC', rank: 'A', exp: 351 },
-        { id: 'world7-s-rank', name: 'S Rank NPC', rank: 'S', exp: 386 },
-        { id: 'novi-chrone-boss', name: 'Novi Chroni', rank: 'SS', exp: 960, drops: ['Clover Pendant', 'Shadow'] },
+        { id: 'world7-e-rank', name: 'E Rank NPC', rank: 'E', exp: 240, hp: '350de', world: 'World 7', drops: { coins: { amount: '35de', probability: 0.8 } } },
+        { id: 'world7-d-rank', name: 'D Rank NPC', rank: 'D', exp: 264, hp: '1.7Ud', world: 'World 7', drops: { coins: { amount: '170de', probability: 0.8 } } },
+        { id: 'world7-c-rank', name: 'C Rank NPC', rank: 'C', exp: 290, hp: '8.7Ud', world: 'World 7', drops: { coins: { amount: '870de', probability: 0.8 } } },
+        { id: 'world7-b-rank', name: 'B Rank NPC', rank: 'B', exp: 319, hp: '43Ud', world: 'World 7', drops: { coins: { amount: '4.3Ud', probability: 0.8 } } },
+        { id: 'world7-a-rank', name: 'A Rank NPC', rank: 'A', exp: 351, hp: '218Ud', world: 'World 7', drops: { coins: { amount: '21Ud', probability: 0.8 } } },
+        { id: 'world7-s-rank', name: 'S Rank NPC', rank: 'S', exp: 386, hp: '1dD', world: 'World 7', drops: { coins: { amount: '100Ud', probability: 0.8 } } },
+        { id: 'novi-chrone-boss', name: 'Novi Chroni', rank: 'SS', exp: 960, hp: '5.4dD', world: 'World 7', drops: { coins: { amount: '540Ud', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     shadows: [
         {
