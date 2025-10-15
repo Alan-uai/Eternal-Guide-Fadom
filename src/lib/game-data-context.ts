@@ -11,8 +11,7 @@ import { world10Data } from '@/lib/world-10-data';
 import { world11Data } from '@/lib/world-11-data';
 import { world12Data } from '@/lib/world-12-data';
 import { world13Data } from '@/lib/world-13-data';
-import { world14Data } from '@/lib
--14-data';
+import { world14Data } from '@/lib/world-14-data';
 import { world15Data } from '@/lib/world-15-data';
 import { world16Data } from '@/lib/world-16-data';
 import { world17Data } from '@/lib/world-17-data';

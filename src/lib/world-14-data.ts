@@ -1,13 +1,86 @@
+
 export const world14Data = {
-    name: 'World 14',
+    name: 'World 14 - Tempest Capital',
+    powers: [
+      {
+        id: 'species',
+        name: 'Species',
+        type: 'gacha',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        stats: [
+          { name: 'Goblin', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+          { name: 'Lizardman', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+          { name: 'Slime', multiplier: '4.5x', rarity: 'Rare', probability: 19.9 },
+          { name: 'Dryad', multiplier: '6x', rarity: 'Epic', probability: 5 },
+          { name: 'Kijin', multiplier: '8x', rarity: 'Legendary', probability: 1 },
+          { name: 'Dragonoid', multiplier: '10x', rarity: 'Mythic', probability: 0.5 },
+          { name: 'Primordial Daemon', multiplier: '12x', rarity: 'Phantom', probability: 0.05 },
+          { name: 'True Dragon', multiplier: '15x', rarity: 'Supreme', probability: 0.01 },
+        ],
+      },
+      {
+        id: 'ultimate-skills',
+        name: 'Ultimate Skills',
+        type: 'gacha',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        stats: [
+            { name: 'Amaterasu', multiplier: '1x', rarity: 'Common', probability: 40.55 },
+            { name: 'True Hero', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
+            { name: 'Uriel', multiplier: '2x', rarity: 'Rare', probability: 19.9 },
+            { name: 'Satanael', multiplier: '4x', rarity: 'Epic', probability: 5 },
+            { name: 'Lucifer', multiplier: '6x', rarity: 'Legendary', probability: 1 },
+            { name: 'Yog-Sothoth', multiplier: '8x', rarity: 'Mythic', probability: 0.5 },
+            { name: 'Beelzebub', multiplier: '10x', rarity: 'Phantom', probability: 0.05 },
+            { name: 'Raphael', multiplier: '12x', rarity: 'Supreme', probability: 0.01 },
+        ]
+      },
+      {
+        id: 'demon-lord-energy',
+        name: 'Demon Lord Energy',
+        type: 'progression',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        maxLevel: 210,
+        maxBoost: '2.10x Energy'
+      },
+      {
+        id: 'demon-lord-damage',
+        name: 'Demon Lord Damage',
+        type: 'progression',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        maxLevel: 210,
+        maxBoost: '2.10x Damage'
+      },
+      {
+        id: 'demon-lord-coins',
+        name: 'Demon Lord Coins',
+        type: 'progression',
+        statType: 'coin',
+        unlockCost: 'N/A',
+        maxLevel: 100,
+        maxBoost: '1.00x Coins'
+      },
+      {
+        id: 'demon-lord-luck',
+        name: 'Demon Lord Luck',
+        type: 'progression',
+        statType: 'luck',
+        unlockCost: 'N/A',
+        maxLevel: 50,
+        maxBoost: '0.50x Luck'
+      }
+    ],
     npcs: [
-        { id: 'world14-e-rank', name: 'E Rank NPC', rank: 'E', exp: 77158, hp: '1.6TVg', world: 'World 14', drops: { coins: { amount: '160DVg', probability: 0.8 } } },
-        { id: 'world14-d-rank', name: 'D Rank NPC', rank: 'D', exp: 84873, hp: '8TVg', world: 'World 14', drops: { coins: { amount: '800DVg', probability: 0.8 } } },
-        { id: 'world14-c-rank', name: 'C Rank NPC', rank: 'C', exp: 93361, hp: '40TVg', world: 'World 14', drops: { coins: { amount: '4TVg', probability: 0.8 } } },
-        { id: 'world14-b-rank', name: 'B Rank NPC', rank: 'B', exp: 102697, hp: '202TVg', world: 'World 14', drops: { coins: { amount: '20TVg', probability: 0.8 } } },
-        { id: 'world14-a-rank', name: 'A Rank NPC', rank: 'A', exp: 112966, hp: '1qtV', world: 'World 14', drops: { coins: { amount: '100TVg', probability: 0.8 } } },
-        { id: 'world14-s-rank', name: 'S Rank NPC', rank: 'S', exp: 124263, hp: '5qtV', world: 'World 14', drops: { coins: { amount: '500TVg', probability: 0.8 } } },
-        { id: 'valzora-boss', name: 'Valzora', rank: 'SS', exp: 184320, hp: '25qtV', world: 'World 14', drops: { coins: { amount: '2.5qtV', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'world14-e-rank', name: 'E Rank NPC', rank: 'E', exp: 155329, hp: '25qtV', world: 'World 14' },
+        { id: 'world14-d-rank', name: 'D Rank NPC', rank: 'D', exp: 170862, hp: '126qtV', world: 'World 14' },
+        { id: 'world14-c-rank', name: 'C Rank NPC', rank: 'C', exp: 187948, hp: '633qtV', world: 'World 14' },
+        { id: 'world14-b-rank', name: 'B Rank NPC', rank: 'B', exp: 206742, hp: '3.1QnV', world: 'World 14' },
+        { id: 'world14-a-rank', name: 'A Rank NPC', rank: 'A', exp: 227417, hp: '15QnV', world: 'World 14' },
+        { id: 'world14-s-rank', name: 'S Rank NPC', rank: 'S', exp: 250158, hp: '79QnV', world: 'World 14' },
+        { id: 'valzora-boss', name: 'Valzora', rank: 'SS', exp: 368640, hp: '397QnV', world: 'World 14' },
     ],
     shadows: [
         {
@@ -31,5 +104,3 @@ export const world14Data = {
         }
     ]
 };
-
-    
