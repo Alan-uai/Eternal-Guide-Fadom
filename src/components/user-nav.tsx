@@ -43,11 +43,8 @@ export function UserNav() {
     );
   }
 
-  // Se for anônimo ou não estiver logado, mostra um botão de login
-  return (
-     <Button variant="outline" onClick={() => setAuthDialogOpen(true)}>
-        <LogIn className="mr-2 h-4 w-4" />
-        Entrar
-    </Button>
-  );
+  // Se não estiver logado ou for anônimo, o botão "Entrar" deve ser mostrado fora daqui.
+  // Se retornarmos o botão aqui, ele aparecerá duplicado em alguns cenários.
+  // Este componente agora só renderiza a UI do usuário logado.
+  return null;
 }
