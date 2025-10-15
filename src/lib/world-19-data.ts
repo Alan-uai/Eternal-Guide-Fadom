@@ -1,5 +1,58 @@
 export const world19Data = {
-    name: 'World 19',
+    name: 'World 19 - Tokyo Empire',
+    powers: [
+      {
+        id: 'special-fire-force',
+        name: 'Special Fire Force',
+        type: 'gacha',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        stats: [
+          { name: 'Company 1', multiplier: '2x', rarity: 'Common' },
+          { name: 'Company 2', multiplier: '3x', rarity: 'Uncommon' },
+          { name: 'Company 3', multiplier: '4.5x', rarity: 'Rare' },
+          { name: 'Company 4', multiplier: '6x', rarity: 'Epic' },
+          { name: 'Company 5', multiplier: '8x', rarity: 'Legendary' },
+          { name: 'Company 6', multiplier: '10x', rarity: 'Mythic' },
+          { name: 'Company 7', multiplier: '12x', rarity: 'Phantom' },
+          { name: 'Company 8', multiplier: '15x', rarity: 'Supreme' }
+        ]
+      },
+      {
+        id: 'pyrokinetics',
+        name: 'Pyrokinetics',
+        type: 'gacha',
+        statType: 'mixed',
+        unlockCost: 'N/A',
+        stats: [
+          { name: '1st Generation', multiplier: '1x', rarity: 'Common' },
+          { name: '1st Generation (lv.20)', multiplier: '1.2x', rarity: 'Common' },
+          { name: '2nd Generation', multiplier: '2x', rarity: 'Uncommon', damage_bonus: '0.2x' },
+          { name: '2nd Generation (lv.40)', multiplier: '2.8x', rarity: 'Uncommon', damage_bonus: '0.28x' },
+          { name: '3rd Generation', multiplier: '3x', rarity: 'Rare', damage_bonus: '0.4x' },
+          { name: '3rd Generation (Lv.60)', multiplier: '4.8x', rarity: 'Rare', damage_bonus: '0.64x' },
+          { name: 'Hybrid', multiplier: '4x', rarity: 'Epic', damage_bonus: '1x' },
+          { name: 'Hybrid (Lv.80)', multiplier: '7.2x', rarity: 'Epic', damage_bonus: '1.8x' },
+          { name: 'Adolla User', multiplier: '5x', rarity: 'Legendary', damage_bonus: '1.5x' },
+          { name: 'Adolla User (Lv.100)', multiplier: '10x', rarity: 'Legendary', damage_bonus: '3x' }
+        ]
+      },
+      {
+        id: 'adolla-generation',
+        name: 'Adolla Generation',
+        type: 'progression',
+        statType: 'mixed',
+        unlockCost: 'N/A',
+        description: 'Evolua o poder Adolla. Geração 1->2 (lvl 20), 2->3 (lvl 40), 3->4 (lvl 60), 4->5 (lvl 80). Nível máximo é 100.'
+      }
+    ],
+    dungeons: [
+      {
+        id: 'netherworld-defense',
+        name: 'Netherworld Defense',
+        description: 'Uma raid de defesa que vai até a wave 50 (w50).'
+      }
+    ],
     npcs: [
       { id: 'world19-e-rank', name: 'E Rank NPC', rank: 'E', exp: 2551239, hp: '7.7TGN', world: 'World 19', drops: { coins: { amount: '770NVG', probability: 0.8 } } },
       { id: 'world19-d-rank', name: 'D Rank NPC', rank: 'D', exp: 2806363, hp: '38TGN', world: 'World 19', drops: { coins: { amount: '3.8TGN', probability: 0.8 } } },
