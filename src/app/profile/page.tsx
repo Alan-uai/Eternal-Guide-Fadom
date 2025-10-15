@@ -54,30 +54,25 @@ function findItemInGameData(identifiedName: string, allGameData: any[], subcolle
         if (!Array.isArray(subcollection)) continue;
 
         for (const cachedItem of subcollection) {
-            // Level 1 Search: Direct name match on the main item
+            // Level 1 Search: Direct name match on the main item (for progression, etc.)
             const normalizedCachedName = normalizeString(cachedItem.name);
-            if (normalizedCachedName === normalizedIdentifiedName) {
-                // If it's a direct match, but it's a gacha item, the rarity might be in stats
-                // For progression items, this is enough.
-                const rarity = cachedItem.stats?.[0]?.rarity || 'Common'; // Default rarity
+            if (normalizedCachedName === normalizedIdentifiedName && !cachedItem.stats) {
+                const rarity = cachedItem.rarity || 'Common';
                 return { ...cachedItem, world: world.name, rarity: rarity, id: cachedItem.id || nanoid() };
             }
 
-            // Level 2 Search: If the main item has a 'stats' array, search inside it
+            // Level 2 Search: If the item has a 'stats' array, search inside it
             if (cachedItem.stats && Array.isArray(cachedItem.stats)) {
                 for (const stat of cachedItem.stats) {
                     if (stat.name) {
                         const normalizedStatName = normalizeString(stat.name);
                          if (normalizedStatName === normalizedIdentifiedName) {
                             // Found a match in the stats array.
-                            // Return the PARENT item's data, but with the specific rarity and name from the stat.
+                            // Return ONLY the specific stat object with the world name and an id.
                             return { 
-                                ...cachedItem, // All parent data (type, unlockCost etc.)
-                                name: stat.name, // Use the specific stat name for display
-                                rarity: stat.rarity, // Use the specific stat rarity
-                                multiplier: stat.multiplier, // Use the specific stat multiplier
-                                world: world.name, 
-                                id: stat.id || nanoid() 
+                                ...stat,
+                                id: stat.id || nanoid(),
+                                world: world.name,
                             };
                         }
                     }
