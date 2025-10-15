@@ -196,17 +196,18 @@
         "email"
       ]
     },
-    "UserProfilePower": {
-        "title": "UserProfilePower",
-        "description": "Represents a power a user has on their profile.",
+    "UserItem": {
+        "title": "UserItem",
+        "description": "Represents a generic item a user has on their profile, like a power, aura, or tier.",
         "type": "object",
         "properties": {
             "id": {"type": "string"},
             "name": {"type": "string"},
             "rarity": {"type": "string"},
-            "world": {"type": "string"}
-        },
-        "required": ["id", "name", "rarity", "world"]
+            "world": {"type": "string"},
+            "avatarTier": {"type": "number"},
+            "petTier": {"type": "number"}
+        }
     },
     "World": {
       "title": "World",
@@ -485,11 +486,59 @@
         }
       },
        {
-        "path": "/users/{userId}/powers/{powerId}",
+        "path": "/users/{userId}/powers/{itemId}",
         "definition": {
-          "entityName": "UserProfilePower",
-          "schema": { "$ref": "#/backend/entities/UserProfilePower" },
-          "description": "Stores the powers a user has."
+          "entityName": "UserItem",
+          "schema": { "$ref": "#/backend/entities/UserItem" },
+          "description": "Stores the items a user has."
+        }
+      },
+       {
+        "path": "/users/{userId}/auras/{itemId}",
+        "definition": {
+          "entityName": "UserItem",
+          "schema": { "$ref": "#/backend/entities/UserItem" },
+          "description": "Stores the items a user has."
+        }
+      },
+       {
+        "path": "/users/{userId}/pets/{itemId}",
+        "definition": {
+          "entityName": "UserItem",
+          "schema": { "$ref": "#/backend/entities/UserItem" },
+          "description": "Stores the items a user has."
+        }
+      },
+      {
+        "path": "/users/{userId}/weapons/{itemId}",
+        "definition": {
+          "entityName": "UserItem",
+          "schema": { "$ref": "#/backend/entities/UserItem" },
+          "description": "Stores the items a user has."
+        }
+      },
+      {
+        "path": "/users/{userId}/index/{itemId}",
+        "definition": {
+          "entityName": "UserItem",
+          "schema": { "$ref": "#/backend/entities/UserItem" },
+          "description": "Stores the user's index tiers."
+        }
+      },
+      {
+        "path": "/users/{userId}/obelisks/{itemId}",
+        "definition": {
+          "entityName": "UserItem",
+          "schema": { "$ref": "#/backend/entities/UserItem" },
+          "description": "Stores the items a user has."
+        }
+      },
+       {
+        "path": "/users/{userId}/rank/{itemId}",
+        "definition": {
+          "entityName": "UserItem",
+          "schema": { "$ref": "#/backend/entities/UserItem" },
+          "description": "Stores the items a user has."
         }
       },
       {
@@ -624,5 +673,3 @@
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. A new top-level collection 'achievements' is added to store all game achievements, which is separate from world-specific data."
   }
 }
-
-    

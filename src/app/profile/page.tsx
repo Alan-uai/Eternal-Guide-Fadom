@@ -15,11 +15,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { useAuth, useCollection, useFirebase, useMemoFirebase, useUser } from '@/firebase';
+import { useAuth, useCollection, useFirebase, useMemoFirebase, useUser, useDoc } from '@/firebase';
 import { signOut } from 'firebase/auth';
-import { collection, query, where, orderBy, doc, setDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, doc, setDoc, getDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const RarityBadge = ({ rarity, className }: { rarity: string, className?: string }) => {
     const rarityClasses: Record<string, string> = {
@@ -348,9 +350,86 @@ function ReputationSection() {
     );
 }
 
+function IndexTierCalculator() {
+    const { user } = useUser();
+    const { firestore } = useFirebase();
+
+    const docRef = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return doc(firestore, 'users', user.uid, 'index', 'tiers');
+    }, [firestore, user]);
+
+    const { data: tierData, isLoading } = useDoc(docRef);
+
+    const [avatarTier, setAvatarTier] = useState<number>(0);
+    const [petTier, setPetTier] = useState<number>(0);
+
+    useEffect(() => {
+        if (tierData) {
+            setAvatarTier((tierData as any).avatarTier || 0);
+            setPetTier((tierData as any).petTier || 0);
+        }
+    }, [tierData]);
+
+    const handleTierChange = async (type: 'avatar' | 'pet', value: string) => {
+        if (!docRef) return;
+        const numericValue = parseInt(value, 10) || 0;
+        if (type === 'avatar') {
+            setAvatarTier(numericValue);
+        } else {
+            setPetTier(numericValue);
+        }
+        await setDoc(docRef, { avatarTier, petTier, [type === 'avatar' ? 'avatarTier' : 'petTier']: numericValue }, { merge: true });
+    };
+
+    const avatarBonus = useMemo(() => (avatarTier * 0.05).toFixed(2), [avatarTier]);
+    const petBonus = useMemo(() => (petTier * 0.05).toFixed(2), [petTier]);
+
+    if (isLoading) {
+      return (
+          <div className="flex items-center justify-center h-full w-full">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+      );
+    }
+
+    return (
+        <div className="w-full p-2 space-y-4">
+            <div className='space-y-2'>
+                <Label htmlFor='avatar-tier'>Tier de Avatar</Label>
+                <Input
+                    id="avatar-tier"
+                    type="number"
+                    value={avatarTier || ''}
+                    onChange={(e) => setAvatarTier(parseInt(e.target.value) || 0)}
+                    onBlur={(e) => handleTierChange('avatar', e.target.value)}
+                    placeholder="Insira o tier do seu avatar"
+                />
+                 <p className="text-xs text-muted-foreground">Bônus de Energia: <span className="font-semibold text-primary">{avatarBonus}x</span></p>
+            </div>
+            <div className='space-y-2'>
+                <Label htmlFor='pet-tier'>Tier de Pet</Label>
+                <Input
+                    id="pet-tier"
+                    type="number"
+                    value={petTier || ''}
+                    onChange={(e) => setPetTier(parseInt(e.target.value) || 0)}
+                    onBlur={(e) => handleTierChange('pet', e.target.value)}
+                    placeholder="Insira o tier do seu pet"
+                />
+                <p className="text-xs text-muted-foreground">Bônus de Energia: <span className="font-semibold text-primary">{petBonus}x</span></p>
+            </div>
+        </div>
+    );
+}
+
 function CategoryDisplay({ subcollectionName }: { subcollectionName: string }) {
     const { user } = useUser();
     const firestore = useFirebase().firestore;
+
+    if (subcollectionName === 'index') {
+        return <IndexTierCalculator />;
+    }
 
     const itemsQuery = useMemoFirebase(() => {
         if (!firestore || !user) return null;
