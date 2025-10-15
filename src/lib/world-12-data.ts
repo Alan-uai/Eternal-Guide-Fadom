@@ -44,16 +44,7 @@ export const world12Data = {
             statType: 'energy',
             unlockCost: 'N/A',
             maxLevel: 50,
-            maxBoost: '0.5x Energy'
-        },
-        {
-            id: 'sins-damage-progression',
-            name: 'Damage Progression',
-            type: 'progression',
-            statType: 'damage',
-            unlockCost: 'N/A',
-            maxLevel: 50,
-            maxBoost: '0.5x Damage'
+            maxBoost: '+12x Energy'
         },
         {
             id: 'sins-coins-progression',
@@ -61,8 +52,24 @@ export const world12Data = {
             type: 'progression',
             statType: 'coin',
             unlockCost: 'N/A',
-            maxLevel: 50,
-            maxBoost: '0.5x Coins'
+            maxLevel: 20,
+            maxBoost: '+100% Coins'
+        },
+        {
+            id: 'sins-star-luck-progression',
+            name: 'Star Luck Progression',
+            type: 'progression',
+            statType: 'luck',
+            unlockCost: 'N/A',
+            maxLevel: 10,
+            maxBoost: '+0.5 Luck'
+        }
+    ],
+    dungeons: [
+        {
+            id: 'raid-sins',
+            name: 'Raid Sins',
+            description: 'Vai até a wave 1000 (w1k). Dropa tokens para os Sin Upgrades.'
         }
     ],
     npcs: [
