@@ -10,7 +10,40 @@ export const world5Data = {
         { id: 'world5-s-rank', name: 'S Rank NPC', rank: 'S', exp: 95, hp: '44O', world: 'World 5', drops: { coins: { amount: '4.4O', probability: 0.8 } } },
         { id: 'rangoki-boss', name: 'Rangoki', rank: 'SS', exp: 240, hp: '224O', world: 'World 5', drops: { coins: { amount: '22O', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
-    powers: [],
+    powers: [
+        {
+            id: 'demon-arts',
+            name: 'Demon Arts',
+            type: 'gacha',
+            statType: 'damage',
+            unlockCost: '2M',
+            stats: [
+                { name: 'Dream Manipulation', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+                { name: 'Blood Scythes', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+                { name: 'Vase Teleportation', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+                { name: 'Emotion Splitting', multiplier: '5x', rarity: 'Epic', probability: 5 },
+                { name: 'Destructive Death', multiplier: '8x', rarity: 'Legendary', probability: 1 },
+                { name: 'Cryokinesis', multiplier: '10x', rarity: 'Mythic', probability: 0.5 },
+                { name: 'Blood Control', multiplier: '12x', rarity: 'Phantom', probability: 0.05 },
+            ]
+        },
+        {
+            id: 'breathings',
+            name: 'Breathings',
+            type: 'progression',
+            unlockCost: 'N/A',
+            statType: 'mixed',
+            description: 'Um sistema para encantar armas. Role com a arma desequipada. O custo e as raridades variam.'
+        },
+        {
+            id: 'weapon-evolution',
+            name: 'Weapon Evolution',
+            type: 'progression',
+            unlockCost: 'N/A',
+            statType: 'mixed',
+            description: 'Evolua suas armas. Evolve 2: 4 armas iguais + 400M de moedas. Evolve 3: 2 armas iguais + 2B de moedas.'
+        }
+    ],
     pets: [],
     dungeons: [],
     shadows: [],
