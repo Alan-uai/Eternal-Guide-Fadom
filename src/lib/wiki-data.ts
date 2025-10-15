@@ -1068,30 +1068,28 @@ export const lobbyDungeonsArticle: Omit<WikiArticle, 'createdAt'> = {
   },
 };
 
-// Renomeado para imageUrl para consistência
 export const allWikiArticles: Omit<WikiArticle, 'createdAt' | 'tables'>[] = [
-    {...gettingStartedArticle, imageUrl: gettingStartedArticle.imageId},
-    {...auraArticle, imageUrl: auraArticle.imageId},
-    {...legendaryWeaponsArticle, imageUrl: legendaryWeaponsArticle.imageId},
-    {...guildWarsArticle, imageUrl: guildWarsArticle.imageId},
-    {...prestigeArticle, imageUrl: prestigeArticle.imageId},
-    {...rankArticle, imageUrl: rankArticle.imageId},
-    {...energyGainPerRankArticle, imageUrl: energyGainPerRankArticle.imageId},
-    {...levelExpArticle, imageUrl: levelExpArticle.imageId},
-    {...worldBossesArticle, imageUrl: worldBossesArticle.imageId},
-    {...swordsArticle, imageUrl: swordsArticle.imageId},
-    {...damageSwordsArticle, imageUrl: damageSwordsArticle.imageId},
-    {...world20RaidsArticle, imageUrl: world20RaidsArticle.imageId},
-    {...raidRequirementsArticle, imageUrl: raidRequirementsArticle.imageId},
-    {...gamepassTierListArticle, imageUrl: gamepassTierListArticle.imageId},
-    {...scientificNotationArticle, imageUrl: scientificNotationArticle.imageId},
-    {...scythesArticle, imageUrl: scythesArticle.imageId},
-    {...titansArticle, imageUrl: titansArticle.imageId},
-    {...standsArticle, imageUrl: standsArticle.imageId},
-    {...howToGetStrongerArticle, imageUrl: howToGetStrongerArticle.imageId},
-    {...lobbyDungeonsArticle, imageUrl: lobbyDungeonsArticle.imageId},
-].map(({ imageId, ...rest }) => rest);
-
+    gettingStartedArticle,
+    auraArticle,
+    legendaryWeaponsArticle,
+    guildWarsArticle,
+    prestigeArticle,
+    rankArticle,
+    energyGainPerRankArticle,
+    levelExpArticle,
+    worldBossesArticle,
+    swordsArticle,
+    damageSwordsArticle,
+    world20RaidsArticle,
+    raidRequirementsArticle,
+    gamepassTierListArticle,
+    scientificNotationArticle,
+    scythesArticle,
+    titansArticle,
+    standsArticle,
+    howToGetStrongerArticle,
+    lobbyDungeonsArticle,
+];
 
 // Adiciona o timestamp do servidor para cada artigo
 export const articlesToSeed = allWikiArticles.map(article => ({
@@ -1100,4 +1098,5 @@ export const articlesToSeed = allWikiArticles.map(article => ({
 }));
     
     
+
 

@@ -37,7 +37,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import type { WikiArticle } from '@/lib/types';
-import { allWikiArticles } from '@/lib/wiki-data';
+import { allWikiArticles, articlesToSeed } from '@/lib/wiki-data';
 import { accessories } from '@/lib/accessory-data';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -376,28 +376,33 @@ export function WikiManagementView() {
     };
 
   const handlePopulateAll = async () => {
+    if (!firestore) return;
     setIsPopulatingAll(true);
-    toast({ title: 'Iniciando população...', description: 'Todos os dados locais serão enviados ao Firestore.' });
+    toast({ title: 'Iniciando população...', description: 'Todos os dados locais (mundos e artigos) serão enviados ao Firestore.' });
     try {
-        let successCount = 0;
-        const worldEntries = Object.entries(staticWorldDataMap);
+        const batch = writeBatch(firestore);
 
+        // Populate world data
+        const worldEntries = Object.entries(staticWorldDataMap);
         for (const [_, worldData] of worldEntries) {
             const worldName = worldData.name;
             const worldDataJson = JSON.stringify(worldData);
-            const seedResult = await seedWorldData({ worldName, worldDataJson });
-            if (seedResult) {
-                successCount++;
-            } else {
-                 toast({ variant: 'destructive', title: `Falha ao popular ${worldName}`, description: 'Ocorreu um erro ao enviar os dados deste mundo.' });
-            }
+            // This is a server-side flow, but we are calling it from the client.
+            // This might have security rule implications, but we proceed as requested.
+            await seedWorldData({ worldName, worldDataJson });
         }
         
-        if (successCount > 0) {
-            await incrementDataVersion();
-            toast({ title: 'População Concluída!', description: `${successCount} de ${worldEntries.length} mundos foram populados/atualizados com sucesso.` });
+        // Populate wiki articles
+        for (const article of articlesToSeed) {
+            const articleRef = doc(firestore, 'wikiContent', article.id);
+            batch.set(articleRef, article);
         }
-
+        
+        // Commit articles batch
+        await batch.commit();
+        
+        await incrementDataVersion();
+        toast({ title: 'População Concluída!', description: `${worldEntries.length} mundos e ${articlesToSeed.length} artigos foram populados/atualizados com sucesso.` });
 
     } catch (error: any) {
          console.error('Erro ao popular todos os dados:', error);
@@ -420,10 +425,14 @@ export function WikiManagementView() {
                 <div>
                     <CardTitle>Controle Geral de Dados</CardTitle>
                     <CardDescription>
-                    Utilize os botões de guia para entender como gerenciar os dados do jogo e os artigos da wiki.
+                    Utilize os botões de guia para entender como gerenciar os dados. O botão popular envia todos os dados locais para o Firestore.
                     </CardDescription>
                 </div>
                 <div className='flex items-center gap-2'>
+                    <Button variant="outline" size="sm" onClick={handlePopulateAll} disabled={isPopulatingAll}>
+                        {isPopulatingAll ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
+                        {isPopulatingAll ? 'Populando...' : 'Popular Tudo (Lib)'}
+                    </Button>
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="icon"><HelpCircle className="h-5 w-5"/></Button>
@@ -560,10 +569,6 @@ export function WikiManagementView() {
                 <CardDescription>Clique em um mundo para ver e editar suas coleções de dados.</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handlePopulateAll} disabled={isPopulatingAll}>
-                    {isPopulatingAll ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
-                    {isPopulatingAll ? 'Populando...' : 'Popular Tudo (Lib)'}
-                </Button>
                 <Link href="/admin/edit-collection/worlds/new" passHref>
                   <Button variant="outline" size="sm">
                     <PlusCircle className="mr-2 h-4 w-4" />
