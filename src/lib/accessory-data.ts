@@ -144,4 +144,4 @@ export const accessories = [
   { "id": "fire-witch-hat-2", "name": "Fire Witch Hat", "world": "World 19", "boss": "Witch Queen", "rarity": "Uncommon", "damage_bonus": "0.15x", "coins_bonus": "0.2" },
   { "id": "fire-witch-hat-3", "name": "Fire Witch Hat", "world": "World 19", "boss": "Witch Queen", "rarity": "Rare", "damage_bonus": "0.2x", "coins_bonus": "0.267" },
   { "id": "fire-witch-hat-4", "name": "Fire Witch Hat", "world": "World 19", "boss": "Witch Queen", "rarity": "Epic", "damage_bonus": "0.25x", "coins_bonus": "0.333" },
-  { "id":
+];
