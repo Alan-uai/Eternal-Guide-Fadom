@@ -35,6 +35,36 @@ const RarityBadge = ({ rarity, className }: { rarity: string, className?: string
     return <Badge className={cn('text-xs', rarityClasses[rarity] || 'bg-gray-400', className)}>{rarity}</Badge>;
 };
 
+
+const normalizeString = (str: string) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/[^a-z0-9]/g, ''); // Remove non-alphanumeric chars
+};
+
+
+function findItemInGameData(identifiedItem: IdentifiedPower, allGameData: any[], subcollectionName: string) {
+    const normalizedIdentifiedName = normalizeString(identifiedItem.name);
+
+    for (const world of allGameData) {
+        const subcollection = world[subcollectionName];
+        if (Array.isArray(subcollection)) {
+            for (const cachedItem of subcollection) {
+                const normalizedCachedName = normalizeString(cachedItem.name);
+                if (normalizedCachedName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedCachedName)) {
+                    // Found a match, return the full data from the cache
+                    return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity };
+                }
+            }
+        }
+    }
+    return null; // No match found
+}
+
+
 // Generic Component for Profile Sections
 function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }: { subcollectionName: string, sectionTitle: string, sectionDescription: string }) {
     const { toast } = useToast();
@@ -95,35 +125,36 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
 
             if (result && result.powers) {
                 let savedCount = 0;
+                const notFoundItems: string[] = [];
+
                 for (const identifiedItem of result.powers) {
-                    const itemId = identifiedItem.name.toLowerCase().replace(/\s/g, '-');
-                    const itemRef = doc(firestore, 'users', user.uid, subcollectionName, itemId);
+                    const fullItemData = findItemInGameData(identifiedItem, allGameData, subcollectionName);
 
-                    // Find the full item data from the local cache
-                    let fullItemData: any = { ...identifiedItem }; // Start with what the AI gave us
-                    const lowerCaseName = identifiedItem.name.toLowerCase();
-                    const worldData = allGameData.find(world => world.name === identifiedItem.world);
-
-                    if (worldData) {
-                        const allSubcollections = Object.keys(worldData);
-                        const category = allSubcollections.find(cat => Array.isArray(worldData[cat]) && worldData[cat].some((item: any) => item.name.toLowerCase() === lowerCaseName));
-
-                        if (category) {
-                            const cachedItem = worldData[category].find((item: any) => item.name.toLowerCase() === lowerCaseName);
-                            if (cachedItem) {
-                                fullItemData = { ...fullItemData, ...cachedItem };
-                            }
-                        }
+                    if (fullItemData) {
+                        const itemId = fullItemData.id || nanoid();
+                        const itemRef = doc(firestore, 'users', user.uid, subcollectionName, itemId);
+                        
+                        await setDoc(itemRef, fullItemData, { merge: true });
+                        savedCount++;
+                    } else {
+                        notFoundItems.push(identifiedItem.name);
                     }
-                    
-                    await setDoc(itemRef, { id: itemId, ...fullItemData }, { merge: true });
-                    savedCount++;
                 }
                 
-                toast({
-                    title: `${sectionTitle} Salvos!`,
-                    description: `${savedCount} itens foram identificados e salvos em seu perfil.`,
-                });
+                if (savedCount > 0) {
+                    toast({
+                        title: `${savedCount} ${sectionTitle} Salvos!`,
+                        description: `Itens foram identificados e salvos em seu perfil.`,
+                    });
+                }
+                if (notFoundItems.length > 0) {
+                    toast({
+                        variant: 'destructive',
+                        title: `${notFoundItems.length} itens não encontrados`,
+                        description: `Não foi possível encontrar dados para: ${notFoundItems.join(', ')}`,
+                    });
+                }
+
             } else {
                  throw new Error('A IA não conseguiu identificar nenhum item.');
             }
@@ -454,5 +485,3 @@ export default function ProfilePage() {
         </>
     );
 }
-
-    
