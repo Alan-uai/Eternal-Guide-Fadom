@@ -42,21 +42,33 @@ const normalizeString = (str: string) => {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // Remove accents
-    .replace(/[^a-z0-9]/g, ''); // Remove non-alphanumeric chars
+    .replace(/[^a-z0-9\s]/g, '') // Remove non-alphanumeric chars, but keep spaces
+    .trim();
 };
-
 
 function findItemInGameData(identifiedItem: IdentifiedPower, allGameData: any[], subcollectionName: string) {
     const normalizedIdentifiedName = normalizeString(identifiedItem.name);
 
     for (const world of allGameData) {
         const subcollection = world[subcollectionName];
-        if (Array.isArray(subcollection)) {
-            for (const cachedItem of subcollection) {
-                const normalizedCachedName = normalizeString(cachedItem.name);
-                if (normalizedCachedName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedCachedName)) {
-                    // Found a match, return the full data from the cache
-                    return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity };
+        if (!Array.isArray(subcollection)) continue;
+
+        for (const cachedItem of subcollection) {
+            // Level 1 Search: Direct name match on the main item
+            const normalizedCachedName = normalizeString(cachedItem.name);
+            if (normalizedCachedName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedCachedName)) {
+                return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity, id: cachedItem.id || nanoid(), name: identifiedItem.name };
+            }
+
+            // Level 2 Search: If the main item has a 'stats' array, search inside it
+            if (cachedItem.stats && Array.isArray(cachedItem.stats)) {
+                for (const stat of cachedItem.stats) {
+                    const normalizedStatName = normalizeString(stat.name);
+                    if (normalizedStatName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedStatName)) {
+                        // Found a match in the stats array.
+                        // Return the PARENT item's data, but with the identified name and rarity.
+                        return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity, id: stat.id || nanoid(), name: identifiedItem.name };
+                    }
                 }
             }
         }
@@ -141,12 +153,11 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                     }
                 }
                 
-                if (savedCount > 0) {
-                    toast({
-                        title: `${savedCount} ${sectionTitle} Salvos!`,
-                        description: `Itens foram identificados e salvos em seu perfil.`,
-                    });
-                }
+                toast({
+                    title: `${savedCount} ${sectionTitle} Salvos!`,
+                    description: `Itens foram identificados e salvos em seu perfil.`,
+                });
+                
                 if (notFoundItems.length > 0) {
                     toast({
                         variant: 'destructive',
@@ -485,3 +496,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+    
