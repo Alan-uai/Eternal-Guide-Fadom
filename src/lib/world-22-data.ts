@@ -7,7 +7,7 @@ export const world22Data = {
         name: 'Shadow Garden',
         type: 'gacha',
         statType: 'energy',
-        unlockCost: '5.00uQDR',
+        unlockCost: '5k',
         leveling: {
           token: 'Garden Lvl Token',
           costPerLevel: 5,
@@ -30,7 +30,7 @@ export const world22Data = {
         name: 'Shadow Arts',
         type: 'gacha',
         statType: 'damage',
-        unlockCost: '7.50uQDR',
+        unlockCost: '5k',
         leveling: {
           token: 'Arts Lvl Token',
           costPerLevel: 5,
@@ -53,7 +53,7 @@ export const world22Data = {
         name: 'Eminence Energy',
         type: 'progression',
         statType: 'energy',
-        unlockCost: '10.00uQDR',
+        unlockCost: '5k',
         maxLevel: 50,
         maxBoost: '0.5x Energy'
       },
@@ -62,7 +62,7 @@ export const world22Data = {
         name: 'Eminence Damage',
         type: 'progression',
         statType: 'damage',
-        unlockCost: '12.50uQDR',
+        unlockCost: '5k',
         maxLevel: 50,
         maxBoost: '0.5x Damage'
       },
@@ -71,7 +71,7 @@ export const world22Data = {
         name: 'Eminence Luck',
         type: 'progression',
         statType: 'luck',
-        unlockCost: '15.00uQDR',
+        unlockCost: '5k',
         maxLevel: 50,
         maxBoost: '0.5x Luck'
       },
@@ -80,7 +80,7 @@ export const world22Data = {
         name: 'Eminence Coins',
         type: 'progression',
         statType: 'coin',
-        unlockCost: '17.50uQDR',
+        unlockCost: '5k',
         maxLevel: 50,
         maxBoost: '0.5x Coins'
       }
@@ -100,5 +100,3 @@ export const world22Data = {
     shadows: [],
     stands: []
   };
-
-

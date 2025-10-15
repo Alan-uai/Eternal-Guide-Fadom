@@ -1,6 +1,22 @@
 
 export const world21Data = {
     name: 'World 21',
+    powers: [
+        {
+            id: 'bankai',
+            name: 'Bankai',
+            type: 'gacha',
+            unlockCost: '6k',
+            statType: 'mixed'
+        },
+        {
+            id: 'espada',
+            name: 'Espada',
+            type: 'gacha',
+            unlockCost: '2k',
+            statType: 'mixed'
+        }
+    ],
     npcs: [
         { id: 'world21-e-rank', name: 'E Rank NPC', rank: 'E', exp: 20193989, hp: '47qTG', world: 'World 21', drops: { coins: { amount: '4.7qTG', probability: 0.8 } } },
         { id: 'world21-d-rank', name: 'D Rank NPC', rank: 'D', exp: 22213388, hp: '237qTG', world: 'World 21', drops: { coins: { amount: '23qTG', probability: 0.8 } } },
@@ -31,5 +47,3 @@ export const world21Data = {
         }
     ]
 };
-
-    

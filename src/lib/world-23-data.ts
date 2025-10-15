@@ -7,7 +7,11 @@ export const world23Data = {
         name: 'Energy Threat Level',
         type: 'gacha',
         statType: 'energy',
-        unlockCost: '1.00uQDR', // Placeholder cost
+        unlockCost: '5k',
+        leveling: {
+          token: 'Threat Lvl Token',
+          cost: '5k',
+        },
         stats: [
           { id: 'predator', name: 'Predator', multiplier: '1x', rarity: 'Common', probability: 40.55 },
           { id: 'havoc', name: 'Havoc', multiplier: '2x', rarity: 'Uncommon', probability: 33 },
@@ -24,7 +28,11 @@ export const world23Data = {
         name: 'Punch Power',
         type: 'gacha',
         statType: 'damage',
-        unlockCost: '1.00uQDR', // Placeholder cost
+        unlockCost: '5k',
+        leveling: {
+          token: 'Punch Lvl Token',
+          cost: '5k',
+        },
         stats: [
           { id: 'basic-punch', name: 'Basic Punch', multiplier: '1x', rarity: 'Common', probability: 40.55 },
           { id: 'heroic-fist', name: 'Heroic Fist', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
