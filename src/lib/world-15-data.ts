@@ -82,5 +82,12 @@ export const world15Data = {
                 }
             ]
         }
+    ],
+    dungeons: [
+        {
+            id: 'gleam-raid',
+            name: 'Gleam Raid',
+            description: 'Uma raid de 10 ondas onde cada onda recompensa o jogador com um nível de poder do "Gleam Power", de comum a supremo.'
+        }
     ]
 };

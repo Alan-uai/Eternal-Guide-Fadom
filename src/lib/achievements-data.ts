@@ -87,6 +87,22 @@ export const generalAchievements = [
             { requirement: 'Room 450', bonus: '25% Dano'},
             { requirement: 'Room 500', bonus: '25% Energia'},
         ]
+    },
+    {
+        id: 'gleam-raid-rooms',
+        name: 'Gleam Raid Rooms',
+        type: 'raid_rooms',
+        category: 'Raid',
+        tiers: [
+            { requirement: 'Wave 1', bonus: 'Gleam Power (Common)'},
+            { requirement: 'Wave 2', bonus: 'Gleam Power (Uncommon)'},
+            { requirement: 'Wave 3', bonus: 'Gleam Power (Rare)'},
+            { requirement: 'Wave 4', bonus: 'Gleam Power (Epic)'},
+            { requirement: 'Wave 5', bonus: 'Gleam Power (Legendary)'},
+            { requirement: 'Wave 6', bonus: 'Gleam Power (Mythic)'},
+            { requirement: 'Wave 7', bonus: 'Gleam Power (Phantom)'},
+            { requirement: 'Wave 8', bonus: 'Gleam Power (Supreme)'},
+        ]
     }
     // ... Add similar structures for Medium, Hard, Crazy, Insane, Nightmare
   ];
@@ -182,6 +198,18 @@ export const generalAchievements = [
             { requirement: '100 Completions', bonus: '200 Créditos'},
         ]
     },
+    {
+        id: 'gleam-raid-total',
+        name: 'Gleam Raid Total',
+        type: 'total_raids',
+        category: 'Raid',
+        tiers: [
+            { requirement: '25 Completions', bonus: 'Variação de poder e porcentagem'},
+            { requirement: '50 Completions', bonus: 'Variação de poder e porcentagem'},
+            { requirement: '75 Completions', bonus: 'Variação de poder e porcentagem'},
+            { requirement: '100 Completions', bonus: '200 Créditos'},
+        ]
+    }
   ];
   
   export const allAchievements = [...generalAchievements, ...raidRoomAchievements, ...totalRaidsAchievements];
