@@ -263,9 +263,9 @@
             "name": { "type": "string" },
             "rank": { "type": "string" },
             "rarity": { "type": "string" },
-            "multiplier": { "type": "string", "description": "The energy bonus provided by the pet." }
+            "energy_bonus": { "type": "string", "description": "The energy bonus provided by the pet." }
         },
-        "required": ["name", "rank", "rarity", "multiplier"]
+        "required": ["name", "rank", "rarity", "energy_bonus"]
     },
     "Avatar": {
         "title": "Avatar",
@@ -275,7 +275,7 @@
             "name": { "type": "string" },
             "rank": { "type": "string" },
             "rarity": { "type": "string" },
-            "multiplier": { "type": "string", "description": "The energy bonus provided by the avatar." },
+            "energy_bonus": { "type": "string", "description": "The energy bonus provided by the avatar." },
             "leveling": {
                 "type": "object",
                 "properties": {
@@ -284,7 +284,7 @@
                 }
             }
         },
-        "required": ["name", "rank", "rarity", "multiplier"]
+        "required": ["name", "rank", "rarity", "energy_bonus"]
     },
     "Dungeon": {
         "title": "Dungeon",
