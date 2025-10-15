@@ -8,6 +8,12 @@ export const world3Data = {
         type: 'gacha',
         statType: 'energy',
         unlockCost: '110k',
+        leveling: {
+            token: "Reiatsu Lvl Token",
+            costPerLevel: 10,
+            unlockWorld: 21,
+            description: "Pode ser evoluído no Mundo 21 usando Reiatsu Lvl Tokens."
+        },
         stats: [
           { name: 'Gray Reiatsu', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Green Reiatsu', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
@@ -59,6 +65,3 @@ export const world3Data = {
     pets: [],
     dungeons: [],
   };
-
-    
-    

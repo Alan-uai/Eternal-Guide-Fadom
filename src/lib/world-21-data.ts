@@ -1,6 +1,6 @@
 
 export const world21Data = {
-    name: 'World 21',
+    name: 'World 21 - Hollow World',
     powers: [
         {
             id: 'bankai',
@@ -14,7 +14,19 @@ export const world21Data = {
             name: 'Espada',
             type: 'gacha',
             unlockCost: '2k',
-            statType: 'mixed'
+            statType: 'mixed',
+            stats: [
+                { "name": "Espada 9", "multiplier": "1x" },
+                { "name": "Espada 8", "multiplier": "2x" },
+                { "name": "Espada 7", "multiplier": "3x" },
+                { "name": "Espada 6", "multiplier": "4x" },
+                { "name": "Espada 5", "multiplier": "5x" },
+                { "name": "Espada 4", "multiplier": "6x" },
+                { "name": "Espada 3", "multiplier": "7.5x" },
+                { "name": "Espada 2", "multiplier": "10x" },
+                { "name": "Espada 1", "multiplier": "12x" },
+                { "name": "Espada 0", "multiplier": "15x" }
+            ]
         }
     ],
     npcs: [
