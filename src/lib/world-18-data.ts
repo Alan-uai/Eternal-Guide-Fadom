@@ -37,6 +37,23 @@ export const world18Data = {
         ]
       },
       {
+        id: 'pokita-power',
+        name: 'Pokita Pet',
+        type: 'gacha',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        stats: [
+          { id: 'pokita-common', name: 'Pokita Pet (Common)', multiplier: '1x', rarity: 'Common' },
+          { id: 'pokita-uncommon', name: 'Pokita Pet (Uncommon)', multiplier: '1.2x', rarity: 'Uncommon' },
+          { id: 'pokita-rare', name: 'Pokita Pet (Rare)', multiplier: '1.4x', rarity: 'Rare' },
+          { id: 'pokita-epic', name: 'Pokita Pet (Epic)', multiplier: '1.6x', rarity: 'Epic' },
+          { id: 'pokita-legendary', name: 'Pokita Pet (Legendary)', multiplier: '1.8x', rarity: 'Legendary' },
+          { id: 'pokita-mythical', name: 'Pokita Pet (Mythical)', multiplier: '2.0x', rarity: 'Mythic' },
+          { id: 'pokita-phantom', name: 'Pokita Pet (Phantom)', multiplier: '2.4x', rarity: 'Phantom' },
+          { id: 'pokita-supreme', name: 'Pokita Pet (Supreme)', multiplier: '3.0x', rarity: 'Supreme' },
+        ]
+      },
+      {
         id: 'akuma-energy',
         name: 'Akuma Energy',
         type: 'progression',
@@ -101,14 +118,5 @@ export const world18Data = {
             description: 'Vai até a wave 1000 (w1k). Tem chance de dropar o pet Pokita.'
         }
     ],
-    pets: [
-        { id: 'pokita-common', name: 'Pokita Pet', rank: 'Common', rarity: 'Common', energy_bonus: '1x' },
-        { id: 'pokita-uncommon', name: 'Pokita Pet', rank: 'Uncommon', rarity: 'Uncommon', energy_bonus: '1.2x' },
-        { id: 'pokita-rare', name: 'Pokita Pet', rank: 'Rare', rarity: 'Rare', energy_bonus: '1.4x' },
-        { id: 'pokita-epic', name: 'Pokita Pet', rank: 'Epic', rarity: 'Epic', energy_bonus: '1.6x' },
-        { id: 'pokita-legendary', name: 'Pokita Pet', rank: 'Legendary', rarity: 'Legendary', energy_bonus: '1.8x' },
-        { id: 'pokita-mythical', name: 'Pokita Pet', rank: 'Mythical', rarity: 'Mythic', energy_bonus: '2.0x' },
-        { id: 'pokita-phantom', name: 'Pokita Pet', rank: 'Phantom', rarity: 'Phantom', energy_bonus: '2.4x' },
-        { id: 'pokita-supreme', name: 'Pokita Pet', rank: 'Supreme', rarity: 'Supreme', energy_bonus: '3.0x' },
-    ]
+    pets: []
 };
