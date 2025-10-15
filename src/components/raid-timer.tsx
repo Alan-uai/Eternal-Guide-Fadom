@@ -72,7 +72,7 @@ export function RaidTimer() {
     <div className="relative w-full flex justify-center z-40">
         <div className={cn(
             "absolute top-0 flex flex-col items-center transition-all duration-300 ease-in-out",
-            isExpanded ? "w-48" : "w-12"
+             isExpanded ? "w-48" : "auto"
         )}>
             <div 
                 className="w-full h-3 bg-background/80 backdrop-blur-sm"
@@ -83,29 +83,27 @@ export function RaidTimer() {
             <motion.div 
                 className="w-full bg-background/80 backdrop-blur-sm border-x border-b rounded-b-lg shadow-lg overflow-hidden flex flex-col items-center"
                 initial={false}
-                animate={{ height: isExpanded ? 'auto' : '2.25rem' }}
+                animate={{ height: isExpanded ? 'auto' : '2rem' }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 shrink-0"
+                <div 
+                    className="flex items-center justify-center gap-1.5 h-8 px-2 cursor-pointer"
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
-                    <Timer className="h-4 w-4" />
-                </Button>
+                    <Timer className="h-3 w-3 text-muted-foreground" />
+                    <span className='text-xs font-mono tracking-tighter'>{timeLeft}</span>
+                </div>
                 <AnimatePresence>
                 {isExpanded && (
                     <motion.div
-                        className="px-3 pb-3 text-center"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
+                        className="px-3 pb-2 text-center"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, delay: 0.1 }}
                     >
                         <p className="text-xs text-muted-foreground">Próxima Raid</p>
-                        <p className="text-sm font-semibold text-primary">{nextRaid?.name || 'Calculando...'}</p>
-                        <p className="text-lg font-bold font-mono">{timeLeft}</p>
+                        <p className="text-sm font-semibold text-primary -mt-1">{nextRaid?.name || 'Calculando...'}</p>
                     </motion.div>
                 )}
                 </AnimatePresence>
