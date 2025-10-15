@@ -5,7 +5,7 @@ export const generalAchievements = [
       name: 'Friends Bonus V',
       type: 'general',
       category: 'Friends',
-      maxLevel: 96, // Corresponds to 96h
+      maxLevel: 5,
       requirement: '96h',
       progressionBonus: '5% de energia a cada lvl',
     },
