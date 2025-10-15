@@ -1,6 +1,19 @@
 
 {
   "entities": {
+    "Ghoul": {
+      "title": "Ghoul",
+      "type": "object",
+      "description": "Representa um Ghoul, um tipo especial de lutador do Mundo 17.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "rarity": { "type": "string" },
+        "energy_bonus": { "type": "string" },
+        "damage_bonus": { "type": "string" }
+      },
+      "required": ["id", "name", "rarity"]
+    },
     "Achievement": {
       "title": "Achievement",
       "type": "object",
@@ -575,6 +588,14 @@
           "entityName": "Stand",
           "schema": { "$ref": "#/backend/entities/Stand" },
           "description": "Sub-collection for Stand fighters available in a world."
+        }
+      },
+       {
+        "path": "/worlds/{worldId}/ghouls/{ghoulId}",
+        "definition": {
+          "entityName": "Ghoul",
+          "schema": { "$ref": "#/backend/entities/Ghoul" },
+          "description": "Sub-collection for Ghoul fighters available in a world."
         }
       }
     ],
