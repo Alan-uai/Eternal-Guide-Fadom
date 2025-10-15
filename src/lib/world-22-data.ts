@@ -10,7 +10,7 @@ export const world22Data = {
         unlockCost: '5k',
         leveling: {
           token: 'Garden Lvl Token',
-          costPerLevel: 5,
+          costPerLevel: 10,
           maxLevel: 50,
           description: 'Pode ser evoluído para aumentar seu poder usando Garden Lvl Tokens.'
         },
@@ -33,7 +33,7 @@ export const world22Data = {
         unlockCost: '5k',
         leveling: {
           token: 'Arts Lvl Token',
-          costPerLevel: 5,
+          costPerLevel: 10,
           maxLevel: 50,
           description: 'Pode ser evoluído para aumentar seu poder usando Arts Lvl Tokens.'
         },
