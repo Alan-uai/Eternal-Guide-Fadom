@@ -1,3 +1,4 @@
+
 export const world19Data = {
     name: 'World 19 - Tokyo Empire',
     powers: [
@@ -50,7 +51,7 @@ export const world19Data = {
       {
         id: 'netherworld-defense',
         name: 'Netherworld Defense',
-        description: 'Uma raid de defesa que vai até a wave 50 (w50).'
+        description: 'Uma raid de defesa que vai até a wave 100 (w100).'
       }
     ],
     npcs: [
