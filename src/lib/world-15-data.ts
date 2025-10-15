@@ -89,5 +89,15 @@ export const world15Data = {
             name: 'Gleam Raid',
             description: 'Uma raid de 10 ondas onde cada onda recompensa o jogador com um nível de poder do "Gleam Power", de comum a supremo.'
         }
+    ],
+    obelisks: [
+        {
+            id: 'damage-obelisk',
+            name: 'Obelisco de Dano',
+            statType: 'damage',
+            maxLevel: 20
+        }
     ]
 };
+
+    

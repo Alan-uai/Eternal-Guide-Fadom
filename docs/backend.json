@@ -395,6 +395,19 @@
       },
       "required": ["id", "name", "rarity", "energy_bonus"]
     },
+    "Obelisk": {
+      "title": "Obelisk",
+      "type": "object",
+      "description": "Representa um obelisco especial em um mundo que fornece bônus de status.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "statType": { "type": "string", "enum": ["damage", "energy", "luck"] },
+        "maxLevel": { "type": "number" },
+        "world": { "type": "string" }
+      },
+      "required": ["id", "name", "statType"]
+    },
      "GameMetadata": {
       "title": "GameMetadata",
       "type": "object",
@@ -598,8 +611,18 @@
           "schema": { "$ref": "#/backend/entities/Ghoul" },
           "description": "Sub-collection for Ghoul fighters available in a world."
         }
+      },
+       {
+        "path": "/worlds/{worldId}/obelisks/{obeliskId}",
+        "definition": {
+          "entityName": "Obelisk",
+          "schema": { "$ref": "#/backend/entities/Obelisk" },
+          "description": "Sub-collection for special Obelisks available in a world."
+        }
       }
     ],
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. A new top-level collection 'achievements' is added to store all game achievements, which is separate from world-specific data."
   }
 }
+
+    

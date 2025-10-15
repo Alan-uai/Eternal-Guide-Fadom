@@ -83,5 +83,15 @@ export const world10Data = {
                 }
             ]
         }
+    ],
+    obelisks: [
+        {
+            id: 'energy-obelisk',
+            name: 'Obelisco de Energia',
+            statType: 'energy',
+            maxLevel: 20
+        }
     ]
 };
+
+    

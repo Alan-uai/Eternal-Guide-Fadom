@@ -92,5 +92,15 @@ export const world20Data = {
                 }
             ]
         }
+    ],
+    obelisks: [
+        {
+            id: 'luck-obelisk',
+            name: 'Obelisco da Sorte',
+            statType: 'luck',
+            maxLevel: 10
+        }
     ]
   };
+
+    
