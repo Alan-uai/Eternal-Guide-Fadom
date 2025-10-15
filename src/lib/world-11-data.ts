@@ -24,7 +24,7 @@ export const world11Data = {
             type: 'progression',
             statType: 'mixed',
             unlockCost: 'N/A',
-            description: 'Evolve os Titãs para 1, 2 ou 3 estrelas para aumentar seu poder.'
+            description: 'Evolua os Titãs. 2 de 0★ para 1★ (custo: 1k Exchange Token 1). 2 de 1★ para 2★ (custo: 2.5k Exchange Token 1). 2 de 2★ para 3★ (custo: 5k Exchange Token 1).'
         }
     ],
     npcs: [
