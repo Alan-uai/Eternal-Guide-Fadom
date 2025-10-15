@@ -1,5 +1,42 @@
+
 export const world9Data = {
-    name: 'World 9',
+    name: 'World 9 - Spirit Residence',
+    powers: [
+        {
+            id: 'psychic-mayhem',
+            name: 'Psychic Mayhem',
+            type: 'gacha',
+            statType: 'energy',
+            unlockCost: 'N/A', // Custo não especificado
+            stats: [
+                { name: 'Illusion Casting', multiplier: '2x', rarity: 'Common' },
+                { name: 'Mind Swap', multiplier: '3x', rarity: 'Uncommon' },
+                { name: 'Brain Freeze Field', multiplier: '4x', rarity: 'Rare' },
+                { name: 'Kinetic Absorption', multiplier: '5x', rarity: 'Epic' },
+                { name: 'Precognition', multiplier: '8x', rarity: 'Legendary' },
+                { name: 'Psychic Barrier', multiplier: '10x', rarity: 'Mythic' },
+                { name: 'Energy Aura Blast', multiplier: '12x', rarity: 'Phantom' }
+            ]
+        },
+        {
+            id: 'lucky-spirit',
+            name: 'Lucky Spirit',
+            type: 'progression',
+            statType: 'luck',
+            unlockCost: 'N/A',
+            maxLevel: 50,
+            maxBoost: '50% Luckboost'
+        },
+        {
+            id: 'spiritual-upgrade',
+            name: 'Spiritual Upgrade',
+            type: 'progression',
+            statType: 'damage',
+            unlockCost: 'N/A',
+            maxLevel: 60,
+            maxBoost: '0,6x Damage'
+        }
+    ],
     npcs: [
         { id: 'world9-e-rank', name: 'E Rank NPC', rank: 'E', exp: 972, hp: '16qdD', world: 'World 9', drops: { coins: { amount: '1.6qdD', probability: 0.8 } } },
         { id: 'world9-d-rank', name: 'D Rank NPC', rank: 'D', exp: 1215, hp: '84qdD', world: 'World 9', drops: { coins: { amount: '8.4qdD', probability: 0.8 } } },
