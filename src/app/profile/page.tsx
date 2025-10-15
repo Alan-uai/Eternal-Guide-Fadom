@@ -5,7 +5,7 @@ import { useState, useRef, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
-import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle, Coins, Zap, Wind } from 'lucide-react';
+import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle, Coins, Zap, Wind, Trophy } from 'lucide-react';
 import Head from 'next/head';
 import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
@@ -23,6 +23,7 @@ import { useApp } from '@/context/app-provider';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { generalAchievements } from '@/lib/achievements-data';
 
 
 const RarityBadge = ({ rarity, className }: { rarity: string, className?: string }) => {
@@ -276,9 +277,10 @@ const profileCategories = [
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets' },
     { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons' },
     { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories' },
-    { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index' },
-    { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', subcollectionName: 'obelisks' },
-    { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', subcollectionName: 'rank' },
+    { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index', disableItemUpload: true },
+    { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', subcollectionName: 'obelisks', disableItemUpload: true },
+    { name: 'Conquistas', icon: Trophy, description: 'Calcule seus bônus de conquistas.', subcollectionName: 'achievements', disableItemUpload: true },
+    { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', subcollectionName: 'rank', disableItemUpload: true },
 ];
 
 
@@ -556,6 +558,140 @@ function ObeliskLevelCalculator() {
     );
 }
 
+function AchievementCalculator() {
+    const { user } = useUser();
+    const { firestore } = useFirebase();
+
+    const docRef = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return doc(firestore, 'users', user.uid, 'achievements', 'levels');
+    }, [firestore, user]);
+
+    const { data: savedLevels, isLoading } = useDoc(docRef);
+    const [levels, setLevels] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        if (savedLevels) {
+            setLevels(savedLevels as Record<string, number>);
+        }
+    }, [savedLevels]);
+
+    const handleLevelChange = async (achievementId: string, value: string) => {
+        const numericValue = parseInt(value, 10);
+        if (isNaN(numericValue) || !docRef) return;
+
+        const updatedLevels = { ...levels, [achievementId]: numericValue };
+        setLevels(updatedLevels);
+        await setDoc(docRef, updatedLevels, { merge: true });
+    };
+
+    const totalBonuses = useMemo(() => {
+        return generalAchievements.reduce((acc, ach) => {
+            const currentLevel = levels[ach.id] || 0;
+            if (ach.progressionBonus.includes('energia')) {
+                acc.energy += currentLevel * 0.05;
+            } else if (ach.progressionBonus.includes('damage')) {
+                acc.damage += currentLevel * 0.05;
+            } else if (ach.progressionBonus.includes('coins')) {
+                acc.coins += currentLevel * 0.05;
+            }
+            return acc;
+        }, { energy: 0, damage: 0, coins: 0 });
+    }, [levels]);
+
+    if (isLoading) {
+        return <div className="flex items-center justify-center h-full w-full"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+    }
+
+    return (
+        <div className="w-full p-2 space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {generalAchievements.map(ach => (
+                    <div key={ach.id} className="space-y-2">
+                        <Label htmlFor={ach.id} className="text-xs truncate">{ach.name}</Label>
+                        <Select value={(levels[ach.id] || 0).toString()} onValueChange={(value) => handleLevelChange(ach.id, value)}>
+                            <SelectTrigger id={ach.id}>
+                                <SelectValue placeholder="Lvl" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Array.from({ length: ach.maxLevel + 1 }, (_, i) => i).map(lvl => (
+                                    <SelectItem key={lvl} value={lvl.toString()}>Lvl {lvl}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                ))}
+            </div>
+            <div className="border-t pt-4">
+                 <h4 className="text-sm font-semibold mb-2">Bônus Totais de Conquistas</h4>
+                 <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="p-2 rounded-md bg-muted/50 border">
+                        <Zap className="h-5 w-5 mb-1 mx-auto text-blue-500" />
+                        <span className="text-xs font-bold">{`+${totalBonuses.energy.toFixed(2)}x`}</span>
+                    </div>
+                     <div className="p-2 rounded-md bg-muted/50 border">
+                        <Flame className="h-5 w-5 mb-1 mx-auto text-red-500" />
+                        <span className="text-xs font-bold">{`+${totalBonuses.damage.toFixed(2)}x`}</span>
+                    </div>
+                     <div className="p-2 rounded-md bg-muted/50 border">
+                        <Coins className="h-5 w-5 mb-1 mx-auto text-yellow-500" />
+                        <span className="text-xs font-bold">{`+${totalBonuses.coins.toFixed(2)}x`}</span>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    );
+}
+
+function RankSelector() {
+    const { user } = useUser();
+    const { firestore } = useFirebase();
+    const docRef = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return doc(firestore, 'users', user.uid, 'rank', 'current');
+    }, [firestore, user]);
+    
+    const { data: rankData, isLoading } = useDoc(docRef);
+    const [rank, setRank] = useState<number>(0);
+
+    const rankOptions = Array.from({ length: 116 }, (_, i) => i); // 0 to 115
+
+    useEffect(() => {
+        if (rankData) {
+            setRank((rankData as any).value || 0);
+        }
+    }, [rankData]);
+
+    const handleRankChange = async (value: string) => {
+        const numericValue = parseInt(value, 10);
+        if (isNaN(numericValue) || !docRef) return;
+        
+        setRank(numericValue);
+        await setDoc(docRef, { value: numericValue }, { merge: true });
+    };
+
+    if (isLoading) {
+        return <div className="flex items-center justify-center h-full w-full"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+    }
+
+    return (
+         <div className="w-full p-2 space-y-2">
+            <Label htmlFor='rank-selector'>Seu Rank Atual</Label>
+            <Select value={rank.toString()} onValueChange={handleRankChange}>
+                <SelectTrigger id="rank-selector">
+                    <SelectValue placeholder="Selecione seu rank" />
+                </SelectTrigger>
+                <SelectContent>
+                    {rankOptions.map(r => (
+                        <SelectItem key={r} value={r.toString()}>{r}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+    );
+}
+
+
 function BonusDisplay({ items }: { items: any[] }) {
     const totals = useMemo(() => {
         const bonusTotals = {
@@ -630,6 +766,12 @@ function CategoryDisplay({ subcollectionName }: { subcollectionName: string }) {
     }
     if (subcollectionName === 'obelisks') {
         return <ObeliskLevelCalculator />;
+    }
+    if (subcollectionName === 'achievements') {
+        return <AchievementCalculator />;
+    }
+    if (subcollectionName === 'rank') {
+        return <RankSelector />;
     }
 
     const itemsQuery = useMemoFirebase(() => {
@@ -741,9 +883,11 @@ export default function ProfilePage() {
                                     </CardTitle>
                                     <CardDescription>{category.description}</CardDescription>
                                 </div>
-                                <div className="absolute top-2 right-2">
-                                    <GeneralItemUploader asShortcut={true} />
-                                </div>
+                                {!category.disableItemUpload && (
+                                    <div className="absolute top-2 right-2">
+                                        <GeneralItemUploader asShortcut={true} />
+                                    </div>
+                                )}
                             </CardHeader>
                             <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
                                 <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>

@@ -450,6 +450,19 @@
         }
       },
       "required": ["id", "userId", "question", "createdAt", "status"]
+    },
+    "AchievementProgress": {
+      "title": "AchievementProgress",
+      "description": "Stores the user's selected level for various general achievements.",
+      "type": "object",
+      "properties": {
+        "friends-bonus": { "type": "number", "description": "Selected level for Friends Bonus V." },
+        "total-coins": { "type": "number", "description": "Selected level for Total coins XXVIII." },
+        "total-energy": { "type": "number", "description": "Selected level for Total energy XLV." },
+        "time-played": { "type": "number", "description": "Selected level for Time Played X." },
+        "star-opened": { "type": "number", "description": "Selected level for Star opened X." },
+        "total-enemies": { "type": "number", "description": "Selected level for Total Enemies XIX." }
+      }
     }
   },
   "auth": {
@@ -539,6 +552,14 @@
           "entityName": "UserItem",
           "schema": { "$ref": "#/backend/entities/UserItem" },
           "description": "Stores the items a user has."
+        }
+      },
+      {
+        "path": "/users/{userId}/achievements/{progressId}",
+        "definition": {
+          "entityName": "AchievementProgress",
+          "schema": { "$ref": "#/backend/entities/AchievementProgress" },
+          "description": "Stores the user's selected level for general achievements."
         }
       },
       {
