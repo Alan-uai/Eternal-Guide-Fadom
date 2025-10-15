@@ -53,6 +53,14 @@ export const world18Data = {
         unlockCost: 'N/A',
         maxLevel: 110,
         maxBoost: '1.10x Damage'
+      },
+      {
+        id: 'pokita-leveling',
+        name: 'Pokita Leveling',
+        type: 'progression',
+        statType: 'mixed',
+        unlockCost: 'N/A',
+        description: 'Evolua o pet Pokita até o nível 50 usando Pokita Tokens.'
       }
     ],
     npcs: [
@@ -85,5 +93,22 @@ export const world18Data = {
                 }
             ]
         }
+    ],
+    dungeons: [
+        {
+            id: 'chainsaw-defense',
+            name: 'Chainsaw Defense',
+            description: 'Vai até a wave 1000 (w1k). Tem chance de dropar o pet Pokita.'
+        }
+    ],
+    pets: [
+        { id: 'pokita-common', name: 'Pokita Pet', rank: 'Common', rarity: 'Common', energy_bonus: '1x' },
+        { id: 'pokita-uncommon', name: 'Pokita Pet', rank: 'Uncommon', rarity: 'Uncommon', energy_bonus: '1.2x' },
+        { id: 'pokita-rare', name: 'Pokita Pet', rank: 'Rare', rarity: 'Rare', energy_bonus: '1.4x' },
+        { id: 'pokita-epic', name: 'Pokita Pet', rank: 'Epic', rarity: 'Epic', energy_bonus: '1.6x' },
+        { id: 'pokita-legendary', name: 'Pokita Pet', rank: 'Legendary', rarity: 'Legendary', energy_bonus: '1.8x' },
+        { id: 'pokita-mythical', name: 'Pokita Pet', rank: 'Mythical', rarity: 'Mythic', energy_bonus: '2.0x' },
+        { id: 'pokita-phantom', name: 'Pokita Pet', rank: 'Phantom', rarity: 'Phantom', energy_bonus: '2.4x' },
+        { id: 'pokita-supreme', name: 'Pokita Pet', rank: 'Supreme', rarity: 'Supreme', energy_bonus: '3.0x' },
     ]
 };
