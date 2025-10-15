@@ -12,6 +12,7 @@ export const world1Data = {
             token: "Dragon Race Lvl Token",
             costPerLevel: 40,
             unlockWorld: 20,
+            maxLevel: 25,
             description: "Pode ser evoluído no Mundo 20 usando Dragon Race Lvl Tokens."
         },
         stats: [
@@ -34,6 +35,7 @@ export const world1Data = {
             token: "Saiyan Lvl Token",
             costPerLevel: 40,
             unlockWorld: 20,
+            maxLevel: 25,
             description: "Pode ser evoluído no Mundo 20 usando Saiyan Lvl Tokens."
         },
         stats: [

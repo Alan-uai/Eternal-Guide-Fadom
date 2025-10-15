@@ -1,5 +1,5 @@
 export const world20Data = {
-    name: 'World 20 - Grand Elder',
+    name: 'World 20 - Green Planet',
     powers: [
       {
         id: 'grand-elder-power',
