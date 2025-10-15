@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useFirestore, useCollection, useMemoFirebase, useFirebase } from '@/firebase';
 import { doc, writeBatch, collection, updateDoc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Bot, User, Send, Info, Loader2, Eye, Pencil, Database, PlusCircle, Trash2, Check, Sparkles, HelpCircle, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -258,6 +258,7 @@ export function WikiManagementView() {
   const [viewingContent, setViewingContent] = useState<{ title: string; data: any, id?: string, isWorld: boolean } | null>(null);
   const [editingWorld, setEditingWorld] = useState<{ id: string, name: string } | null>(null);
   const [seedingWorld, setSeedingWorld] = useState<{ id: string, name: string } | null>(null);
+  const [isPopulatingAll, setIsPopulatingAll] = useState(false);
 
   const [newWorldName, setNewWorldName] = useState('');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
@@ -355,6 +356,54 @@ export function WikiManagementView() {
     } finally {
         setIsGeneratingArticle(false);
         setViewingContent(null);
+    }
+  };
+
+    const incrementDataVersion = async () => {
+        if (!firestore) return;
+        const metadataRef = doc(firestore, 'metadata', 'gameData');
+        const docSnap = await getDoc(metadataRef);
+        let newVersion = '1.0.1';
+
+        if (docSnap.exists()) {
+            const currentVersion = docSnap.data()?.version || '1.0.0';
+            const versionParts = currentVersion.split('.').map(Number);
+            versionParts[2]++; 
+            newVersion = versionParts.join('.');
+        }
+
+        await setDoc(metadataRef, { version: newVersion, lastUpdatedAt: serverTimestamp() }, { merge: true });
+    };
+
+  const handlePopulateAll = async () => {
+    setIsPopulatingAll(true);
+    toast({ title: 'Iniciando população...', description: 'Todos os dados locais serão enviados ao Firestore.' });
+    try {
+        let successCount = 0;
+        const worldEntries = Object.entries(staticWorldDataMap);
+
+        for (const [_, worldData] of worldEntries) {
+            const worldName = worldData.name;
+            const worldDataJson = JSON.stringify(worldData);
+            const seedResult = await seedWorldData({ worldName, worldDataJson });
+            if (seedResult) {
+                successCount++;
+            } else {
+                 toast({ variant: 'destructive', title: `Falha ao popular ${worldName}`, description: 'Ocorreu um erro ao enviar os dados deste mundo.' });
+            }
+        }
+        
+        if (successCount > 0) {
+            await incrementDataVersion();
+            toast({ title: 'População Concluída!', description: `${successCount} de ${worldEntries.length} mundos foram populados/atualizados com sucesso.` });
+        }
+
+
+    } catch (error: any) {
+         console.error('Erro ao popular todos os dados:', error);
+         toast({ variant: 'destructive', title: 'Erro na População em Massa', description: error.message });
+    } finally {
+        setIsPopulatingAll(false);
     }
   };
 
@@ -506,13 +555,22 @@ export function WikiManagementView() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Dados de Jogo por Mundo</CardTitle>
-              <Link href="/admin/edit-collection/worlds/new" passHref>
-                <Button variant="outline" size="sm">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Novo Mundo
+              <div>
+                <CardTitle>Dados de Jogo por Mundo</CardTitle>
+                <CardDescription>Clique em um mundo para ver e editar suas coleções de dados.</CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={handlePopulateAll} disabled={isPopulatingAll}>
+                    {isPopulatingAll ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
+                    {isPopulatingAll ? 'Populando...' : 'Popular Tudo (Lib)'}
                 </Button>
-              </Link>
+                <Link href="/admin/edit-collection/worlds/new" passHref>
+                  <Button variant="outline" size="sm">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Novo Mundo
+                  </Button>
+                </Link>
+              </div>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {areWorldsLoading ? (
@@ -656,5 +714,3 @@ export function WikiManagementView() {
     </>
   );
 }
-
-    
