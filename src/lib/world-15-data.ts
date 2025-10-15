@@ -1,5 +1,60 @@
+
 export const world15Data = {
-    name: 'World 15',
+    name: 'World 15 - Virtual City',
+    powers: [
+      {
+        id: 'power-energy-runes',
+        name: 'Power Energy Runes',
+        type: 'gacha',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        stats: [
+          { name: 'Common Energy Rune', multiplier: '2x', rarity: 'Common' },
+          { name: 'Uncommon Energy Rune', multiplier: '3x', rarity: 'Uncommon' },
+          { name: 'Rare Energy Rune', multiplier: '4.5x', rarity: 'Rare' },
+          { name: 'Epic Energy Rune', multiplier: '6x', rarity: 'Epic' },
+          { name: 'Legendary Energy Rune', multiplier: '8x', rarity: 'Legendary' },
+          { name: 'Mythical Energy Rune', multiplier: '10x', rarity: 'Mythic' },
+          { name: 'Phantom Energy Rune', multiplier: '12x', rarity: 'Phantom' },
+          { name: 'Supreme Energy Rune', multiplier: '15x', rarity: 'Supreme' },
+        ],
+      },
+      {
+        id: 'gleam-raid-power',
+        name: 'Gleam Raid Power',
+        type: 'gacha',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        stats: [
+          { name: 'Common Gleam Power', multiplier: '1x', rarity: 'Common' },
+          { name: 'Uncommon Gleam Power', multiplier: '1.5x', rarity: 'Uncommon' },
+          { name: 'Rare Gleam Power', multiplier: '2x', rarity: 'Rare' },
+          { name: 'Epic Gleam Power', multiplier: '4x', rarity: 'Epic' },
+          { name: 'Legendary Gleam Power', multiplier: '6x', rarity: 'Legendary' },
+          { name: 'Mythical Gleam Power', multiplier: '8x', rarity: 'Mythic' },
+          { name: 'Phantom Gleam Power', multiplier: '10x', rarity: 'Phantom' },
+          { name: 'Supreme Gleam Power', multiplier: '12x', rarity: 'Supreme' },
+        ],
+      },
+      {
+        id: 'swordsman-energy',
+        name: 'Swordsman Energy',
+        type: 'progression',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        maxLevel: 210,
+        maxBoost: '2.10x Energy'
+      },
+      {
+        id: 'swordsman-damage',
+        name: 'Swordsman Damage',
+        type: 'progression',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        maxLevel: 110,
+        maxBoost: '1.10x Damage'
+      }
+    ],
     npcs: [
         { id: 'world15-e-rank', name: 'E Rank NPC', rank: 'E', exp: 155329, hp: '25qtV', world: 'World 15', drops: { coins: { amount: '2.5qtV', probability: 0.8 } } },
         { id: 'world15-d-rank', name: 'D Rank NPC', rank: 'D', exp: 170862, hp: '126qtV', world: 'World 15', drops: { coins: { amount: '12qtV', probability: 0.8 } } },
@@ -29,5 +84,3 @@ export const world15Data = {
         }
     ]
 };
-
-    
