@@ -27,6 +27,23 @@ export const world21Data = {
                 { "name": "Espada 1", "multiplier": "12x" },
                 { "name": "Espada 0", "multiplier": "15x" }
             ]
+        },
+        {
+            id: 'hollow-power',
+            name: 'Hollow Power',
+            type: 'gacha',
+            unlockCost: 'N/A',
+            statType: 'damage',
+            stats: [
+              { name: 'Common Hollow Power', multiplier: '1x', rarity: 'Common' },
+              { name: 'Uncommon Hollow Power', multiplier: '1.5x', rarity: 'Uncommon' },
+              { name: 'Rare Hollow Power', multiplier: '2x', rarity: 'Rare' },
+              { name: 'Epic Hollow Power', multiplier: '3x', rarity: 'Epic' },
+              { name: 'Legendary Hollow Power', multiplier: '5x', rarity: 'Legendary' },
+              { name: 'Mythical Hollow Power', multiplier: '7x', rarity: 'Mythic' },
+              { name: 'Phantom Hollow Power', multiplier: '10x', rarity: 'Phantom' },
+              { name: 'Supreme Hollow Power', multiplier: '12x', rarity: 'Supreme' }
+            ]
         }
     ],
     npcs: [

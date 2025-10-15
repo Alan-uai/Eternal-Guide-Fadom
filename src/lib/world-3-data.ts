@@ -30,6 +30,12 @@ export const world3Data = {
         type: 'gacha',
         statType: 'damage',
         unlockCost: '190k',
+        leveling: {
+            token: "Zanpakuto Lvl Token",
+            costPerLevel: 10,
+            unlockWorld: 21,
+            description: "Pode ser evoluído no Mundo 21 usando Zanpakuto Lvl Tokens."
+        },
         stats: [
           { name: 'Common', multiplier: '2x', rarity: 'Common', probability: 40.55 },
           { name: 'Uncommon', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
