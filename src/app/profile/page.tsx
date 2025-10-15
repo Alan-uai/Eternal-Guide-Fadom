@@ -28,7 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { generalAchievements } from '@/lib/achievements-data';
 import { energyGainPerRank } from '@/lib/energy-gain-data';
 import { allGamepasses, type Gamepass } from '@/lib/gamepass-data';
-import { accessories, type Accessory } from '@/lib/accessory-data';
+import { accessories, type Accessory, type RarityOption } from '@/lib/accessory-data';
 
 
 const RarityBadge = ({ rarity, className }: { rarity: string, className?: string }) => {
@@ -39,16 +39,16 @@ const RarityBadge = ({ rarity, className }: { rarity: string, className?: string
         'S-Rank': 'bg-purple-500 text-white border-purple-600',
         'SS-Rank': 'bg-yellow-500 text-black border-yellow-600',
         'SSS-Rank': 'bg-red-600 text-white border-red-700',
-        Common: 'bg-gray-500 text-white border-gray-600',
-        Uncommon: 'bg-green-500 text-white border-green-600',
-        Rare: 'bg-blue-500 text-white border-blue-600',
-        Epic: 'bg-purple-500 text-white border-purple-600',
-        Legendary: 'bg-yellow-500 text-black border-yellow-600',
-        Mythic: 'bg-red-600 text-white border-red-700',
-        Phantom: 'bg-fuchsia-700 text-white border-fuchsia-800',
-        Supreme: 'bg-gradient-to-r from-orange-400 to-rose-400 text-white border-transparent',
+        'Common': 'bg-gray-500 text-white border-gray-600',
+        'Uncommon': 'bg-green-500 text-white border-green-600',
+        'Rare': 'bg-blue-500 text-white border-blue-600',
+        'Epic': 'bg-purple-500 text-white border-purple-600',
+        'Legendary': 'bg-yellow-500 text-black border-yellow-600',
+        'Mythic': 'bg-red-600 text-white border-red-700',
+        'Phantom': 'bg-fuchsia-700 text-white border-fuchsia-800',
+        'Supreme': 'bg-gradient-to-r from-orange-400 to-rose-400 text-white border-transparent',
     };
-    return <Badge className={cn('text-[10px] px-1.5 py-0', rarityClasses[rarity] || 'bg-gray-400', className)}>{rarity}</Badge>;
+    return <Badge variant="outline" className={cn('text-[10px] px-1.5 py-0', rarityClasses[rarity] || 'bg-gray-400', className)}>{rarity}</Badge>;
 };
 
 const normalizeString = (str: string | null | undefined): string => {
@@ -287,7 +287,7 @@ const profileCategories = [
     { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras' },
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets' },
     { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons' },
-    { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories' },
+    { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories', isInteractiveGrid: true, gridData: accessories },
     { name: 'Gamepasses', icon: Wallet, description: 'Gamepasses que você possui.', subcollectionName: 'gamepasses', isInteractiveGrid: true, gridData: allGamepasses },
     { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index', disableItemUpload: true },
     { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', subcollectionName: 'obelisks', disableItemUpload: true },
@@ -727,7 +727,7 @@ function RankSelector() {
 
 // ... (BonusDisplay and CategoryDisplay would need updates, but let's implement InteractiveGridCategory first)
 
-function BonusDisplay({ items }: { items: any[] }) {
+function BonusDisplay({ items, category }: { items: any[], category: string }) {
     const totals = useMemo(() => {
         const bonusTotals = {
             damage: 0,
@@ -745,11 +745,19 @@ function BonusDisplay({ items }: { items: any[] }) {
         };
 
         items.forEach(item => {
-            if (item.damage_bonus) bonusTotals.damage += parseBonus(item.damage_bonus);
-            if (item.energy_bonus) bonusTotals.energy += parseBonus(item.energy_bonus);
-            if (item.coins_bonus) bonusTotals.coins += parseBonus(item.coins_bonus);
-            if (item.exp_bonus) bonusTotals.exp += parseBonus(item.exp_bonus);
-            if (item.movespeed_bonus) bonusTotals.movespeed += parseBonus(item.movespeed_bonus);
+            let data: any = item;
+            if(category === 'accessories') {
+                const fullAccessory: Accessory | undefined = accessories.find(a => a.id === item.id);
+                const rarityOption: RarityOption | undefined = fullAccessory?.rarity_options.find(ro => ro.rarity === item.rarity);
+                if (!rarityOption) return;
+                data = rarityOption;
+            }
+            
+            if (data.damage_bonus) bonusTotals.damage += parseBonus(data.damage_bonus);
+            if (data.energy_bonus) bonusTotals.energy += parseBonus(data.energy_bonus);
+            if (data.coins_bonus) bonusTotals.coins += parseBonus(data.coins_bonus);
+            if (data.exp_bonus) bonusTotals.exp += parseBonus(data.exp_bonus);
+            if (data.movespeed_bonus) bonusTotals.movespeed += parseBonus(data.movespeed_bonus);
 
             if (item.statType === 'damage' && item.multiplier) bonusTotals.damage += parseBonus(item.multiplier);
             if (item.statType === 'energy' && item.multiplier) bonusTotals.energy += parseBonus(item.multiplier);
@@ -758,7 +766,7 @@ function BonusDisplay({ items }: { items: any[] }) {
         
         return bonusTotals;
 
-    }, [items]);
+    }, [items, category]);
 
     const bonusConfig = [
         { key: 'damage', label: 'Dano', icon: Flame, color: 'text-red-500', suffix: 'x' },
@@ -856,44 +864,47 @@ function InteractiveGridCategory({ subcollectionName, allItems }: { subcollectio
     }
     
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
-            {allItems.map((item) => {
-                const isEquipped = equippedItems?.some(i => i.id === item.id);
-                const equippedAccessory = subcollectionName === 'accessories' ? equippedItems?.find(i => i.id === item.id) : null;
+        <div className="w-full">
+            <BonusDisplay items={equippedItems} category={subcollectionName} />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
+                {allItems.map((item) => {
+                    const isEquipped = equippedItems?.some(i => i.id === item.id);
+                    const equippedAccessory = subcollectionName === 'accessories' ? equippedItems?.find(i => i.id === item.id) : null;
 
-                return (
-                    <Popover key={item.id} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
-                        <PopoverTrigger asChild>
-                            <button
-                                onClick={() => handleItemClick(item)}
-                                onPointerDown={() => handlePointerDown(item.id)}
-                                onPointerUp={handlePointerUp}
-                                onPointerLeave={handlePointerUp} // Cancel on drag out
-                                className={cn(
-                                    'aspect-square bg-muted/30 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border-2 transition-all duration-200',
-                                    isEquipped ? 'border-primary bg-primary/10' : 'border-transparent hover:border-primary/50'
-                                )}
-                            >
-                                <p className="text-[10px] font-bold leading-tight text-center z-10">{item.name}</p>
-                                {equippedAccessory && (
-                                    <RarityBadge rarity={(equippedAccessory as any).rarity} className="absolute bottom-1 right-1" />
-                                )}
-                            </button>
-                        </PopoverTrigger>
-                        {subcollectionName === 'accessories' && (
-                             <PopoverContent className="w-auto p-0">
-                               <div className="flex flex-col">
-                                {item.rarity_options.map((opt: { rarity: string; }) => (
-                                    <Button key={opt.rarity} variant="ghost" className="rounded-none" onClick={() => handleRarityChange(item.id, opt.rarity)}>
-                                        <RarityBadge rarity={opt.rarity} />
-                                    </Button>
-                                ))}
-                               </div>
-                            </PopoverContent>
-                        )}
-                    </Popover>
-                );
-            })}
+                    return (
+                        <Popover key={item.id} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
+                            <PopoverTrigger asChild>
+                                <button
+                                    onClick={() => handleItemClick(item)}
+                                    onPointerDown={() => handlePointerDown(item.id)}
+                                    onPointerUp={handlePointerUp}
+                                    onPointerLeave={handlePointerUp} // Cancel on drag out
+                                    className={cn(
+                                        'aspect-square bg-muted/30 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border-2 transition-all duration-200',
+                                        isEquipped ? 'border-primary bg-primary/10' : 'border-transparent hover:border-primary/50'
+                                    )}
+                                >
+                                    <p className="text-[10px] font-bold leading-tight text-center z-10">{item.name}</p>
+                                    {equippedAccessory && (
+                                        <RarityBadge rarity={(equippedAccessory as any).rarity} className="absolute bottom-1 right-1" />
+                                    )}
+                                </button>
+                            </PopoverTrigger>
+                            {subcollectionName === 'accessories' && (
+                                <PopoverContent className="w-auto p-0">
+                                <div className="flex flex-col">
+                                    {(item as Accessory).rarity_options.map((opt: RarityOption) => (
+                                        <Button key={opt.rarity} variant="ghost" className="rounded-none" onClick={() => handleRarityChange(item.id, opt.rarity)}>
+                                            <RarityBadge rarity={opt.rarity} />
+                                        </Button>
+                                    ))}
+                                </div>
+                                </PopoverContent>
+                            )}
+                        </Popover>
+                    );
+                })}
+            </div>
         </div>
     );
 }
@@ -935,7 +946,7 @@ function CategoryDisplay({ subcollectionName, isInteractiveGrid, gridData }: { s
 
     return (
         <>
-            <BonusDisplay items={items} />
+            <BonusDisplay items={items} category={subcollectionName} />
             <div className="grid grid-cols-5 gap-2 w-full">
                 {items.map(item => (
                     <div key={item.id} className="aspect-square bg-muted/50 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border">
