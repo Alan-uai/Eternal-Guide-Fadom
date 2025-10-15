@@ -37,6 +37,14 @@ export const world16Data = {
         unlockCost: 'N/A',
         maxLevel: 110,
         maxBoost: '1.10x Energy'
+      },
+      {
+        id: 'stand-evolution',
+        name: 'Stand Evolution',
+        type: 'progression',
+        statType: 'mixed',
+        unlockCost: 'N/A',
+        description: 'Evolua os Stands. 2 de 0★ para 1★ (custo: 1k Exchange Token 1). 2 de 1★ para 2★ (custo: 2.5k Exchange Token 1). 2 de 2★ para 3★ (custo: 5k Exchange Token 1).'
       }
     ],
     npcs: [
