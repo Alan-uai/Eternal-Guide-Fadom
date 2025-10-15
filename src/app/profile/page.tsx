@@ -417,7 +417,7 @@ function IndexTierCalculator() {
                         ))}
                     </SelectContent>
                 </Select>
-                 <p className="text-xs text-muted-foreground">Bônus de Energia: <span className="font-semibold text-primary">{avatarBonus}x</span></p>
+                 <p className="text-xs text-muted-foreground">Bônus de Dano: <span className="font-semibold text-primary">{avatarBonus}x</span></p>
             </div>
             <div className='space-y-2'>
                 <Label htmlFor='pet-tier'>Tier de Pet</Label>
