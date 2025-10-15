@@ -7,6 +7,7 @@ import { AppProvider } from '@/context/app-provider';
 import { MainNav } from '@/components/main-nav';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthDialog } from '@/components/auth-dialog';
+import { RaidTimer } from '@/components/raid-timer';
 
 // We can't export metadata from a client component.
 // We can remove it or keep it for reference, but it won't be used.
@@ -36,6 +37,7 @@ export default function RootLayout({
             <header className="sticky top-0 flex h-14 items-center border-b bg-background/80 px-4 backdrop-blur-sm z-50">
               <MainNav />
             </header>
+            <RaidTimer />
             <main className="flex flex-1 flex-col p-4 md:p-6">
               {children}
             </main>
