@@ -1,6 +1,6 @@
 
 export const world18Data = {
-    name: 'World 18 - Debiru Hunter',
+    name: 'World 18 - Chainsaw City',
     powers: [
       {
         id: 'debiru-hunter',
