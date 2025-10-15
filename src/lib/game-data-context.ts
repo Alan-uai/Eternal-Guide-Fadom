@@ -11,7 +11,8 @@ import { world10Data } from '@/lib/world-10-data';
 import { world11Data } from '@/lib/world-11-data';
 import { world12Data } from '@/lib/world-12-data';
 import { world13Data } from '@/lib/world-13-data';
-import { world14Data } from '@/lib/world-14-data';
+import { world14Data } from '@/lib
+-14-data';
 import { world15Data } from '@/lib/world-15-data';
 import { world16Data } from '@/lib/world-16-data';
 import { world17Data } from '@/lib/world-17-data';
@@ -20,6 +21,7 @@ import { world19Data } from '@/lib/world-19-data';
 import { world20Data } from '@/lib/world-20-data';
 import { world21Data } from '@/lib/world-21-data';
 import { world22Data } from '@/lib/world-22-data';
+import { world23Data } from '@/lib/world-23-data';
 
 
 export const allGameData = [
@@ -45,4 +47,5 @@ export const allGameData = [
   world20Data,
   world21Data,
   world22Data,
+  world23Data,
 ];
