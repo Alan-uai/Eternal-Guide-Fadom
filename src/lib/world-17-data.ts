@@ -24,6 +24,12 @@ export const world17Data = {
         type: 'gacha',
         statType: 'damage',
         unlockCost: 'N/A',
+        leveling: {
+            token: 'Flesh Token',
+            costPerLevel: 5,
+            maxLevel: 50,
+            description: "Pode ser evoluído até o nível 50 usando Flesh Tokens para atingir um multiplicador de 18x."
+        },
         stats: [
           { name: 'Retto', multiplier: '1x', rarity: 'Common' },
           { name: 'Hakuro', multiplier: '1.5x', rarity: 'Uncommon' },
@@ -77,7 +83,17 @@ export const world17Data = {
         {
             id: 'ghoul-raid',
             name: 'Ghoul Raid',
-            description: 'Vai até a wave 1000 (w1k).'
+            description: 'Vai até a wave 1000 (w1k). Tem chance de dropar a Ghoul Mask.'
         }
+    ],
+    accessories: [
+        { id: 'ghoul-mask-common', name: 'Ghoul Mask', rarity: 'Common', damage_bonus: '1x' },
+        { id: 'ghoul-mask-uncommon', name: 'Ghoul Mask', rarity: 'Uncommon', damage_bonus: '1.2x' },
+        { id: 'ghoul-mask-rare', name: 'Ghoul Mask', rarity: 'Rare', damage_bonus: '1.4x' },
+        { id: 'ghoul-mask-epic', name: 'Ghoul Mask', rarity: 'Epic', damage_bonus: '1.6x' },
+        { id: 'ghoul-mask-legendary', name: 'Ghoul Mask', rarity: 'Legendary', damage_bonus: '1.8x' },
+        { id: 'ghoul-mask-mythic', name: 'Ghoul Mask', rarity: 'Mythic', damage_bonus: '2.0x' },
+        { id: 'ghoul-mask-phantom', name: 'Ghoul Mask', rarity: 'Phantom', damage_bonus: '2.4x' },
+        { id: 'ghoul-mask-supreme', name: 'Ghoul Mask', rarity: 'Supreme', damage_bonus: '3.0x' }
     ]
 };

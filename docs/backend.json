@@ -346,6 +346,7 @@
         "type": "object",
         "description": "Represents a wearable accessory dropped by a boss in a specific world.",
         "properties": {
+            "id": { "type": "string", "description": "Unique identifier for the accessory." },
             "name": { "type": "string", "description": "The name of the accessory." },
             "world": { "type": "string", "description": "The name of the world where the accessory drops." },
             "boss": { "type": "string", "description": "The name of the boss that drops the accessory." },
@@ -356,7 +357,7 @@
             "damage_bonus": { "type": "string", "description": "The damage bonus multiplier (e.g., '0.05x', '1x')." },
             "movespeed_bonus": { "type": "string", "description": "The movement speed bonus percentage (e.g., '10%', '75%')." }
         },
-        "required": ["name", "world", "boss"]
+        "required": ["id", "name", "world"]
     },
     "Shadow": {
       "title": "Shadow",
