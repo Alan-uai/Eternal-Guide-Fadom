@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Um fluxo que identifica poderes do jogo a partir de um screenshot.
@@ -28,8 +29,8 @@ const powerKnowledgeContext = allGameData.map(world =>
 
 const IdentifiedPowerSchema = z.object({
   name: z.string().describe('O nome exato do poder identificado na imagem.'),
-  rarity: z.string().describe('A raridade do poder, inferida pela cor da borda ou pelo nome (ex: "Phantom", "Supreme").'),
-  world: z.string().describe('O mundo de origem deste poder.'),
+  // A raridade foi removida pois a IA só precisa fornecer o nome.
+  // rarity: z.string().describe('A raridade do poder, inferida pela cor da borda ou pelo nome (ex: "Phantom", "Supreme").'),
 });
 export type IdentifiedPower = z.infer<typeof IdentifiedPowerSchema>;
 
@@ -39,7 +40,7 @@ const IdentifyPowersInputSchema = z.object({
 export type IdentifyPowersInput = z.infer<typeof IdentifyPowersInputSchema>;
 
 const IdentifyPowersOutputSchema = z.object({
-  powers: z.array(IdentifiedPowerSchema).describe('Uma lista de todos os poderes únicos identificados nas imagens.'),
+  powers: z.array(IdentifiedPowerSchema).describe('Uma lista de todos os nomes de poderes únicos identificados nas imagens.'),
 });
 export type IdentifyPowersOutput = z.infer<typeof IdentifyPowersOutputSchema>;
 
@@ -53,27 +54,14 @@ export const prompt = ai.definePrompt({
   name: 'identifyPowersPrompt',
   input: { schema: IdentifyPowersInputSchema },
   output: { schema: IdentifyPowersOutputSchema },
-  prompt: `Você é um especialista em análise de imagem para o jogo Anime Eternal. Sua tarefa é analisar um ou mais screenshots da tela de "Poderes" do jogador e identificar cada poder, sua raridade e de qual mundo ele vem.
-
-**MANUAL TÉCNICO DE IDENTIFICAÇÃO DE RARIDADE:**
-
-Analise a composição de cores da borda de cada poder. Ignore a posição exata dos brilhos, pois eles giram, mas preste atenção na combinação de cores.
-
-*   **Supreme:** Borda com um gradiente de arco-íris (várias cores como laranja, rosa, amarelo, azul).
-*   **Phantom:** Borda com base roxa escura e um brilho fúcsia/magenta vibrante.
-*   **Mythic:** Borda com base vermelha e um brilho laranja/vermelho claro.
-*   **Legendary:** Borda com base amarela/dourada e um brilho branco/amarelo claro.
-*   **Epic:** Borda com base magenta/lilás e um brilho rosa claro.
-*   **Rare:** Borda com base ciano/azul claro e um brilho azul mais claro.
-*   **Uncommon:** Borda com base verde-limão e um brilho verde mais claro.
-*   **Common:** Borda cinza com uma textura pontilhada.
+  prompt: `Você é um especialista em análise de imagem para o jogo Anime Eternal. Sua tarefa é analisar um ou mais screenshots da tela de "Poderes" do jogador e identificar o NOME de cada poder.
 
 **PROCESSO:**
 
-1.  Para cada poder na imagem, identifique o nome do poder.
-2.  Analise a borda e compare sua composição de cores com o **MANUAL TÉCNICO** acima para determinar a raridade.
-3.  Use o **CONHECIMENTO DE PODERES** abaixo para encontrar a qual mundo cada poder pertence. Se um poder não estiver na lista de conhecimento, marque o mundo como "Desconhecido".
-4.  Retorne uma lista JSON de objetos, onde cada objeto representa um poder identificado. Não inclua duplicatas na lista final.
+1.  Para cada poder na imagem, extraia apenas o nome exato do poder.
+2.  Ignore a raridade, a cor da borda ou qualquer outra informação. Foque APENAS no nome.
+3.  Use o **CONHECIMENTO DE PODERES** abaixo como referência para garantir que os nomes extraídos estão corretos e correspondem aos nomes oficiais do jogo.
+4.  Retorne uma lista JSON de objetos, onde cada objeto contém apenas a chave "name". Não inclua duplicatas na lista final.
 
 ---
 INÍCIO DO CONHECIMENTO DE PODERES
@@ -81,7 +69,7 @@ ${powerKnowledgeContext}
 ---
 FIM DO CONHECIMENTO DE PODERES
 
-Agora, analise as seguintes imagens:
+Agora, analise as seguintes imagens e extraia apenas os nomes dos poderes:
 {{#each images}}
 {{media url=this}}
 {{/each}}

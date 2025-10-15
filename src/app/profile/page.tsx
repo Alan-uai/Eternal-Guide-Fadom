@@ -35,8 +35,7 @@ const RarityBadge = ({ rarity, className }: { rarity: string, className?: string
     return <Badge className={cn('text-xs', rarityClasses[rarity] || 'bg-gray-400', className)}>{rarity}</Badge>;
 };
 
-
-const normalizeString = (str: string) => {
+const normalizeString = (str: string | null | undefined): string => {
   if (!str) return '';
   return str
     .toLowerCase()
@@ -46,8 +45,8 @@ const normalizeString = (str: string) => {
     .trim();
 };
 
-function findItemInGameData(identifiedItem: IdentifiedPower, allGameData: any[], subcollectionName: string) {
-    const normalizedIdentifiedName = normalizeString(identifiedItem.name);
+function findItemInGameData(identifiedName: string, allGameData: any[], subcollectionName: string) {
+    const normalizedIdentifiedName = normalizeString(identifiedName);
 
     for (const world of allGameData) {
         const subcollection = world[subcollectionName];
@@ -56,9 +55,11 @@ function findItemInGameData(identifiedItem: IdentifiedPower, allGameData: any[],
         for (const cachedItem of subcollection) {
             // Level 1 Search: Direct name match on the main item
             const normalizedCachedName = normalizeString(cachedItem.name);
-            if (normalizedCachedName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedCachedName)) {
-                 // Found a match at the top level, return the full item data
-                return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity, id: cachedItem.id || nanoid() };
+            if (normalizedCachedName === normalizedIdentifiedName) {
+                // If it's a direct match, but it's a gacha item, the rarity might be in stats
+                // For progression items, this is enough.
+                const rarity = cachedItem.stats?.[0]?.rarity || 'Common'; // Default rarity
+                return { ...cachedItem, world: world.name, rarity: rarity, id: cachedItem.id || nanoid() };
             }
 
             // Level 2 Search: If the main item has a 'stats' array, search inside it
@@ -66,10 +67,16 @@ function findItemInGameData(identifiedItem: IdentifiedPower, allGameData: any[],
                 for (const stat of cachedItem.stats) {
                     if (stat.name) {
                         const normalizedStatName = normalizeString(stat.name);
-                         if (normalizedStatName.includes(normalizedIdentifiedName) || normalizedIdentifiedName.includes(normalizedStatName)) {
+                         if (normalizedStatName === normalizedIdentifiedName) {
                             // Found a match in the stats array.
-                            // Return the PARENT item's data, but with the identified rarity and a unique ID for this specific stat.
-                            return { ...cachedItem, world: world.name, rarity: identifiedItem.rarity, id: stat.id || nanoid() };
+                            // Return the PARENT item's data, but with the specific rarity and name from the stat.
+                            return { 
+                                ...cachedItem, 
+                                name: stat.name, // Use the specific stat name for display
+                                world: world.name, 
+                                rarity: stat.rarity, 
+                                id: stat.id || nanoid() 
+                            };
                         }
                     }
                 }
@@ -143,7 +150,7 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                 const notFoundItems: string[] = [];
 
                 for (const identifiedItem of result.powers) {
-                    const fullItemData = findItemInGameData(identifiedItem, allGameData, subcollectionName);
+                    const fullItemData = findItemInGameData(identifiedItem.name, allGameData, subcollectionName);
 
                     if (fullItemData) {
                         const itemRef = doc(firestore, 'users', user.uid, subcollectionName, fullItemData.id);
@@ -154,10 +161,12 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                     }
                 }
                 
-                toast({
-                    title: `${savedCount} ${sectionTitle} Salvos!`,
-                    description: `Itens foram identificados e salvos em seu perfil.`,
-                });
+                if (savedCount > 0) {
+                  toast({
+                      title: `${savedCount} ${sectionTitle} Salvos!`,
+                      description: `Itens foram identificados e salvos em seu perfil.`,
+                  });
+                }
                 
                 if (notFoundItems.length > 0) {
                     toast({
@@ -166,6 +175,15 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                         description: `Não foi possível encontrar dados para: ${notFoundItems.join(', ')}`,
                     });
                 }
+
+                 if (savedCount === 0 && notFoundItems.length > 0) {
+                     toast({
+                        variant: 'destructive',
+                        title: 'Nenhum item salvo',
+                        description: 'A busca no cache falhou para todos os itens identificados. Verifique os nomes e os dados do jogo.',
+                    });
+                 }
+
 
             } else {
                  throw new Error('A IA não conseguiu identificar nenhum item.');
