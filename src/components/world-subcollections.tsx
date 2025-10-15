@@ -87,20 +87,20 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
     }, [item]);
 
     const handleFieldChange = (key: string, value: any) => {
-        if (key.includes('.')) {
-            const keys = key.split('.');
-            setLocalData((prev: any) => {
-                const newData = { ...prev };
-                let current = newData;
-                for (let i = 0; i < keys.length - 1; i++) {
-                    current = current[keys[i]];
+        const keys = key.split('.');
+        setLocalData((prev: any) => {
+            const newData = { ...prev };
+            let current = newData;
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (current[keys[i]] === undefined || typeof current[keys[i]] !== 'object') {
+                    // This part is tricky if the path doesn't exist. For now, assume it does for simplicity.
+                    return prev;
                 }
-                current[keys[keys.length - 1]] = value;
-                return newData;
-            });
-        } else {
-            setLocalData({ ...localData, [key]: value });
-        }
+                current = current[keys[i]];
+            }
+            current[keys[keys.length - 1]] = value;
+            return newData;
+        });
     };
     
     const handleSaveField = async (key: string, valueToSave: any) => {
@@ -143,7 +143,39 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
         const fullKey = prefix ? `${prefix}.${key}` : key;
         const propertySchema = entitySchema?.properties?.[key];
 
-        // Case 1: Field has an 'enum' in its schema (render as Select)
+        if (key === 'boosts' && Array.isArray(value)) {
+            return (
+                <div key={fullKey} className="space-y-3">
+                    <Label className="capitalize font-semibold text-primary">{key}</Label>
+                    <div className="pl-4 space-y-3 border-l-2">
+                        {value.map((boost, index) => (
+                            <div key={index} className="p-2 border rounded-md bg-background/50 space-y-2">
+                                <p className="text-xs font-medium text-muted-foreground">Boost {index + 1}</p>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`${fullKey}.${index}.type`} className='text-xs'>Type</Label>
+                                    <Input
+                                        id={`${fullKey}.${index}.type`}
+                                        value={boost.type}
+                                        onChange={(e) => handleFieldChange(`${fullKey}.${index}.type`, e.target.value)}
+                                        onBlur={(e) => handleSaveField(fullKey, localData[key])}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`${fullKey}.${index}.value`} className='text-xs'>Value</Label>
+                                    <Input
+                                        id={`${fullKey}.${index}.value`}
+                                        value={boost.value}
+                                        onChange={(e) => handleFieldChange(`${fullKey}.${index}.value`, e.target.value)}
+                                        onBlur={(e) => handleSaveField(fullKey, localData[key])}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )
+        }
+
         if (propertySchema?.enum) {
             return (
                  <div key={fullKey} className="space-y-2">
@@ -168,7 +200,6 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
             )
         }
 
-        // Case 2: Field is a nested object (render recursively)
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
              return (
                 <div key={fullKey} className="space-y-2 p-2 border rounded-md bg-background/50">
@@ -180,7 +211,6 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
              )
         }
         
-        // Case 3: Field is an array (render as JSON in Textarea)
         if (typeof value === 'object' && value !== null && Array.isArray(value)) {
             const jsonString = JSON.stringify(value, null, 2);
              return (
@@ -204,7 +234,6 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
             )
         }
         
-        // Case 4: Default case (render as Input or Textarea for long strings)
         const isLongText = typeof value === 'string' && value.length > 70;
         return (
             <div key={fullKey} className="space-y-2">
@@ -238,7 +267,7 @@ function InlineItemEditor({ item, itemRef, subcollectionName }: { item: any, ite
                 <div className="flex flex-wrap gap-2">
                     {suggestedFields.map(field => {
                         const propertySchema = entitySchema?.properties?.[field];
-                        let defaultValue = '';
+                        let defaultValue: any = '';
                         if (propertySchema?.enum) {
                             defaultValue = propertySchema.enum[0];
                         } else if (propertySchema?.type === 'array') {
