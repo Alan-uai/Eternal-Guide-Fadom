@@ -37,7 +37,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import type { WikiArticle } from '@/lib/types';
-import { allWikiArticles, articlesToSeed } from '@/lib/wiki-data';
+import { allWikiArticles } from '@/lib/wiki-data';
 import { accessories } from '@/lib/accessory-data';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -46,28 +46,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useRouter } from 'next/navigation';
 import { generateWikiArticleFromData } from '@/ai/flows/generate-wiki-from-data-flow';
-import { world1Data } from '@/lib/world-1-data';
-import { world2Data } from '@/lib/world-2-data';
-import { world3Data } from '@/lib/world-3-data';
-import { world4Data } from '@/lib/world-4-data';
-import { world5Data } from '@/lib/world-5-data';
-import { world6Data } from '@/lib/world-6-data';
-import { world7Data } from '@/lib/world-7-data';
-import { world8Data } from '@/lib/world-8-data';
-import { world9Data } from '@/lib/world-9-data';
-import { world10Data } from '@/lib/world-10-data';
-import { world11Data } from '@/lib/world-11-data';
-import { world12Data } from '@/lib/world-12-data';
-import { world13Data } from '@/lib/world-13-data';
-import { world14Data } from '@/lib/world-14-data';
-import { world15Data } from '@/lib/world-15-data';
-import { world16Data } from '@/lib/world-16-data';
-import { world17Data } from '@/lib/world-17-data';
-import { world18Data } from '@/lib/world-18-data';
-import { world19Data } from '@/lib/world-19-data';
-import { world20Data } from '@/lib/world-20-data';
-import { world21Data } from '@/lib/world-21-data';
-import { world22Data } from '@/lib/world-22-data';
+import { allGameData } from '@/lib/game-data-context';
 import { seedWorldData } from '@/ai/flows/seed-world-data-flow';
 import { extractTextFromFile } from '@/ai/flows/extract-text-from-file-flow';
 import { formatTextToJson } from '@/ai/flows/format-text-to-json-flow';
@@ -78,30 +57,6 @@ import { formatTextToJson } from '@/ai/flows/format-text-to-json-flow';
 // In a real app, this might be a dedicated metadata doc in Firestore.
 import backendConfig from '@/../docs/backend.json';
 
-const staticWorldDataMap: Record<string, any> = {
-    'world-1': world1Data,
-    'world-2': world2Data,
-    'world-3': world3Data,
-    'world-4': world4Data,
-    'world-5': world5Data,
-    'world-6': world6Data,
-    'world-7': world7Data,
-    'world-8': world8Data,
-    'world-9': world9Data,
-    'world-10': world10Data,
-    'world-11': world11Data,
-    'world-12': world12Data,
-    'world-13': world13Data,
-    'world-14': world14Data,
-    'world-15': world15Data,
-    'world-16': world16Data,
-    'world-17': world17Data,
-    'world-18': world18Data,
-    'world-19': world19Data,
-    'world-20': world20Data,
-    'world-21': world21Data,
-    'world-22': world22Data,
-  };
 
 const getSubcollectionsForWorld = (worldId: string): string[] => {
     if (!backendConfig.firestore || !backendConfig.firestore.structure) {
@@ -288,8 +243,9 @@ export function WikiManagementView() {
 
     const handleViewContent = (title: string, data: any, id?: string, isWorld: boolean = false) => {
         let finalData = data;
-        if (id && staticWorldDataMap[id]) {
-            finalData = { ...staticWorldDataMap[id], ...data };
+        const staticWorldData = allGameData.find(w => w.name.toLowerCase().replace(/[^a-z0-9]/g, '') === (id || '').replace(/-/g, ''));
+        if (id && staticWorldData) {
+            finalData = { ...staticWorldData, ...data };
         }
         setViewingContent({ title, data: finalData, id, isWorld });
     };
@@ -382,27 +338,25 @@ export function WikiManagementView() {
     try {
         const batch = writeBatch(firestore);
 
-        // Populate world data
-        const worldEntries = Object.entries(staticWorldDataMap);
-        for (const [_, worldData] of worldEntries) {
+        // Populate world data from the centralized source
+        for (const worldData of allGameData) {
+            if (!worldData || !worldData.name) continue;
             const worldName = worldData.name;
             const worldDataJson = JSON.stringify(worldData);
-            // This is a server-side flow, but we are calling it from the client.
-            // This might have security rule implications, but we proceed as requested.
             await seedWorldData({ worldName, worldDataJson });
         }
         
-        // Populate wiki articles
-        for (const article of articlesToSeed) {
+        // Populate wiki articles from the centralized source
+        for (const article of allWikiArticles) {
             const articleRef = doc(firestore, 'wikiContent', article.id);
-            batch.set(articleRef, article);
+            const articleWithTimestamp = { ...article, createdAt: serverTimestamp() };
+            batch.set(articleRef, articleWithTimestamp);
         }
         
-        // Commit articles batch
         await batch.commit();
         
         await incrementDataVersion();
-        toast({ title: 'População Concluída!', description: `${worldEntries.length} mundos e ${articlesToSeed.length} artigos foram populados/atualizados com sucesso.` });
+        toast({ title: 'População Concluída!', description: `${allGameData.length} mundos e ${allWikiArticles.length} artigos foram populados/atualizados com sucesso.` });
 
     } catch (error: any) {
          console.error('Erro ao popular todos os dados:', error);
