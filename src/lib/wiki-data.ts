@@ -1,3 +1,4 @@
+
 import type { WikiArticle } from '@/lib/types';
 import { serverTimestamp } from 'firebase/firestore';
 
@@ -714,7 +715,9 @@ export const raidRequirementsArticle: Omit<WikiArticle, 'createdAt'> = {
 **Raids em Grupo (até 4 Jogadores):**
 *   Todas as outras raids não mencionadas como "solo" permitem a participação de até 4 jogadores.
 
-Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a tabela consolidada para as raids mais antigas. A "Mundo Raid" é desbloqueada junto com o Mundo 21.`,
+Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a tabela consolidada para as raids mais antigas. 
+
+A **Mundo Raid**, localizada no Lobby 2, é desbloqueada junto com o Mundo 21. Sua mecânica é similar à da Gleam Raid: cada onda completada é uma conquista que concede um nível de um poder exclusivo da raid (do comum ao supremo), além de uma conquista final que recompensa com créditos.`,
   tags: ['raid', 'dungeon', 'energia', 'guia', 'geral', 'solo'],
   imageUrl: 'wiki-11',
   tables: {
@@ -1171,3 +1174,6 @@ export const articlesToSeed = allWikiArticles.map(article => ({
 
 
 
+
+
+    
