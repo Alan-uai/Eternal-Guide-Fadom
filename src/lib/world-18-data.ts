@@ -77,7 +77,7 @@ export const world18Data = {
         type: 'progression',
         statType: 'mixed',
         unlockCost: 'N/A',
-        description: 'Evolua o pet Pokita até o nível 50 usando Pokita Tokens.'
+        description: 'Evolua o poder Pokita até o nível 50 usando Pokita Tokens.'
       }
     ],
     npcs: [
@@ -115,7 +115,7 @@ export const world18Data = {
         {
             id: 'chainsaw-defense',
             name: 'Chainsaw Defense',
-            description: 'Vai até a wave 1000 (w1k). Tem chance de dropar o pet Pokita.'
+            description: 'Vai até a wave 1000 (w1k). Tem chance de dropar o poder Pokita.'
         }
     ],
     pets: []
