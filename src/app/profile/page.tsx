@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
@@ -45,6 +45,7 @@ const normalizeString = (str: string | null | undefined): string => {
     .trim();
 };
 
+
 function findItemInGameData(identifiedName: string, allGameData: any[], subcollectionName: string) {
     const normalizedIdentifiedName = normalizeString(identifiedName);
 
@@ -71,10 +72,11 @@ function findItemInGameData(identifiedName: string, allGameData: any[], subcolle
                             // Found a match in the stats array.
                             // Return the PARENT item's data, but with the specific rarity and name from the stat.
                             return { 
-                                ...cachedItem, 
+                                ...cachedItem, // All parent data (type, unlockCost etc.)
                                 name: stat.name, // Use the specific stat name for display
+                                rarity: stat.rarity, // Use the specific stat rarity
+                                multiplier: stat.multiplier, // Use the specific stat multiplier
                                 world: world.name, 
-                                rarity: stat.rarity, 
                                 id: stat.id || nanoid() 
                             };
                         }
@@ -97,6 +99,17 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [foundItems, setFoundItems] = useState<any[]>([]);
+    const [notFoundNames, setNotFoundNames] = useState<string[]>([]);
+    
+
+    // Reset state when dialog opens
+    useEffect(() => {
+        if (isDialogOpen) {
+            setFoundItems([]);
+            setNotFoundNames([]);
+        }
+    }, [isDialogOpen]);
 
     const userSubcollectionQuery = useMemoFirebase(() => {
         if (!firestore || !user) return null;
@@ -126,6 +139,8 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
         }
 
         setIsAnalyzing(true);
+        setFoundItems([]);
+        setNotFoundNames([]);
         toast({
             title: 'Analisando Imagens...',
             description: `A IA está identificando seus itens. Isso pode levar um momento.`,
@@ -147,7 +162,7 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
 
             if (result && result.powers) {
                 let savedCount = 0;
-                const notFoundItems: string[] = [];
+                const notFound: string[] = [];
 
                 for (const identifiedItem of result.powers) {
                     const fullItemData = findItemInGameData(identifiedItem.name, allGameData, subcollectionName);
@@ -157,7 +172,7 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                         await setDoc(itemRef, fullItemData, { merge: true });
                         savedCount++;
                     } else {
-                        notFoundItems.push(identifiedItem.name);
+                        notFound.push(identifiedItem.name);
                     }
                 }
                 
@@ -168,15 +183,15 @@ function ProfileSection({ subcollectionName, sectionTitle, sectionDescription }:
                   });
                 }
                 
-                if (notFoundItems.length > 0) {
+                if (notFound.length > 0) {
                     toast({
                         variant: 'destructive',
-                        title: `${notFoundItems.length} itens não encontrados`,
-                        description: `Não foi possível encontrar dados para: ${notFoundItems.join(', ')}`,
+                        title: `${notFound.length} itens não encontrados`,
+                        description: `Não foi possível encontrar dados para: ${notFound.join(', ')}`,
                     });
                 }
 
-                 if (savedCount === 0 && notFoundItems.length > 0) {
+                 if (savedCount === 0 && notFound.length > 0) {
                      toast({
                         variant: 'destructive',
                         title: 'Nenhum item salvo',
