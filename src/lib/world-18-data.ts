@@ -1,5 +1,60 @@
+
 export const world18Data = {
-    name: 'World 18',
+    name: 'World 18 - Debiru Hunter',
+    powers: [
+      {
+        id: 'debiru-hunter',
+        name: 'Debiru Hunter',
+        type: 'gacha',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        stats: [
+          { name: 'Rookie Hunter', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+          { name: 'Field Hunter', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+          { name: 'Contract Hunter', multiplier: '4.5x', rarity: 'Rare', probability: 19.9 },
+          { name: 'Fiend Hunter', multiplier: '6x', rarity: 'Epic', probability: 5 },
+          { name: 'Hybrid Hunter', multiplier: '8x', rarity: 'Legendary', probability: 1 },
+          { name: 'Veteran Hunter', multiplier: '10x', rarity: 'Mythic', probability: 0.5 },
+          { name: 'Special Division Hunter', multiplier: '12x', rarity: 'Phantom', probability: 0.05 },
+          { name: 'Primal Threat Hunter', multiplier: '15x', rarity: 'Supreme', probability: 0.01 },
+        ]
+      },
+      {
+        id: 'akuma-powers',
+        name: 'Akuma Powers',
+        type: 'gacha',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        stats: [
+          { name: 'Akuma: Ghost', multiplier: '1x', rarity: 'Common', probability: 40.55 },
+          { name: 'Akuma: Fox', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
+          { name: 'Akuma: Future', multiplier: '2x', rarity: 'Rare', probability: 19.9 },
+          { name: 'Akuma: Curse', multiplier: '3x', rarity: 'Epic', probability: 5 },
+          { name: 'Akuma: Angel', multiplier: '5x', rarity: 'Legendary', probability: 1 },
+          { name: 'Akuma: Crossbow', multiplier: '7x', rarity: 'Mythic', probability: 0.5 },
+          { name: 'Akuma: Pokita', multiplier: '9x', rarity: 'Phantom', probability: 0.05 },
+          { name: 'Akuma: Control', multiplier: '12x', rarity: 'Supreme', probability: 0.01 },
+        ]
+      },
+      {
+        id: 'akuma-energy',
+        name: 'Akuma Energy',
+        type: 'progression',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        maxLevel: 160,
+        maxBoost: '1.60x Energy'
+      },
+      {
+        id: 'akuma-damage',
+        name: 'Akuma Damage',
+        type: 'progression',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        maxLevel: 110,
+        maxBoost: '1.10x Damage'
+      }
+    ],
     npcs: [
         { id: 'world18-e-rank', name: 'E Rank NPC', rank: 'E', exp: 1267295, hp: '97OVG', world: 'World 18', drops: { coins: { amount: '9.7OVG', probability: 0.8 } } },
         { id: 'world18-d-rank', name: 'D Rank NPC', rank: 'D', exp: 1394024, hp: '488OVG', world: 'World 18', drops: { coins: { amount: '48OVG', probability: 0.8 } } },

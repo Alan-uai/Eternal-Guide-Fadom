@@ -8,7 +8,7 @@ import { world7Data } from '@/lib/world-7-data';
 import { world8Data } from '@/lib/world-8-data';
 import { world9Data } from '@/lib/world-9-data';
 import { world10Data } from '@/lib/world-10-data';
-import { world11Data } from '@/lib/world-11-data';
+import { world11Data } from '@/lib_world-11-data';
 import { world12Data } from '@/lib/world-12-data';
 import { world13Data } from '@/lib/world-13-data';
 import { world14Data } from '@/lib/world-14-data';
