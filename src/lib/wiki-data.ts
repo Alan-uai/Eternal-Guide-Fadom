@@ -411,22 +411,22 @@ export const levelExpArticle: Omit<WikiArticle, 'createdAt'> = {
             { Nível: 127, 'Experiência Necessária': '166M' },
             { Nível: 128, 'Experiência Necessária': '183M' },
             { Nível: 129, 'Experiência Necessária': '201M' },
-            { Nível: 130, 'Experiência Necessária': '221M' },
-            { Nível: 131, 'Experiência Necessária': '243M' },
-            { Nível: 132, 'Experiência Necessária': '266M' },
-            { Nível: 133, 'Experiência Necessária': '293M' },
-            { Nível: 134, 'Experiência Necessária': '322M' },
-            { Nível: 135, 'Experiência Necessária': '354M' },
-            { Nível: 136, 'Experiência Necessária': '390M' },
-            { Nível: 137, 'Experiência Necessária': '429M' },
-            { Nível: 138, 'Experiência Necessária': '472M' },
-            { Nível: 139, 'Experiência Necessária': '519M' },
-            { Nível: 140, 'Experiência Necessária': '571M' },
-            { Nível: 141, 'Experiência Necessária': '628M' },
-            { Nível: 142, 'Experiência Necessária': '691M' },
-            { Nível: 143, 'Experiência Necessária': '760M' },
-            { Nível: 144, 'Experiência Necessária': '836M' },
-            { Nível: 145, 'Experiência Necessária': '920M' },
+            { Nível: 130, 'Experiência Necessária': '22M' },
+            { Nível: 131, 'Experiência Necessária': '24.3M' },
+            { Nível: 132, 'Experiência Necessária': '26.6M' },
+            { Nível: 133, 'Experiência Necessária': '29.3M' },
+            { Nível: 134, 'Experiência Necessária': '32.2M' },
+            { Nível: 135, 'Experiência Necessária': '35.4M' },
+            { Nível: 136, 'Experiência Necessária': '39M' },
+            { Nível: 137, 'Experiência Necessária': '42.9M' },
+            { Nível: 138, 'Experiência Necessária': '47.2M' },
+            { Nível: 139, 'Experiência Necessária': '51.9M' },
+            { Nível: 140, 'Experiência Necessária': '57.1M' },
+            { Nível: 141, 'Experiência Necessária': '62.8M' },
+            { Nível: 142, 'Experiência Necessária': '69.1M' },
+            { Nível: 143, 'Experiência Necessária': '76M' },
+            { Nível: 144, 'Experiência Necessária': '83.6M' },
+            { Nível: 145, 'Experiência Necessária': '92M' },
             { Nível: 146, 'Experiência Necessária': '1.01B' },
             { Nível: 147, 'Experiência Necessária': '1.11B' },
             { Nível: 148, 'Experiência Necessária': '1.22B' },
@@ -447,9 +447,9 @@ export const levelExpArticle: Omit<WikiArticle, 'createdAt'> = {
             { Nível: 163, 'Experiência Necessária': '5.11B' },
             { Nível: 164, 'Experiência Necessária': '5.62B' },
             { Nível: 165, 'Experiência Necessária': '6.18B' },
-            { Nível: 166, 'Experiência Necessária': '6.81B' },
-            { Nível: 167, 'Experiência Necessária': '7.49B' },
-            { Nível: 168, 'Experiência Necessária': '8.24B' },
+            { Nível: 166, 'Experiência Necessária': '681M' },
+            { Nível: 167, 'Experiência Necessária': '749M' },
+            { Nível: 168, 'Experiência Necessária': '824M' },
             { Nível: 169, 'Experiência Necessária': '9.06B' },
             { Nível: 170, 'Experiência Necessária': '9.97B' },
             { Nível: 171, 'Experiência Necessária': '10.9B' },
@@ -465,44 +465,44 @@ export const levelExpArticle: Omit<WikiArticle, 'createdAt'> = {
             { Nível: 181, 'Experiência Necessária': '28.3B' },
             { Nível: 182, 'Experiência Necessária': '31.1B' },
             { Nível: 183, 'Experiência Necessária': '34.2B' },
-            { Nível: 184, 'Experiência Necessária': '37.8B' },
-            { Nível: 185, 'Experiência Necessária': '41.6B' },
-            { Nível: 186, 'Experiência Necessária': '45.8B' },
-            { Nível: 187, 'Experiência Necessária': '50.3B' },
-            { Nível: 188, 'Experiência Necessária': '55.4B' },
-            { Nível: 189, 'Experiência Necessária': '60.9B' },
-            { Nível: 190, 'Experiência Necessária': '67B' },
-            { Nível: 191, 'Experiência Necessária': '73.7B' },
-            { Nível: 192, 'Experiência Necessária': '81.1B' },
-            { Nível: 193, 'Experiência Necessária': '89.2B' },
-            { Nível: 194, 'Experiência Necessária': '98.1B' },
-            { Nível: 195, 'Experiência Necessária': '108B' },
-            { Nível: 196, 'Experiência Necessária': '119B' },
-            { Nível: 197, 'Experiência Necessária': '131B' },
-            { Nível: 198, 'Experiência Necessária': '144B' },
-            { Nível: 199, 'Experiência Necessária': '159B' },
-            { Nível: 200, 'Experiência Necessária': '175B' },
-            { Nível: 201, 'Experiência Necessária': '192B' },
-            { Nível: 202, 'Experiência Necessária': '211B' },
-            { Nível: 203, 'Experiência Necessária': '232B' },
-            { Nível: 204, 'Experiência Necessária': '256B' },
-            { Nível: 205, 'Experiência Necessária': '281B' },
-            { Nível: 206, 'Experiência Necessária': '309B' },
-            { Nível: 207, 'Experiência Necessária': '340B' },
-            { Nível: 208, 'Experiência Necessária': '374B' },
-            { Nível: 209, 'Experiência Necessária': '412B' },
-            { Nível: 210, 'Experiência Necessária': '453B' },
-            { Nível: 211, 'Experiência Necessária': '498B' },
-            { Nível: 212, 'Experiência Necessária': '548B' },
-            { Nível: 213, 'Experiência Necessária': '603B' },
-            { Nível: 214, 'Experiência Necessária': '663B' },
-            { Nível: 215, 'Experiência Necessária': '730B' },
-            { Nível: 216, 'Experiência Necessária': '803B' },
-            { Nível: 217, 'Experiência Necessária': '883B' },
-            { Nível: 218, 'Experiência Necessária': '971B' },
-            { Nível: 219, 'Experiência Necessária': '1.07T' },
-            { Nível: 220, 'Experiência Necessária': '1.18T' },
-            { Nível: 221, 'Experiência Necessária': '1.29T' },
+            { Nível: 184, 'Experiência Necessária': '3.78B' },
+            { Nível: 185, 'Experiência Necessária': '4.16B' },
+            { Nível: 186, 'Experiência Necessária': '4.58B' },
+            { Nível: 187, 'Experiência Necessária': '5.03B' },
+            { Nível: 188, 'Experiência Necessária': '5.54B' },
+            { Nível: 189, 'Experiência Necessária': '6.09B' },
+            { Nível: 190, 'Experiência Necessária': '6.7B' },
+            { Nível: 191, 'Experiência Necessária': '7.37B' },
+            { Nível: 192, 'Experiência Necessária': '8.11B' },
+            { Nível: 193, 'Experiência Necessária': '8.92B' },
+            { Nível: 194, 'Experiência Necessária': '9.81B' },
+            { Nível: 195, 'Experiência Necessária': '10.8B' },
+            { Nível: 196, 'Experiência Necessária': '11.9B' },
+            { Nível: 197, 'Experiência Necessária': '13.1B' },
+            { Nível: 198, 'Experiência Necessária': '14.4B' },
+            { Nível: 199, 'Experiência Necessária': '15.9B' },
+            { Nível: 200, 'Experiência Necessária': '17.5B' },
+            { Nível: 201, 'Experiência Necessária': '19.2B' },
+            { Nível: 202, 'Experiência Necessária': '21.1B' },
+            { Nível: 203, 'Experiência Necessária': '23.2B' },
+            { Nível: 204, 'Experiência Necessária': '25.6B' },
+            { Nível: 205, 'Experiência Necessária': '28.1B' },
+            { Nível: 206, 'Experiência Necessária': '30.9B' },
+            { Nível: 207, 'Experiência Necessária': '34B' },
+            { Nível: 208, 'Experiência Necessária': '37.4B' },
+            { Nível: 209, 'Experiência Necessária': '41.2B' },
+            { Nível: 210, 'Experiência Necessária': '45.3B' },
+            { Nível: 211, 'Experiência Necessária': '49.8B' },
+            { Nível: 212, 'Experiência Necessária': '54.8B' },
+            { Nível: 213, 'Experiência Necessária': '60.3B' },
+            { Nível: 214, 'Experiência Necessária': '66.3B' },
+            { Nível: 215, 'Experiência Necessária': '73B' },
+            { Nível: 216, 'Experiência Necessária': '80.3B' },
+            { Nível: 217, 'Experiência Necessária': '88.3B' },
+            { Nível: 218, 'Experiência Necessária': '97.1B' },
+            { Nível: 219, 'Experiência Necessária': '107B' },
+            { Nível: 220, 'Experiência Necessária': '118B' },
+            { Nível: 221, 'Experiência Necessária': '129T' },
             { Nível: 222, 'Experiência Necessária': '1.42T' },
             { Nível: 223, 'Experiência Necessária': '1.57T' },
             { Nível: 224, 'Experiência Necessária': '1.72T' },
@@ -887,7 +887,7 @@ export const scientificNotationArticle: Omit<WikiArticle, 'createdAt'> = {
             { Abreviação: 'sxQDR', Nome: 'Sesquadragintillion', 'Notação Científica': '1.00E+141' },
             { Abreviação: 'SpQDR', Nome: 'Septenquadragintillion', 'Notação Científica': '1.00E+144' },
             { Abreviação: 'OQQDR', Nome: 'Octoquadragintillion', 'Notação Científica': '1.00E+147' },
-            { Abreviação: 'NQQDR', Nome: 'Novemquadragintillion', 'Notação Científica': '1.00E+150' },
+            { Abreviação: 'NQQDR', Nome: 'Novemquadragintillion', 'Notação Científica': '1soo.E+150' },
         ]
     }
   }
@@ -1068,6 +1068,64 @@ export const lobbyDungeonsArticle: Omit<WikiArticle, 'createdAt'> = {
   },
 };
 
+export const achievementsGuideArticle: Omit<WikiArticle, 'createdAt'> = {
+    id: 'achievements-guide',
+    title: 'Guia de Conquistas',
+    summary: 'Um guia completo para todas as conquistas do jogo, incluindo gerais, de raids e totais.',
+    content: `Este guia detalha todas as conquistas disponíveis no Anime Eternal, seus requisitos e as recompensas que elas oferecem.
+
+### Conquistas Gerais
+Estas são conquistas que você progride ao longo do tempo jogando.
+
+### Conquistas de Raids (Salas)
+Estas conquistas são obtidas ao alcançar certas salas (rooms) nas dungeons do lobby. O bônus para as salas 10, 20, 30 e 40 varia de raid para raid, mas a sala 50 sempre concede +1 espaço para equipar pet.
+
+### Conquistas de Conclusão Total de Raids
+Estas são recompensas por completar uma raid do lobby um certo número de vezes. A recompensa final geralmente são Créditos, uma moeda F2P.
+
+### Análise de Tempo das Raids
+O tempo para completar as raids de 50 salas foi cronometrado. A velocidade de movimento base é considerada 100%.
+- **Pokita (100% de Velocidade):** Acessório de evento que dobra a velocidade de movimento. O tempo médio com ele é de **1 minuto, 12 segundos e 25 nanossegundos**.
+- **Clover Pendant (50% de Velocidade):** O melhor acessório de velocidade não-evento. O tempo médio com ele seria de aproximadamente **1 minuto, 36 segundos**.
+- **Sem Acessórios (Velocidade Base):** Sem nenhum bônus de velocidade, o tempo seria de aproximadamente **2 minutos e 24 segundos**.
+
+**Nota:** A raid Kaiju tem um tempo diferente de **2 minutos e 16 segundos** com o Pokita (100%). Os tempos para outros acessórios seguiriam uma lógica de cálculo similar.
+`,
+    tags: ['conquistas', 'achievements', 'guia', 'raid', 'créditos', 'geral'],
+    imageUrl: 'wiki-4',
+    tables: {
+      general: {
+        headers: ['Conquista', 'Nível Máx/Requisito', 'Progressão'],
+        rows: [
+          { Conquista: 'Friends Bonus V', 'Nível Máx/Requisito': '96h', Progressão: '5% de energia a cada lvl' },
+          { Conquista: 'Total coins XXVIII', 'Nível Máx/Requisito': '100N', Progressão: '5% coins (x10 a cada lvl)' },
+          { Conquista: 'Total energy XLV', 'Nível Máx/Requisito': '10QnD', Progressão: '5% energia (x10 a cada lvl)' },
+          { Conquista: 'Time Played X', 'Nível Máx/Requisito': '1250h', Progressão: '5% energia' },
+          { Conquista: 'Star opened X', 'Nível Máx/Requisito': '5M', Progressão: '+1 equip pet (lvl 1), depois +1 star open' },
+          { Conquista: 'Total Enemies XIX', 'Nível Máx/Requisito': '75M', Progressão: '5% damage' },
+        ]
+      },
+      totalRaids: {
+        headers: ['Raid', '25 Conclusões', '50 Conclusões', '75 Conclusões', '100 Conclusões'],
+        rows: [
+          { Raid: 'Easy', '25 Conclusões': 'Bônus Variável', '50 Conclusões': 'Bônus Variável', '75 Conclusões': 'Bônus Variável', '100 Conclusões': '250 Créditos' },
+          { Raid: 'Medium', '25 Conclusões': 'Bônus Variável', '50 Conclusões': 'Bônus Variável', '75 Conclusões': 'Bônus Variável', '100 Conclusões': '350 Créditos' },
+          { Raid: 'Hard', '25 Conclusões': 'Bônus Variável', '50 Conclusões': 'Bônus Variável', '75 Conclusões': 'Bônus Variável', '100 Conclusões': '550 Créditos' },
+          { Raid: 'Insane', '25 Conclusões': 'Bônus Variável', '50 Conclusões': 'Bônus Variável', '75 Conclusões': 'Bônus Variável', '100 Conclusões': '750 Créditos' },
+          { Raid: 'Crazy', '25 Conclusões': 'Bônus Variável', '50 Conclusões': 'Bônus Variável', '75 Conclusões': 'Bônus Variável', '100 Conclusões': '1k Créditos' },
+        ]
+      },
+      specialRaids: {
+          headers: ['Raid', 'Requisito', 'Recompensa'],
+          rows: [
+              { Raid: 'Nightmare', Requisito: '25 Conclusões', Recompensa: '1k Créditos' },
+              { Raid: 'Leaf Raid', Requisito: 'Room 2000', Recompensa: '200 Créditos' },
+          ]
+      }
+    }
+  };
+
+
 export const allWikiArticles: Omit<WikiArticle, 'createdAt' | 'tables'>[] = [
     gettingStartedArticle,
     auraArticle,
@@ -1089,6 +1147,7 @@ export const allWikiArticles: Omit<WikiArticle, 'createdAt' | 'tables'>[] = [
     standsArticle,
     howToGetStrongerArticle,
     lobbyDungeonsArticle,
+    achievementsGuideArticle,
 ];
 
 // Adiciona o timestamp do servidor para cada artigo
@@ -1098,6 +1157,7 @@ export const articlesToSeed = allWikiArticles.map(article => ({
 }));
     
     
+
 
 
 

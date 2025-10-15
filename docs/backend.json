@@ -1,6 +1,33 @@
 
 {
   "entities": {
+    "Achievement": {
+      "title": "Achievement",
+      "type": "object",
+      "description": "Representa uma conquista no jogo.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["general", "raid_rooms", "total_raids"] },
+        "category": { "type": "string", "description": "Categoria geral da conquista (ex: 'Friends', 'Coins', 'Energy', 'Raid')" },
+        "maxLevel": { "type": "number", "description": "Nível máximo para conquistas de progressão." },
+        "requirement": { "type": "string", "description": "Requisito para completar a conquista (ex: '100N', '1250h')." },
+        "progressionBonus": { "type": "string", "description": "Descrição do bônus de progressão (ex: '5% de energia a cada lvl')." },
+        "tiers": {
+          "type": "array",
+          "description": "Níveis específicos para conquistas de raid.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement": { "type": "string", "description": "O requisito do nível (ex: 'Room 10', '25 Completions')." },
+              "bonus": { "type": "string", "description": "O bônus concedido neste nível." }
+            },
+            "required": ["requirement", "bonus"]
+          }
+        }
+      },
+      "required": ["id", "name", "type", "category"]
+    },
     "SavedAnswer": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "SavedAnswer",
@@ -145,6 +172,10 @@
         "reputationPoints": {
             "type": "number",
             "description": "Points awarded to a user for helpful feedback."
+        },
+        "credits": {
+            "type": "number",
+            "description": "F2P currency earned from achievements, used for Gamepasses."
         }
       },
       "required": [
@@ -307,7 +338,7 @@
             "boss": { "type": "string", "description": "The name of the boss that drops the accessory." },
             "rarity": { "type": "string", "description": "The rarity of the accessory (e.g., C-Rank, S-Rank, SS-Rank)." },
             "coins_bonus": { "type": "string", "description": "The coin bonus multiplier (e.g., '0.1', '2.25')." },
-            "energy_bonus": { "type": "string", "description": "The energy bonus multiplier (e.g., '0.01x', '0.75x')." },
+            "energy_bonus": { "type": "string", "description": "The energy bonus multiplier (eg., '0.01x', '0.75x')." },
             "exp_bonus": { "type": "string", "description": "The experience bonus percentage (e.g., '1.0%', '7.5%')." },
             "damage_bonus": { "type": "string", "description": "The damage bonus multiplier (e.g., '0.05x', '1x')." },
             "movespeed_bonus": { "type": "string", "description": "The movement speed bonus percentage (e.g., '10%', '75%')." }
@@ -402,6 +433,14 @@
   },
   "firestore": {
     "structure": [
+      {
+        "path": "/achievements/{achievementId}",
+        "definition": {
+          "entityName": "Achievement",
+          "schema": { "$ref": "#/backend/entities/Achievement" },
+          "description": "Stores game achievements."
+        }
+      },
       {
         "path": "/users/{userId}",
         "definition": {
@@ -539,6 +578,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. This model is much more detailed and accurate than the previous one, and enables the AI to answer specific questions about game content by querying the appropriate sub-collection."
+    "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. A new top-level collection 'achievements' is added to store all game achievements, which is separate from world-specific data."
   }
 }
