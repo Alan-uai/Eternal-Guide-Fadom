@@ -89,7 +89,7 @@ function findItemInGameData(identifiedName: string, category: string, allGameDat
 
 
 // Componente centralizado para upload e análise de itens
-function GeneralItemUploader() {
+function GeneralItemUploader({ asShortcut = false }: { asShortcut?: boolean }) {
     const { toast } = useToast();
     const { user } = useUser();
     const { firestore } = useFirebase();
@@ -216,10 +216,16 @@ function GeneralItemUploader() {
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Adicionar Itens com IA
-                </Button>
+                {asShortcut ? (
+                    <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <PlusCircle className="h-4 w-4" />
+                    </Button>
+                ) : (
+                    <Button>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Adicionar Itens com IA
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="max-w-lg">
                 <DialogHeader>
@@ -726,13 +732,18 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {profileCategories.map((category) => (
-                        <Card key={category.name}>
-                            <CardHeader>
-                                <CardTitle className='flex items-center gap-3'>
-                                    <category.icon className="h-6 w-6 text-primary" />
-                                    {category.name}
-                                </CardTitle>
-                                <CardDescription>{category.description}</CardDescription>
+                        <Card key={category.name} className="relative">
+                            <CardHeader className='flex-row items-start justify-between'>
+                                <div>
+                                    <CardTitle className='flex items-center gap-3'>
+                                        <category.icon className="h-6 w-6 text-primary" />
+                                        {category.name}
+                                    </CardTitle>
+                                    <CardDescription>{category.description}</CardDescription>
+                                </div>
+                                <div className="absolute top-2 right-2">
+                                    <GeneralItemUploader asShortcut={true} />
+                                </div>
                             </CardHeader>
                             <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
                                 <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
@@ -746,5 +757,3 @@ export default function ProfilePage() {
         </>
     );
 }
-
-    
