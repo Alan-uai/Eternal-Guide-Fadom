@@ -1,5 +1,47 @@
+
 export const world8Data = {
-    name: 'World 8',
+    name: 'World 8 - Leaf Village',
+    powers: [
+      {
+        id: 'power-eye',
+        name: 'Power Eye',
+        type: 'gacha',
+        statType: 'mixed', 
+        unlockCost: 'N/A', 
+        stats: [
+          { name: 'Single Tomoe Eye', multiplier: '2.5x', statType: 'damage', rarity: 'Common' },
+          { name: 'Double Tomoe Eye', multiplier: '3x', statType: 'damage', rarity: 'Uncommon' },
+          { name: 'Triple Tomoe Eye', multiplier: '4x', statType: 'damage', rarity: 'Rare' },
+          { name: 'Triad Insight Eye', multiplier: '5x', statType: 'damage', rarity: 'Epic' },
+          { name: 'Cyclone Eye', multiplier: '0.5x', statType: 'damage', rarity: 'Legendary' },
+          { name: 'Whirlpool\'s Depth Eye', multiplier: '6x', statType: 'damage', rarity: 'Legendary' },
+          { name: 'Triad Nexus Eye', multiplier: '1x', statType: 'damage', rarity: 'Mythic' },
+          { name: 'Eclipse Eye', multiplier: '8x', statType: 'damage', rarity: 'Mythic' },
+          { name: 'Atomic Insight Eye', multiplier: '1x', statType: 'damage', rarity: 'Mythic' },
+          { name: 'Eternal Eclipse Eye', multiplier: '2x', statType: 'damage', rarity: 'Mythic' },
+          { name: 'Eternal Atomic Eye', multiplier: '12x', statType: 'damage', rarity: 'Phantom' },
+          { name: 'Eye Of Six Paths', multiplier: '15x', statType: 'damage', rarity: 'Supreme' }
+        ]
+      },
+      {
+        id: 'chakra-progression',
+        name: 'Chakra Progression',
+        type: 'progression',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        maxLevel: 210,
+        maxBoost: '2.10x Energy'
+      },
+      {
+        id: 'damage-range',
+        name: 'Damage Range',
+        type: 'progression',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        maxLevel: 10,
+        maxBoost: 'N/A' 
+      }
+    ],
     npcs: [
         { id: 'world8-e-rank', name: 'E Rank NPC', rank: 'E', exp: 483, hp: '54dD', world: 'World 8', drops: { coins: { amount: '5.4dD', probability: 0.8 } } },
         { id: 'world8-d-rank', name: 'D Rank NPC', rank: 'D', exp: 531, hp: '270dD', world: 'World 8', drops: { coins: { amount: '27dD', probability: 0.8 } } },
@@ -32,5 +74,3 @@ export const world8Data = {
         }
     ]
 };
-
-    
