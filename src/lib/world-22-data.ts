@@ -1,6 +1,6 @@
 
 export const world22Data = {
-    name: 'World 22 - Shadow Garden',
+    name: 'World 22 - Shadow Academy',
     powers: [
       {
         id: 'shadow-garden',
