@@ -70,6 +70,24 @@ export const generalAchievements = [
             { requirement: 'Room 50', bonus: '+1 equip pet'},
         ]
     },
+    {
+        id: 'dragon-raid-rooms',
+        name: 'Dragon Raid Rooms',
+        type: 'raid_rooms',
+        category: 'Raid',
+        tiers: [
+            { requirement: 'Room 50', bonus: '25% Dano'},
+            { requirement: 'Room 100', bonus: '25% Energia'},
+            { requirement: 'Room 150', bonus: '25% Dano'},
+            { requirement: 'Room 200', bonus: '25% Energia'},
+            { requirement: 'Room 250', bonus: '25% Dano'},
+            { requirement: 'Room 300', bonus: '25% Energia'},
+            { requirement: 'Room 350', bonus: '25% Dano'},
+            { requirement: 'Room 400', bonus: '25% Energia'},
+            { requirement: 'Room 450', bonus: '25% Dano'},
+            { requirement: 'Room 500', bonus: '25% Energia'},
+        ]
+    }
     // ... Add similar structures for Medium, Hard, Crazy, Insane, Nightmare
   ];
   

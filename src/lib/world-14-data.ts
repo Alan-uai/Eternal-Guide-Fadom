@@ -102,5 +102,12 @@ export const world14Data = {
                 }
             ]
         }
+    ],
+    dungeons: [
+      {
+        id: 'dragon-raid',
+        name: 'Raid do Dragão',
+        description: 'Vai até a wave 1000 (w1k).'
+      }
     ]
 };
