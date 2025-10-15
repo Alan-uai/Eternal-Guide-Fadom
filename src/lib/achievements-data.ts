@@ -161,7 +161,7 @@ export const generalAchievements = [
             { requirement: '25 Completions', bonus: 'Variação de poder e porcentagem'},
             { requirement: '50 Completions', bonus: 'Variação de poder e porcentagem'},
             { requirement: '75 Completions', bonus: 'Variação de poder e porcentagem'},
-            { requirement: '100 Completions', bonus: '550 Créditos'},
+            { requirement: '100 Completions', bonus: '200 Créditos'},
         ]
     },
   ];
