@@ -1,3 +1,4 @@
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -32,4 +33,9 @@ export interface WikiArticle {
   createdAt: any; // Firestore Timestamp
 }
 
-    
+export type BonusCategory = 'damage' | 'energy' | 'coins' | 'exp' | 'movespeed' | 'luck';
+
+export interface Bonus {
+  type: BonusCategory;
+  value: number;
+}

@@ -1,11 +1,13 @@
 
+
 'use client';
 
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
-import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle, Coins, Zap, Wind, Trophy } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle, Coins, Zap, Wind, Trophy, Wallet } from 'lucide-react';
 import Head from 'next/head';
 import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
@@ -17,17 +19,26 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useAuth, useCollection, useFirebase, useMemoFirebase, useUser, useDoc } from '@/firebase';
 import { signOut } from 'firebase/auth';
-import { collection, query, where, orderBy, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { generalAchievements } from '@/lib/achievements-data';
+import { energyGainPerRank } from '@/lib/energy-gain-data';
+import { allGamepasses, type Gamepass } from '@/lib/gamepass-data';
+import { accessories, type Accessory } from '@/lib/accessory-data';
 
 
 const RarityBadge = ({ rarity, className }: { rarity: string, className?: string }) => {
     const rarityClasses: Record<string, string> = {
+        'C-Rank': 'bg-gray-500 text-white border-gray-600',
+        'B-Rank': 'bg-green-500 text-white border-green-600',
+        'A-Rank': 'bg-blue-500 text-white border-blue-600',
+        'S-Rank': 'bg-purple-500 text-white border-purple-600',
+        'SS-Rank': 'bg-yellow-500 text-black border-yellow-600',
+        'SSS-Rank': 'bg-red-600 text-white border-red-700',
         Common: 'bg-gray-500 text-white border-gray-600',
         Uncommon: 'bg-green-500 text-white border-green-600',
         Rare: 'bg-blue-500 text-white border-blue-600',
@@ -37,7 +48,7 @@ const RarityBadge = ({ rarity, className }: { rarity: string, className?: string
         Phantom: 'bg-fuchsia-700 text-white border-fuchsia-800',
         Supreme: 'bg-gradient-to-r from-orange-400 to-rose-400 text-white border-transparent',
     };
-    return <Badge className={cn('text-xs', rarityClasses[rarity] || 'bg-gray-400', className)}>{rarity}</Badge>;
+    return <Badge className={cn('text-[10px] px-1.5 py-0', rarityClasses[rarity] || 'bg-gray-400', className)}>{rarity}</Badge>;
 };
 
 const normalizeString = (str: string | null | undefined): string => {
@@ -277,6 +288,7 @@ const profileCategories = [
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets' },
     { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons' },
     { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories' },
+    { name: 'Gamepasses', icon: Wallet, description: 'Gamepasses que você possui.', subcollectionName: 'gamepasses', isInteractiveGrid: true, gridData: allGamepasses },
     { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index', disableItemUpload: true },
     { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', subcollectionName: 'obelisks', disableItemUpload: true },
     { name: 'Conquistas', icon: Trophy, description: 'Calcule seus bônus de conquistas.', subcollectionName: 'achievements', disableItemUpload: true },
@@ -687,6 +699,10 @@ function RankSelector() {
         await setDoc(docRef, { value: numericValue }, { merge: true });
     };
 
+    const baseEnergyGain = useMemo(() => {
+        return (energyGainPerRank as Record<string, string>)[rank.toString()] || '0';
+    }, [rank]);
+
     if (isLoading) {
         return <div className="flex items-center justify-center h-full w-full"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
     }
@@ -704,10 +720,12 @@ function RankSelector() {
                     ))}
                 </SelectContent>
             </Select>
+            <p className="text-xs text-muted-foreground">Ganho de Energia Base: <span className="font-semibold text-primary">{baseEnergyGain}</span></p>
         </div>
     );
 }
 
+// ... (BonusDisplay and CategoryDisplay would need updates, but let's implement InteractiveGridCategory first)
 
 function BonusDisplay({ items }: { items: any[] }) {
     const totals = useMemo(() => {
@@ -774,21 +792,122 @@ function BonusDisplay({ items }: { items: any[] }) {
     )
 }
 
-function CategoryDisplay({ subcollectionName }: { subcollectionName: string }) {
+function InteractiveGridCategory({ subcollectionName, allItems }: { subcollectionName: string; allItems: any[] }) {
+    const { user } = useUser();
+    const { firestore } = useFirebase();
+    const { toast } = useToast();
+    
+    const itemsQuery = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return collection(firestore, 'users', user.uid, subcollectionName);
+    }, [firestore, user, subcollectionName]);
+    const { data: equippedItems, isLoading } = useCollection(itemsQuery);
+    
+    const [openPopover, setOpenPopover] = useState<string | null>(null);
+    const holdTimeout = useRef<NodeJS.Timeout>();
+
+    const handleItemClick = async (item: any) => {
+        if (!itemsQuery) return;
+        const itemRef = doc(itemsQuery, item.id);
+        const isEquipped = equippedItems?.some(i => i.id === item.id);
+
+        try {
+            if (isEquipped) {
+                await deleteDoc(itemRef);
+            } else {
+                let dataToSave: any = { id: item.id };
+                if (subcollectionName === 'accessories') {
+                    // Default to the first rarity if not specified
+                    dataToSave.rarity = item.rarity_options ? item.rarity_options[0].rarity : 'Common';
+                }
+                await setDoc(itemRef, dataToSave);
+            }
+        } catch (error: any) {
+            toast({ variant: 'destructive', title: 'Erro', description: `Não foi possível atualizar ${item.name}.` });
+        }
+    };
+
+    const handleRarityChange = async (itemId: string, rarity: string) => {
+        if (!itemsQuery) return;
+        const itemRef = doc(itemsQuery, itemId);
+        try {
+            await setDoc(itemRef, { rarity }, { merge: true });
+            toast({ title: 'Raridade Atualizada!', description: `A raridade do item foi definida como ${rarity}.` });
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setOpenPopover(null);
+        }
+    };
+    
+    const handlePointerDown = (itemId: string) => {
+        if (subcollectionName !== 'accessories') return;
+        holdTimeout.current = setTimeout(() => {
+            setOpenPopover(itemId);
+        }, 1500); // 1.5 seconds
+    };
+
+    const handlePointerUp = () => {
+        clearTimeout(holdTimeout.current);
+    };
+
+    if (isLoading) {
+        return <div className="flex items-center justify-center h-full w-full"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+    }
+    
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
+            {allItems.map((item) => {
+                const isEquipped = equippedItems?.some(i => i.id === item.id);
+                const equippedAccessory = subcollectionName === 'accessories' ? equippedItems?.find(i => i.id === item.id) : null;
+
+                return (
+                    <Popover key={item.id} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
+                        <PopoverTrigger asChild>
+                            <button
+                                onClick={() => handleItemClick(item)}
+                                onPointerDown={() => handlePointerDown(item.id)}
+                                onPointerUp={handlePointerUp}
+                                onPointerLeave={handlePointerUp} // Cancel on drag out
+                                className={cn(
+                                    'aspect-square bg-muted/30 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border-2 transition-all duration-200',
+                                    isEquipped ? 'border-primary bg-primary/10' : 'border-transparent hover:border-primary/50'
+                                )}
+                            >
+                                <p className="text-[10px] font-bold leading-tight text-center z-10">{item.name}</p>
+                                {equippedAccessory && (
+                                    <RarityBadge rarity={(equippedAccessory as any).rarity} className="absolute bottom-1 right-1" />
+                                )}
+                            </button>
+                        </PopoverTrigger>
+                        {subcollectionName === 'accessories' && (
+                             <PopoverContent className="w-auto p-0">
+                               <div className="flex flex-col">
+                                {item.rarity_options.map((opt: { rarity: string; }) => (
+                                    <Button key={opt.rarity} variant="ghost" className="rounded-none" onClick={() => handleRarityChange(item.id, opt.rarity)}>
+                                        <RarityBadge rarity={opt.rarity} />
+                                    </Button>
+                                ))}
+                               </div>
+                            </PopoverContent>
+                        )}
+                    </Popover>
+                );
+            })}
+        </div>
+    );
+}
+
+function CategoryDisplay({ subcollectionName, isInteractiveGrid, gridData }: { subcollectionName: string, isInteractiveGrid?: boolean, gridData?: any[] }) {
     const { user } = useUser();
     const firestore = useFirebase().firestore;
 
-    if (subcollectionName === 'index') {
-        return <IndexTierCalculator />;
-    }
-    if (subcollectionName === 'obelisks') {
-        return <ObeliskLevelCalculator />;
-    }
-    if (subcollectionName === 'achievements') {
-        return <AchievementCalculator />;
-    }
-    if (subcollectionName === 'rank') {
-        return <RankSelector />;
+    if (subcollectionName === 'index') return <IndexTierCalculator />;
+    if (subcollectionName === 'obelisks') return <ObeliskLevelCalculator />;
+    if (subcollectionName === 'achievements') return <AchievementCalculator />;
+    if (subcollectionName === 'rank') return <RankSelector />;
+    if (isInteractiveGrid && gridData) {
+        return <InteractiveGridCategory subcollectionName={subcollectionName} allItems={gridData} />;
     }
 
     const itemsQuery = useMemoFirebase(() => {
@@ -878,9 +997,19 @@ export default function ProfilePage() {
                     </div>
                 </header>
 
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Bônus Totais</CardTitle>
+                        <CardDescription>Resumo de todos os bônus combinados de suas categorias.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {/* Placeholder for the global bonus display */}
+                        <p className='text-sm text-muted-foreground text-center py-4'>Cálculo de bônus globais será implementado aqui.</p>
+                    </CardContent>
+                </Card>
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <ReputationSection />
-
                     <UserFeedbackSection />
                 </div>
 
@@ -908,7 +1037,11 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
                                 <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
-                                    <CategoryDisplay subcollectionName={category.subcollectionName} />
+                                    <CategoryDisplay 
+                                        subcollectionName={category.subcollectionName} 
+                                        isInteractiveGrid={category.isInteractiveGrid}
+                                        gridData={category.gridData}
+                                    />
                                 </div>
                             </CardContent>
                         </Card>

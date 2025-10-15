@@ -209,6 +209,25 @@
             "petTier": {"type": "number"}
         }
     },
+    "UserAccessory": {
+        "title": "UserAccessory",
+        "description": "Represents an accessory that a user has equipped/owns, including its rarity.",
+        "type": "object",
+        "properties": {
+            "id": { "type": "string" },
+            "rarity": { "type": "string" }
+        },
+        "required": ["id", "rarity"]
+    },
+    "UserGamepass": {
+        "title": "UserGamepass",
+        "description": "Represents a gamepass that a user owns.",
+        "type": "object",
+        "properties": {
+            "id": { "type": "string" }
+        },
+        "required": ["id"]
+    },
     "World": {
       "title": "World",
       "type": "object",
@@ -528,6 +547,22 @@
           "entityName": "UserItem",
           "schema": { "$ref": "#/backend/entities/UserItem" },
           "description": "Stores the items a user has."
+        }
+      },
+      {
+        "path": "/users/{userId}/accessories/{accessoryId}",
+        "definition": {
+            "entityName": "UserAccessory",
+            "schema": { "$ref": "#/backend/entities/UserAccessory"},
+            "description": "Stores user-owned accessories and their rarities."
+        }
+      },
+      {
+        "path": "/users/{userId}/gamepasses/{gamepassId}",
+        "definition": {
+            "entityName": "UserGamepass",
+            "schema": { "$ref": "#/backend/entities/UserGamepass"},
+            "description": "Stores user-owned gamepasses."
         }
       },
       {
