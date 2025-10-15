@@ -1,5 +1,51 @@
+
 export const world7Data = {
-    name: 'World 7',
+    name: 'World 7 - Clover Village',
+    powers: [
+      {
+        id: 'grimoire-1',
+        name: 'Grimoire 1',
+        type: 'gacha',
+        statType: 'energy',
+        unlockCost: 'N/A', // Custo não especificado
+        stats: [
+          { name: 'Water Grimoire', multiplier: '2x', rarity: 'Common' },
+          { name: 'Fire Grimoire', multiplier: '3x', rarity: 'Uncommon' },
+          { name: 'Wind Grimoire', multiplier: '4x', rarity: 'Rare' },
+          { name: 'Dark Grimoire', multiplier: '5x', rarity: 'Epic' },
+          { name: 'Light Grimoire', multiplier: '8x', rarity: 'Legendary' },
+          { name: 'Anti-Magic Grimoire', multiplier: '10x', rarity: 'Mythic' },
+          { name: 'Time Magic Grimoire', multiplier: '12x', rarity: 'Phantom' }
+        ]
+      },
+      {
+        id: 'water-spirit-progression',
+        name: 'Water Spirit Progression',
+        type: 'progression',
+        statType: 'energy',
+        unlockCost: 'N/A',
+        maxLevel: 100,
+        maxBoost: '1.00x Energy'
+      },
+      {
+        id: 'wind-spirit-progression',
+        name: 'Wind Spirit Progression',
+        type: 'progression',
+        statType: 'luck', // Assuming crit chance falls under luck
+        unlockCost: 'N/A',
+        maxLevel: 10,
+        maxBoost: '5% Crit Chance'
+      },
+      {
+        id: 'fire-spirit-progression',
+        name: 'Fire Spirit Progression',
+        type: 'progression',
+        statType: 'damage',
+        unlockCost: 'N/A',
+        maxLevel: 100,
+        maxBoost: '1.00x Damage'
+      }
+    ],
     npcs: [
         { id: 'world7-e-rank', name: 'E Rank NPC', rank: 'E', exp: 240, hp: '350de', world: 'World 7', drops: { coins: { amount: '35de', probability: 0.8 } } },
         { id: 'world7-d-rank', name: 'D Rank NPC', rank: 'D', exp: 264, hp: '1.7Ud', world: 'World 7', drops: { coins: { amount: '170de', probability: 0.8 } } },
