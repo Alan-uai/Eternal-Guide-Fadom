@@ -14,6 +14,7 @@ import { GeneralItemUploader } from '@/components/profile/GeneralItemUploader';
 import { ReputationSection } from '@/components/profile/ReputationSection';
 import { UserFeedbackSection } from '@/components/profile/UserFeedbackSection';
 import { CharacterInventory } from '@/components/profile/CharacterInventory';
+import { GlobalBonusDisplay } from '@/components/profile/GlobalBonusDisplay';
 
 
 export default function ProfilePage() {
@@ -70,8 +71,7 @@ export default function ProfilePage() {
                         <CardDescription>Resumo de todos os bônus combinados de suas categorias.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {/* Placeholder for the global bonus display */}
-                        <p className='text-sm text-muted-foreground text-center py-4'>Cálculo de bônus globais será implementado aqui.</p>
+                       <GlobalBonusDisplay />
                     </CardContent>
                 </Card>
 
