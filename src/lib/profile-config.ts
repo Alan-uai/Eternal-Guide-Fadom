@@ -2,7 +2,7 @@ import { Flame, Shield, PawPrint, Swords, User, Wallet, Star, Pyramid, Trophy, S
 
 export const profileCategories = [
     { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', subcollectionName: 'powers', isInteractiveGrid: true },
-    { name: 'Lutadores', icon: Users, description: 'Seus Titãs, Stands e Shadows.', subcollectionName: 'fighters', itemTypeFilter: 'Titan', isInteractiveGrid: true },
+    { name: 'Lutadores', icon: Users, description: 'Seus Titãs, Stands e Shadows.', subcollectionName: 'fighters', isFighterSlots: true },
     { name: 'Armas', icon: Swords, description: 'Espadas e foices com seus encantamentos.', subcollectionName: 'weapons', isWeaponSlots: true },
     { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras', isInteractiveGrid: true },
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets', isInteractiveGrid: true },

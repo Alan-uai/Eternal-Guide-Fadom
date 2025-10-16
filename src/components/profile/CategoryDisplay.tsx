@@ -13,8 +13,9 @@ import { WeaponSlots } from './WeaponSlots';
 import { InteractiveGridCategory } from './InteractiveGridCategory';
 import { allGamepasses } from '@/lib/gamepass-data';
 import { accessories } from '@/lib/accessory-data';
+import { FighterSlots } from './FighterSlots';
 
-export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeaponSlots, itemTypeFilter }: { subcollectionName: string; isInteractiveGrid?: boolean; isWeaponSlots?: boolean; itemTypeFilter?: string; }) {
+export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeaponSlots, isFighterSlots, itemTypeFilter }: { subcollectionName: string; isInteractiveGrid?: boolean; isWeaponSlots?: boolean; isFighterSlots?: boolean; itemTypeFilter?: string; }) {
     const { user } = useUser();
     const { firestore } = useFirebase();
 
@@ -23,6 +24,7 @@ export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeapon
     if (subcollectionName === 'achievements') return <AchievementCalculator />;
     if (subcollectionName === 'rank') return <RankSelector />;
     if (isWeaponSlots) return <WeaponSlots />;
+    if (isFighterSlots) return <FighterSlots />;
     if (isInteractiveGrid) {
         let gridData;
         if (subcollectionName === 'gamepasses') gridData = allGamepasses;

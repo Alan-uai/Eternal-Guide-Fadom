@@ -27,6 +27,7 @@ export function CharacterInventory() {
                                 subcollectionName={category.subcollectionName} 
                                 isInteractiveGrid={category.isInteractiveGrid}
                                 isWeaponSlots={category.isWeaponSlots}
+                                isFighterSlots={(category as any).isFighterSlots}
                                 itemTypeFilter={category.itemTypeFilter}
                             />
                         </TabsContent>
