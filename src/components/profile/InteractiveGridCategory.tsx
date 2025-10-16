@@ -14,8 +14,11 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Separator } from '../ui/separator';
+import { allGamepasses } from '@/lib/gamepass-data';
+import { accessories } from '@/lib/accessory-data';
+import { allAuras } from '@/lib/aura-data';
 
-export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeFilter }: { subcollectionName: string; gridData?: any[]; itemTypeFilter?: string; }) {
+export function InteractiveGridCategory({ subcollectionName, itemTypeFilter }: { subcollectionName: string; gridData?: any[]; itemTypeFilter?: string; }) {
     const { user } = useUser();
     const { firestore } = useFirebase();
     const { allGameData } = useApp();
@@ -33,7 +36,10 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
     const [currentLevelingValue, setCurrentLevelingValue] = useState(0);
     
     const allItems = useMemo(() => {
-        if (gridData) return gridData;
+        if (subcollectionName === 'gamepasses') return allGamepasses;
+        if (subcollectionName === 'accessories') return accessories;
+        if (subcollectionName === 'auras') return allAuras;
+
 
         let items;
         const nonEquippablePowerNames = [
@@ -55,7 +61,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
         }
         return items;
 
-    }, [gridData, allGameData, subcollectionName, itemTypeFilter]);
+    }, [allGameData, subcollectionName, itemTypeFilter]);
 
     const handleEquipItem = async (item: any, rarityOrLevel?: string | number) => {
         if (!itemsQuery) return;
@@ -66,6 +72,10 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
             dataToSave.rarity = rarityOrLevel;
         } else if (typeof rarityOrLevel === 'number') {
             dataToSave.leveling = rarityOrLevel;
+        }
+
+        if (item.bonus_type && item.bonus_value) {
+            dataToSave[item.bonus_type + '_bonus'] = item.bonus_value;
         }
 
         const itemRef = doc(itemsQuery, item.id);
@@ -103,7 +113,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
         }
     };
 
-    const handleGamepassClick = (item: any, isEquipped: boolean) => {
+    const handleItemClick = (item: any, isEquipped: boolean) => {
         if (isEquipped) {
             handleUnequipItem(item.id);
         } else {
@@ -138,8 +148,8 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                             const currentLevel = (equippedItemData as any)?.leveling || 0;
                             displayText = `${currentLevel}/${item.maxLevel}`;
                             selectedRarity = 'Rare'; // Placeholder
-                        } else if (subcollectionName === 'gamepasses') {
-                            selectedRarity = 'Epic'; // Placeholder for equipped gamepass color
+                        } else if (subcollectionName === 'gamepasses' || subcollectionName === 'auras') {
+                            selectedRarity = 'Epic'; // Placeholder for equipped gamepass/aura color
                             displayText = item.name;
                         } else if (popoverOptions.length > 0) {
                             const equippedRarity = (equippedItemData as any)?.rarity;
@@ -161,14 +171,14 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                     const hasLeveling = item.leveling && typeof item.leveling.maxLevel !== 'undefined';
                     const currentLeveling = (equippedItemData as any)?.leveling || 0;
                     
-                    const isGamepass = subcollectionName === 'gamepasses';
+                    const isSingleClickItem = subcollectionName === 'gamepasses' || subcollectionName === 'auras';
                     const isSpecialRarity = selectedRarity === 'Supreme' || selectedRarity === 'Phantom';
 
                     return (
-                        <Popover key={item.id} open={!isGamepass && openPopoverId === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopoverId(null)}>
+                        <Popover key={item.id} open={!isSingleClickItem && openPopoverId === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopoverId(null)}>
                             <PopoverTrigger asChild>
                                 <button
-                                    onClick={() => isGamepass ? handleGamepassClick(item, isEquipped) : setOpenPopoverId(item.id)}
+                                    onClick={() => isSingleClickItem ? handleItemClick(item, isEquipped) : setOpenPopoverId(item.id)}
                                     className={cn(
                                         'aspect-square flex flex-col items-center justify-center p-1 text-center relative overflow-hidden border-2 transition-all duration-200 group rounded-md',
                                         isEquipped ? 'border-primary/50' : 'border-transparent hover:border-primary/50',
