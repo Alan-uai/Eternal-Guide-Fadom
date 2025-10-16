@@ -113,7 +113,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
     return (
         <div className="w-full">
             <BonusDisplay items={equippedItems} category={subcollectionName} />
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 w-full">
+            <div className="grid grid-cols-5 gap-2 w-full">
                 {uniqueItems.map((item) => {
                     const isEquipped = equippedItems?.some(i => i.id === item.id);
                     const equippedItemData = equippedItems?.find(i => i.id === item.id);
@@ -174,7 +174,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                                         </Popover>
                                     )}
 
-                                    <p className="text-xs lg:text-sm font-bold leading-tight z-10 group-hover:scale-105 transition-transform">{item.name}</p>
+                                    <p className="text-[10px] lg:text-xs font-bold leading-tight z-10 group-hover:scale-105 transition-transform">{item.name}</p>
 
                                      {isEquipped && (
                                         <div className="absolute bottom-1 flex items-center justify-center w-full z-10 gap-2">
