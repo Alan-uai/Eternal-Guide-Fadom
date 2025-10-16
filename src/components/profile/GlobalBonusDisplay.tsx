@@ -55,18 +55,29 @@ export function GlobalBonusDisplay() {
     const { user, isUserLoading } = useUser();
     const { firestore } = useFirebase();
 
-    // Fetch all user data collections
-    const collections = useMemo(() => {
-        return profileCategories.reduce((acc, category) => {
-            const query = (firestore && user) 
-                ? collection(firestore, 'users', user.uid, category.subcollectionName)
-                : null;
-            acc[category.subcollectionName] = useCollection(useMemoFirebase(() => query, [firestore, user]));
-            return acc;
-        }, {} as Record<string, any>);
-    }, [firestore, user]);
+    // Hooks cannot be called inside loops. Let's fetch all collections at the top level.
+    const accessoriesQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'accessories') : null), [firestore, user]);
+    const gamepassesQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'gamepasses') : null), [firestore, user]);
+    const achievementsQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'achievements') : null), [firestore, user]);
+    const indexQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'index') : null), [firestore, user]);
+    const obelisksQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'obelisks') : null), [firestore, user]);
+    const powersQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'powers') : null), [firestore, user]);
+    const aurasQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'auras') : null), [firestore, user]);
+    const petsQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'pets') : null), [firestore, user]);
+    const fightersQuery = useMemoFirebase(() => (firestore && user ? collection(firestore, 'users', user.uid, 'fighters') : null), [firestore, user]);
 
-     const { data: weaponSlotsData, isLoading: weaponsLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, `users/${user.uid}`) : null, [firestore, user]));
+
+    const { data: accessoryItems, isLoading: accessoriesLoading } = useCollection(accessoriesQuery);
+    const { data: gamepassItems, isLoading: gamepassesLoading } = useCollection(gamepassesQuery);
+    const { data: achievementItems, isLoading: achievementsLoading } = useCollection(achievementsQuery);
+    const { data: indexItems, isLoading: indexLoading } = useCollection(indexQuery);
+    const { data: obeliskItems, isLoading: obelisksLoading } = useCollection(obelisksQuery);
+    const { data: powerItems, isLoading: powersLoading } = useCollection(powersQuery);
+    const { data: auraItems, isLoading: aurasLoading } = useCollection(aurasQuery);
+    const { data: petItems, isLoading: petsLoading } = useCollection(petsQuery);
+    const { data: fighterItems, isLoading: fightersLoading } = useCollection(fightersQuery);
+
+    const { data: weaponSlotsData, isLoading: weaponsLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, `users/${user.uid}`) : null, [firestore, user]));
 
 
     const totalBonuses = useMemo(() => {
@@ -80,7 +91,6 @@ export function GlobalBonusDisplay() {
         };
 
         // Accessories
-        const accessoryItems = collections.accessories?.data;
         if (accessoryItems) {
             accessoryItems.forEach((item: any) => {
                 const fullAccessory = accessories.find(a => a.id === item.id);
@@ -96,7 +106,6 @@ export function GlobalBonusDisplay() {
         }
         
         // Gamepasses
-        const gamepassItems = collections.gamepasses?.data;
         if (gamepassItems) {
              gamepassItems.forEach((item: any) => {
                 const gamepassData = allGamepasses.find(gp => gp.id === item.id);
@@ -110,7 +119,7 @@ export function GlobalBonusDisplay() {
         }
 
         // Achievements
-        const achievementLevels = collections.achievements?.data?.[0];
+        const achievementLevels = achievementItems?.[0];
         if (achievementLevels) {
             generalAchievements.forEach(ach => {
                 const currentLevel = (achievementLevels as any)[ach.id] || 0;
@@ -121,14 +130,14 @@ export function GlobalBonusDisplay() {
         }
         
         // Index Tiers
-        const indexTiers = collections.index?.data?.[0];
+        const indexTiers = indexItems?.[0];
         if (indexTiers) {
             totals.damage += ((indexTiers as any).avatarTier || 0) * 0.05;
             totals.energy += ((indexTiers as any).petTier || 0) * 0.05;
         }
 
         // Obelisks
-        const obeliskLevels = collections.obelisks?.data?.[0];
+        const obeliskLevels = obeliskItems?.[0];
         if(obeliskLevels) {
             totals.damage += ((obeliskLevels as any).damage || 0) * 0.02;
             totals.energy += ((obeliskLevels as any).energy || 0) * 0.02;
@@ -147,9 +156,13 @@ export function GlobalBonusDisplay() {
         }
         
         // Other categories
-        const simpleBonusCategories = ['powers', 'auras', 'pets', 'fighters'];
-        simpleBonusCategories.forEach(cat => {
-             const items = collections[cat]?.data;
+        const simpleBonusCategories = [
+            { items: powerItems },
+            { items: auraItems },
+            { items: petItems },
+            { items: fighterItems },
+        ];
+        simpleBonusCategories.forEach(({ items }) => {
              if(items) {
                  items.forEach((item: any) => {
                     if (item.statType === 'damage' && item.multiplier) totals.damage += parseBonus(item.multiplier);
@@ -164,12 +177,16 @@ export function GlobalBonusDisplay() {
 
 
         return totals;
-    }, [collections, weaponSlotsData]);
+    }, [
+        accessoryItems, gamepassItems, achievementItems, indexItems, obeliskItems, 
+        powerItems, auraItems, petItems, fighterItems, weaponSlotsData
+    ]);
 
     const isLoading = useMemo(() => {
-        if(isUserLoading || weaponsLoading) return true;
-        return Object.values(collections).some(c => c.isLoading);
-    }, [isUserLoading, weaponsLoading, collections]);
+        return isUserLoading || weaponsLoading || accessoriesLoading || gamepassesLoading || achievementsLoading || indexLoading || obelisksLoading || powersLoading || aurasLoading || petsLoading || fightersLoading;
+    }, [
+        isUserLoading, weaponsLoading, accessoriesLoading, gamepassesLoading, achievementsLoading, indexLoading, obelisksLoading, powersLoading, aurasLoading, petsLoading, fightersLoading
+    ]);
 
     if (isLoading) {
         return (
