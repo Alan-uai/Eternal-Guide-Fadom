@@ -69,6 +69,7 @@ const createStatsSchema = (maxEnergyGain: number) => z.object({
     energyGain: z.string()
         .min(1, 'O ganho de energia é obrigatório.')
         .refine(val => parseUserEnergy(val) <= maxEnergyGain, { message: `O ganho de energia máximo é ${formatNumber(maxEnergyGain)}.` }),
+    totalDamage: z.string().optional(),
     currentEnergy: z.string().optional(),
 });
 
@@ -99,6 +100,7 @@ export function WelcomePopover() {
             currentWorld: '',
             rank: '',
             energyGain: '',
+            totalDamage: '',
             currentEnergy: '',
         },
     });
@@ -118,7 +120,7 @@ export function WelcomePopover() {
         form.setValue('currentWorld', String(MAX_WORLD));
         form.setValue('rank', String(MAX_RANK));
         form.setValue('energyGain', formatNumber(maxBonuses.energyGain));
-        form.setValue('currentEnergy', formatNumber(maxBonuses.damage));
+        form.setValue('totalDamage', formatNumber(maxBonuses.damage));
 
         toast({
             title: "Valores Máximos Calculados!",
@@ -187,11 +189,10 @@ export function WelcomePopover() {
                     missingFields.push('Rank');
                 }
                 if (result.totalDamage) {
-                    // Assuming totalDamage from screenshot reflects current accumulated energy
-                    form.setValue('currentEnergy', result.totalDamage);
-                    foundFields.push('Energia Atual');
+                    form.setValue('totalDamage', result.totalDamage);
+                    foundFields.push('Dano Total');
                 } else {
-                    missingFields.push('Energia Atual');
+                    missingFields.push('Dano Total');
                 }
                 if (result.energyGain) {
                     form.setValue('energyGain', result.energyGain);
@@ -278,6 +279,19 @@ export function WelcomePopover() {
                                 </FormItem>
                             )}
                         />
+                        <FormField
+                            control={form.control}
+                            name="totalDamage"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Dano Total (DPS)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="ex: 1.5sx" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                          <FormField
                             control={form.control}
                             name="currentEnergy"
@@ -316,3 +330,5 @@ export function WelcomePopover() {
         </Dialog>
     );
 }
+
+    
