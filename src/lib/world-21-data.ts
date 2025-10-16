@@ -17,16 +17,16 @@ export const world21Data = {
             unlockCost: '2k',
             statType: 'mixed',
             stats: [
-                { "name": "Espada 9", "multiplier": "1x" },
-                { "name": "Espada 8", "multiplier": "2x" },
-                { "name": "Espada 7", "multiplier": "3x" },
-                { "name": "Espada 6", "multiplier": "4x" },
-                { "name": "Espada 5", "multiplier": "5x" },
-                { "name": "Espada 4", "multiplier": "6x" },
-                { "name": "Espada 3", "multiplier": "7.5x" },
-                { "name": "Espada 2", "multiplier": "10x" },
-                { "name": "Espada 1", "multiplier": "12x" },
-                { "name": "Espada 0", "multiplier": "15x" }
+                { id: 'espada-9', name: "Espada 9", "multiplier": "1x" },
+                { id: 'espada-8', name: "Espada 8", "multiplier": "2x" },
+                { id: 'espada-7', name: "Espada 7", "multiplier": "3x" },
+                { id: 'espada-6', name: "Espada 6", "multiplier": "4x" },
+                { id: 'espada-5', name: "Espada 5", "multiplier": "5x" },
+                { id: 'espada-4', name: "Espada 4", "multiplier": "6x" },
+                { id: 'espada-3', name: "Espada 3", "multiplier": "7.5x" },
+                { id: 'espada-2', name: "Espada 2", "multiplier": "10x" },
+                { id: 'espada-1', name: "Espada 1", "multiplier": "12x" },
+                { id: 'espada-0', name: "Espada 0", "multiplier": "15x" }
             ]
         },
         {
@@ -36,14 +36,14 @@ export const world21Data = {
             unlockCost: 'N/A',
             statType: 'damage',
             stats: [
-              { name: 'Common Hollow Power', multiplier: '1x', rarity: 'Common' },
-              { name: 'Uncommon Hollow Power', multiplier: '1.5x', rarity: 'Uncommon' },
-              { name: 'Rare Hollow Power', multiplier: '2x', rarity: 'Rare' },
-              { name: 'Epic Hollow Power', multiplier: '3x', rarity: 'Epic' },
-              { name: 'Legendary Hollow Power', multiplier: '5x', rarity: 'Legendary' },
-              { name: 'Mythical Hollow Power', multiplier: '7x', rarity: 'Mythic' },
-              { name: 'Phantom Hollow Power', multiplier: '10x', rarity: 'Phantom' },
-              { name: 'Supreme Hollow Power', multiplier: '12x', rarity: 'Supreme' }
+              { id: 'hollow-common', name: 'Common Hollow Power', multiplier: '1x', rarity: 'Common' },
+              { id: 'hollow-uncommon', name: 'Uncommon Hollow Power', multiplier: '1.5x', rarity: 'Uncommon' },
+              { id: 'hollow-rare', name: 'Rare Hollow Power', multiplier: '2x', rarity: 'Rare' },
+              { id: 'hollow-epic', name: 'Epic Hollow Power', multiplier: '3x', rarity: 'Epic' },
+              { id: 'hollow-legendary', name: 'Legendary Hollow Power', multiplier: '5x', rarity: 'Legendary' },
+              { id: 'hollow-mythical', name: 'Mythical Hollow Power', multiplier: '7x', rarity: 'Mythic' },
+              { id: 'hollow-phantom', name: 'Phantom Hollow Power', multiplier: '10x', rarity: 'Phantom' },
+              { id: 'hollow-supreme', name: 'Supreme Hollow Power', multiplier: '12x', rarity: 'Supreme' }
             ]
         }
     ],

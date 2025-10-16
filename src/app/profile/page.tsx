@@ -52,7 +52,7 @@ const RarityBadge = ({ rarity, className, children }: { rarity: string, classNam
     };
     const finalClassName = rarityClasses[rarity] || 'bg-gray-400';
     return (
-        <Badge variant="outline" className={cn('text-[10px] px-1.5 py-0', finalClassName, className)}>
+        <Badge variant="outline" className={cn('text-[10px] px-1.5 py-0 whitespace-nowrap', finalClassName, className)}>
             {children || rarity}
         </Badge>
     );
@@ -598,45 +598,19 @@ function ObeliskLevelCalculator() {
 }
 
 function toRoman(num: number): string {
-    if (num === 0) return '0';
-    if (num < 0 || num > 49) return num.toString(); // Basic implementation for expected range
-    const romanNumerals: [number, string][] = [
-        [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
-    ];
-    let result = '';
-    let remaining = num;
-    
-    // Handle tens above 40
-    while (remaining >= 50) { // Should not happen with max 45
-        result += 'L';
-        remaining -= 50;
+  if (num === 0) return '0';
+  if (num < 1 || num > 49) return num.toString();
+  const roman: [number, string][] = [
+    [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]
+  ];
+  let result = '';
+  for (const [value, symbol] of roman) {
+    while (num >= value) {
+      result += symbol;
+      num -= value;
     }
-    
-    for (const [value, symbol] of romanNumerals) {
-        if (remaining >= value) {
-            if (value === 40 || value === 9 || value === 4) {
-                 result += symbol;
-                 remaining -= value;
-            } else {
-                 let count = Math.floor(remaining / value);
-                 if (value === 10 && num > 30) {
-                     // handles cases like 30 (XXX)
-                 }
-                 result += symbol.repeat(count);
-                 remaining -= count * value;
-            }
-        }
-    }
-    
-     // A more direct way to handle numbers like 20, 30
-    if (num >= 20 && num < 40) {
-        result = 'X'.repeat(Math.floor(num/10)) + 'I'.repeat(num % 10);
-    } else if (num === 45) { // Specific fix
-        return 'XLV';
-    }
-
-
-    return result;
+  }
+  return result;
 }
 
 function AchievementCalculator() {
@@ -869,9 +843,20 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
     const allItems = useMemo(() => {
         if (gridData) return gridData;
 
-        // For powers, we need to flatten the structure, but only grab the parent power, not each stat.
+        // For powers, we need to filter out non-equipable progression/mechanic items.
         if (subcollectionName === 'powers') {
-            const equipablePowers = allGameData.flatMap(world => world.powers || []).filter(power => power && power.id && power.type === 'gacha');
+             // Only include items that are explicitly 'gacha' and not just 'progression'.
+             // This filters out items like "Haki Upgrade" or "Weapon Evolution".
+             // Also excludes items that are conceptually different, like 'Stands'.
+            const equipablePowers = allGameData.flatMap(world => world.powers || [])
+            .filter(power => 
+                power && 
+                power.id && 
+                power.type === 'gacha' && 
+                !power.name.toLowerCase().includes('stand') &&
+                !power.name.toLowerCase().includes('evolution') &&
+                !power.name.toLowerCase().includes('breathing')
+             );
             return equipablePowers;
         }
 
@@ -944,10 +929,11 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                     
                     const popoverOptions = subcollectionName === 'accessories' ? item.rarity_options : (subcollectionName === 'powers' ? item.stats : []);
                     const selectedRarity = (equippedItemData as any)?.rarity || popoverOptions?.[0]?.rarity;
+                    const selectedOption = popoverOptions?.find((opt:any) => opt.rarity === selectedRarity);
                     const cardBgClass = isEquipped ? getRarityClass(selectedRarity) : 'bg-muted/30 border-transparent';
 
                     return (
-                        <Popover key={item.id} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
+                        <Popover key={`${item.id}-${(selectedOption as any)?.id || ''}`} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
                             <PopoverTrigger asChild>
                                 <button
                                     onClick={() => handleItemClick(item)}
@@ -962,7 +948,10 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                                 >
                                     <p className="text-[10px] font-bold leading-tight text-center z-10">{item.name}</p>
                                     {isEquipped && (
-                                        <RarityBadge rarity={selectedRarity} className="absolute bottom-1 right-1" />
+                                        <div className="absolute bottom-1 right-1 flex items-center gap-1">
+                                            <span className='text-[9px] opacity-70'>{selectedOption?.name || selectedRarity}</span>
+                                            <RarityBadge rarity={selectedRarity} />
+                                        </div>
                                     )}
                                 </button>
                             </PopoverTrigger>
