@@ -45,7 +45,15 @@ export const world5Data = {
             description: 'Evolua suas armas. Evolve 2: 4 armas iguais + 400M de moedas. Evolve 3: 2 armas iguais + 2B de moedas.'
         }
     ],
-    pets: [],
+    pets: [
+        { id: 'nazuki', name: 'Nazuki', energy_bonus: '117' },
+        { id: 'tenjaro', name: 'Tenjaro', energy_bonus: '234' },
+        { id: 'zentsu', name: 'Zentsu', energy_bonus: '352' },
+        { id: 'insake', name: 'Insake', energy_bonus: '469' },
+        { id: 'tamoka', name: 'Tamoka', energy_bonus: '586' },
+        { id: 'shinabe', name: 'Shinabe', energy_bonus: '781' },
+        { id: 'rangaki', name: 'Rangaki', energy_bonus: '1.75k' }
+    ],
     dungeons: [],
     shadows: [],
     stands: []

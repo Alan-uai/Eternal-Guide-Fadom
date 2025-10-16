@@ -1,3 +1,4 @@
+
 export const world6Data = {
     id: '006',
     name: 'World 6 - Solo Island',
@@ -48,6 +49,15 @@ export const world6Data = {
         { id: 'world6-a-rank', name: 'A Rank NPC', rank: 'A', exp: 174, hp: '1.4de', world: 'World 6', drops: { coins: { amount: '140N', probability: 0.8 } } },
         { id: 'world6-s-rank', name: 'S Rank NPC', rank: 'S', exp: 192, hp: '7de', world: 'World 6', drops: { coins: { amount: '700N', probability: 0.8 } } },
         { id: 'statue-of-god-boss', name: 'Statue of God', rank: 'SS', exp: 480, hp: '35de', world: 'World 6', drops: { coins: { amount: '3.5de', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+    ],
+    pets: [
+        { id: 'weak-sung', name: 'Weak Sung', energy_bonus: '293' },
+        { id: 'green-goblin', name: 'Green Goblin', energy_bonus: '586' },
+        { id: 'white-tiger', name: 'White Tiger', energy_bonus: '879' },
+        { id: 'cha', name: 'Cha', energy_bonus: '1.17k' },
+        { id: 'choi', name: 'Choi', energy_bonus: '1.46k' },
+        { id: 'solo-sung', name: 'Solo Sung', energy_bonus: '1.95k' },
+        { id: 'statue-of-god-pet', name: 'Statue of God', energy_bonus: '4.39k' }
     ],
     shadows: [
         {

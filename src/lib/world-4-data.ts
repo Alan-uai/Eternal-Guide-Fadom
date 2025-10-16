@@ -70,7 +70,15 @@ export const world4Data = {
         { id: 'world4-s-rank', name: 'S Rank NPC', rank: 'S', exp: 50, hp: '284sx', world: 'World 4', drops: { coins: { amount: '28sx', probability: 0.8 } } },
         { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, hp: '1.4Sp', world: 'World 4', drops: { coins: { amount: '140sx', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
-    pets: [],
+    pets: [
+        { id: 'itodo', name: 'Itodo', energy_bonus: '47' },
+        { id: 'nebara', name: 'Nebara', energy_bonus: '94' },
+        { id: 'magum', name: 'Magum', energy_bonus: '141' },
+        { id: 'meki', name: 'Meki', energy_bonus: '188' },
+        { id: 'tage', name: 'Tage', energy_bonus: '234' },
+        { id: 'gajo', name: 'Gajo', energy_bonus: '313' },
+        { id: 'sakuni-pet', name: 'Sakuni', energy_bonus: '703' }
+    ],
     dungeons: [
         {
             id: 'cursed-dungeon',

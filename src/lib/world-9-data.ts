@@ -47,6 +47,15 @@ export const world9Data = {
         { id: 'world9-s-rank', name: 'S Rank NPC', rank: 'S', exp: 3915, hp: '52QnD', world: 'World 9', drops: { coins: { amount: '5.2QnD', probability: 0.8 } } },
         { id: 'ken-turbo-boss', name: 'Ken Turbo', rank: 'SS', exp: 5760, hp: '264QnD', world: 'World 9', drops: { coins: { amount: '26QnD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
+    pets: [
+        { id: 'ken', name: 'Ken', energy_bonus: '4.57k' },
+        { id: 'aira', name: 'Aira', energy_bonus: '9.15k' },
+        { id: 'jiji', name: 'Jiji', energy_bonus: '13.7k' },
+        { id: 'momo', name: 'Momo', energy_bonus: '18.3k' },
+        { id: 'alien', name: 'Alien', energy_bonus: '22.8k' },
+        { id: 'saiko', name: 'Saiko', energy_bonus: '30.5k' },
+        { id: 'ken-turbo-pet', name: 'Ken Turbo', energy_bonus: '68.6k' }
+    ],
     shadows: [
         {
             id: 'ken-turbo-shadow',

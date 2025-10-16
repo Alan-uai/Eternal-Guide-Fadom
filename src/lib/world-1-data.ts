@@ -59,7 +59,15 @@ export const world1Data = {
         { id: 'world1-s-rank', name: 'S Rank NPC', rank: 'S', exp: 6, hp: '312.5M', world: 'World 1', drops: { coins: { amount: '30M', probability: 0.8 } } },
         { id: 'kid-kohan-boss', name: 'Kid Kohan', rank: 'SS', exp: 15, hp: '1.5B', world: 'World 1', drops: { coins: { amount: '150M', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
-    pets: [],
+    pets: [
+        { id: 'kriluni', name: 'Kriluni', energy_bonus: '3' },
+        { id: 'ymicha', name: 'Ymicha', energy_bonus: '6' },
+        { id: 'tian-shan', name: 'Tian Shan', energy_bonus: '9' },
+        { id: 'kohan', name: 'Kohan', energy_bonus: '12' },
+        { id: 'picco', name: 'Picco', energy_bonus: '15' },
+        { id: 'koku', name: 'Koku', energy_bonus: '20' },
+        { id: 'kid-kohan-pet', name: 'Kid Kohan', energy_bonus: '45' }
+    ],
     dungeons: [
         {
             id: 'tournemant',

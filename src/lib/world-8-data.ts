@@ -53,6 +53,15 @@ export const world8Data = {
         { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 1920, hp: '844tD', world: 'World 8', drops: { coins: { amount: '84tD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
         { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 2880, hp: '1.6qdD', world: 'World 8', drops: { coins: { amount: '160tD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
+    pets: [
+        { id: 'sekuri', name: 'Sekuri', energy_bonus: '1.83k' },
+        { id: 'kid-norto', name: 'Kid Norto', energy_bonus: '3.66k' },
+        { id: 'kid-seske', name: 'Kid Seske', energy_bonus: '5.49k' },
+        { id: 'kakashki', name: 'Kakashki', energy_bonus: '7.32k' },
+        { id: 'jiria', name: 'Jiria', energy_bonus: '9.15k' },
+        { id: 'tsuni', name: 'Tsuni', energy_bonus: '12.2k' },
+        { id: 'itechi-pet', name: 'Itechi', energy_bonus: '27.4k' }
+    ],
     shadows: [
         {
             id: 'madara-shadow',

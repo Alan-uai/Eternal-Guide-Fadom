@@ -246,9 +246,14 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             } else {
               itemCollections.forEach(collectionInfo => {
                   collectionInfo.data?.forEach((item: any) => {
-                      addBonus('damage', item.multiplier && item.statType === 'damage' ? item.multiplier : item.damage_bonus);
-                      addBonus('energy', item.multiplier && item.statType === 'energy' ? item.multiplier : item.energy_bonus);
-                      addBonus('coins', item.multiplier && item.statType === 'coin' ? item.multiplier : item.coins_bonus);
+                      if (collectionInfo.name === 'pets' && item.energy_bonus) {
+                         const numericBonus = parseUserEnergy(item.energy_bonus);
+                         bonuses.energy.bonuses.push(numericBonus / 100); 
+                      } else {
+                        addBonus('damage', item.multiplier && item.statType === 'damage' ? item.multiplier : item.damage_bonus);
+                        addBonus('energy', item.multiplier && item.statType === 'energy' ? item.multiplier : item.energy_bonus);
+                        addBonus('coins', item.multiplier && item.statType === 'coin' ? item.multiplier : item.coins_bonus);
+                      }
                   });
               });
             }
@@ -297,4 +302,3 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
         isLoading
     };
 }
-
