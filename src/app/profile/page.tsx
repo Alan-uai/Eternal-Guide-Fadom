@@ -10,12 +10,10 @@ import { cn } from '@/lib/utils';
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
-
-import { profileCategories } from '@/lib/profile-config';
 import { GeneralItemUploader } from '@/components/profile/GeneralItemUploader';
 import { ReputationSection } from '@/components/profile/ReputationSection';
 import { UserFeedbackSection } from '@/components/profile/UserFeedbackSection';
-import { CategoryDisplay } from '@/components/profile/CategoryDisplay';
+import { CharacterInventory } from '@/components/profile/CharacterInventory';
 
 
 export default function ProfilePage() {
@@ -82,76 +80,7 @@ export default function ProfilePage() {
                     <UserFeedbackSection />
                 </div>
 
-                <div className="space-y-2">
-                    <h2 className="text-2xl font-bold tracking-tight font-headline">Meu Personagem</h2>
-                    <p className="text-muted-foreground">Adicione seus itens usando o botão acima. Eles aparecerão aqui automaticamente.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {profileCategories.map((category) => (
-                        <Card key={category.name} className={cn("relative", category.isWeaponSlots && "md:col-span-2 lg:col-span-3")}>
-                            <CardHeader className='flex-row items-start justify-between'>
-                                <div>
-                                    <CardTitle className='flex items-center gap-3'>
-                                        <category.icon className="h-6 w-6 text-primary" />
-                                        {category.name}
-                                    </CardTitle>
-                                    <CardDescription>{category.description}</CardDescription>
-                                </div>
-                                {!category.disableItemUpload && (
-                                    <div className="absolute top-2 right-2">
-                                        <GeneralItemUploader asShortcut={true} />
-                                    </div>
-                                )}
-                            </CardHeader>
-                            <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
-                                <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
-                                    <CategoryDisplay 
-                                        subcollectionName={category.subcollectionName} 
-                                        isInteractiveGrid={category.isInteractiveGrid}
-                                        isWeaponSlots={category.isWeaponSlots}
-                                    />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                    
-                    {/* Fighters Section */}
-                    <Card className="relative md:col-span-1 lg:col-span-1">
-                        <CardHeader>
-                            <CardTitle className='flex items-center gap-3'><User className="h-6 w-6 text-primary" />Titãs</CardTitle>
-                            <CardDescription>Seus lutadores do tipo Titã.</CardDescription>
-                        </CardHeader>
-                        <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
-                             <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
-                                <CategoryDisplay subcollectionName="fighters" itemTypeFilter="Titan" isInteractiveGrid={true}/>
-                            </div>
-                        </CardContent>
-                    </Card>
-                     <Card className="relative md:col-span-1 lg:col-span-1">
-                        <CardHeader>
-                            <CardTitle className='flex items-center gap-3'><User className="h-6 w-6 text-primary" />Stands</CardTitle>
-                            <CardDescription>Seus lutadores do tipo Stand.</CardDescription>
-                        </CardHeader>
-                        <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
-                             <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
-                                 <CategoryDisplay subcollectionName="stands" isInteractiveGrid={true} />
-                            </div>
-                        </CardContent>
-                    </Card>
-                     <Card className="relative md:col-span-1 lg:col-span-1">
-                        <CardHeader>
-                            <CardTitle className='flex items-center gap-3'><User className="h-6 w-6 text-primary" />Shadows</CardTitle>
-                            <CardDescription>Seus lutadores do tipo Shadow.</CardDescription>
-                        </CardHeader>
-                        <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
-                             <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
-                                <CategoryDisplay subcollectionName="shadows" isInteractiveGrid={true} />
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                </div>
+                <CharacterInventory />
             </div>
         </>
     );

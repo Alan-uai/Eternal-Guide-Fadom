@@ -1,0 +1,40 @@
+'use client'
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { profileCategories } from "@/lib/profile-config";
+import { CategoryDisplay } from "./CategoryDisplay";
+
+export function CharacterInventory() {
+
+    return (
+         <Card>
+            <CardHeader>
+                <CardTitle>Inventário do Personagem</CardTitle>
+                <CardDescription>Gerencie todos os seus itens, poderes e equipamentos em um só lugar.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Tabs defaultValue="powers" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 h-auto">
+                        {profileCategories.map(category => (
+                            <TabsTrigger key={category.subcollectionName} value={category.subcollectionName}>{category.name}</TabsTrigger>
+                        ))}
+                    </TabsList>
+
+                     {profileCategories.map((category) => (
+                        <TabsContent key={category.subcollectionName} value={category.subcollectionName}>
+                            <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-4 mt-4 min-h-64'>
+                                <CategoryDisplay 
+                                    subcollectionName={category.subcollectionName} 
+                                    isInteractiveGrid={category.isInteractiveGrid}
+                                    isWeaponSlots={category.isWeaponSlots}
+                                    itemTypeFilter={category.itemTypeFilter}
+                                />
+                            </div>
+                        </TabsContent>
+                    ))}
+                </Tabs>
+            </CardContent>
+        </Card>
+    )
+}
