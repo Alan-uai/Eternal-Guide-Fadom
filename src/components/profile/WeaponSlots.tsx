@@ -30,10 +30,14 @@ export function WeaponSlots() {
     const equippedWeapons = (userData as any)?.weaponSlots || {};
 
     const weaponData = useMemo(() => {
+        const energySwords = swordsArticle.tables 
+          ? Object.values(swordsArticle.tables).flatMap(table => table.rows)
+          : [];
+
         return {
             damage: damageSwordsArticle.tables?.damageSwords.rows || [],
             scythe: scythesArticle.tables?.scythes.rows || [],
-            energy: swordsArticle.tables?.world3.rows.concat(swordsArticle.tables?.world5.rows, swordsArticle.tables?.world15.rows, swordsArticle.tables?.world19.rows) || [],
+            energy: energySwords,
         };
     }, []);
 
@@ -54,15 +58,15 @@ export function WeaponSlots() {
         const newSlots = {
             ...equippedWeapons,
             [selectedSlot]: {
-                name: item.Espada || item.Foice,
-                rarity: item.Raridade,
-                stats: item['Stats (3 Estrelas)'] || item.Stats
+                name: item.name,
+                rarity: item.rarity,
+                stats: item.three_star_stats || item.stats
             }
         };
 
         try {
             await updateDoc(userDocRef, { weaponSlots: newSlots });
-            toast({ title: "Arma Equipada!", description: `${item.Espada || item.Foice} equipada no slot ${selectedSlot + 1}.` });
+            toast({ title: "Arma Equipada!", description: `${item.name} equipada no slot ${selectedSlot + 1}.` });
         } catch (error) {
             toast({ variant: 'destructive', title: "Erro", description: "Não foi possível equipar a arma." });
         } finally {
@@ -117,8 +121,8 @@ export function WeaponSlots() {
                                 {weaponType && weaponData[weaponType].map((item: any, index: number) => (
                                      <Button key={index} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleItemSelect(item)}>
                                         <div className='flex flex-col items-start'>
-                                            <p>{item.Espada || item.Foice}</p>
-                                            {item.Raridade && <RarityBadge rarity={item.Raridade} />}
+                                            <p>{item.name}</p>
+                                            {item.rarity && <RarityBadge rarity={item.rarity} />}
                                         </div>
                                     </Button>
                                 ))}

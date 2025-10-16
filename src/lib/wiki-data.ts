@@ -611,39 +611,39 @@ export const swordsArticle: Omit<WikiArticle, 'createdAt'> = {
   imageUrl: 'wiki-8',
   tables: {
     world3: {
-      headers: ['Espada (Mundo 3 - Ichige)', 'Stats'],
+      headers: ['name', 'stats'],
       rows: [
-        { 'Espada (Mundo 3 - Ichige)': 'Zangetsu', 'Stats': '0.05x' },
-        { 'Espada (Mundo 3 - Ichige)': 'Zangetsu (1 Estrela)', 'Stats': '0.1x' },
-        { 'Espada (Mundo 3 - Ichige)': 'Zangetsu (2 Estrelas)', 'Stats': '0.15x' },
-        { 'Espada (Mundo 3 - Ichige)': 'Zangetsu (3 Estrelas)', 'Stats': '0.25x' },
+        { name: 'Zangetsu', stats: '0.05x' },
+        { name: 'Zangetsu (1 Estrela)', stats: '0.1x' },
+        { name: 'Zangetsu (2 Estrelas)', stats: '0.15x' },
+        { name: 'Zangetsu (3 Estrelas)', stats: '0.25x' },
       ],
     },
     world5: {
-      headers: ['Espada (Mundo 5 - Zentsu)', 'Stats'],
+      headers: ['name', 'stats'],
       rows: [
-        { 'Espada (Mundo 5 - Zentsu)': 'Yellow Nichirin', 'Stats': '0.075x' },
-        { 'Espada (Mundo 5 - Zentsu)': 'Yellow Nichirin (1 Estrela)', 'Stats': '0.15x' },
-        { 'Espada (Mundo 5 - Zentsu)': 'Yellow Nichirin (2 Estrelas)', 'Stats': '0.225x' },
-        { 'Espada (Mundo 5 - Zentsu)': 'Yellow Nichirin (3 Estrelas)', 'Stats': '0.375x' },
+        { name: 'Yellow Nichirin', stats: '0.075x' },
+        { name: 'Yellow Nichirin (1 Estrela)', stats: '0.15x' },
+        { name: 'Yellow Nichirin (2 Estrelas)', stats: '0.225x' },
+        { name: 'Yellow Nichirin (3 Estrelas)', stats: '0.375x' },
       ],
     },
     world15: {
-        headers: ['Espada (Mundo 15 - Beater)', 'Stats'],
+        headers: ['name', 'stats'],
         rows: [
-            { 'Espada (Mundo 15 - Beater)': 'Lucidator', 'Stats': '0.125x' },
-            { 'Espada (Mundo 15 - Beater)': 'Lucidator (1 Estrela)', 'Stats': '0.250x' },
-            { 'Espada (Mundo 15 - Beater)': 'Lucidator (2 Estrelas)', 'Stats': '0.375x' },
-            { 'Espada (Mundo 15 - Beater)': 'Lucidator (3 Estrelas)', 'Stats': '0.625x' },
+            { name: 'Lucidator', stats: '0.125x' },
+            { name: 'Lucidator (1 Estrela)', stats: '0.250x' },
+            { name: 'Lucidator (2 Estrelas)', stats: '0.375x' },
+            { name: 'Lucidator (3 Estrelas)', stats: '0.625x' },
         ],
     },
     world19: {
-        headers: ['Espada (Mundo 19 - Arter)', 'Stats'],
+        headers: ['name', 'stats'],
         rows: [
-            { 'Espada (Mundo 19 - Arter)': 'Excalibur', 'Stats': '0.2x' },
-            { 'Espada (Mundo 19 - Arter)': 'Excalibur (1 Estrela)', 'Stats': '0.4x' },
-            { 'Espada (Mundo 19 - Arter)': 'Excalibur (2 Estrelas)', 'Stats': '0.6x' },
-            { 'Espada (Mundo 19 - Arter)': 'Excalibur (3 Estrelas)', 'Stats': '1x' },
+            { name: 'Excalibur', stats: '0.2x' },
+            { name: 'Excalibur (1 Estrela)', stats: '0.4x' },
+            { name: 'Excalibur (2 Estrelas)', stats: '0.6x' },
+            { name: 'Excalibur (3 Estrelas)', stats: '1x' },
         ],
     }
   },
@@ -660,16 +660,16 @@ export const damageSwordsArticle: Omit<WikiArticle, 'createdAt'> = {
   imageUrl: 'wiki-9',
   tables: {
     damageSwords: {
-      headers: ['Espada', 'Raridade', 'Dano Base (3 Estrelas)', 'Com Respiração Phantom', 'Com Runa de Dano Phantom + Respiração Phantom', 'Com Runa de Dano Supremo + Respiração Phantom'],
+      headers: ['name', 'rarity', 'baseDamage', 'phantomBreathing', 'phantomRune', 'supremeRune'],
       rows: [
-        { 'Espada': 'BloodThorn', 'Raridade': 'Comum', 'Dano Base (3 Estrelas)': '1.25x', 'Com Respiração Phantom': '2.25x', 'Com Runa de Dano Phantom + Respiração Phantom': '4.05x', 'Com Runa de Dano Supremo + Respiração Phantom': '5x' },
-        { 'Espada': 'Eclipse Warden', 'Raridade': 'Incomum', 'Dano Base (3 Estrelas)': '2.25x', 'Com Respiração Phantom': '4.05x', 'Com Runa de Dano Phantom + Respiração Phantom': '7.29x', 'Com Runa de Dano Supremo + Respiração Phantom': '9.10x' },
-        { 'Espada': 'Obsidian Reaver', 'Raridade': 'Raro', 'Dano Base (3 Estrelas)': '3.75x', 'Com Respiração Phantom': '6.75x', 'Com Runa de Dano Phantom + Respiração Phantom': '12.15x', 'Com Runa de Dano Supremo + Respiração Phantom': '13.50x' },
-        { 'Espada': 'Aquarius Edge', 'Raridade': 'Lendário', 'Dano Base (3 Estrelas)': '5x', 'Com Respiração Phantom': '9x', 'Com Runa de Dano Phantom + Respiração Phantom': '16.2x', 'Com Runa de Dano Supremo + Respiração Phantom': '18x' },
-        { 'Espada': 'Demon Soul', 'Raridade': 'Mítico', 'Dano Base (3 Estrelas)': '6.25x', 'Com Respiração Phantom': '11.25x', 'Com Runa de Dano Phantom + Respiração Phantom': '20.25x', 'Com Runa de Dano Supremo + Respiração Phantom': '22.50x' },
-        { 'Espada': 'Redmourne', 'Raridade': 'Mítico', 'Dano Base (3 Estrelas)': '7.5x', 'Com Respiração Phantom': '13.5x', 'Com Runa de Dano Phantom + Respiração Phantom': '24.3x', 'Com Runa de Dano Supremo + Respiração Phantom': '27x' },
-        { 'Espada': 'VenomStrike', 'Raridade': 'Phantom', 'Dano Base (3 Estrelas)': '10x', 'Com Respiração Phantom': '18x', 'Com Runa de Dano Phantom + Respiração Phantom': '32.4x', 'Com Runa de Dano Supremo + Respiração Phantom': '36x' },
-        { 'Espada': 'Golden Venom Strike', 'Raridade': 'Evento', 'Dano Base (3 Estrelas)': '38x (Não possui estrelas)', 'Com Respiração Phantom': 'N/A', 'Com Runa de Dano Phantom + Respiração Phantom': 'N/A', 'Com Runa de Dano Supremo + Respiração Phantom': 'N/A' },
+        { name: 'BloodThorn', rarity: 'Comum', baseDamage: '1.25x', phantomBreathing: '2.25x', phantomRune: '4.05x', supremeRune: '5x' },
+        { name: 'Eclipse Warden', rarity: 'Incomum', baseDamage: '2.25x', phantomBreathing: '4.05x', phantomRune: '7.29x', supremeRune: '9.10x' },
+        { name: 'Obsidian Reaver', rarity: 'Raro', baseDamage: '3.75x', phantomBreathing: '6.75x', phantomRune: '12.15x', supremeRune: '13.50x' },
+        { name: 'Aquarius Edge', rarity: 'Lendário', baseDamage: '5x', phantomBreathing: '9x', phantomRune: '16.2x', supremeRune: '18x' },
+        { name: 'Demon Soul', rarity: 'Mítico', baseDamage: '6.25x', phantomBreathing: '11.25x', phantomRune: '20.25x', supremeRune: '22.50x' },
+        { name: 'Redmourne', rarity: 'Mítico', baseDamage: '7.5x', phantomBreathing: '13.5x', phantomRune: '24.3x', supremeRune: '27x' },
+        { name: 'VenomStrike', rarity: 'Phantom', baseDamage: '10x', phantomBreathing: '18x', phantomRune: '32.4x', supremeRune: '36x' },
+        { name: 'Golden Venom Strike', rarity: 'Evento', baseDamage: '38x', phantomBreathing: 'N/A', phantomRune: 'N/A', supremeRune: 'N/A' },
       ],
     },
   },
@@ -911,16 +911,16 @@ export const scythesArticle: Omit<WikiArticle, 'createdAt'> = {
   imageUrl: 'wiki-14',
   tables: {
     scythes: {
-      headers: ['Foice', 'Stats (Base)', 'Stats (1 Estrela)', 'Stats (2 Estrelas)', 'Stats (3 Estrelas)'],
+      headers: ['name', 'rarity', 'base_stats', 'one_star_stats', 'two_star_stats', 'three_star_stats'],
       rows: [
-        { 'Foice': 'Venomleaf', 'Stats (Base)': '0.75x', 'Stats (1 Estrela)': '1.5x', 'Stats (2 Estrelas)': '2.25x', 'Stats (3 Estrelas)': '3.75x' },
-        { 'Foice': 'Cryoscythe', 'Stats (Base)': '1x', 'Stats (1 Estrela)': '2x', 'Stats (2 Estrelas)': '3x', 'Stats (3 Estrelas)': '5x' },
-        { 'Foice': 'Toxinfang', 'Stats (Base)': '1.75x', 'Stats (1 Estrela)': '3.5x', 'Stats (2 Estrelas)': '5.25x', 'Stats (3 Estrelas)': '8.75x' },
-        { 'Foice': 'Crimson Thorn', 'Stats (Base)': '2.2x', 'Stats (1 Estrela)': '4.4x', 'Stats (2 Estrelas)': '6.6x', 'Stats (3 Estrelas)': '11x' },
-        { 'Foice': 'Bonehowl', 'Stats (Base)': '2.75x', 'Stats (1 Estrela)': '5.5x', 'Stats (2 Estrelas)': '8.25x', 'Stats (3 Estrelas)': '13.75x' },
-        { 'Foice': 'Ashfang', 'Stats (Base)': '3.5x', 'Stats (1 Estrela)': '7x', 'Stats (2 Estrelas)': '10.5x', 'Stats (3 Estrelas)': '17.5x' },
-        { 'Foice': 'Phantom Requiem', 'Stats (Base)': '4.25x', 'Stats (1 Estrela)': '8.5x', 'Stats (2 Estrelas)': '12.75x', 'Stats (3 Estrelas)': '21.25x' },
-        { 'Foice': 'Stormreaver', 'Stats (Base)': '5x', 'Stats (1 Estrela)': '10x', 'Stats (2 Estrelas)': '15x', 'Stats (3 Estrelas)': '25x' },
+        { name: 'Venomleaf', rarity: 'Comum', base_stats: '0.75x', one_star_stats: '1.5x', two_star_stats: '2.25x', three_star_stats: '3.75x' },
+        { name: 'Cryoscythe', rarity: 'Incomum', base_stats: '1x', one_star_stats: '2x', two_star_stats: '3x', three_star_stats: '5x' },
+        { name: 'Toxinfang', rarity: 'Raro', base_stats: '1.75x', one_star_stats: '3.5x', two_star_stats: '5.25x', three_star_stats: '8.75x' },
+        { name: 'Crimson Thorn', rarity: 'Lendário', base_stats: '2.2x', one_star_stats: '4.4x', two_star_stats: '6.6x', three_star_stats: '11x' },
+        { name: 'Bonehowl', rarity: 'Mítico', base_stats: '2.75x', one_star_stats: '5.5x', two_star_stats: '8.25x', three_star_stats: '13.75x' },
+        { name: 'Ashfang', rarity: 'Phantom', base_stats: '3.5x', one_star_stats: '7x', two_star_stats: '10.5x', three_star_stats: '17.5x' },
+        { name: 'Phantom Requiem', rarity: 'Phantom', base_stats: '4.25x', one_star_stats: '8.5x', two_star_stats: '12.75x', three_star_stats: '21.25x' },
+        { name: 'Stormreaver', rarity: 'Supremo', base_stats: '5x', one_star_stats: '10x', two_star_stats: '15x', three_star_stats: '25x' },
       ]
     }
   }
