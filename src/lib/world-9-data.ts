@@ -48,13 +48,13 @@ export const world9Data = {
         { id: 'ken-turbo-boss', name: 'Ken Turbo', rank: 'SS', exp: 5760, hp: '264QnD', world: 'World 9', drops: { coins: { amount: '26QnD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [
-        { id: 'ken', name: 'Ken', energy_bonus: '4.57k' },
-        { id: 'aira', name: 'Aira', energy_bonus: '9.15k' },
-        { id: 'jiji', name: 'Jiji', energy_bonus: '13.7k' },
-        { id: 'momo', name: 'Momo', energy_bonus: '18.3k' },
-        { id: 'alien', name: 'Alien', energy_bonus: '22.8k' },
-        { id: 'saiko', name: 'Saiko', energy_bonus: '30.5k' },
-        { id: 'ken-turbo-pet', name: 'Ken Turbo', energy_bonus: '68.6k' }
+        { id: 'ken', name: 'Ken', rarity: 'Common', energy_bonus: '4.57k' },
+        { id: 'aira', name: 'Aira', rarity: 'Uncommon', energy_bonus: '9.15k' },
+        { id: 'jiji', name: 'Jiji', rarity: 'Rare', energy_bonus: '13.7k' },
+        { id: 'momo', name: 'Momo', rarity: 'Epic', energy_bonus: '18.3k' },
+        { id: 'alien', name: 'Alien', rarity: 'Legendary', energy_bonus: '22.8k' },
+        { id: 'saiko', name: 'Saiko', rarity: 'Mythic', energy_bonus: '30.5k' },
+        { id: 'ken-turbo-pet', name: 'Ken Turbo', rarity: 'Phantom', energy_bonus: '68.6k' }
     ],
     shadows: [
         {

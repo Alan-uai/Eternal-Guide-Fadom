@@ -70,13 +70,13 @@ export const world3Data = {
       { id: 'eizen-boss', name: 'Eizen', rank: 'SS', exp: 60, hp: '18Qn', world: 'World 3', drops: { coins: { amount: '1.8Qn', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [
-        { id: 'hime', name: 'Hime', energy_bonus: '19' },
-        { id: 'ichige', name: 'Ichige', energy_bonus: '38' },
-        { id: 'uryua', name: 'Uryua', energy_bonus: '56' },
-        { id: 'rakiu', name: 'Rakiu', energy_bonus: '75' },
-        { id: 'yoichi', name: 'Yoichi', energy_bonus: '94' },
-        { id: 'kahara', name: 'Kahara', energy_bonus: '125' },
-        { id: 'eizen-pet', name: 'Eizen', energy_bonus: '281' }
+        { id: 'hime', name: 'Hime', rarity: 'Common', energy_bonus: '19' },
+        { id: 'ichige', name: 'Ichige', rarity: 'Uncommon', energy_bonus: '38' },
+        { id: 'uryua', name: 'Uryua', rarity: 'Rare', energy_bonus: '56' },
+        { id: 'rakiu', name: 'Rakiu', rarity: 'Epic', energy_bonus: '75' },
+        { id: 'yoichi', name: 'Yoichi', rarity: 'Legendary', energy_bonus: '94' },
+        { id: 'kahara', name: 'Kahara', rarity: 'Mythic', energy_bonus: '125' },
+        { id: 'eizen-pet', name: 'Eizen', rarity: 'Phantom', energy_bonus: '281' }
     ],
     dungeons: [],
   };

@@ -57,13 +57,13 @@ export const world7Data = {
         { id: 'novi-chrone-boss', name: 'Novi Chroni', rank: 'SS', exp: 960, hp: '5.4dD', world: 'World 7', drops: { coins: { amount: '540Ud', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [
-        { id: 'noalle', name: 'Noalle', energy_bonus: '732' },
-        { id: 'megna', name: 'Megna', energy_bonus: '1.46k' },
-        { id: 'finrel', name: 'Finrel', energy_bonus: '2.19k' },
-        { id: 'aste', name: 'Aste', energy_bonus: '2.93k' },
-        { id: 'yune', name: 'Yune', energy_bonus: '3.66k' },
-        { id: 'yemi', name: 'Yemi', energy_bonus: '4.88k' },
-        { id: 'novi-chroni-pet', name: 'Novi Chroni', energy_bonus: '10.9k' }
+        { id: 'noalle', name: 'Noalle', rarity: 'Common', energy_bonus: '732' },
+        { id: 'megna', name: 'Megna', rarity: 'Uncommon', energy_bonus: '1.46k' },
+        { id: 'finrel', name: 'Finrel', rarity: 'Rare', energy_bonus: '2.19k' },
+        { id: 'aste', name: 'Aste', rarity: 'Epic', energy_bonus: '2.93k' },
+        { id: 'yune', name: 'Yune', rarity: 'Legendary', energy_bonus: '3.66k' },
+        { id: 'yemi', name: 'Yemi', rarity: 'Mythic', energy_bonus: '4.88k' },
+        { id: 'novi-chroni-pet', name: 'Novi Chroni', rarity: 'Phantom', energy_bonus: '10.9k' }
     ],
     shadows: [
         {

@@ -91,13 +91,13 @@ export const world2Data = {
         { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 30, hp: '117T', world: 'World 2', drops: { coins: { amount: '11T', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [
-        { id: 'nomi', name: 'Nomi', energy_bonus: '8' },
-        { id: 'usup', name: 'Usup', energy_bonus: '15' },
-        { id: 'robins', name: 'Robins', energy_bonus: '23' },
-        { id: 'senji', name: 'Senji', energy_bonus: '30' },
-        { id: 'zaro', name: 'Zaro', energy_bonus: '38' },
-        { id: 'loffy', name: 'Loffy', energy_bonus: '50' },
-        { id: 'shanks-pet', name: 'Shanks', energy_bonus: '113' }
+        { id: 'nomi', name: 'Nomi', rarity: 'Common', energy_bonus: '8' },
+        { id: 'usup', name: 'Usup', rarity: 'Uncommon', energy_bonus: '15' },
+        { id: 'robins', name: 'Robins', rarity: 'Rare', energy_bonus: '23' },
+        { id: 'senji', name: 'Senji', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'zaro', name: 'Zaro', rarity: 'Legendary', energy_bonus: '38' },
+        { id: 'loffy', name: 'Loffy', rarity: 'Mythic', energy_bonus: '50' },
+        { id: 'shanks-pet', name: 'Shanks', rarity: 'Phantom', energy_bonus: '113' }
     ],
     dungeons: [
         {

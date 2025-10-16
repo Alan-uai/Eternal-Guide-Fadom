@@ -51,13 +51,13 @@ export const world6Data = {
         { id: 'statue-of-god-boss', name: 'Statue of God', rank: 'SS', exp: 480, hp: '35de', world: 'World 6', drops: { coins: { amount: '3.5de', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [
-        { id: 'weak-sung', name: 'Weak Sung', energy_bonus: '293' },
-        { id: 'green-goblin', name: 'Green Goblin', energy_bonus: '586' },
-        { id: 'white-tiger', name: 'White Tiger', energy_bonus: '879' },
-        { id: 'cha', name: 'Cha', energy_bonus: '1.17k' },
-        { id: 'choi', name: 'Choi', energy_bonus: '1.46k' },
-        { id: 'solo-sung', name: 'Solo Sung', energy_bonus: '1.95k' },
-        { id: 'statue-of-god-pet', name: 'Statue of God', energy_bonus: '4.39k' }
+        { id: 'weak-sung', name: 'Weak Sung', rarity: 'Common', energy_bonus: '293' },
+        { id: 'green-goblin', name: 'Green Goblin', rarity: 'Uncommon', energy_bonus: '586' },
+        { id: 'white-tiger', name: 'White Tiger', rarity: 'Rare', energy_bonus: '879' },
+        { id: 'cha', name: 'Cha', rarity: 'Epic', energy_bonus: '1.17k' },
+        { id: 'choi', name: 'Choi', rarity: 'Legendary', energy_bonus: '1.46k' },
+        { id: 'solo-sung', name: 'Solo Sung', rarity: 'Mythic', energy_bonus: '1.95k' },
+        { id: 'statue-of-god-pet', name: 'Statue of God', rarity: 'Phantom', energy_bonus: '4.39k' }
     ],
     shadows: [
         {

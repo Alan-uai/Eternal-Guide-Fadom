@@ -71,13 +71,13 @@ export const world4Data = {
         { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, hp: '1.4Sp', world: 'World 4', drops: { coins: { amount: '140sx', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [
-        { id: 'itodo', name: 'Itodo', energy_bonus: '47' },
-        { id: 'nebara', name: 'Nebara', energy_bonus: '94' },
-        { id: 'magum', name: 'Magum', energy_bonus: '141' },
-        { id: 'meki', name: 'Meki', energy_bonus: '188' },
-        { id: 'tage', name: 'Tage', energy_bonus: '234' },
-        { id: 'gajo', name: 'Gajo', energy_bonus: '313' },
-        { id: 'sakuni-pet', name: 'Sakuni', energy_bonus: '703' }
+        { id: 'itodo', name: 'Itodo', rarity: 'Common', energy_bonus: '47' },
+        { id: 'nebara', name: 'Nebara', rarity: 'Uncommon', energy_bonus: '94' },
+        { id: 'magum', name: 'Magum', rarity: 'Rare', energy_bonus: '141' },
+        { id: 'meki', name: 'Meki', rarity: 'Epic', energy_bonus: '188' },
+        { id: 'tage', name: 'Tage', rarity: 'Legendary', energy_bonus: '234' },
+        { id: 'gajo', name: 'Gajo', rarity: 'Mythic', energy_bonus: '313' },
+        { id: 'sakuni-pet', name: 'Sakuni', rarity: 'Phantom', energy_bonus: '703' }
     ],
     dungeons: [
         {

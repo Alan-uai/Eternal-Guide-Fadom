@@ -60,13 +60,13 @@ export const world1Data = {
         { id: 'kid-kohan-boss', name: 'Kid Kohan', rank: 'SS', exp: 15, hp: '1.5B', world: 'World 1', drops: { coins: { amount: '150M', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
     ],
     pets: [
-        { id: 'kriluni', name: 'Kriluni', energy_bonus: '3' },
-        { id: 'ymicha', name: 'Ymicha', energy_bonus: '6' },
-        { id: 'tian-shan', name: 'Tian Shan', energy_bonus: '9' },
-        { id: 'kohan', name: 'Kohan', energy_bonus: '12' },
-        { id: 'picco', name: 'Picco', energy_bonus: '15' },
-        { id: 'koku', name: 'Koku', energy_bonus: '20' },
-        { id: 'kid-kohan-pet', name: 'Kid Kohan', energy_bonus: '45' }
+        { id: 'kriluni', name: 'Kriluni', rarity: 'Common', energy_bonus: '3' },
+        { id: 'ymicha', name: 'Ymicha', rarity: 'Uncommon', energy_bonus: '6' },
+        { id: 'tian-shan', name: 'Tian Shan', rarity: 'Rare', energy_bonus: '9' },
+        { id: 'kohan', name: 'Kohan', rarity: 'Epic', energy_bonus: '12' },
+        { id: 'picco', name: 'Picco', rarity: 'Legendary', energy_bonus: '15' },
+        { id: 'koku', name: 'Koku', rarity: 'Mythic', energy_bonus: '20' },
+        { id: 'kid-kohan-pet', name: 'Kid Kohan', rarity: 'Phantom', energy_bonus: '45' }
     ],
     dungeons: [
         {

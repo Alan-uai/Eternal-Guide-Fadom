@@ -46,13 +46,13 @@ export const world5Data = {
         }
     ],
     pets: [
-        { id: 'nazuki', name: 'Nazuki', energy_bonus: '117' },
-        { id: 'tenjaro', name: 'Tenjaro', energy_bonus: '234' },
-        { id: 'zentsu', name: 'Zentsu', energy_bonus: '352' },
-        { id: 'insake', name: 'Insake', energy_bonus: '469' },
-        { id: 'tamoka', name: 'Tamoka', energy_bonus: '586' },
-        { id: 'shinabe', name: 'Shinabe', energy_bonus: '781' },
-        { id: 'rangaki', name: 'Rangaki', energy_bonus: '1.75k' }
+        { id: 'nazuki', name: 'Nazuki', rarity: 'Common', energy_bonus: '117' },
+        { id: 'tenjaro', name: 'Tenjaro', rarity: 'Uncommon', energy_bonus: '234' },
+        { id: 'zentsu', name: 'Zentsu', rarity: 'Rare', energy_bonus: '352' },
+        { id: 'insake', name: 'Insake', rarity: 'Epic', energy_bonus: '469' },
+        { id: 'tamoka', name: 'Tamoka', rarity: 'Legendary', energy_bonus: '586' },
+        { id: 'shinabe', name: 'Shinabe', rarity: 'Mythic', energy_bonus: '781' },
+        { id: 'rangaki', name: 'Rangaki', rarity: 'Phantom', energy_bonus: '1.75k' }
     ],
     dungeons: [],
     shadows: [],
