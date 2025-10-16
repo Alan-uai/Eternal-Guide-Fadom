@@ -17,14 +17,12 @@ import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 
-// Dummy data for enchantments - in a real app, this would come from a data file
 const breathingEnchantments = ['Sun', 'Moon', 'Water', 'Thunder', 'Wind', 'Beast'];
 const stoneEnchantments = ['Attack', 'Speed', 'Critical'];
-const passiveEnchantments = ['Lifesteal', 'Cooldown', 'AoE'];
+const passiveEnchantments = ['Lifesteal', 'Cooldown', 'AoE', 'Phantom', 'Supreme'];
 
-// Helper to parse multiplier strings like '1.25x' into numbers
 const parseMultiplier = (value?: string): number => {
-    if (typeof value !== 'string') return 1; // Return 1 for no bonus
+    if (typeof value !== 'string') return 1;
     const parsed = parseFloat(value.replace(/x/g, ''));
     return isNaN(parsed) ? 1 : parsed;
 };
@@ -92,14 +90,12 @@ export function WeaponSlots() {
         const updatedWeapon = { ...weaponToUpdate, ...newData };
         const newSlots = { ...currentData, [slotIndex]: updatedWeapon };
 
-        // Optimistic UI update
         setEquippedWeapons(newSlots);
 
         try {
             await updateDoc(userDocRef, { weaponSlots: newSlots });
         } catch (error) {
             console.error("Error updating weapon data:", error);
-            // Revert on error
             setEquippedWeapons((userData as any)?.weaponSlots || {});
             toast({ variant: "destructive", title: "Erro", description: "Não foi possível atualizar os dados da arma." });
         }
@@ -154,7 +150,6 @@ export function WeaponSlots() {
              const statKey = ['base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'][level];
              const baseDamage = parseMultiplier((item as any)[statKey] || '1x');
              
-             // Enchantment multipliers
              const breathingMultiplier = equipped.breathingEnchantment ? 1.8 : 1;
              const stoneMultiplier = equipped.stoneEnchantment ? 1.8 : 1;
              
@@ -164,7 +159,17 @@ export function WeaponSlots() {
 
         if(equipped.type === 'scythe') {
             const statKey = ['base_stats', 'one_star_stats', 'two_star_stats', 'three_star_stats'][level];
-            return item[statKey] || item.base_stats;
+            const baseDamage = parseMultiplier(item[statKey] || item.base_stats);
+            
+            let passiveMultiplier = 1;
+            if (equipped.passiveEnchantment === 'Phantom') {
+                passiveMultiplier = 1.8;
+            } else if (equipped.passiveEnchantment === 'Supreme') {
+                passiveMultiplier = 2.0;
+            }
+
+            const finalDamage = baseDamage * passiveMultiplier;
+            return `${finalDamage.toFixed(2)}x`;
         }
 
         if(equipped.type === 'energy') {
@@ -243,7 +248,7 @@ export function WeaponSlots() {
                                                     </Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-1">
-                                                    {passiveEnchantments.map(enchant => (
+                                                    {passiveEnchantments.filter(p => p === 'Phantom' || p === 'Supreme').map(enchant => (
                                                         <Button key={enchant} variant="ghost" size="sm" className="w-full justify-start" onClick={(e) => { e.stopPropagation(); updateWeaponData(slotIndex, { passiveEnchantment: enchant }) }}>
                                                                 {enchant}
                                                         </Button>
