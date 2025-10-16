@@ -170,7 +170,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                                 <button
                                     onClick={() => isGamepass ? handleGamepassClick(item, isEquipped) : setOpenPopoverId(item.id)}
                                     className={cn(
-                                        'aspect-square rounded-md flex flex-col items-center justify-center p-1 text-center relative overflow-hidden border-2 transition-all duration-200 group',
+                                        'aspect-square flex flex-col items-center justify-center p-1 text-center relative overflow-hidden border-2 transition-all duration-200 group rounded-md',
                                         isEquipped ? 'border-primary/50' : 'border-transparent hover:border-primary/50',
                                         cardBgClass,
                                         isEquipped && isSpecialRarity && 'border-solid' 
