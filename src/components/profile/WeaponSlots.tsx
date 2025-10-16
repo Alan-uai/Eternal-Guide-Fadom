@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -85,7 +86,6 @@ export function WeaponSlots() {
 
         const updatedWeapon = { ...weaponToUpdate, ...newData };
         
-        // Se a nova chave for um encantamento, e o outro encantamento não existir, defina-o como 'Common'
         if (updatedWeapon.type === 'damage') {
             if ('breathingEnchantment' in newData && !updatedWeapon.stoneEnchantment) {
                 updatedWeapon.stoneEnchantment = 'Common';
@@ -157,26 +157,25 @@ export function WeaponSlots() {
         if (!item || !equipped) return equipped?.stats || '0x';
 
         const level = equipped.evolutionLevel || 0;
-        const evolutionKey = ['base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'][level] as keyof typeof item;
-
+        
         if (equipped.type === 'damage') {
-             const breathing = equipped.breathingEnchantment;
-             const stone = equipped.stoneEnchantment;
-             if(breathing && stone && item.enchantments) {
-                 const enchantData = item.enchantments[breathing]?.[stone];
-                 if(enchantData && enchantData[level as 0 | 1 | 2 | 3]) {
-                     return enchantData[level as 0 | 1 | 2 | 3];
-                 }
-             }
-             return item[evolutionKey] || item['base_damage'] || '0x';
+            const breathing = equipped.breathingEnchantment;
+            const stone = equipped.stoneEnchantment;
+
+            if (breathing && stone && item.enchantments?.[breathing]?.[stone]?.[level]) {
+                return item.enchantments[breathing][stone][level];
+            }
+             const evolutionKey = ['base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'][level] as keyof typeof item;
+             return item[evolutionKey] || item.base_damage || '0x';
         }
 
         if(equipped.type === 'scythe') {
             const passive = equipped.passiveEnchantment;
-            if(passive && item.passives && item.passives[passive] && item.passives[passive][level as 0 | 1 | 2 | 3]) {
-                return item.passives[passive][level as 0 | 1 | 2 | 3];
+            if(passive && item.passives?.[passive]?.[level]) {
+                return item.passives[passive][level];
             }
-             return item[evolutionKey] || item['base_damage'] || '0x';
+             const evolutionKey = ['base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'][level] as keyof typeof item;
+             return item[evolutionKey] || item.base_damage || '0x';
         }
 
         if(equipped.type === 'energy') {
@@ -184,6 +183,7 @@ export function WeaponSlots() {
             return item[statKey] || item.base_stats || '0x';
         }
         
+        const evolutionKey = ['base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'][level] as keyof typeof item;
         return item[evolutionKey] || '0x';
     }
 

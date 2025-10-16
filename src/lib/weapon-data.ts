@@ -7,8 +7,12 @@ interface RarityEnchantments {
     [rarity: string]: EnchantmentValues;
 }
 
-interface WeaponEnchantments {
-    [enchantmentType: string]: RarityEnchantments;
+interface StoneEnchantments {
+    [stoneRarity: string]: EnchantmentValues;
+}
+
+interface BreathingEnchantments {
+    [breathingRarity: string]: StoneEnchantments;
 }
 
 interface WeaponPassives {
@@ -27,43 +31,87 @@ interface Weapon {
     one_star_stats?: string;
     two_star_stats?: string;
     three_star_stats?: string;
-    enchantments?: WeaponEnchantments;
+    enchantments?: BreathingEnchantments;
     passives?: WeaponPassives;
 }
 
 export const damageSwords: Weapon[] = [
-    // ... (base damage values are correct from previous step)
     { 
         name: 'Bloodthorn', rarity: 'Comum', type: 'damage', 
         base_damage: '0.25x', one_star_damage: '0.5x', two_star_damage: '0.75x', three_star_damage: '1.25x',
         enchantments: {
-            Common: { Common: { 0: '0.25x', 1: '0.5x', 2: '0.75x', 3: '1.25x'} },
-            Phantom: { Supreme: { 0: '1.8x', 1: '1.8x', 2: '1.8x', 3: '38x'} }
+            Phantom: {
+                Common: { 0: '0.45x', 1: '0.9x', 2: '1.35x', 3: '2.25x' },
+                Phantom: { 0: '0.73x', 1: '1.46x', 2: '2.19x', 3: '4.05x' },
+                Supreme: { 0: '0.9x', 1: '1.8x', 2: '2.7x', 3: '5x' }
+            }
         }
     },
     { 
         name: 'Eclipse Warden', rarity: 'Incomum', type: 'damage', 
-        base_damage: '0.45x', one_star_damage: '0.9x', two_star_damage: '1.35x', three_star_damage: '2.25x' 
+        base_damage: '0.45x', one_star_damage: '0.9x', two_star_damage: '1.35x', three_star_damage: '2.25x',
+         enchantments: {
+            Phantom: {
+                Common: { 0: '0.81x', 1: '1.62x', 2: '2.43x', 3: '4.05x' },
+                Phantom: { 0: '1.31x', 1: '2.62x', 2: '3.93x', 3: '7.29x' },
+                Supreme: { 0: '1.64x', 1: '3.28x', 2: '4.91x', 3: '9.10x' }
+            }
+        }
     },
     { 
         name: 'Obsidian Reaver', rarity: 'Raro', type: 'damage', 
-        base_damage: '0.75x', one_star_damage: '1.5x', two_star_damage: '2.25x', three_star_damage: '3.75x' 
+        base_damage: '0.75x', one_star_damage: '1.5x', two_star_damage: '2.25x', three_star_damage: '3.75x',
+        enchantments: {
+            Phantom: {
+                Common: { 0: '1.35x', 1: '2.7x', 2: '4.05x', 3: '6.75x' },
+                Phantom: { 0: '2.19x', 1: '4.37x', 2: '6.56x', 3: '12.15x' },
+                Supreme: { 0: '2.7x', 1: '5.4x', 2: '8.1x', 3: '13.50x' }
+            }
+        }
     },
     { 
         name: 'Aquarius Edge', rarity: 'Lendário', type: 'damage', 
-        base_damage: '1x', one_star_damage: '2x', two_star_damage: '3x', three_star_damage: '5x' 
+        base_damage: '1x', one_star_damage: '2x', two_star_damage: '3x', three_star_damage: '5x',
+         enchantments: {
+            Phantom: {
+                Common: { 0: '1.8x', 1: '3.6x', 2: '5.4x', 3: '9x' },
+                Phantom: { 0: '2.92x', 1: '5.83x', 2: '8.75x', 3: '16.2x' },
+                Supreme: { 0: '3.6x', 1: '7.2x', 2: '10.8x', 3: '18x' }
+            }
+        }
     },
     { 
         name: 'Doomsoul', rarity: 'Mítico', type: 'damage', 
-        base_damage: '1.25x', one_star_damage: '2.5x', two_star_damage: '3.75x', three_star_damage: '6.25x'
+        base_damage: '1.25x', one_star_damage: '2.5x', two_star_damage: '3.75x', three_star_damage: '6.25x',
+        enchantments: {
+            Phantom: {
+                Common: { 0: '2.25x', 1: '4.5x', 2: '6.75x', 3: '11.25x' },
+                Phantom: { 0: '3.65x', 1: '7.29x', 2: '10.94x', 3: '20.25x' },
+                Supreme: { 0: '4.5x', 1: '9x', 2: '13.5x', 3: '22.50x' }
+            }
+        }
     },
     { 
         name: 'Redmourne', rarity: 'Mítico', type: 'damage', 
-        base_damage: '1.5x', one_star_damage: '3x', two_star_damage: '4.5x', three_star_damage: '7.5x' 
+        base_damage: '1.5x', one_star_damage: '3x', two_star_damage: '4.5x', three_star_damage: '7.5x',
+        enchantments: {
+            Phantom: {
+                Common: { 0: '2.7x', 1: '5.4x', 2: '8.1x', 3: '13.5x' },
+                Phantom: { 0: '4.37x', 1: '8.75x', 2: '13.12x', 3: '24.3x' },
+                Supreme: { 0: '5.4x', 1: '10.8x', 2: '16.2x', 3: '27x' }
+            }
+        }
     },
     { 
         name: 'Venomstrike', rarity: 'Phantom', type: 'damage', 
-        base_damage: '2x', one_star_damage: '4x', two_star_damage: '6x', three_star_damage: '10x' 
+        base_damage: '2x', one_star_damage: '4x', two_star_damage: '6x', three_star_damage: '10x',
+        enchantments: {
+            Phantom: {
+                Common: { 0: '3.6x', 1: '7.2x', 2: '10.8x', 3: '18x' },
+                Phantom: { 0: '5.83x', 1: '11.66x', 2: '17.5x', 3: '32.4x' },
+                Supreme: { 0: '7.2x', 1: '14.4x', 2: '21.6x', 3: '36x' }
+            }
+        }
     },
     { 
         name: 'Golden Venom Strike', rarity: 'Evento', type: 'damage', 
