@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,7 +12,9 @@ import { Button } from '@/components/ui/button';
 import { useUser, useFirebase } from '@/firebase';
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Upload } from 'lucide-react';
+import { extractStatsFromImage } from '@/ai/flows/extract-stats-from-image-flow';
+import { Separator } from '../ui/separator';
 
 const statsSchema = z.object({
     currentWorld: z.string().min(1, 'O mundo atual é obrigatório.'),
@@ -32,6 +34,8 @@ export function WelcomePopover() {
     
     const [isOpen, setIsOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const imageInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm<StatsFormData>({
         resolver: zodResolver(statsSchema),
@@ -51,7 +55,6 @@ export function WelcomePopover() {
 
     const handleClose = () => {
         setIsOpen(false);
-        // Remove the query param from the URL without reloading the page
         router.replace('/profile', { scroll: false });
     };
 
@@ -63,18 +66,14 @@ export function WelcomePopover() {
         setIsSaving(true);
         try {
             const userRef = doc(firestore, 'users', user.uid);
-            // We use updateDoc because the user document is already created on login
             await updateDoc(userRef, {
                 currentWorld: values.currentWorld,
                 rank: parseInt(values.rank, 10),
             });
             
-            // Save energy and damage to their respective locations
             const energyRef = doc(firestore, 'users', user.uid, 'rank', 'current');
             await setDoc(energyRef, { value: parseInt(values.rank, 10) }, { merge: true });
 
-            // Note: We're saving the 'totalDamage' from the form as the user's 'currentEnergy'
-            // because a user's base damage is derived from their accumulated energy.
             localStorage.setItem('eternal-guide-current-energy', values.totalDamage);
 
             toast({ title: 'Perfil Atualizado!', description: 'Suas informações foram salvas.' });
@@ -88,18 +87,96 @@ export function WelcomePopover() {
         }
     };
 
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsAnalyzing(true);
+        toast({ title: 'Analisando Imagem...', description: 'A IA está lendo suas estatísticas.' });
+
+        try {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const fileDataUri = reader.result as string;
+                const result = await extractStatsFromImage({ image: fileDataUri });
+                
+                const foundFields: string[] = [];
+                const missingFields: string[] = [];
+
+                if (result.currentWorld) {
+                    form.setValue('currentWorld', result.currentWorld);
+                    foundFields.push('Mundo');
+                } else {
+                    missingFields.push('Mundo');
+                }
+                if (result.rank) {
+                    form.setValue('rank', result.rank);
+                    foundFields.push('Rank');
+                } else {
+                    missingFields.push('Rank');
+                }
+                if (result.totalDamage) {
+                    form.setValue('totalDamage', result.totalDamage);
+                    foundFields.push('Dano');
+                } else {
+                    missingFields.push('Dano');
+                }
+                if (result.energyGain) {
+                    form.setValue('energyGain', result.energyGain);
+                    foundFields.push('Energia');
+                } else {
+                    missingFields.push('Energia');
+                }
+
+                if (foundFields.length > 0) {
+                    toast({ title: 'Campos Preenchidos!', description: `A IA encontrou: ${foundFields.join(', ')}.` });
+                }
+                if (missingFields.length > 0) {
+                     toast({ variant: 'destructive', title: 'Campos Faltando', description: `Não foi possível encontrar: ${missingFields.join(', ')}. Por favor, preencha manualmente.` });
+                }
+            };
+        } catch (error) {
+            console.error('Error analyzing image:', error);
+            toast({ variant: 'destructive', title: 'Erro na Análise', description: 'Não foi possível extrair dados da imagem.' });
+        } finally {
+            setIsAnalyzing(false);
+            if(imageInputRef.current) imageInputRef.current.value = '';
+        }
+    };
+
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[425px]" onInteractOutside={(e) => e.preventDefault()}>
+            <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>Bem-vindo ao Guia Eterno!</DialogTitle>
                     <DialogDescription>
-                        Para começar, preencha suas estatísticas básicas do jogo. Isso nos ajudará a fornecer cálculos e dicas personalizadas.
+                        Para começar, preencha suas estatísticas ou envie um screenshot do jogo.
                     </DialogDescription>
                 </DialogHeader>
+
+                <div className="py-2">
+                    <input type="file" ref={imageInputRef} onChange={handleImageUpload} style={{ display: 'none' }} accept="image/*" />
+                    <Button variant="outline" className='w-full' onClick={() => imageInputRef.current?.click()} disabled={isAnalyzing}>
+                         {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                        {isAnalyzing ? 'Analisando...' : 'Enviar Imagem'}
+                    </Button>
+                </div>
+
+                <div className="relative py-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Ou
+                    </span>
+                  </div>
+                </div>
+
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
                             control={form.control}
                             name="currentWorld"
@@ -157,7 +234,7 @@ export function WelcomePopover() {
                                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                                 Salvar e Continuar
                             </Button>
-                        </DialogFooter>
+                         </DialogFooter>
                     </form>
                 </Form>
             </DialogContent>
