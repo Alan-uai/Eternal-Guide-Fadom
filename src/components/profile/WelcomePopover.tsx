@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,11 +19,45 @@ import { useGlobalBonuses } from '@/hooks/use-global-bonuses';
 import { allGameData } from '@/lib/game-data-context';
 import { energyGainPerRank } from '@/lib/energy-gain-data';
 
-
 const MAX_RANK = Math.max(...Object.keys(energyGainPerRank).map(Number));
 const MAX_WORLD = allGameData.length;
 
-const statsSchema = z.object({
+const parseUserEnergy = (energyStr: string): number => {
+    if (!energyStr || typeof energyStr !== 'string') return 0;
+    const lowerStr = energyStr.toLowerCase().trim();
+    const suffixes: { [key: string]: number } = {
+        k: 1e3, m: 1e6, b: 1e9, t: 1e12, qd: 1e15, qn: 1e18, sx: 1e21, sp: 1e24,
+        o: 1e27, n: 1e30, de: 1e33, ud: 1e36, dd: 1e39, td: 1e42, qdd: 1e45, qnd: 1e48,
+        sxd: 1e51, spd: 1e54, ocd: 1e57, nvd: 1e60, vgn: 1e63, uvg: 1e66, dvg: 1e69,
+        tvg: 1e72, qtv: 1e75, qnv: 1e78, sev: 1e81, spg: 1e84, ovg: 1e87, nvg: 1e90,
+        tgn: 1e93, utg: 1e96, dtg: 1e99, tstg: 1e102, qtg: 1e105, qntg: 1e108, sstg: 1e111,
+        sptg: 1e114, octg: 1e117, notg: 1e120, qdr: 1e123, uqdr: 1e126, dqdr: 1e129,
+        tqdr: 1e132
+    };
+
+    const suffixKey = Object.keys(suffixes).reverse().find(s => lowerStr.endsWith(s));
+    if (suffixKey) {
+        const numberPart = parseFloat(lowerStr.replace(suffixKey, ''));
+        if (isNaN(numberPart)) return 0;
+        return numberPart * suffixes[suffixKey];
+    }
+    
+    const numberValue = parseFloat(lowerStr);
+    return isNaN(numberValue) ? 0 : numberValue;
+};
+
+const formatNumber = (num: number): string => {
+    if (num < 1e3) return num.toFixed(2);
+    const suffixes = ["", "k", "M", "B", "T", "qd", "Qn", "sx", "Sp", "O", "N", "de", "Ud", "dD", "tD", "qdD", "QnD", "sxD", "SpD", "OcD", "NvD", "Vgn", "UVg", "DVg", "TVg", "qtV", "QnV", "SeV", "SPG", "OVG", "NVG", "TGN", "UTG", "DTG", "tsTG", "qTG", "QnTG", "ssTG", "SpTG", "OcTG", "NoTG", "QDR", "uQDR", "dQDR", "tQDR"];
+    const i = Math.floor(Math.log10(num) / 3);
+    if (i < suffixes.length) {
+        const value = (num / Math.pow(1000, i));
+        return `${value.toFixed(2)}${suffixes[i]}`;
+    }
+    return num.toExponential(2);
+};
+
+const createStatsSchema = (maxDamage: number, maxEnergyGain: number) => z.object({
     currentWorld: z.string()
         .min(1, 'O mundo atual é obrigatório.')
         .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
@@ -32,12 +66,15 @@ const statsSchema = z.object({
         .min(1, 'O rank é obrigatório.')
         .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
         .refine(val => parseInt(val, 10) <= MAX_RANK, { message: `O rank máximo é ${MAX_RANK}.` }),
-    totalDamage: z.string().min(1, 'O dano total é obrigatório.'),
-    energyGain: z.string().min(1, 'O ganho de energia é obrigatório.'),
+    totalDamage: z.string()
+        .min(1, 'O dano total é obrigatório.')
+        .refine(val => parseUserEnergy(val) <= maxDamage, { message: `O dano máximo é ${formatNumber(maxDamage)}.` }),
+    energyGain: z.string()
+        .min(1, 'O ganho de energia é obrigatório.')
+        .refine(val => parseUserEnergy(val) <= maxEnergyGain, { message: `O ganho de energia máximo é ${formatNumber(maxEnergyGain)}.` }),
 });
 
-
-type StatsFormData = z.infer<typeof statsSchema>;
+type StatsFormData = z.infer<ReturnType<typeof createStatsSchema>>;
 
 export function WelcomePopover() {
     const router = useRouter();
@@ -51,9 +88,11 @@ export function WelcomePopover() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const imageInputRef = useRef<HTMLInputElement>(null);
 
-    // Placeholder for max stats calculation logic
     const { bonuses: maxBonuses, isLoading: areBonusesLoading } = useGlobalBonuses("5.6e+34", true);
 
+    const statsSchema = useMemo(() => {
+        return createStatsSchema(maxBonuses.damage, maxBonuses.energyGain);
+    }, [maxBonuses]);
 
     const form = useForm<StatsFormData>({
         resolver: zodResolver(statsSchema),
@@ -80,26 +119,10 @@ export function WelcomePopover() {
         const maxWorld = allGameData.length;
         const maxRank = Math.max(...Object.keys(energyGainPerRank).map(Number));
 
-        // Use the calculated max bonuses
-        const maxEnergyGain = maxBonuses.energyGain;
-        const maxDamage = maxBonuses.damage;
-        
-        function formatNumber(num: number): string {
-            if (num < 1e3) return num.toFixed(2);
-            const suffixes = ["", "k", "M", "B", "T", "qd", "Qn", "sx", "Sp", "O", "N", "de", "Ud", "dD", "tD", "qdD", "QnD", "sxD", "SpD", "OcD", "NvD", "Vgn", "UVg", "DVg", "TVg", "qtV", "QnV", "SeV", "SPG", "OVG", "NVG", "TGN", "UTG", "DTG", "tsTG", "qTG", "QnTG", "ssTG", "SpTG", "OcTG", "NoTG", "QDR", "uQDR", "dQDR", "tQDR"];
-            const i = Math.floor(Math.log10(num) / 3);
-            if (i < suffixes.length) {
-                const value = (num / Math.pow(1000, i));
-                return `${value.toFixed(2)}${suffixes[i]}`;
-            }
-            return num.toExponential(2);
-        }
-
-
         form.setValue('currentWorld', String(maxWorld));
         form.setValue('rank', String(maxRank));
-        form.setValue('totalDamage', formatNumber(maxDamage));
-        form.setValue('energyGain', formatNumber(maxEnergyGain));
+        form.setValue('totalDamage', formatNumber(maxBonuses.damage));
+        form.setValue('energyGain', formatNumber(maxBonuses.energyGain));
 
         toast({
             title: "Valores Máximos Calculados!",
@@ -154,7 +177,7 @@ export function WelcomePopover() {
                 const missingFields: string[] = [];
 
                 if (result.currentWorld) {
-                    form.setValue('currentWorld', result.currentWorld);
+                    form.setValue('currentWorld', result.currentWorld.replace(/\D/g, ''));
                     foundFields.push('Mundo');
                 } else {
                     missingFields.push('Mundo');
