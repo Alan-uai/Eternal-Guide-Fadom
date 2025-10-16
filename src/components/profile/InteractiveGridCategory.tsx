@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef } from 'react';
 import { useUser, useFirebase, useMemoFirebase, useCollection } from '@/firebase';
-import { doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, collection } from 'firebase/firestore';
 import { useApp } from '@/context/app-provider';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -139,7 +139,8 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
             <BonusDisplay items={equippedItems} category={subcollectionName} />
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
                 {uniqueItems.map((item) => {
-                    const uniqueKey = item.id;
+                    const isPower = subcollectionName === 'powers';
+                    const uniqueKey = isPower ? `${item.name}-${item.id}` : item.id;
                     const isEquipped = equippedItems?.some(i => i.id === item.id);
                     const equippedItemData = equippedItems?.find(i => i.id === item.id);
                     
