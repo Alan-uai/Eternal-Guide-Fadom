@@ -20,14 +20,6 @@ export const world16Data = {
           { id: 'supreme-onomato', name: 'Supreme Onomatopoeia', multiplier: '15x', rarity: 'Supreme', probability: 0.01 },
         ],
       },
-      {
-        id: 'stands-power',
-        name: 'Stands',
-        type: 'gacha',
-        statType: 'damage',
-        unlockCost: 'N/A',
-        description: 'Lutadores com diferentes tempos de ataque e porcentagens de dano, que evoluem com estrelas.',
-      },
        {
         id: 'ripple-energy',
         name: 'Ripple Energy',
