@@ -25,8 +25,10 @@ const passiveEnchantments = ['Lifesteal', 'Cooldown', 'AoE'];
 // Helper to parse multiplier strings like '1.25x' into numbers
 const parseMultiplier = (value?: string): number => {
     if (typeof value !== 'string') return 1; // Return 1 for no bonus
-    return parseFloat(value.replace('x', '')) || 1;
+    const parsed = parseFloat(value.replace(/x/g, ''));
+    return isNaN(parsed) ? 1 : parsed;
 };
+
 
 export function WeaponSlots() {
     const { user, isUserLoading } = useUser();
@@ -101,7 +103,7 @@ export function WeaponSlots() {
 
 
     const handleItemSelect = async (item: any) => {
-        if (selectedSlot === null || !userDocRef || !item.type) {
+        if (selectedSlot === null || !userDocRef || !weaponType) {
             toast({ variant: "destructive", title: "Erro", description: "Tipo de arma inválido ou slot não selecionado."});
             return;
         };
@@ -110,7 +112,7 @@ export function WeaponSlots() {
             id: item.name, 
             name: item.name,
             rarity: item.rarity,
-            type: item.type,
+            type: weaponType,
             evolutionLevel: 0, 
             breathingEnchantment: null,
             stoneEnchantment: null,
