@@ -19,6 +19,7 @@ import { standsArticle } from './wiki-articles/stands';
 import { starChancesArticle } from './wiki-articles/star-chances';
 import { swordsArticle } from './wiki-articles/swords';
 import { titansArticle } from './wiki-articles/titans';
+import { upgradesCostsArticle } from './wiki-articles/upgrades-costs';
 import { world20RaidsArticle } from './wiki-articles/world-20-raids';
 import { worldBossesArticle } from './wiki-articles/world-bosses';
 
@@ -45,6 +46,7 @@ export const allWikiArticles = [
     lobbyDungeonsArticle,
     achievementsGuideArticle,
     starChancesArticle,
+    upgradesCostsArticle,
 ];
 
 // Adiciona o timestamp do servidor para cada artigo
