@@ -68,6 +68,11 @@ export function WeaponSlots() {
         setOpen(true);
     };
 
+    const handleTypeSelect = (type: 'damage' | 'scythe' | 'energy') => {
+        setWeaponType(type);
+        setStep('item');
+    };
+
      const updateWeaponData = async (slotIndex: number, newData: object) => {
         if (!userDocRef) return;
         
