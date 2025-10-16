@@ -113,7 +113,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
     return (
         <div className="w-full">
             <BonusDisplay items={equippedItems} category={subcollectionName} />
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 w-full">
                 {uniqueItems.map((item) => {
                     const isEquipped = equippedItems?.some(i => i.id === item.id);
                     const equippedItemData = equippedItems?.find(i => i.id === item.id);
@@ -123,32 +123,29 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
 
                     const selectedRarity = (equippedItemData as any)?.rarity || popoverOptions?.[0]?.rarity;
                     const selectedOption = popoverOptions?.find((opt:any) => opt.rarity === selectedRarity);
+                    const selectedName = selectedOption?.name || (isProgressionPower ? `${((equippedItemData as any)?.leveling || 0)}/${item.maxLevel}` : '');
+
 
                     const cardBgClass = isEquipped ? getRarityClass(selectedRarity) : 'bg-muted/30 border-transparent';
                     const hasLeveling = item.leveling && typeof item.leveling.maxLevel !== 'undefined';
                     const currentLeveling = (equippedItemData as any)?.leveling || 0;
                     
-                    const openPopover = () => {
-                        const hasOptions = (popoverOptions && popoverOptions.length > 0) || isProgressionPower;
-                        if(hasOptions) {
-                            setOpenPopoverId(item.id);
-                        }
-                    };
-
                     return (
                         <Popover key={item.id} open={openPopoverId === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopoverId(null)}>
                             <PopoverTrigger asChild>
                                 <button
-                                    onClick={openPopover}
+                                    onClick={() => setOpenPopoverId(item.id)}
                                     className={cn(
-                                        'aspect-square rounded-md flex flex-col items-center justify-center p-2 text-center relative overflow-hidden border-2 transition-all duration-200',
+                                        'aspect-square rounded-md flex flex-col items-center justify-center p-1 text-center relative overflow-hidden border-2 transition-all duration-200 group',
                                         isEquipped ? 'border-primary/50' : 'hover:border-primary/50',
                                         cardBgClass
                                     )}
                                 >
-                                     <div className='absolute top-1 text-xs font-semibold opacity-80 z-10 text-center px-1 truncate w-full'>
-                                        {isEquipped && selectedOption?.name}
-                                     </div>
+                                     {isEquipped && (
+                                        <div className='absolute top-1 text-xs font-semibold opacity-80 z-10 text-center px-1 truncate w-full'>
+                                            {selectedName}
+                                        </div>
+                                     )}
 
                                     {hasLeveling && isEquipped && (
                                          <Popover open={levelingPopover === item.id} onOpenChange={(isOpen) => !isOpen && setLevelingPopover(null)}>
@@ -177,12 +174,13 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                                         </Popover>
                                     )}
 
-                                    <p className="text-sm font-bold leading-tight z-10">{item.name}</p>
+                                    <p className="text-xs lg:text-sm font-bold leading-tight z-10 group-hover:scale-105 transition-transform">{item.name}</p>
 
-                                     <div className="absolute bottom-1 flex items-center justify-center w-full z-10 gap-2">
-                                         {isEquipped && <RarityBadge rarity={selectedRarity} />}
-                                         {isEquipped && selectedOption?.name && <span className="text-[10px] font-medium opacity-80">{selectedOption.name}</span>}
-                                    </div>
+                                     {isEquipped && (
+                                        <div className="absolute bottom-1 flex items-center justify-center w-full z-10 gap-2">
+                                            <RarityBadge rarity={selectedRarity} />
+                                        </div>
+                                     )}
                                 </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
