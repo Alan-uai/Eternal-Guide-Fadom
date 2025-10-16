@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle, Coins, Zap, Wind, Trophy, Wallet, Users } from 'lucide-react';
+import { Swords, Shield, Flame, PawPrint, Star, Pyramid, ShieldCheck, PlusCircle, BrainCircuit, User, Upload, Sparkles, X, Image as ImageIcon, LogOut, Award, Eye, ThumbsUp, HelpCircle, Coins, Zap, Wind, Trophy, Wallet, Users, ChevronRight } from 'lucide-react';
 import Head from 'next/head';
 import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
@@ -19,7 +19,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useAuth, useCollection, useFirebase, useMemoFirebase, useUser, useDoc } from '@/firebase';
 import { signOut } from 'firebase/auth';
-import { collection, query, where, orderBy, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, doc, setDoc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { useApp } from '@/context/app-provider';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ import { energyGainPerRank } from '@/lib/energy-gain-data';
 import { allGamepasses, type Gamepass } from '@/lib/gamepass-data';
 import { accessories, type Accessory, type RarityOption } from '@/lib/accessory-data';
 import { Slider } from '@/components/ui/slider';
+import { damageSwordsArticle, scythesArticle, swordsArticle } from '@/lib/wiki-data';
 
 
 const RarityBadge = ({ rarity, className, children }: { rarity: string, className?: string, children?: React.ReactNode }) => {
@@ -314,7 +315,7 @@ const profileCategories = [
     { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', subcollectionName: 'powers', isInteractiveGrid: true },
     { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras', isInteractiveGrid: true },
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets', isInteractiveGrid: true },
-    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons', isInteractiveGrid: true },
+    { name: 'Armas', icon: Swords, description: 'Espadas e foices com seus encantamentos.', subcollectionName: 'weapons', isWeaponSlots: true },
     { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories', isInteractiveGrid: true },
     { name: 'Gamepasses', icon: Wallet, description: 'Gamepasses que você possui.', subcollectionName: 'gamepasses', isInteractiveGrid: true },
     { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index', disableItemUpload: true },
@@ -844,7 +845,7 @@ function InteractiveGridCategory({ subcollectionName, gridData, itemTypeFilter }
 
         let items;
         if (itemTypeFilter) {
-            items = allGameData.flatMap(world => world[subcollectionName] || []).filter(item => item && item.id && item.name === itemTypeFilter);
+            items = allGameData.flatMap(world => world[itemTypeFilter] || []).filter(item => item && item.id);
         } else if (subcollectionName === 'weapons') {
             const scythes = allGameData.flatMap(world => world.scythes || []);
             const swords = allGameData.flatMap(world => (world.powers || []).filter(p => p.name === 'Swords'));
@@ -914,7 +915,9 @@ function InteractiveGridCategory({ subcollectionName, gridData, itemTypeFilter }
     };
 
     const handlePointerUp = () => {
-        clearTimeout(holdTimeout.current);
+        if (holdTimeout.current) {
+            clearTimeout(holdTimeout.current);
+        }
     };
 
     const handleLevelingChange = async (itemId: string, level: number) => {
@@ -975,7 +978,7 @@ function InteractiveGridCategory({ subcollectionName, gridData, itemTypeFilter }
                                             <PopoverTrigger asChild>
                                                  <div 
                                                     className="absolute top-1 right-1 h-5 w-5 flex items-center justify-center bg-black/50 rounded-full text-white text-[10px] font-bold z-20 cursor-pointer"
-                                                    onPointerDown={(e) => { e.stopPropagation(); clearTimeout(holdTimeout.current); }}
+                                                    onPointerDown={(e) => { e.stopPropagation(); clearTimeout(holdTimeout.current as NodeJS.Timeout); }}
                                                     onClick={(e) => { e.stopPropagation(); e.preventDefault(); setCurrentLevelingValue(currentLeveling); setLevelingPopover(item.id); }}
                                                  >
                                                     {currentLeveling}
@@ -1039,7 +1042,126 @@ function InteractiveGridCategory({ subcollectionName, gridData, itemTypeFilter }
     );
 }
 
-function CategoryDisplay({ subcollectionName, isInteractiveGrid }: { subcollectionName: string, isInteractiveGrid?: boolean }) {
+function WeaponSlots() {
+    const { user, isUserLoading } = useUser();
+    const firestore = useFirebase().firestore;
+    const [open, setOpen] = useState(false);
+    const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+    const [step, setStep] = useState<'type' | 'item'>('type');
+    const [weaponType, setWeaponType] = useState<'damage' | 'scythe' | 'energy' | null>(null);
+    const { toast } = useToast();
+
+    const userDocRef = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return doc(firestore, 'users', user.uid);
+    }, [firestore, user]);
+    
+    const { data: userData, isLoading: isUserDataLoading } = useDoc(userDocRef);
+    const equippedWeapons = (userData as any)?.weaponSlots || {};
+
+    const weaponData = useMemo(() => {
+        return {
+            damage: damageSwordsArticle.tables?.damageSwords.rows || [],
+            scythe: scythesArticle.tables?.scythes.rows || [],
+            energy: swordsArticle.tables?.world3.rows.concat(swordsArticle.tables?.world5.rows, swordsArticle.tables?.world15.rows, swordsArticle.tables?.world19.rows) || [],
+        };
+    }, []);
+
+    const handleSlotClick = (slotIndex: number) => {
+        setSelectedSlot(slotIndex);
+        setStep('type');
+        setWeaponType(null);
+        setOpen(true);
+    };
+
+    const handleTypeSelect = (type: 'damage' | 'scythe' | 'energy') => {
+        setWeaponType(type);
+        setStep('item');
+    };
+
+    const handleItemSelect = async (item: any) => {
+        if (selectedSlot === null || !userDocRef) return;
+        const newSlots = {
+            ...equippedWeapons,
+            [selectedSlot]: {
+                name: item.Espada || item.Foice,
+                rarity: item.Raridade,
+                stats: item['Stats (3 Estrelas)'] || item.Stats
+            }
+        };
+
+        try {
+            await updateDoc(userDocRef, { weaponSlots: newSlots });
+            toast({ title: "Arma Equipada!", description: `${item.Espada || item.Foice} equipada no slot ${selectedSlot + 1}.` });
+        } catch (error) {
+            toast({ variant: 'destructive', title: "Erro", description: "Não foi possível equipar a arma." });
+        } finally {
+            setOpen(false);
+        }
+    };
+    
+    const isLoading = isUserLoading || isUserDataLoading;
+
+    return (
+        <div className='grid grid-cols-3 gap-4'>
+            {[0, 1, 2].map(slotIndex => {
+                const equipped = equippedWeapons[slotIndex];
+                return (
+                    <Card key={slotIndex} onClick={() => handleSlotClick(slotIndex)} className="cursor-pointer hover:border-primary/50 transition-colors h-48 flex flex-col justify-center items-center">
+                        <CardContent className="p-4 text-center">
+                             {isLoading ? (
+                                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                            ) : equipped ? (
+                                <div>
+                                    <p className="font-bold">{equipped.name}</p>
+                                    <p className="text-xs text-muted-foreground">{equipped.rarity}</p>
+                                    <p className="text-xs mt-2">{equipped.stats}</p>
+                                </div>
+                            ) : (
+                                <div className="text-muted-foreground">
+                                    <PlusCircle className="mx-auto h-8 w-8" />
+                                    <p className="text-sm mt-2">Equipar Arma</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )
+            })}
+             <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Equipar Arma no Slot {selectedSlot !== null ? selectedSlot + 1 : ''}</DialogTitle>
+                        <DialogDescription>
+                            {step === 'type' ? 'Selecione o tipo de arma.' : `Selecione uma arma do tipo ${weaponType}.`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    {step === 'type' ? (
+                        <div className='grid grid-cols-1 gap-2 py-4'>
+                            <Button variant="outline" onClick={() => handleTypeSelect('damage')}>Dano (Espadas)</Button>
+                            <Button variant="outline" onClick={() => handleTypeSelect('scythe')}>Foices</Button>
+                            <Button variant="outline" onClick={() => handleTypeSelect('energy')}>Energia (Espadas)</Button>
+                        </div>
+                    ) : (
+                        <ScrollArea className="h-72">
+                            <div className="space-y-2 py-4">
+                                {weaponType && weaponData[weaponType].map((item: any, index: number) => (
+                                     <Button key={index} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleItemSelect(item)}>
+                                        <div className='flex flex-col items-start'>
+                                            <p>{item.Espada || item.Foice}</p>
+                                            {item.Raridade && <RarityBadge rarity={item.Raridade} />}
+                                        </div>
+                                    </Button>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    )}
+                </DialogContent>
+            </Dialog>
+        </div>
+    )
+}
+
+function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeaponSlots }: { subcollectionName: string, isInteractiveGrid?: boolean, isWeaponSlots?: boolean }) {
     const { allGameData } = useApp();
     const { user } = useUser();
     const { firestore } = useFirebase();
@@ -1048,6 +1170,7 @@ function CategoryDisplay({ subcollectionName, isInteractiveGrid }: { subcollecti
     if (subcollectionName === 'obelisks') return <ObeliskLevelCalculator />;
     if (subcollectionName === 'achievements') return <AchievementCalculator />;
     if (subcollectionName === 'rank') return <RankSelector />;
+    if (isWeaponSlots) return <WeaponSlots />;
     if (isInteractiveGrid) {
         const gridData = subcollectionName === 'gamepasses' ? allGamepasses : (subcollectionName === 'accessories' ? accessories : undefined);
         return <InteractiveGridCategory subcollectionName={subcollectionName} gridData={gridData} />;
@@ -1163,7 +1286,7 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {profileCategories.map((category) => (
-                        <Card key={category.name} className="relative">
+                        <Card key={category.name} className={cn("relative", category.isWeaponSlots && "md:col-span-2 lg:col-span-3")}>
                             <CardHeader className='flex-row items-start justify-between'>
                                 <div>
                                     <CardTitle className='flex items-center gap-3'>
@@ -1183,6 +1306,7 @@ export default function ProfilePage() {
                                     <CategoryDisplay 
                                         subcollectionName={category.subcollectionName} 
                                         isInteractiveGrid={category.isInteractiveGrid}
+                                        isWeaponSlots={category.isWeaponSlots}
                                     />
                                 </div>
                             </CardContent>
