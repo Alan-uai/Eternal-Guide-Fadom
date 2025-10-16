@@ -22,7 +22,7 @@ const parseBonusValue = (value: string | undefined): { value: number; isMultipli
 
 // Helper to calculate weapon-specific bonuses
 const getWeaponBonus = (weapon: any, allWeapons: any[]) => {
-    const totals = { damage: { multipliers: [], bonuses: [] }, energy: { multipliers: [], bonuses: [] } };
+    const totals: { damage: { multipliers: number[], bonuses: number[] }, energy: { multipliers: number[], bonuses: number[] } } = { damage: { multipliers: [], bonuses: [] }, energy: { multipliers: [], bonuses: [] } };
     if (!weapon) return totals;
 
     const weaponData = allWeapons.find(w => w.name === weapon.name);
@@ -54,7 +54,32 @@ const getWeaponBonus = (weapon: any, allWeapons: any[]) => {
     return totals;
 };
 
-export function useGlobalBonuses() {
+// New function to parse user-entered energy with abbreviations
+const parseUserEnergy = (energyStr: string): number => {
+    if (!energyStr || typeof energyStr !== 'string') return 0;
+    const lowerStr = energyStr.toLowerCase().trim();
+    const suffixes: { [key: string]: number } = {
+        k: 1e3, m: 1e6, b: 1e9, t: 1e12, qd: 1e15, qn: 1e18, sx: 1e21, sp: 1e24,
+        o: 1e27, n: 1e30, de: 1e33, ud: 1e36, dd: 1e39, td: 1e42, qdd: 1e45, qnd: 1e48,
+        sxd: 1e51, spd: 1e54, ocd: 1e57, nvd: 1e60, vgn: 1e63, uvg: 1e66, dvg: 1e69,
+        tvg: 1e72, qtv: 1e75, qnv: 1e78, sev: 1e81, spg: 1e84, ovg: 1e87, nvg: 1e90,
+        tgn: 1e93, utg: 1e96, dtg: 1e99, tstg: 1e102, qtg: 1e105, qntg: 1e108, sstg: 1e111,
+        sptg: 1e114, octg: 1e117, notg: 1e120, qdr: 1e123, uqdr: 1e126, dqdr: 1e129,
+        tqdr: 1e132
+    };
+
+    const suffix = Object.keys(suffixes).find(s => lowerStr.endsWith(s));
+    if (suffix) {
+        const numberPart = parseFloat(lowerStr.replace(suffix, ''));
+        if (isNaN(numberPart)) return 0;
+        return numberPart * suffixes[suffix];
+    }
+
+    return parseFloat(lowerStr) || 0;
+}
+
+
+export function useGlobalBonuses(currentEnergyInput: string) {
     const { user, isUserLoading } = useUser();
     const { firestore } = useFirebase();
 
@@ -170,13 +195,14 @@ export function useGlobalBonuses() {
         
         // Final Calculation
         const rankValue = (rankData as any)?.value || 0;
-        const baseEnergy = parseFloat((energyGainPerRank as Record<string, string>)[rankValue.toString()] || '0');
+        const baseEnergyGainStr = (energyGainPerRank as Record<string, string>)[rankValue.toString()] || '0';
+        const baseEnergyGain = parseFloat(baseEnergyGainStr);
 
         const totalEnergyMultiplier = bonuses.energy.multipliers.reduce((a, b) => a * b, 1);
         const totalEnergyBonus = bonuses.energy.bonuses.reduce((a, b) => a + b, 0);
-        const finalEnergy = baseEnergy * totalEnergyMultiplier * (1 + totalEnergyBonus);
+        const finalEnergyGain = baseEnergyGain * totalEnergyMultiplier * (1 + totalEnergyBonus);
         
-        const baseDamage = finalEnergy; // Core game mechanic
+        const baseDamage = parseUserEnergy(currentEnergyInput); // Use user's current accumulated energy
         const totalDamageMultiplier = bonuses.damage.multipliers.reduce((a, b) => a * b, 1);
         const totalDamageBonus = bonuses.damage.bonuses.reduce((a, b) => a + b, 0);
         const finalDamage = baseDamage * totalDamageMultiplier * (1 + totalDamageBonus);
@@ -191,7 +217,7 @@ export function useGlobalBonuses() {
 
         return {
             damage: finalDamage,
-            energy: finalEnergy,
+            energyGain: finalEnergyGain,
             coins: totalCoinsMultiplier * (1 + totalCoinsBonus), // Presented as a multiplier
             exp: totalExpBonus * 100, // Presented as percentage
             movespeed: totalMovespeedBonus * 100, // Presented as percentage
@@ -200,7 +226,7 @@ export function useGlobalBonuses() {
 
     }, [
         accessoryItems, gamepassItems, achievementItems, indexItems, obeliskItems, 
-        powerItems, auraItems, petItems, fighterItems, weaponSlotsData, rankData
+        powerItems, auraItems, petItems, fighterItems, weaponSlotsData, rankData, currentEnergyInput
     ]);
 
     return {

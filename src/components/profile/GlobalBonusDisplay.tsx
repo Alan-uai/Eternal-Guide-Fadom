@@ -5,6 +5,7 @@ import { Loader2, Zap, Flame, Coins, Star, Wind, Shield } from 'lucide-react';
 import { format } from 'path';
 
 function formatNumber(num: number): string {
+    if (num === 0) return '0.00';
     if (num < 1000) {
         return num.toFixed(2);
     }
@@ -15,8 +16,8 @@ function formatNumber(num: number): string {
 }
 
 
-export function GlobalBonusDisplay() {
-    const { bonuses, isLoading } = useGlobalBonuses();
+export function GlobalBonusDisplay({ currentEnergy }: { currentEnergy: string }) {
+    const { bonuses, isLoading } = useGlobalBonuses(currentEnergy);
 
     if (isLoading) {
         return (
@@ -28,7 +29,7 @@ export function GlobalBonusDisplay() {
     
     const bonusConfig = [
         { key: 'damage', label: 'Dano Total', icon: Flame, color: 'text-red-500', value: formatNumber(bonuses.damage), suffix: '' },
-        { key: 'energy', label: 'Energia Total', icon: Zap, color: 'text-blue-500', value: formatNumber(bonuses.energy), suffix: '' },
+        { key: 'energyGain', label: 'Ganho de Energia', icon: Zap, color: 'text-blue-500', value: formatNumber(bonuses.energyGain), suffix: '/clique' },
         { key: 'coins', label: 'Bônus Moedas', icon: Coins, color: 'text-yellow-500', value: bonuses.coins.toFixed(2), suffix: 'x' },
         { key: 'exp', label: 'Bônus EXP', icon: Star, color: 'text-green-500', value: bonuses.exp.toFixed(2), suffix: '%' },
         { key: 'movespeed', label: 'Bônus Velocidade', icon: Wind, color: 'text-sky-500', value: bonuses.movespeed.toFixed(2), suffix: '%' },
