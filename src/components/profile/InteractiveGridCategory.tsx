@@ -12,7 +12,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
+import { Separator } from '../ui/separator';
 
 export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeFilter }: { subcollectionName: string; gridData?: any[]; itemTypeFilter?: string; }) {
     const { user } = useUser();
@@ -27,8 +28,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
 
     const { data: equippedItems, isLoading } = useCollection(itemsQuery);
     
-    const [openPopover, setOpenPopover] = useState<string | null>(null);
-    const holdTimeout = useRef<NodeJS.Timeout>();
+    const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
     const [levelingPopover, setLevelingPopover] = useState<string | null>(null);
     const [currentLevelingValue, setCurrentLevelingValue] = useState(0);
     
@@ -36,23 +36,19 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
         if (gridData) return gridData;
 
         let items;
-        if (itemTypeFilter) {
-            items = allGameData.flatMap(world => (world[subcollectionName] || [])).filter(item => item && item.id && item.type === itemTypeFilter);
-        } else if (subcollectionName === 'weapons') {
-            const scythes = allGameData.flatMap(world => world.scythes || []);
-            const swords = allGameData.flatMap(world => (world.powers || []).filter(p => p.name === 'Swords'));
-            items = [...scythes, ...swords];
-        } else if (subcollectionName === 'powers') {
-            const nonEquippableNames = [
-                'Weapon Evolution', 'Stand Evolution', 'Titan Evolution', 'Chakra Progression', 'Breathings', 'Bankai', 'Swords', 'Stands'
-            ];
-            const equipablePowers = allGameData.flatMap(world => world.powers || [])
+        const nonEquippablePowerNames = [
+            'Weapon Evolution', 'Stand Evolution', 'Titan Evolution', 'Chakra Progression', 'Breathings', 'Bankai'
+        ];
+
+        if (subcollectionName === 'powers') {
+            items = allGameData.flatMap(world => world.powers || [])
             .filter(power => 
                 power && 
                 power.id && 
-                !nonEquippableNames.includes(power.name)
+                !nonEquippablePowerNames.includes(power.name)
              );
-            return equipablePowers;
+        } else if (itemTypeFilter) {
+            items = allGameData.flatMap(world => (world.fighters || [])).filter(item => item && item.id && item.type === itemTypeFilter);
         }
         else {
             items = allGameData.flatMap(world => world[subcollectionName] || []).filter(item => item && item.id);
@@ -61,61 +57,41 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
 
     }, [gridData, allGameData, subcollectionName, itemTypeFilter]);
 
-    const handleItemClick = async (item: any) => {
+    const handleEquipItem = async (item: any, rarityOrLevel: string | number) => {
         if (!itemsQuery) return;
+        
+        let dataToSave: any = { id: item.id, name: item.name };
+        if (typeof rarityOrLevel === 'string') {
+            dataToSave.rarity = rarityOrLevel;
+        } else if (typeof rarityOrLevel === 'number') {
+            dataToSave.leveling = rarityOrLevel;
+        }
+
         const itemRef = doc(itemsQuery, item.id);
-        const isEquipped = equippedItems?.some(i => i.id === item.id);
 
         try {
-            if (isEquipped) {
-                await deleteDoc(itemRef);
-            } else {
-                 let dataToSave: any = { id: item.id, name: item.name };
-                 if (item.stats && item.stats.length > 0) {
-                    dataToSave.rarity = item.stats[0].rarity; 
-                 } else if (item.rarity_options && item.rarity_options.length > 0) {
-                    dataToSave.rarity = item.rarity_options[0].rarity;
-                 }
-                 if (item.leveling?.maxLevel) {
-                    dataToSave.leveling = 0;
-                 }
-                 if (item.type === 'progression') {
-                     dataToSave.leveling = 0;
-                 }
-                await setDoc(itemRef, dataToSave, { merge: true });
-            }
+            await setDoc(itemRef, dataToSave, { merge: true });
+            toast({ title: 'Item Equipado!', description: `${item.name} foi equipado/atualizado.` });
         } catch (error: any) {
-            toast({ variant: 'destructive', title: 'Erro', description: `Não foi possível atualizar ${item.name}.` });
+            toast({ variant: 'destructive', title: 'Erro', description: `Não foi possível equipar ${item.name}.` });
+        } finally {
+            setOpenPopoverId(null);
         }
     };
 
-    const handleRarityChange = async (itemId: string, rarity: string) => {
+    const handleUnequipItem = async (itemId: string) => {
         if (!itemsQuery) return;
         const itemRef = doc(itemsQuery, itemId);
         try {
-            await setDoc(itemRef, { rarity }, { merge: true });
-            toast({ title: 'Raridade Atualizada!', description: `A raridade do item foi definida como ${rarity}.` });
+            await deleteDoc(itemRef);
+            toast({ title: 'Item Removido' });
         } catch (error) {
-            console.error(error);
+             toast({ variant: 'destructive', title: 'Erro', description: `Não foi possível remover o item.` });
         } finally {
-            setOpenPopover(null);
+             setOpenPopoverId(null);
         }
-    };
+    }
     
-    const handlePointerDown = (itemId: string, item: any) => {
-         const hasOptions = (item.stats?.length > 0) || (item.rarity_options?.length > 0) || (item.type === 'progression' && item.maxLevel);
-        if (!hasOptions) return;
-        holdTimeout.current = setTimeout(() => {
-            setOpenPopover(itemId);
-        }, 1000); 
-    };
-
-    const handlePointerUp = () => {
-        if (holdTimeout.current) {
-            clearTimeout(holdTimeout.current);
-        }
-    };
-
     const handleLevelingChange = async (itemId: string, level: number) => {
         if (!itemsQuery) return;
         const itemRef = doc(itemsQuery, itemId);
@@ -139,27 +115,31 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
             <BonusDisplay items={equippedItems} category={subcollectionName} />
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
                 {uniqueItems.map((item) => {
-                    const isPower = subcollectionName === 'powers';
-                    const uniqueKey = isPower ? `${item.name}-${item.id}` : item.id;
                     const isEquipped = equippedItems?.some(i => i.id === item.id);
                     const equippedItemData = equippedItems?.find(i => i.id === item.id);
                     
                     const popoverOptions = item.stats || item.rarity_options || [];
+                    const isProgressionPower = item.type === 'progression' && item.maxLevel;
 
                     const selectedRarity = (equippedItemData as any)?.rarity || popoverOptions?.[0]?.rarity;
                     const selectedOption = popoverOptions?.find((opt:any) => opt.rarity === selectedRarity);
+
                     const cardBgClass = isEquipped ? getRarityClass(selectedRarity) : 'bg-muted/30 border-transparent';
                     const hasLeveling = item.leveling && typeof item.leveling.maxLevel !== 'undefined';
                     const currentLeveling = (equippedItemData as any)?.leveling || 0;
+                    
+                    const openPopover = () => {
+                        const hasOptions = (popoverOptions && popoverOptions.length > 0) || isProgressionPower;
+                        if(hasOptions) {
+                            setOpenPopoverId(item.id);
+                        }
+                    };
 
                     return (
-                        <Popover key={uniqueKey} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
+                        <Popover key={item.id} open={openPopoverId === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopoverId(null)}>
                             <PopoverTrigger asChild>
                                 <button
-                                    onClick={() => handleItemClick(item)}
-                                    onPointerDown={() => handlePointerDown(item.id, item)}
-                                    onPointerUp={handlePointerUp}
-                                    onPointerLeave={handlePointerUp}
+                                    onClick={openPopover}
                                     className={cn(
                                         'aspect-square rounded-md flex flex-col items-center justify-center p-2 text-center relative overflow-hidden border-2 transition-all duration-200',
                                         isEquipped ? 'border-primary/50' : 'hover:border-primary/50',
@@ -175,8 +155,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                                             <PopoverTrigger asChild>
                                                  <div 
                                                     className="absolute top-1 right-1 h-5 w-5 flex items-center justify-center bg-black/50 rounded-full text-white text-[10px] font-bold z-20 cursor-pointer"
-                                                    onPointerDown={(e) => { e.stopPropagation(); clearTimeout(holdTimeout.current as NodeJS.Timeout); }}
-                                                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); setCurrentLevelingValue(currentLeveling); setLevelingPopover(item.id); }}
+                                                    onClick={(e) => { e.stopPropagation(); setCurrentLevelingValue(currentLeveling); setLevelingPopover(item.id); }}
                                                  >
                                                     {currentLeveling}
                                                 </div>
@@ -206,32 +185,37 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                                     </div>
                                 </button>
                             </PopoverTrigger>
-                             {popoverOptions && popoverOptions.length > 0 && (
-                                <PopoverContent className="w-auto p-0">
+                            <PopoverContent className="w-auto p-0">
                                 <div className="flex flex-col">
-                                    {popoverOptions.map((opt: any) => (
-                                        <Button key={opt.id || opt.rarity} variant="ghost" className={cn("rounded-none justify-start", getRarityClass(opt.rarity))} onClick={() => handleRarityChange(item.id, opt.rarity)}>
-                                             <RarityBadge rarity={opt.rarity}>{opt.name || opt.rarity}</RarityBadge>
+                                    {popoverOptions && popoverOptions.length > 0 && popoverOptions.map((opt: any) => (
+                                        <Button key={opt.id || opt.rarity} variant="ghost" className={cn("rounded-none justify-start", getRarityClass(opt.rarity))} onClick={() => handleEquipItem(item, opt.rarity)}>
+                                            <RarityBadge rarity={opt.rarity}>{opt.name || opt.rarity}</RarityBadge>
                                         </Button>
                                     ))}
+                                    {isProgressionPower && (
+                                        <div className="p-4 space-y-4">
+                                            <Label htmlFor="level-slider" className='text-sm'>{item.name} Level ({(equippedItemData as any)?.leveling || 0}/{item.maxLevel})</Label>
+                                            <Slider
+                                                id="level-slider"
+                                                min={0}
+                                                max={item.maxLevel}
+                                                step={1}
+                                                defaultValue={[(equippedItemData as any)?.leveling || 0]}
+                                                onValueCommit={(value) => handleEquipItem(item, value[0])}
+                                            />
+                                        </div>
+                                    )}
+                                    {isEquipped && (
+                                        <>
+                                            <Separator />
+                                            <Button variant="ghost" className="w-full justify-center text-destructive rounded-none" onClick={() => handleUnequipItem(item.id)}>
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Remover
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
-                                </PopoverContent>
-                            )}
-                             {item.type === 'progression' && item.maxLevel && (
-                                 <PopoverContent className="w-56 p-4">
-                                    <div className="space-y-4">
-                                        <Label htmlFor="level-slider" className='text-sm'>{item.name} Level ({(equippedItemData as any)?.leveling || 0}/{item.maxLevel})</Label>
-                                        <Slider
-                                            id="level-slider"
-                                            min={0}
-                                            max={item.maxLevel}
-                                            step={1}
-                                            defaultValue={[(equippedItemData as any)?.leveling || 0]}
-                                            onValueCommit={(value) => handleLevelingChange(item.id, value[0])}
-                                        />
-                                    </div>
-                                </PopoverContent>
-                             )}
+                            </PopoverContent>
                         </Popover>
                     );
                 })}
