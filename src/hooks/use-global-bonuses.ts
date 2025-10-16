@@ -10,6 +10,7 @@ import { generalAchievements } from '@/lib/achievements-data';
 import { damageSwords, scythes, energySwords, Weapon as WeaponData } from '@/lib/weapon-data';
 import { energyGainPerRank } from '@/lib/energy-gain-data';
 import { allGameData } from '@/lib/game-data-context';
+import { useApp } from '@/context/app-provider';
 
 // Helper function to safely parse bonus values which can be strings like '1.5x' or '10%'
 const parseBonusValue = (value: string | undefined): { value: number; isMultiplier: boolean } => {
@@ -77,13 +78,16 @@ const parseUserEnergy = (energyStr: string): number => {
         return numberPart * suffixes[suffixKey];
     }
 
-    return parseFloat(lowerStr) || 0;
+    const numberValue = parseFloat(lowerStr);
+    return isNaN(numberValue) ? 0 : numberValue;
 }
 
 
 export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: boolean = false) {
     const { user, isUserLoading } = useUser();
     const { firestore } = useFirebase();
+    const { isGameDataLoading } = useApp();
+
 
     // Define all queries at the top level
     const accessoryItems = useCollection(useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'accessories') : null, [firestore, user]));
@@ -99,7 +103,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
     const { data: weaponSlotsData, isLoading: weaponsLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, `users/${user.uid}`) : null, [firestore, user]));
     const { data: rankData, isLoading: rankLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, 'users', user.uid, 'rank', 'current') : null, [firestore, user]));
 
-    const isLoading = isUserLoading || weaponsLoading || rankLoading || accessoryItems.isLoading || gamepassItems.isLoading || achievementsLoading || indexLoading || obelisksLoading || powerItems.isLoading || auraItems.isLoading || petItems.isLoading || fighterItems.isLoading;
+    const isLoading = isUserLoading || isGameDataLoading || weaponsLoading || rankLoading || accessoryItems.isLoading || gamepassItems.isLoading || achievementsLoading || indexLoading || obelisksLoading || powerItems.isLoading || auraItems.isLoading || petItems.isLoading || fighterItems.isLoading;
 
     const totalBonuses = useMemo(() => {
         const bonuses: {
@@ -125,9 +129,9 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
         };
         
         // Data processing logic
-        const processData = (calculateForMax: boolean) => {
+        const processData = (calculateForMaxFlag: boolean) => {
             // Accessories
-            const accItems = calculateForMax ? accessories.map(acc => ({ ...acc, rarity: acc.rarity_options.slice(-1)[0].rarity })) : accessoryItems.data;
+            const accItems = calculateForMaxFlag ? accessories.map(acc => ({ ...acc, rarity: acc.rarity_options.slice(-1)[0].rarity })) : accessoryItems.data;
             accItems?.forEach((item: any) => {
                 const fullAccessory = accessories.find(a => a.id === item.id);
                 const rarityOption = fullAccessory?.rarity_options.find(ro => ro.rarity === item.rarity);
@@ -140,7 +144,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             });
 
             // Gamepasses
-            const gpItems = calculateForMax ? allGamepasses : gamepassItems.data;
+            const gpItems = calculateForMaxFlag ? allGamepasses : gamepassItems.data;
             gpItems?.forEach((item: any) => {
                 const gamepassData = allGamepasses.find(gp => gp.id === item.id);
                 if (gamepassData?.bonus_type && gamepassData.bonus_value) {
@@ -150,7 +154,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             });
 
              // Achievements
-            const achievementLevels = calculateForMax ? generalAchievements.reduce((acc, ach) => ({...acc, [ach.id]: ach.maxLevel}), {}) : achievementItems;
+            const achievementLevels = calculateForMaxFlag ? generalAchievements.reduce((acc, ach) => ({...acc, [ach.id]: ach.maxLevel}), {}) : achievementItems;
             if (achievementLevels) {
                 generalAchievements.forEach(ach => {
                     const currentLevel = (achievementLevels as any)[ach.id] || 0;
@@ -161,14 +165,14 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             }
 
             // Index Tiers
-            const indexTiers = calculateForMax ? { avatarTier: 23, petTier: 23 } : indexItems;
+            const indexTiers = calculateForMaxFlag ? { avatarTier: 23, petTier: 23 } : indexItems;
             if (indexTiers) {
                 bonuses.damage.bonuses.push(((indexTiers as any).avatarTier || 0) * 0.05);
                 bonuses.energy.bonuses.push(((indexTiers as any).petTier || 0) * 0.05);
             }
 
             // Obelisks
-            const obeliskLevels = calculateForMax ? { damage: 20, energy: 20, lucky: 10 } : obeliskItems;
+            const obeliskLevels = calculateForMaxFlag ? { damage: 20, energy: 20, lucky: 10 } : obeliskItems;
             if(obeliskLevels) {
                 bonuses.damage.bonuses.push(((obeliskLevels as any).damage || 0) * 0.02);
                 bonuses.energy.bonuses.push(((obeliskLevels as any).energy || 0) * 0.02);
@@ -177,7 +181,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
 
             // Weapons
             const allWeaponsData = [...damageSwords, ...scythes, ...energySwords];
-            const equippedWeapons = calculateForMax ? 
+            const equippedWeapons = calculateForMaxFlag ? 
                 { 
                   '0': { id: 'Venomstrike', name: 'Venomstrike', rarity: 'Phantom', type: 'damage', evolutionLevel: 3, breathingEnchantment: 'Supreme', stoneEnchantment: 'Supreme'},
                   '1': { id: 'Stormreaver', name: 'Stormreaver', rarity: 'Supremo', type: 'scythe', evolutionLevel: 3, passiveEnchantment: 'Supreme' },
@@ -200,17 +204,19 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
                 { data: fighterItems.data, name: 'fighters'},
             ];
             
-            if (calculateForMax) {
-              const allItems = allGameData.flatMap(world => [
-                  ...(world.powers || []),
-                  ...(world.auras || []),
-                  ...(world.pets || []),
-                  ...(world.fighters || [])
-              ]);
-              allItems.forEach(item => {
-                  addBonus('damage', item.multiplier && item.statType === 'damage' ? item.multiplier : item.damage_bonus);
-                  addBonus('energy', item.multiplier && item.statType === 'energy' ? item.multiplier : item.energy_bonus);
-                  addBonus('coins', item.multiplier && item.statType === 'coin' ? item.multiplier : item.coins_bonus);
+            if (calculateForMaxFlag) {
+              const allItemCategories = ['powers', 'auras', 'pets', 'fighters'];
+              allGameData.forEach(world => {
+                allItemCategories.forEach(category => {
+                  if(world[category]) {
+                    world[category].forEach((item: any) => {
+                       const itemToProcess = item.stats && item.stats.length > 0 ? item.stats.slice(-1)[0] : item;
+                        addBonus('damage', itemToProcess.multiplier && itemToProcess.statType === 'damage' ? itemToProcess.multiplier : itemToProcess.damage_bonus);
+                        addBonus('energy', itemToProcess.multiplier && itemToProcess.statType === 'energy' ? itemToProcess.multiplier : itemToProcess.energy_bonus);
+                        addBonus('coins', itemToProcess.multiplier && itemToProcess.statType === 'coin' ? itemToProcess.multiplier : itemToProcess.coins_bonus);
+                    });
+                  }
+                });
               });
             } else {
               itemCollections.forEach(collectionInfo => {
@@ -226,9 +232,9 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
         processData(calculateForMax);
         
         // Final Calculation
-        const rankValue = calculateForMax ? 115 : (rankData as any)?.value || 0;
+        const rankValue = calculateForMax ? 205 : (rankData as any)?.value || 0;
         const baseEnergyGainStr = (energyGainPerRank as Record<string, string>)[rankValue.toString()] || '0';
-        const baseEnergyGain = parseFloat(baseEnergyGainStr.replace(/,/g, ''));
+        const baseEnergyGain = parseUserEnergy(baseEnergyGainStr);
 
         const totalEnergyMultiplier = bonuses.energy.multipliers.reduce((a, b) => a * b, 1);
         const totalEnergyBonus = bonuses.energy.bonuses.reduce((a, b) => a + b, 0);
@@ -258,7 +264,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
 
     }, [
         accessoryItems.data, gamepassItems.data, achievementItems, indexItems, obeliskItems,
-        powerItems.data, auraItems.data, petItems.data, fighterItems.data, weaponSlotsData, rankData, currentEnergyInput, calculateForMax
+        powerItems.data, auraItems.data, petItems.data, fighterItems.data, weaponSlotsData, rankData, currentEnergyInput, calculateForMax, isGameDataLoading
     ]);
 
     return {
