@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useUser, useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
@@ -36,8 +36,17 @@ export function WeaponSlots() {
         return doc(firestore, 'users', user.uid);
     }, [firestore, user]);
     
+    // Using a separate state for weapons to allow for immediate local updates
+    const [equippedWeapons, setEquippedWeapons] = useState<any>({});
     const { data: userData, isLoading: isUserDataLoading } = useDoc(userDocRef);
-    const equippedWeapons = (userData as any)?.weaponSlots || {};
+    
+    // Effect to sync local state with Firestore data on initial load and external changes
+    useEffect(() => {
+        if (userData?.weaponSlots) {
+            setEquippedWeapons(userData.weaponSlots);
+        }
+    }, [userData]);
+
 
     const weaponData = useMemo(() => {
         return {
@@ -64,7 +73,7 @@ export function WeaponSlots() {
     const updateWeaponData = async (slotIndex: number, newData: object) => {
         if (!userDocRef) return;
         
-        const currentData = (userData as any)?.weaponSlots || {};
+        const currentData = equippedWeapons;
         const weaponToUpdate = currentData[slotIndex];
 
         if (!weaponToUpdate) {
@@ -75,11 +84,16 @@ export function WeaponSlots() {
         const updatedWeapon = { ...weaponToUpdate, ...newData };
         const newSlots = { ...currentData, [slotIndex]: updatedWeapon };
 
+        // Optimistic UI update: update local state immediately for instant feedback
+        setEquippedWeapons(newSlots);
+
         try {
+            // Update Firestore in the background
             await updateDoc(userDocRef, { weaponSlots: newSlots });
-             // No toast here to avoid being too noisy on star clicks
         } catch (error) {
             console.error("Error updating weapon data:", error);
+            // If the update fails, revert the local state to the original data from userData
+            setEquippedWeapons((userData as any)?.weaponSlots || {});
             toast({ variant: "destructive", title: "Erro", description: "Não foi possível atualizar os dados da arma." });
         }
     };
@@ -92,7 +106,7 @@ export function WeaponSlots() {
             id: item.name, 
             name: item.name,
             rarity: item.rarity,
-            type: weaponType,
+            type: weaponType, // Use the selected weaponType
             evolutionLevel: 0, 
             breathingEnchantment: null,
             stoneEnchantment: null,
@@ -104,11 +118,16 @@ export function WeaponSlots() {
             [selectedSlot]: newWeaponData
         };
 
+        // Optimistic UI update
+        setEquippedWeapons(newSlots);
+
         try {
             await updateDoc(userDocRef, { weaponSlots: newSlots });
             toast({ title: "Arma Equipada!", description: `${item.name} equipada no slot ${selectedSlot + 1}.` });
         } catch (error) {
             console.error(error);
+            // Revert on error
+            setEquippedWeapons((userData as any)?.weaponSlots || {});
             toast({ variant: "destructive", title: "Erro", description: "Não foi possível equipar a arma." });
         } finally {
             setOpen(false);
@@ -120,13 +139,13 @@ export function WeaponSlots() {
 
         const level = equipped.evolutionLevel || 0;
         
-        if (item.type === 'damage') {
+        if (equipped.type === 'damage') {
              // For damage swords, stats are based on enchantments and not stars in the provided data
              // This part might need adjustment if the data structure for damage swords changes to include star levels
-             return item.baseDamage;
+             return item.base_stats;
         }
 
-        if(item.type === 'scythe') {
+        if(equipped.type === 'scythe') {
             switch(level) {
                 case 1: return item.one_star_stats;
                 case 2: return item.two_star_stats;
@@ -135,7 +154,7 @@ export function WeaponSlots() {
             }
         }
 
-        if(item.type === 'energy') {
+        if(equipped.type === 'energy') {
             // Find the base item and its evolutions
             const baseItem = weaponData.energy.find(i => i.name.startsWith(item.name.split(' (')[0]) && !i.name.includes('Estrela'));
             const evolutions = weaponData.energy.filter(i => i.name.startsWith(item.name.split(' (')[0]) && i.name.includes('Estrela'));
