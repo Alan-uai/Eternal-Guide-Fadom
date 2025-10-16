@@ -13,6 +13,9 @@ import { RarityBadge } from './RarityBadge';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { useApp } from '@/context/app-provider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+const shadowRarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic', 'Phantom', 'Supreme'];
 
 export function FighterSlots() {
     const { user, isUserLoading } = useUser();
@@ -102,7 +105,7 @@ export function FighterSlots() {
         };
         
         if (type === 'Shadow') {
-           newFighterData.passive = null; 
+           newFighterData.rarity = 'Common';
         }
 
         const newSlots = {
@@ -139,12 +142,12 @@ export function FighterSlots() {
         }
 
         if(equipped.type === 'Shadow') {
-            const passive = equipped.passive;
-            const stat = item.stats?.find((s:any) => s.rarity === passive);
+            const equippedRarity = equipped.rarity;
+            const stat = item.stats?.find((s:any) => s.rarity.toLowerCase().includes(equippedRarity.toLowerCase()));
             if(stat) {
                 return `Bônus: ${stat.bonus}`;
             }
-            return 'Selecione a passiva';
+            return 'Selecione a raridade';
         }
         
         return 'N/A';
@@ -152,10 +155,11 @@ export function FighterSlots() {
 
     const isLoading = isUserLoading || isUserDataLoading;
     const baseEvolutionStars = [1, 2, 3];
+    const totalSlots = 6;
 
     return (
-        <div className='flex w-full flex-row gap-4 items-start justify-center'>
-            {[0, 1, 2].map(slotIndex => {
+        <div className='grid grid-cols-3 md:grid-cols-6 gap-4 items-start justify-center'>
+            {Array.from({ length: totalSlots }).map((_, slotIndex) => {
                 const equipped = equippedFighters[slotIndex];
                 const fullItemData = equipped ? 
                     (fighterData[equipped.type as 'Titan' | 'Stand' | 'Shadow'] || []).find(i => i.id === equipped.id) 
@@ -164,40 +168,40 @@ export function FighterSlots() {
                 const displayedStat = getStatForFighter(fullItemData, equipped);
 
                 return (
-                    <div key={slotIndex} className="flex flex-col items-center gap-2">
+                    <div key={slotIndex} className="flex flex-col items-center gap-2 w-full">
                         <Card 
-                            className="cursor-pointer hover:border-primary/50 transition-colors w-22 h-22 flex flex-col justify-between flex-shrink-0"
+                            className="cursor-pointer hover:border-primary/50 transition-colors w-full h-24 flex flex-col justify-between flex-shrink-0"
                             onClick={() => handleSlotClick(slotIndex)}
                         >
-                            <div className='p-4 text-center relative flex-grow flex flex-col items-center justify-center'>
+                            <div className='p-2 text-center relative flex-grow flex flex-col items-center justify-center'>
                                 {isLoading ? (
                                     <Loader2 className="h-6 w-6 animate-spin text-primary" />
                                 ) : equipped ? (
                                     <>
-                                        {equipped.type === 'Shadow' && fullItemData?.stats && (
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button variant="ghost" size="sm" className="absolute top-1 right-1 h-6 px-2 text-xs" onClick={(e) => e.stopPropagation()}>
-                                                        {equipped.passive || 'Passiva'}
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-1">
-                                                    {fullItemData.stats.map((stat: any) => (
-                                                        <Button key={stat.rarity} variant="ghost" size="sm" className="w-full justify-start" onClick={(e) => { e.stopPropagation(); updateFighterData(slotIndex, { passive: stat.rarity }) }}>
-                                                            {stat.rarity} ({stat.bonus})
-                                                        </Button>
+                                        {equipped.type === 'Shadow' ? (
+                                             <Select 
+                                                value={equipped.rarity || 'Common'} 
+                                                onValueChange={(newRarity) => updateFighterData(slotIndex, { rarity: newRarity })}
+                                             >
+                                                <SelectTrigger className="absolute top-1 right-1 h-6 px-2 text-xs w-auto focus:ring-0 focus:ring-offset-0 border-0 bg-transparent">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent onClick={(e) => e.stopPropagation()}>
+                                                    {shadowRarities.map(rarity => (
+                                                        <SelectItem key={rarity} value={rarity}>{rarity}</SelectItem>
                                                     ))}
-                                                </PopoverContent>
-                                            </Popover>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <RarityBadge rarity={equipped.rarity} className="absolute top-1 right-1" />
                                         )}
                                         <p className="font-bold text-sm">{equipped.name}</p>
-                                        <RarityBadge rarity={equipped.rarity} />
                                         <p className="text-xs mt-2">{displayedStat}</p>
                                     </>
                                 ) : (
                                     <div className="text-muted-foreground">
                                         <PlusCircle className="mx-auto h-8 w-8" />
-                                        <p className="text-sm mt-2">Equipar Lutador</p>
+                                        <p className="text-xs mt-2">Equipar</p>
                                     </div>
                                 )}
                             </div>

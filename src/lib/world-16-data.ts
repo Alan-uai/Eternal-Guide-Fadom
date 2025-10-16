@@ -27,8 +27,6 @@ export const world16Data = {
         statType: 'damage',
         unlockCost: 'N/A',
         description: 'Lutadores com diferentes tempos de ataque e porcentagens de dano, que evoluem com estrelas.',
-        // Os stats detalhados para cada stand e nível de estrela precisariam de uma estrutura mais complexa,
-        // mas por enquanto estamos capturando a existência do poder.
       },
        {
         id: 'ripple-energy',
@@ -85,5 +83,15 @@ export const world16Data = {
             ]
         }
     ],
-    stands: []
+    stands: [
+        { id: 'star-platinum', name: 'Star Platinum', rarity: 'Comum', energy_bonus: '2%' },
+        { id: 'magicians-red', name: 'Magicians Red', rarity: 'Incomum', energy_bonus: '4%' },
+        { id: 'hierophant-green', name: 'Hierophant Green', rarity: 'Raro', energy_bonus: '6%' },
+        { id: 'the-world', name: 'The World', rarity: 'Épico', energy_bonus: '10%' },
+        { id: 'king-crimson', name: 'King Crimson', rarity: 'Lendário', energy_bonus: '15%' },
+        { id: 'killer-queen', name: 'Killer Queen', rarity: 'Mítico', energy_bonus: '20%' },
+        { id: 'golden-experience', name: 'Golden Experience', rarity: 'Mítico', energy_bonus: '25%' },
+        { id: 'golden-experience-requiem', name: 'Golden Experience Requiem', rarity: 'Phantom', energy_bonus: '35%' },
+        { id: 'the-world-over-heaven', name: 'The World Over Heaven', rarity: 'Phantom', energy_bonus: '40%' }
+    ]
 };
