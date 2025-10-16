@@ -13,7 +13,23 @@ export const raidRequirementsArticle: Omit<WikiArticle, 'createdAt'> = {
 **Raids em Grupo (até 4 Jogadores):**
 *   Todas as outras raids não mencionadas como "solo" permitem a participação de até 4 jogadores.
 
-Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a tabela consolidada para as raids mais antigas. 
+Abaixo estão as tabelas com os requisitos de HP e DPS para as novas raids, e a tabela consolidada para as raids mais antigas.
+
+### Cálculo de HP Exponencial para Raids
+
+Para raids como **Titan Defense** e **Progression Raid**, o HP dos inimigos aumenta exponencialmente a cada sala. Em vez de uma tabela gigante, use a seguinte fórmula para estimar o HP:
+
+**Fórmula:** \`HP(sala) = HP_inicial * (HP_final / HP_inicial)^((sala - 1) / 999)\`
+
+**Valores Base:**
+*   **Titan Defense:**
+    *   HP Inicial (Sala 1): 7.62 sxD (7.62e51)
+    *   HP Final (Sala 1000): 1.63 TGN (1.63e93)
+*   **Progression Raid:**
+    *   HP Inicial (Sala 1): 57.2 DD (5.72e40)
+    *   HP Final (Sala 1000): 12.3 SeV (1.23e82)
+
+**Exemplo de Uso:** Para calcular o DPS necessário para a sala 500 da Titan Defense, a IA primeiro calcularia o HP dessa sala usando a fórmula e depois dividiria o resultado por 30 para obter uma estimativa de DPS para uma luta de 30 segundos.
 
 A **Mundo Raid**, localizada no Lobby 2, é desbloqueada junto com o Mundo 21. Sua mecânica é similar à da Gleam Raid: cada onda completada é uma conquista que concede um nível de um poder exclusivo da raid (do comum ao supremo), além de uma conquista final que recompensa com créditos.`,
   tags: ['raid', 'dungeon', 'energia', 'guia', 'geral', 'solo'],
