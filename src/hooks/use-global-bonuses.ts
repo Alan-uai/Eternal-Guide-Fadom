@@ -83,26 +83,26 @@ export function useGlobalBonuses(currentEnergyInput: string) {
     const { user, isUserLoading } = useUser();
     const { firestore } = useFirebase();
 
-    // Fetch all necessary data collections
-    const collectionsToFetch = ['accessories', 'gamepasses', 'achievements', 'index', 'obelisks', 'powers', 'auras', 'pets', 'fighters'];
-    const collectionQueries = useMemo(() => {
-        if (!firestore || !user) return {};
-        const queries: { [key: string]: any } = {};
-        collectionsToFetch.forEach(name => {
-            queries[name] = collection(firestore, 'users', user.uid, name);
-        });
-        return queries;
-    }, [firestore, user]);
+    // Fetch all necessary data collections individually
+    const accessoriesQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'accessories') : null, [firestore, user]);
+    const gamepassesQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'gamepasses') : null, [firestore, user]);
+    const achievementsQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'achievements') : null, [firestore, user]);
+    const indexQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'index') : null, [firestore, user]);
+    const obelisksQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'obelisks') : null, [firestore, user]);
+    const powersQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'powers') : null, [firestore, user]);
+    const aurasQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'auras') : null, [firestore, user]);
+    const petsQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'pets') : null, [firestore, user]);
+    const fightersQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'fighters') : null, [firestore, user]);
 
-    const { data: accessoryItems, isLoading: accessoriesLoading } = useCollection(collectionQueries.accessories);
-    const { data: gamepassItems, isLoading: gamepassesLoading } = useCollection(collectionQueries.gamepasses);
-    const { data: achievementItems, isLoading: achievementsLoading } = useCollection(collectionQueries.achievements);
-    const { data: indexItems, isLoading: indexLoading } = useCollection(collectionQueries.index);
-    const { data: obeliskItems, isLoading: obelisksLoading } = useCollection(collectionQueries.obelisks);
-    const { data: powerItems, isLoading: powersLoading } = useCollection(collectionQueries.powers);
-    const { data: auraItems, isLoading: aurasLoading } = useCollection(collectionQueries.auras);
-    const { data: petItems, isLoading: petsLoading } = useCollection(collectionQueries.pets);
-    const { data: fighterItems, isLoading: fightersLoading } = useCollection(collectionQueries.fighters);
+    const { data: accessoryItems, isLoading: accessoriesLoading } = useCollection(accessoriesQuery);
+    const { data: gamepassItems, isLoading: gamepassesLoading } = useCollection(gamepassesQuery);
+    const { data: achievementItems, isLoading: achievementsLoading } = useCollection(achievementsQuery);
+    const { data: indexItems, isLoading: indexLoading } = useCollection(indexQuery);
+    const { data: obeliskItems, isLoading: obelisksLoading } = useCollection(obelisksQuery);
+    const { data: powerItems, isLoading: powersLoading } = useCollection(powersQuery);
+    const { data: auraItems, isLoading: aurasLoading } = useCollection(aurasQuery);
+    const { data: petItems, isLoading: petsLoading } = useCollection(petsQuery);
+    const { data: fighterItems, isLoading: fightersLoading } = useCollection(fightersQuery);
     
     const { data: weaponSlotsData, isLoading: weaponsLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, `users/${user.uid}`) : null, [firestore, user]));
     const { data: rankData, isLoading: rankLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, 'users', user.uid, 'rank', 'current') : null, [firestore, user]));
