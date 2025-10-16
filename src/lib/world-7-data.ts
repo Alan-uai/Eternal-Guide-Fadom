@@ -66,13 +66,13 @@ export const world7Data = {
         { id: 'novi-chroni-pet', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '14.6k' }
     ],
     avatars: [
-        { id: 'noalle-avatar', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '732' },
-        { id: 'megna-avatar', name: 'Megna', rank: 'D', rarity: 'Uncommon', energy_bonus: '1.46k' },
-        { id: 'finrel-avatar', name: 'Finrel', rank: 'C', rarity: 'Rare', energy_bonus: '2.19k' },
-        { id: 'aste-avatar', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '2.93k' },
-        { id: 'yune-avatar', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '3.66k' },
-        { id: 'yemi-avatar', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '4.88k' },
-        { id: 'novi-chroni-avatar', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '14.6k' }
+        { id: 'noalle-avatar', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '732', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'megna-avatar', name: 'Megna', rank: 'D', rarity: 'Uncommon', energy_bonus: '1460', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'finrel-avatar', name: 'Finrel', rank: 'C', rarity: 'Rare', energy_bonus: '2190', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'aste-avatar', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '2930', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'yune-avatar', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '3660', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'yemi-avatar', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '4880', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'novi-chroni-avatar', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '14600', leveling: { maxLevel: 150, costUnit: 'Coin' } }
     ],
     shadows: [
         {
@@ -94,4 +94,5 @@ export const world7Data = {
         }
     ]
 };
+    
     

@@ -55,16 +55,17 @@ export const world5Data = {
         { id: 'rangaki-pet', name: 'Rangaki', rank: 'SS', rarity: 'Phantom', energy_bonus: '2.43k' }
     ],
     avatars: [
-        { id: 'nazuki-avatar', name: 'Nazuki', rank: 'E', rarity: 'Common', energy_bonus: '117' },
-        { id: 'tenjaro-avatar', name: 'Tenjaro', rank: 'D', rarity: 'Uncommon', energy_bonus: '234' },
-        { id: 'zentsu-avatar', name: 'Zentsu', rank: 'C', rarity: 'Rare', energy_bonus: '352' },
-        { id: 'insake-avatar', name: 'Insake', rank: 'B', rarity: 'Epic', energy_bonus: '469' },
-        { id: 'tamoka-avatar', name: 'Tamoka', rank: 'A', rarity: 'Legendary', energy_bonus: '586' },
-        { id: 'shinabe-avatar', name: 'Shinabe', rank: 'S', rarity: 'Mythic', energy_bonus: '781' },
-        { id: 'rangaki-avatar', name: 'Rangaki', rank: 'SS', rarity: 'Phantom', energy_bonus: '2.43k' }
+        { id: 'nazuki-avatar', name: 'Nazuki', rank: 'E', rarity: 'Common', energy_bonus: '117', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'tenjaro-avatar', name: 'Tenjaro', rank: 'D', rarity: 'Uncommon', energy_bonus: '234', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'zentsu-avatar', name: 'Zentsu', rank: 'C', rarity: 'Rare', energy_bonus: '352', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'insake-avatar', name: 'Insake', rank: 'B', rarity: 'Epic', energy_bonus: '469', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'tamoka-avatar', name: 'Tamoka', rank: 'A', rarity: 'Legendary', energy_bonus: '586', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'shinabe-avatar', name: 'Shinabe', rank: 'S', rarity: 'Mythic', energy_bonus: '781', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'rangaki-avatar', name: 'Rangaki', rank: 'SS', rarity: 'Phantom', energy_bonus: '2340', leveling: { maxLevel: 150, costUnit: 'Coin' } }
     ],
     dungeons: [],
     shadows: [],
     stands: []
 };
+    
     

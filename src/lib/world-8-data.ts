@@ -64,14 +64,14 @@ export const world8Data = {
         { id: 'madera-pet', name: 'Madera', rank: 'SS', rarity: 'Phantom', energy_bonus: '40.2k' }
     ],
     avatars: [
-        { id: 'sekuri-avatar', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1.83k' },
-        { id: 'kid-norto-avatar', name: 'Kid Norto', rank: 'D', rarity: 'Uncommon', energy_bonus: '3.66k' },
-        { id: 'kid-seske-avatar', name: 'Kid Seske', rank: 'C', rarity: 'Rare', energy_bonus: '5.49k' },
-        { id: 'kakashki-avatar', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '7.32k' },
-        { id: 'jiria-avatar', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '9.15k' },
-        { id: 'tsuni-avatar', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '12.2k' },
-        { id: 'itechi-avatar', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '36.6k' },
-        { id: 'madera-avatar', name: 'Madera', rank: 'SS', rarity: 'Phantom', energy_bonus: '40.2k' }
+        { id: 'sekuri-avatar', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1830', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'kid-norto-avatar', name: 'Kid Norto', rank: 'D', rarity: 'Uncommon', energy_bonus: '3660', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'kid-seske-avatar', name: 'Kid Seske', rank: 'C', rarity: 'Rare', energy_bonus: '5490', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'kakashki-avatar', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '7320', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'jiria-avatar', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '9150', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'tsuni-avatar', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '12200', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'itechi-avatar', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '36600', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'madera-avatar', name: 'Madera', rank: 'SS', rarity: 'Phantom', energy_bonus: '40200', leveling: { maxLevel: 150, costUnit: 'Coin' } }
     ],
     shadows: [
         {
@@ -95,3 +95,5 @@ export const world8Data = {
         }
     ]
 };
+
+    

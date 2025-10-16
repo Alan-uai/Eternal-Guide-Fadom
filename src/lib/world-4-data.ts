@@ -80,13 +80,13 @@ export const world4Data = {
         { id: 'sakuni-pet', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '938' }
     ],
     avatars: [
-        { id: 'itodo-avatar', name: 'Itodo', rank: 'E', rarity: 'Common', energy_bonus: '47' },
-        { id: 'nebara-avatar', name: 'Nebara', rank: 'D', rarity: 'Uncommon', energy_bonus: '94' },
-        { id: 'magum-avatar', name: 'Magum', rank: 'C', rarity: 'Rare', energy_bonus: '141' },
-        { id: 'meki-avatar', name: 'Meki', rank: 'B', rarity: 'Epic', energy_bonus: '188' },
-        { id: 'tage-avatar', name: 'Tage', rank: 'A', rarity: 'Legendary', energy_bonus: '234' },
-        { id: 'gajo-avatar', name: 'Gajo', rank: 'S', rarity: 'Mythic', energy_bonus: '313' },
-        { id: 'sakuni-avatar', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '938' }
+        { id: 'itodo-avatar', name: 'Itodo', rank: 'E', rarity: 'Common', energy_bonus: '47', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'nebara-avatar', name: 'Nebara', rank: 'D', rarity: 'Uncommon', energy_bonus: '94', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'magum-avatar', name: 'Magum', rank: 'C', rarity: 'Rare', energy_bonus: '141', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'meki-avatar', name: 'Meki', rank: 'B', rarity: 'Epic', energy_bonus: '188', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'tage-avatar', name: 'Tage', rank: 'A', rarity: 'Legendary', energy_bonus: '234', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'gajo-avatar', name: 'Gajo', rank: 'S', rarity: 'Mythic', energy_bonus: '313', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'sakuni-avatar', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '938', leveling: { maxLevel: 150, costUnit: 'Coin' } }
     ],
     dungeons: [
         {
@@ -97,3 +97,4 @@ export const world4Data = {
     ],
   };
   
+    

@@ -100,13 +100,13 @@ export const world2Data = {
         { id: 'shanks-pet', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '150' }
     ],
     avatars: [
-        { id: 'nomi-avatar', name: 'Nomi', rank: 'E', rarity: 'Common', energy_bonus: '8' },
-        { id: 'usup-avatar', name: 'Usup', rank: 'D', rarity: 'Uncommon', energy_bonus: '15' },
-        { id: 'robins-avatar', name: 'Robins', rank: 'C', rarity: 'Rare', energy_bonus: '23' },
-        { id: 'senji-avatar', name: 'Senji', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'zaro-avatar', name: 'Zaro', rank: 'A', rarity: 'Legendary', energy_bonus: '38' },
-        { id: 'loffy-avatar', name: 'Loffy', rank: 'S', rarity: 'Mythic', energy_bonus: '50' },
-        { id: 'shanks-avatar', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '150' }
+        { id: 'nomi-avatar', name: 'Nomi', rank: 'E', rarity: 'Common', energy_bonus: '8', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'usup-avatar', name: 'Usup', rank: 'D', rarity: 'Uncommon', energy_bonus: '15', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'robins-avatar', name: 'Robins', rank: 'C', rarity: 'Rare', energy_bonus: '23', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'senji-avatar', name: 'Senji', rank: 'B', rarity: 'Epic', energy_bonus: '30', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'zaro-avatar', name: 'Zaro', rank: 'A', rarity: 'Legendary', energy_bonus: '38', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'loffy-avatar', name: 'Loffy', rank: 'S', rarity: 'Mythic', energy_bonus: '50', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'shanks-avatar', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '150', leveling: { maxLevel: 150, costUnit: 'Coin' } }
     ],
     dungeons: [
         {
@@ -118,3 +118,4 @@ export const world2Data = {
     ],
   };
   
+    

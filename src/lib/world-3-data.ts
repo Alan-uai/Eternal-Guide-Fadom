@@ -79,14 +79,15 @@ export const world3Data = {
         { id: 'eizen-pet', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '375' }
     ],
     avatars: [
-        { id: 'hime-avatar', name: 'Hime', rank: 'E', rarity: 'Common', energy_bonus: '19' },
-        { id: 'ichige-avatar', name: 'Ichige', rank: 'D', rarity: 'Uncommon', energy_bonus: '38' },
-        { id: 'uryua-avatar', name: 'Uryua', rank: 'C', rarity: 'Rare', energy_bonus: '56' },
-        { id: 'rakiu-avatar', name: 'Rakiu', rank: 'B', rarity: 'Epic', energy_bonus: '75' },
-        { id: 'yoichi-avatar', name: 'Yoichi', rank: 'A', rarity: 'Legendary', energy_bonus: '94' },
-        { id: 'kahara-avatar', name: 'Kahara', rank: 'S', rarity: 'Mythic', energy_bonus: '125' },
-        { id: 'eizen-avatar', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '375' }
+        { id: 'hime-avatar', name: 'Hime', rank: 'E', rarity: 'Common', energy_bonus: '19', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'ichige-avatar', name: 'Ichige', rank: 'D', rarity: 'Uncommon', energy_bonus: '38', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'uryua-avatar', name: 'Uryua', rank: 'C', rarity: 'Rare', energy_bonus: '56', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'rakiu-avatar', name: 'Rakiu', rank: 'B', rarity: 'Epic', energy_bonus: '75', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'yoichi-avatar', name: 'Yoichi', rank: 'A', rarity: 'Legendary', energy_bonus: '94', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'kahara-avatar', name: 'Kahara', rank: 'S', rarity: 'Mythic', energy_bonus: '125', leveling: { maxLevel: 150, costUnit: 'Coin' } },
+        { id: 'eizen-avatar', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '375', leveling: { maxLevel: 150, costUnit: 'Coin' } }
     ],
     dungeons: [],
   };
   
+    
