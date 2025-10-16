@@ -17,6 +17,7 @@ import { CharacterInventory } from '@/components/profile/CharacterInventory';
 import { GlobalBonusDisplay } from '@/components/profile/GlobalBonusDisplay';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { WelcomePopover } from '@/components/profile/WelcomePopover';
 
 const ENERGY_STORAGE_KEY = 'eternal-guide-current-energy';
 
@@ -61,6 +62,7 @@ export default function ProfilePage() {
   
     return (
         <>
+            <WelcomePopover />
             <Head>
                 <title>Meu Perfil - Guia Eterno</title>
             </Head>

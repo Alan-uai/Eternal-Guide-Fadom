@@ -9,6 +9,7 @@ import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { handleUserLogin } from '@/lib/auth-actions';
 import { useToast } from '@/hooks/use-toast';
 import { FirebaseError } from 'firebase/app';
+import { useRouter } from 'next/navigation';
 
 
 interface FirebaseProviderProps {
@@ -66,6 +67,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   firestore,
   auth,
 }) => {
+  const router = useRouter();
+  const { toast } = useToast();
   const [userAuthState, setUserAuthState] = useState<UserAuthState>({
     user: null,
     isUserLoading: true, // Start loading until first auth event
@@ -101,6 +104,10 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
               // Determine if the user is new on the client side
               const isNewUser = firebaseUser.metadata.creationTime === firebaseUser.metadata.lastSignInTime;
 
+              if (isNewUser) {
+                  router.push('/profile?new-user=true');
+              }
+
               // Create a simple, serializable object to send to the server action
               const userData = {
                 id: firebaseUser.uid,
@@ -130,7 +137,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       }
     );
     return () => unsubscribe(); // Cleanup
-  }, [auth, firestore]); // Depends on the auth instance
+  }, [auth, firestore, router, toast]); // Depends on the auth instance
 
   // Memoize the context value
   const contextValue = useMemo((): FirebaseContextState => {
