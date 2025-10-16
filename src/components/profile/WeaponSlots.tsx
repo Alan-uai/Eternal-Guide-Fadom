@@ -151,15 +151,14 @@ export function WeaponSlots() {
         const level = equipped.evolutionLevel || 0;
         
         if (equipped.type === 'damage') {
-             // Evolution multipliers for damage swords
-             const starMultipliers = [1, 1.2, 1.5, 2];
-             let finalDamage = parseMultiplier(item.baseDamage) * (starMultipliers[level] || 1);
+             const statKey = ['base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'][level];
+             const baseDamage = parseMultiplier((item as any)[statKey] || '1x');
              
              // Enchantment multipliers
-             const breathingMultiplier = equipped.breathingEnchantment ? 1.8 : 1; // Example: 1.8x for Phantom
-             const stoneMultiplier = equipped.stoneEnchantment ? 1.8 : 1; // Example: 1.8x for Phantom
+             const breathingMultiplier = equipped.breathingEnchantment ? 1.8 : 1;
+             const stoneMultiplier = equipped.stoneEnchantment ? 1.8 : 1;
              
-             finalDamage = finalDamage * breathingMultiplier * stoneMultiplier;
+             const finalDamage = baseDamage * breathingMultiplier * stoneMultiplier;
              return `${finalDamage.toFixed(2)}x`;
         }
 
