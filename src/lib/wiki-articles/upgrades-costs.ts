@@ -139,6 +139,30 @@ export const upgradesCostsArticle: Omit<WikiArticle, 'createdAt'> = {
             { Upgrade: 39, Custo: '1.5de' },
             { Upgrade: 40, Custo: '20de' },
         ]
+    },
+    attackRange1: {
+      headers: ['Attack Range', 'Costs'],
+      rows: [
+        { 'Attack Range': 1, Costs: 50 },
+        { 'Attack Range': 2, Costs: 75 },
+        { 'Attack Range': 3, Costs: 100 },
+        { 'Attack Range': 4, Costs: 125 },
+        { 'Attack Range': 5, Costs: 150 },
+        { 'Attack Range': 6, Costs: 175 },
+        { 'Attack Range': 7, Costs: 200 },
+        { 'Attack Range': 8, Costs: 250 },
+        { 'Attack Range': 9, Costs: 300 },
+        { 'Attack Range': 10, Costs: 350 },
+      ]
+    },
+    attackRange2: {
+      headers: ['Attack Range 2', 'Costs'],
+      rows: [
+        { 'Attack Range 2': 1, Costs: 500 },
+        { 'Attack Range 2': 2, Costs: 750 },
+        { 'Attack Range 2': 3, Costs: 1250 },
+        { 'Attack Range 2': 4, Costs: 2500 },
+      ]
     }
   },
 };
