@@ -11,11 +11,28 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, PlusCircle, Star } from 'lucide-react';
 import { RarityBadge } from './RarityBadge';
 import { cn } from '@/lib/utils';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { useApp } from '@/context/app-provider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { titansArticle } from '@/lib/wiki-articles/titans';
 
 const shadowRarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic', 'Phantom', 'Supreme'];
+
+// Helper to get the correct damage percentage for a Titan
+const getTitanDamage = (titanName: string, evolutionLevel: number): string => {
+    const tables = [
+        titansArticle.tables.baseTitans,
+        titansArticle.tables.oneStarTitans,
+        titansArticle.tables.twoStarTitans,
+        titansArticle.tables.threeStarTitans,
+    ];
+    const titanKey = 'Titã (0 Estrelas)'.replace('0', evolutionLevel.toString());
+    const table = tables[evolutionLevel];
+    if (!table) return '5%'; 
+
+    const titanRow = table.rows.find((row: any) => row[titanKey] === titanName);
+    return titanRow ? titanRow['Dano de Ataque'] : 'N/A';
+};
+
 
 export function FighterSlots() {
     const { user, isUserLoading } = useUser();
@@ -23,8 +40,9 @@ export function FighterSlots() {
     const { allGameData } = useApp();
     const [open, setOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
-    const [step, setStep] = useState<'type' | 'item'>('type');
+    const [step, setStep] = useState<'type' | 'item' | 'rarity'>('type');
     const [fighterType, setFighterType] = useState<'Titan' | 'Stand' | 'Shadow' | null>(null);
+    const [selectedItem, setSelectedItem] = useState<any>(null);
     const { toast } = useToast();
 
     const userDocRef = useMemoFirebase(() => {
@@ -59,6 +77,7 @@ export function FighterSlots() {
         setSelectedSlot(slotIndex);
         setStep('type');
         setFighterType(null);
+        setSelectedItem(null);
         setOpen(true);
     };
 
@@ -93,20 +112,32 @@ export function FighterSlots() {
         }
     };
 
-    const handleItemSelect = async (item: any, type: 'Titan' | 'Stand' | 'Shadow') => {
+    const handleItemSelect = async (item: any) => {
+        setSelectedItem(item);
+        if (fighterType === 'Shadow') {
+            setStep('rarity');
+        } else {
+            // For Titans and Stands, equip directly
+            await equipFighter(item, item.rarity || 'Comum');
+        }
+    };
+    
+    const handleRaritySelect = async (rarity: string) => {
+        if (selectedItem) {
+            await equipFighter(selectedItem, rarity);
+        }
+    };
+
+    const equipFighter = async (item: any, rarity: string) => {
         if (selectedSlot === null || !userDocRef) return;
-        
+
         const newFighterData: any = {
-            id: item.id, 
+            id: item.id,
             name: item.name,
-            rarity: item.rarity || 'Comum',
-            type: type,
+            rarity: rarity,
+            type: fighterType,
             evolutionLevel: 0,
         };
-        
-        if (type === 'Shadow') {
-           newFighterData.rarity = 'Common';
-        }
 
         const newSlots = {
             ...equippedFighters,
@@ -117,11 +148,11 @@ export function FighterSlots() {
 
         try {
             await updateDoc(userDocRef, { fighterSlots: newSlots });
-            toast({ title: "Lutador Equipado!", description: `${item.name} equipado no slot ${selectedSlot + 1}.` });
-        } catch (error) {
+            toast({ title: "Lutador Equipado!", description: `${item.name} (${rarity}) equipado no slot ${selectedSlot + 1}.` });
+        } catch (error: any) {
             console.error(error);
             setEquippedFighters((userData as any)?.fighterSlots || {});
-            toast({ variant: "destructive", title: "Erro", description: "Não foi possível equipar o lutador." });
+            toast({ variant: "destructive", title: "Erro", description: error.message || "Não foi possível equipar o lutador." });
         } finally {
             setOpen(false);
         }
@@ -133,8 +164,7 @@ export function FighterSlots() {
         const level = equipped.evolutionLevel || 0;
         
         if (equipped.type === 'Titan') {
-            const damagePercentages = ['5%', '7.5%', '10%', '15%']; // Simplified for example
-            return `Dano: ${damagePercentages[level] || '5%'}`;
+            return `Dano: ${getTitanDamage(equipped.name, level)}`;
         }
         
         if(equipped.type === 'Stand') {
@@ -143,7 +173,7 @@ export function FighterSlots() {
 
         if(equipped.type === 'Shadow') {
             const equippedRarity = equipped.rarity;
-            const stat = item.stats?.find((s:any) => s.rarity.toLowerCase().includes(equippedRarity.toLowerCase()));
+            const stat = item.stats?.find((s:any) => s.rarity === equippedRarity);
             if(stat) {
                 return `Bônus: ${stat.bonus}`;
             }
@@ -178,7 +208,7 @@ export function FighterSlots() {
                                     <Loader2 className="h-6 w-6 animate-spin text-primary" />
                                 ) : equipped ? (
                                     <>
-                                        {equipped.type === 'Shadow' ? (
+                                        {equipped.type === 'Shadow' && (
                                              <Select 
                                                 value={equipped.rarity || 'Common'} 
                                                 onValueChange={(newRarity) => updateFighterData(slotIndex, { rarity: newRarity })}
@@ -192,10 +222,9 @@ export function FighterSlots() {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                        ) : (
-                                            <RarityBadge rarity={equipped.rarity} className="absolute top-1 right-1" />
                                         )}
                                         <p className="font-bold text-sm">{equipped.name}</p>
+                                        {equipped.type !== 'Shadow' && <RarityBadge rarity={equipped.rarity} />}
                                         <p className="text-xs mt-2">{displayedStat}</p>
                                     </>
                                 ) : (
@@ -236,25 +265,42 @@ export function FighterSlots() {
                     <DialogHeader>
                         <DialogTitle>Equipar Lutador no Slot {selectedSlot !== null ? selectedSlot + 1 : ''}</DialogTitle>
                         <DialogDescription>
-                            {step === 'type' ? 'Selecione o tipo de lutador.' : `Selecione um lutador do tipo ${fighterType}.`}
+                            {step === 'type' && 'Selecione o tipo de lutador.'}
+                            {step === 'item' && `Selecione um lutador do tipo ${fighterType}.`}
+                            {step === 'rarity' && `Selecione a raridade para ${selectedItem?.name}.`}
                         </DialogDescription>
                     </DialogHeader>
-                    {step === 'type' ? (
+                    {step === 'type' && (
                         <div className='grid grid-cols-1 gap-2 py-4'>
                             <Button variant="outline" onClick={() => handleTypeSelect('Titan')}>Titãs</Button>
                             <Button variant="outline" onClick={() => handleTypeSelect('Stand')}>Stands</Button>
                             <Button variant="outline" onClick={() => handleTypeSelect('Shadow')}>Shadows</Button>
                         </div>
-                    ) : (
+                    )}
+                    {step === 'item' && (
                         <ScrollArea className="h-72">
                             <div className="space-y-2 py-4">
                                 {fighterType && fighterData[fighterType]
                                     .filter((item: any) => item.name)
                                     .map((item: any, index: number) => (
-                                     <Button key={item.id || index} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleItemSelect(item, fighterType)}>
+                                     <Button key={item.id || index} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleItemSelect(item)}>
                                         <div className='flex flex-col items-start'>
                                             <p>{item.name}</p>
-                                            {item.rarity && <RarityBadge rarity={item.rarity} />}
+                                            <RarityBadge rarity={item.rarity} />
+                                        </div>
+                                    </Button>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    )}
+                    {step === 'rarity' && (
+                        <ScrollArea className="h-72">
+                             <div className="space-y-2 py-4">
+                                {shadowRarities.map(rarity => (
+                                    <Button key={rarity} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleRaritySelect(rarity)}>
+                                       <div className='flex flex-col items-start'>
+                                            <p>{rarity}</p>
+                                            <RarityBadge rarity={rarity} />
                                         </div>
                                     </Button>
                                 ))}
