@@ -16,6 +16,7 @@ import { rankArticle } from './wiki-articles/rank-system';
 import { scientificNotationArticle } from './wiki-articles/scientific-notation';
 import { scythesArticle } from './wiki-articles/scythes';
 import { standsArticle } from './wiki-articles/stands';
+import { starChancesArticle } from './wiki-articles/star-chances';
 import { swordsArticle } from './wiki-articles/swords';
 import { titansArticle } from './wiki-articles/titans';
 import { world20RaidsArticle } from './wiki-articles/world-20-raids';
@@ -43,6 +44,7 @@ export const allWikiArticles = [
     howToGetStrongerArticle,
     lobbyDungeonsArticle,
     achievementsGuideArticle,
+    starChancesArticle,
 ];
 
 // Adiciona o timestamp do servidor para cada artigo
