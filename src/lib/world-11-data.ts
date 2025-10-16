@@ -10,13 +10,13 @@ export const world11Data = {
             statType: 'energy',
             unlockCost: 'N/A',
             stats: [
-                { name: 'Grice Family', multiplier: '2x', rarity: 'Common', probability: 40.55 },
-                { name: 'Leonhart Family', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
-                { name: 'Braun Family', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
-                { name: 'Tybur Family', multiplier: '6x', rarity: 'Epic', probability: 5 },
-                { name: 'Ackerman Family', multiplier: '8x', rarity: 'Legendary', probability: 1 },
-                { name: 'Yeager Family', multiplier: '12x', rarity: 'Mythic', probability: 0.5 },
-                { name: 'Reiss Family', multiplier: '15x', rarity: 'Phantom', probability: 0.05 },
+                { id: 'grice-family', name: 'Grice Family', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+                { id: 'leonhart-family', name: 'Leonhart Family', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+                { id: 'braun-family', name: 'Braun Family', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+                { id: 'tybur-family', name: 'Tybur Family', multiplier: '6x', rarity: 'Epic', probability: 5 },
+                { id: 'ackerman-family', name: 'Ackerman Family', multiplier: '8x', rarity: 'Legendary', probability: 1 },
+                { id: 'yeager-family', name: 'Yeager Family', multiplier: '12x', rarity: 'Mythic', probability: 0.5 },
+                { id: 'reiss-family', name: 'Reiss Family', multiplier: '15x', rarity: 'Phantom', probability: 0.05 },
             ]
         },
         {
@@ -27,6 +27,15 @@ export const world11Data = {
             unlockCost: 'N/A',
             description: 'Evolua os Titãs. 2 de 0★ para 1★ (custo: 1k Exchange Token 1). 2 de 1★ para 2★ (custo: 2.5k Exchange Token 1). 2 de 2★ para 3★ (custo: 5k Exchange Token 1).'
         }
+    ],
+    fighters: [
+        { id: 'jaw-titan', name: 'Jaw Titan', type: 'Titan' },
+        { id: 'female-titan', name: 'Female Titan', type: 'Titan' },
+        { id: 'beast-titan', name: 'Beast Titan', type: 'Titan' },
+        { id: 'armored-titan', name: 'Armored Titan', type: 'Titan' },
+        { id: 'warhammer-titan', name: 'Warhammer Titan', type: 'Titan' },
+        { id: 'attack-titan', name: 'Attack Titan', type: 'Titan' },
+        { id: 'colossal-titan', name: 'Colossal Titan', type: 'Titan' },
     ],
     npcs: [
         { id: 'world11-e-rank', name: 'E Rank NPC', rank: 'E', exp: 9457, hp: '41OcD', world: 'World 11', drops: { coins: { amount: '4.1OcD', probability: 0.8 } } },
@@ -51,11 +60,13 @@ export const world11Data = {
             type: 'Energy',
             stats: [
                 {
+                    id: 'eren-phantom',
                     rank: 'Rank SS',
                     rarity: 'Phantom',
                     bonus: '15.4% Energy',
                 },
                 {
+                    id: 'eren-supreme',
                     rank: 'Rank SSS',
                     rarity: 'Supremo',
                     bonus: '16.5% Energy',

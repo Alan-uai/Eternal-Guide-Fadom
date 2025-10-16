@@ -313,7 +313,6 @@ function GeneralItemUploader({ asShortcut = false }: { asShortcut?: boolean }) {
 const profileCategories = [
     { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', subcollectionName: 'powers', isInteractiveGrid: true },
     { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras', isInteractiveGrid: true },
-    { name: 'Lutadores', icon: Users, description: 'Seus lutadores como Titãs, Stands e Shadows.', subcollectionName: 'fighters', isInteractiveGrid: true },
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets', isInteractiveGrid: true },
     { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons', isInteractiveGrid: true },
     { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories', isInteractiveGrid: true },
@@ -711,8 +710,6 @@ function RankSelector() {
     const { data: rankData, isLoading } = useDoc(docRef);
     const [rank, setRank] = useState<number>(0);
 
-    const rankOptions = Array.from({ length: 116 }, (_, i) => i); // 0 to 115
-
     useEffect(() => {
         if (rankData) {
             setRank((rankData as any).value || 0);
@@ -738,16 +735,14 @@ function RankSelector() {
     return (
          <div className="w-full p-2 space-y-2">
             <Label htmlFor='rank-selector'>Seu Rank Atual</Label>
-            <Select value={rank.toString()} onValueChange={handleRankChange}>
-                <SelectTrigger id="rank-selector">
-                    <SelectValue placeholder="Selecione seu rank" />
-                </SelectTrigger>
-                <SelectContent>
-                    {rankOptions.map(r => (
-                        <SelectItem key={r} value={r.toString()}>{r}</SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+            <Input 
+                id="rank-selector"
+                type="number"
+                value={rank}
+                onChange={(e) => handleRankChange(e.target.value)}
+                min="0"
+                max="115"
+            />
             <p className="text-xs text-muted-foreground">Ganho de Energia Base: <span className="font-semibold text-primary">{baseEnergyGain}</span></p>
         </div>
     );
@@ -826,7 +821,7 @@ function BonusDisplay({ items, category }: { items: any[], category: string }) {
     )
 }
 
-function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectionName: string; gridData?: any[] }) {
+function InteractiveGridCategory({ subcollectionName, gridData, itemTypeFilter }: { subcollectionName: string; gridData?: any[]; itemTypeFilter?: string; }) {
     const { user } = useUser();
     const { firestore } = useFirebase();
     const { allGameData } = useApp();
@@ -847,36 +842,31 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
     const allItems = useMemo(() => {
         if (gridData) return gridData;
 
-        // Special handling for fighters
-        if (subcollectionName === 'fighters') {
-             const stands = allGameData.flatMap(world => world.stands || []).filter(item => item && item.id);
-             const shadows = allGameData.flatMap(world => world.shadows || []).filter(item => item && item.id);
-             // Titans might be in a different structure, let's assume they are similar to shadows
-             const titans = allGameData.flatMap(world => world.titans || []).filter(item => item && item.id);
-             return [...stands, ...shadows, ...titans];
-        }
-
-        // Special handling for weapons
-        if (subcollectionName === 'weapons') {
+        let items;
+        if (itemTypeFilter) {
+            items = allGameData.flatMap(world => world[subcollectionName] || []).filter(item => item && item.id && item.name === itemTypeFilter);
+        } else if (subcollectionName === 'weapons') {
             const scythes = allGameData.flatMap(world => world.scythes || []);
-            const swords = allGameData.flatMap(world => (world.powers || []).filter(p => p.name === 'Swords' || p.name === 'Zanpakuto'));
-            return [...scythes, ...swords];
-        }
-
-        if (subcollectionName === 'powers') {
+            const swords = allGameData.flatMap(world => (world.powers || []).filter(p => p.name === 'Swords'));
+            items = [...scythes, ...swords];
+        } else if (subcollectionName === 'powers') {
+            const nonEquippableNames = [
+                'Weapon Evolution', 'Stand Evolution', 'Titan Evolution', 'Chakra Progression', 'Breathings', 'Bankai', 'Swords', 'Stands'
+            ];
             const equipablePowers = allGameData.flatMap(world => world.powers || [])
             .filter(power => 
                 power && 
                 power.id && 
-                ['gacha', 'progression'].includes(power.type) && // Only include actual equipable powers
-                !['Weapon Evolution', 'Stand Evolution', 'Titan Evolution', 'Chakra Progression', 'Breathings', 'Bankai'].includes(power.name)
+                !nonEquippableNames.includes(power.name)
              );
             return equipablePowers;
         }
+        else {
+            items = allGameData.flatMap(world => world[subcollectionName] || []).filter(item => item && item.id);
+        }
+        return items;
 
-        // Default: Get all items from the subcollection across all worlds
-        return allGameData.flatMap(world => world[subcollectionName] || []).filter(item => item && item.id);
-    }, [gridData, allGameData, subcollectionName]);
+    }, [gridData, allGameData, subcollectionName, itemTypeFilter]);
 
     const handleItemClick = async (item: any) => {
         if (!itemsQuery) return;
@@ -888,12 +878,12 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                 await deleteDoc(itemRef);
             } else {
                  let dataToSave: any = { id: item.id, name: item.name };
-                 if (item.type === 'gacha' && item.stats && item.stats.length > 0) {
-                    dataToSave.rarity = item.stats[0].rarity; // Default to first rarity/level
-                 } else if (item.type === 'progression' && item.maxLevel) {
-                    dataToSave.leveling = 0; // Default to level 0
-                 } else if (subcollectionName === 'accessories' && item.rarity_options?.length > 0) {
+                 if (item.stats && item.stats.length > 0) {
+                    dataToSave.rarity = item.stats[0].rarity; 
+                 } else if (item.rarity_options && item.rarity_options.length > 0) {
                     dataToSave.rarity = item.rarity_options[0].rarity;
+                 } else if (item.leveling?.maxLevel) {
+                    dataToSave.leveling = 0;
                  }
                 await setDoc(itemRef, dataToSave, { merge: true });
             }
@@ -916,13 +906,11 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
     };
     
     const handlePointerDown = (itemId: string, item: any) => {
-         const hasOptions = (item.type === 'gacha' && item.stats?.length > 0) || 
-                            (item.type === 'progression' && item.maxLevel) ||
-                            (subcollectionName === 'accessories' && item.rarity_options?.length > 0);
+         const hasOptions = (item.stats?.length > 0) || (item.rarity_options?.length > 0) || (item.type === 'progression' && item.maxLevel);
         if (!hasOptions) return;
         holdTimeout.current = setTimeout(() => {
             setOpenPopover(itemId);
-        }, 1000); // 1 second
+        }, 1000); 
     };
 
     const handlePointerUp = () => {
@@ -934,7 +922,6 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
         const itemRef = doc(itemsQuery, itemId);
         try {
             await setDoc(itemRef, { leveling: level }, { merge: true });
-            // No toast here to avoid spamming while sliding
         } catch (error) {
             console.error(error);
         }
@@ -953,12 +940,11 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
             <BonusDisplay items={equippedItems} category={subcollectionName} />
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
                 {uniqueItems.map((item) => {
-                    const uniqueKey = `${item.id}-${(item.stats?.[0] as any)?.id || 'main'}`;
+                    const uniqueKey = item.id;
                     const isEquipped = equippedItems?.some(i => i.id === item.id);
                     const equippedItemData = equippedItems?.find(i => i.id === item.id);
                     
-                    const popoverOptions = (item.type === 'gacha' && item.stats) ? item.stats :
-                                         (subcollectionName === 'accessories' ? item.rarity_options : []);
+                    const popoverOptions = item.stats || item.rarity_options || [];
 
                     const selectedRarity = (equippedItemData as any)?.rarity || popoverOptions?.[0]?.rarity;
                     const selectedOption = popoverOptions?.find((opt:any) => opt.rarity === selectedRarity);
@@ -980,7 +966,7 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                                         cardBgClass
                                     )}
                                 >
-                                     <div className='absolute top-1 text-xs font-semibold opacity-80 z-10'>
+                                     <div className='absolute top-1 text-xs font-semibold opacity-80 z-10 text-center px-1'>
                                         {isEquipped && selectedOption?.name}
                                      </div>
 
@@ -1024,7 +1010,7 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                                 <div className="flex flex-col">
                                     {popoverOptions.map((opt: any) => (
                                         <Button key={opt.id || opt.rarity} variant="ghost" className={cn("rounded-none justify-start", getRarityClass(opt.rarity))} onClick={() => handleRarityChange(item.id, opt.rarity)}>
-                                            <RarityBadge rarity={opt.rarity}>{opt.name || opt.rarity}</RarityBadge>
+                                             <RarityBadge rarity={opt.rarity}>{opt.name}</RarityBadge>
                                         </Button>
                                     ))}
                                 </div>
@@ -1202,6 +1188,42 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
                     ))}
+                    
+                    {/* Fighters Section */}
+                    <Card className="relative md:col-span-1 lg:col-span-1">
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-3'><Users className="h-6 w-6 text-primary" />Titãs</CardTitle>
+                            <CardDescription>Seus lutadores do tipo Titã.</CardDescription>
+                        </CardHeader>
+                        <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
+                             <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
+                                <InteractiveGridCategory subcollectionName="fighters" itemTypeFilter="Titan" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                     <Card className="relative md:col-span-1 lg:col-span-1">
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-3'><Users className="h-6 w-6 text-primary" />Stands</CardTitle>
+                            <CardDescription>Seus lutadores do tipo Stand.</CardDescription>
+                        </CardHeader>
+                        <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
+                             <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
+                                 <InteractiveGridCategory subcollectionName="stands" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                     <Card className="relative md:col-span-1 lg:col-span-1">
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-3'><Users className="h-6 w-6 text-primary" />Shadows</CardTitle>
+                            <CardDescription>Seus lutadores do tipo Shadow.</CardDescription>
+                        </CardHeader>
+                        <CardContent className='flex flex-col items-center justify-center text-center p-6 pt-0 space-y-4'>
+                             <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-2 min-h-48'>
+                                <InteractiveGridCategory subcollectionName="shadows" />
+                            </div>
+                        </CardContent>
+                    </Card>
+
                 </div>
             </div>
         </>
