@@ -22,6 +22,12 @@ const breathingEnchantments = ['Sun', 'Moon', 'Water', 'Thunder', 'Wind', 'Beast
 const stoneEnchantments = ['Attack', 'Speed', 'Critical'];
 const passiveEnchantments = ['Lifesteal', 'Cooldown', 'AoE'];
 
+// Helper to parse multiplier strings like '1.25x' into numbers
+const parseMultiplier = (value?: string): number => {
+    if (typeof value !== 'string') return 1; // Return 1 for no bonus
+    return parseFloat(value.replace('x', '')) || 1;
+};
+
 export function WeaponSlots() {
     const { user, isUserLoading } = useUser();
     const { firestore } = useFirebase();
@@ -36,11 +42,9 @@ export function WeaponSlots() {
         return doc(firestore, 'users', user.uid);
     }, [firestore, user]);
     
-    // Using a separate state for weapons to allow for immediate local updates
     const [equippedWeapons, setEquippedWeapons] = useState<any>({});
     const { data: userData, isLoading: isUserDataLoading } = useDoc(userDocRef);
     
-    // Effect to sync local state with Firestore data on initial load and external changes
     useEffect(() => {
         if (userData?.weaponSlots) {
             setEquippedWeapons(userData.weaponSlots);
@@ -84,15 +88,12 @@ export function WeaponSlots() {
         const updatedWeapon = { ...weaponToUpdate, ...newData };
         const newSlots = { ...currentData, [slotIndex]: updatedWeapon };
 
-        // Optimistic UI update: update local state immediately for instant feedback
         setEquippedWeapons(newSlots);
 
         try {
-            // Update Firestore in the background
             await updateDoc(userDocRef, { weaponSlots: newSlots });
         } catch (error) {
             console.error("Error updating weapon data:", error);
-            // If the update fails, revert the local state to the original data from userData
             setEquippedWeapons((userData as any)?.weaponSlots || {});
             toast({ variant: "destructive", title: "Erro", description: "Não foi possível atualizar os dados da arma." });
         }
@@ -100,13 +101,16 @@ export function WeaponSlots() {
 
 
     const handleItemSelect = async (item: any) => {
-        if (selectedSlot === null || !userDocRef || !weaponType) return;
+        if (selectedSlot === null || !userDocRef || !item.type) {
+            toast({ variant: "destructive", title: "Erro", description: "Tipo de arma inválido ou slot não selecionado."});
+            return;
+        };
         
         const newWeaponData = {
             id: item.name, 
             name: item.name,
             rarity: item.rarity,
-            type: weaponType, // Use the selected weaponType
+            type: item.type,
             evolutionLevel: 0, 
             breathingEnchantment: null,
             stoneEnchantment: null,
@@ -118,7 +122,6 @@ export function WeaponSlots() {
             [selectedSlot]: newWeaponData
         };
 
-        // Optimistic UI update
         setEquippedWeapons(newSlots);
 
         try {
@@ -126,7 +129,6 @@ export function WeaponSlots() {
             toast({ title: "Arma Equipada!", description: `${item.name} equipada no slot ${selectedSlot + 1}.` });
         } catch (error) {
             console.error(error);
-            // Revert on error
             setEquippedWeapons((userData as any)?.weaponSlots || {});
             toast({ variant: "destructive", title: "Erro", description: "Não foi possível equipar a arma." });
         } finally {
@@ -140,31 +142,26 @@ export function WeaponSlots() {
         const level = equipped.evolutionLevel || 0;
         
         if (equipped.type === 'damage') {
-             // For damage swords, stats are based on enchantments and not stars in the provided data
-             // This part might need adjustment if the data structure for damage swords changes to include star levels
-             return item.base_stats;
+             const baseDamage = parseMultiplier(item.baseDamage);
+             // Assuming star evolution adds a simple multiplier for damage swords for now
+             // e.g., 1x for 0-star, 1.2x for 1-star, 1.5x for 2-star, 2x for 3-star
+             const starMultipliers = [1, 1.2, 1.5, 2];
+             const finalDamage = baseDamage * (starMultipliers[level] || 1);
+             return `${finalDamage.toFixed(2)}x`;
         }
 
         if(equipped.type === 'scythe') {
-            switch(level) {
-                case 1: return item.one_star_stats;
-                case 2: return item.two_star_stats;
-                case 3: return item.three_star_stats;
-                default: return item.base_stats;
-            }
+            const statKey = ['base_stats', 'one_star_stats', 'two_star_stats', 'three_star_stats'][level];
+            return item[statKey] || item.base_stats;
         }
 
         if(equipped.type === 'energy') {
-            // Find the base item and its evolutions
             const baseItem = weaponData.energy.find(i => i.name.startsWith(item.name.split(' (')[0]) && !i.name.includes('Estrela'));
             const evolutions = weaponData.energy.filter(i => i.name.startsWith(item.name.split(' (')[0]) && i.name.includes('Estrela'));
             
-            switch(level) {
-                case 1: return evolutions.find(e => e.name.includes('1 Estrela'))?.stats || baseItem?.stats;
-                case 2: return evolutions.find(e => e.name.includes('2 Estrelas'))?.stats || baseItem?.stats;
-                case 3: return evolutions.find(e => e.name.includes('3 Estrelas'))?.stats || baseItem?.stats;
-                default: return baseItem?.stats;
-            }
+            const evoNames = ['1 Estrela', '2 Estrelas', '3 Estrelas'];
+            const selectedEvo = evolutions.find(e => e.name.includes(evoNames[level - 1]));
+            return selectedEvo?.stats || baseItem?.stats;
         }
         
         return equipped.stats;
@@ -174,7 +171,7 @@ export function WeaponSlots() {
     const baseEvolutionStars = [1, 2, 3];
 
     return (
-        <div className='flex w-full flex-row gap-4 items-start'>
+        <div className='flex w-full flex-row gap-4 items-start justify-center'>
             {[0, 1, 2].map(slotIndex => {
                 const equipped = equippedWeapons[slotIndex];
                 const fullItemData = equipped ? 
@@ -184,9 +181,9 @@ export function WeaponSlots() {
                 const displayedStat = getStatForLevel(fullItemData, equipped);
 
                 return (
-                    <div key={slotIndex} className="flex flex-col items-center gap-2 w-full">
+                    <div key={slotIndex} className="flex flex-col items-center gap-2 w-32">
                         <Card 
-                            className="cursor-pointer hover:border-primary/50 transition-colors h-48 w-full flex flex-col justify-between" 
+                            className="cursor-pointer hover:border-primary/50 transition-colors w-full aspect-square flex flex-col justify-between" 
                             onClick={() => handleSlotClick(slotIndex)}
                         >
                             <div className='p-4 text-center relative flex-grow flex flex-col items-center justify-center'>
@@ -236,13 +233,13 @@ export function WeaponSlots() {
                                                 <PopoverContent className="w-auto p-1">
                                                     {passiveEnchantments.map(enchant => (
                                                         <Button key={enchant} variant="ghost" size="sm" className="w-full justify-start" onClick={(e) => { e.stopPropagation(); updateWeaponData(slotIndex, { passiveEnchantment: enchant }) }}>
-                                                            {enchant}
+                                                                {enchant}
                                                         </Button>
                                                     ))}
                                                 </PopoverContent>
                                             </Popover>
                                         )}
-                                        <p className="font-bold">{equipped.name}</p>
+                                        <p className="font-bold text-sm">{equipped.name}</p>
                                         <RarityBadge rarity={equipped.rarity} />
                                         <p className="text-xs mt-2">{displayedStat}</p>
                                     </>
