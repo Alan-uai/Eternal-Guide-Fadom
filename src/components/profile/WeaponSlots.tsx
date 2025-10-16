@@ -10,7 +10,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, PlusCircle, Star } from 'lucide-react';
 import { RarityBadge } from './RarityBadge';
-import { damageSwordsArticle, scythesArticle, swordsArticle } from '@/lib/wiki-data';
+import { damageSwordsArticle } from '@/lib/wiki-articles/damage-swords';
+import { scythesArticle } from '@/lib/wiki-articles/scythes';
+import { swordsArticle } from '@/lib/wiki-articles/swords';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
