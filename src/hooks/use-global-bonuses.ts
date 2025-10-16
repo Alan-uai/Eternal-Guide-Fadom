@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo } from 'react';
@@ -88,9 +89,9 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
     const queries = {
         accessories: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'accessories') : null, [firestore, user]),
         gamepasses: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'gamepasses') : null, [firestore, user]),
-        achievements: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'achievements') : null, [firestore, user]),
-        index: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'index') : null, [firestore, user]),
-        obelisks: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'obelisks') : null, [firestore, user]),
+        achievements: useMemoFirebase(() => firestore && user ? doc(firestore, 'users', user.uid, 'achievements', 'levels') : null, [firestore, user]),
+        index: useMemoFirebase(() => firestore && user ? doc(firestore, 'users', user.uid, 'index', 'tiers') : null, [firestore, user]),
+        obelisks: useMemoFirebase(() => firestore && user ? doc(firestore, 'users', user.uid, 'obelisks', 'levels') : null, [firestore, user]),
         powers: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'powers') : null, [firestore, user]),
         auras: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'auras') : null, [firestore, user]),
         pets: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'pets') : null, [firestore, user]),
@@ -100,9 +101,9 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
     // Use useCollection for each query
     const accessoryItems = useCollection(queries.accessories);
     const gamepassItems = useCollection(queries.gamepasses);
-    const achievementItems = useCollection(queries.achievements);
-    const indexItems = useCollection(queries.index);
-    const obeliskItems = useCollection(queries.obelisks);
+    const { data: achievementItems, isLoading: achievementsLoading } = useDoc(queries.achievements);
+    const { data: indexItems, isLoading: indexLoading } = useDoc(queries.index);
+    const { data: obeliskItems, isLoading: obelisksLoading } = useDoc(queries.obelisks);
     const powerItems = useCollection(queries.powers);
     const auraItems = useCollection(queries.auras);
     const petItems = useCollection(queries.pets);
@@ -111,23 +112,29 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
     const { data: weaponSlotsData, isLoading: weaponsLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, `users/${user.uid}`) : null, [firestore, user]));
     const { data: rankData, isLoading: rankLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, 'users', user.uid, 'rank', 'current') : null, [firestore, user]));
 
-    const isLoading = isUserLoading || weaponsLoading || rankLoading || accessoryItems.isLoading || gamepassItems.isLoading || achievementItems.isLoading || indexItems.isLoading || obelisksLoading.isLoading || powerItems.isLoading || auraItems.isLoading || petItems.isLoading || fighterItems.isLoading;
+    const isLoading = isUserLoading || weaponsLoading || rankLoading || accessoryItems.isLoading || gamepassItems.isLoading || achievementsLoading || indexLoading || obelisksLoading || powerItems.isLoading || auraItems.isLoading || petItems.isLoading || fighterItems.isLoading;
 
     const totalBonuses = useMemo(() => {
-        const bonuses = {
-            damage: { multipliers: [1], bonuses: [0] },
-            energy: { multipliers: [1], bonuses: [0] },
-            coins: { multipliers: [1], bonuses: [0] },
-            exp: { multipliers: [1], bonuses: [0] },
-            movespeed: { multipliers: [1], bonuses: [0] },
-            luck: { multipliers: [1], bonuses: [0] },
+        const bonuses: {
+            [key in 'damage' | 'energy' | 'coins' | 'exp' | 'movespeed' | 'luck']: { multipliers: number[], bonuses: number[] }
+        } = {
+            damage: { multipliers: [], bonuses: [] },
+            energy: { multipliers: [], bonuses: [] },
+            coins: { multipliers: [], bonuses: [] },
+            exp: { multipliers: [], bonuses: [] },
+            movespeed: { multipliers: [], bonuses: [] },
+            luck: { multipliers: [], bonuses: [] },
         };
 
         const addBonus = (category: keyof typeof bonuses, valueStr: string | undefined) => {
+            if (!valueStr) return;
             const { value, isMultiplier } = parseBonusValue(valueStr);
             if (value === 0) return;
-            if (isMultiplier) bonuses[category].multipliers.push(value);
-            else bonuses[category].bonuses.push(value);
+            if (isMultiplier) {
+                 bonuses[category].multipliers.push(value);
+            } else {
+                 bonuses[category].bonuses.push(value);
+            }
         };
         
         // Data processing logic
@@ -150,12 +157,13 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             gpItems?.forEach((item: any) => {
                 const gamepassData = allGamepasses.find(gp => gp.id === item.id);
                 if (gamepassData?.bonus_type && gamepassData.bonus_value) {
+                    // Gamepass bonuses are multipliers, not additive
                     bonuses[gamepassData.bonus_type].multipliers.push(gamepassData.bonus_value);
                 }
             });
 
              // Achievements
-            const achievementLevels = calculateMax ? generalAchievements.reduce((acc, ach) => ({...acc, [ach.id]: ach.maxLevel}), {}) : achievementItems?.data?.[0];
+            const achievementLevels = calculateMax ? generalAchievements.reduce((acc, ach) => ({...acc, [ach.id]: ach.maxLevel}), {}) : achievementItems;
             if (achievementLevels) {
                 generalAchievements.forEach(ach => {
                     const currentLevel = (achievementLevels as any)[ach.id] || 0;
@@ -166,14 +174,14 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             }
 
             // Index Tiers
-            const indexTiers = calculateMax ? { avatarTier: 23, petTier: 23 } : indexItems?.data?.[0];
+            const indexTiers = calculateMax ? { avatarTier: 23, petTier: 23 } : indexItems;
             if (indexTiers) {
                 bonuses.damage.bonuses.push(((indexTiers as any).avatarTier || 0) * 0.05);
                 bonuses.energy.bonuses.push(((indexTiers as any).petTier || 0) * 0.05);
             }
 
             // Obelisks
-            const obeliskLevels = calculateMax ? { damage: 20, energy: 20, lucky: 10 } : obeliskItems?.data?.[0];
+            const obeliskLevels = calculateMax ? { damage: 20, energy: 20, lucky: 10 } : obeliskItems;
             if(obeliskLevels) {
                 bonuses.damage.bonuses.push(((obeliskLevels as any).damage || 0) * 0.02);
                 bonuses.energy.bonuses.push(((obeliskLevels as any).energy || 0) * 0.02);
@@ -219,9 +227,9 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
         processData(calculateForMax);
         
         // Final Calculation
-        const rankValue = calculateMax ? 115 : (rankData as any)?.value || 0;
+        const rankValue = calculateForMax ? 115 : (rankData as any)?.value || 0;
         const baseEnergyGainStr = (energyGainPerRank as Record<string, string>)[rankValue.toString()] || '0';
-        const baseEnergyGain = parseFloat(baseEnergyGainStr);
+        const baseEnergyGain = parseFloat(baseEnergyGainStr.replace(/,/g, ''));
 
         const totalEnergyMultiplier = bonuses.energy.multipliers.reduce((a, b) => a * b, 1);
         const totalEnergyBonus = bonuses.energy.bonuses.reduce((a, b) => a + b, 0);
@@ -250,7 +258,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
         };
 
     }, [
-        accessoryItems.data, gamepassItems.data, achievementItems.data, indexItems.data, obeliskItems.data,
+        accessoryItems.data, gamepassItems.data, achievementItems, indexItems, obeliskItems,
         powerItems.data, auraItems.data, petItems.data, fighterItems.data, weaponSlotsData, rankData, currentEnergyInput, calculateForMax
     ]);
 
