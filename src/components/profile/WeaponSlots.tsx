@@ -64,7 +64,6 @@ export function WeaponSlots() {
     const updateWeaponData = async (slotIndex: number, newData: object) => {
         if (!userDocRef) return;
         
-        // Ensure you're working with the latest state
         const currentData = (userData as any)?.weaponSlots || {};
         const weaponToUpdate = currentData[slotIndex];
 
@@ -87,15 +86,14 @@ export function WeaponSlots() {
 
 
     const handleItemSelect = async (item: any) => {
-        if (selectedSlot === null || !userDocRef) return;
+        if (selectedSlot === null || !userDocRef || !weaponType) return;
         
         const newWeaponData = {
-            id: item.name, // Use name as ID for simplicity here, could be a real ID
+            id: item.name, 
             name: item.name,
             rarity: item.rarity,
-            stats: item.baseDamage || item.stats || item.base_stats,
             type: weaponType,
-            evolutionLevel: 0, // Default evolution
+            evolutionLevel: 0, 
             breathingEnchantment: null,
             stoneEnchantment: null,
             passiveEnchantment: null,
@@ -117,6 +115,42 @@ export function WeaponSlots() {
         }
     };
     
+    const getStatForLevel = (item: any, equipped: any) => {
+        if (!item || !equipped) return equipped?.stats;
+
+        const level = equipped.evolutionLevel || 0;
+        
+        if (item.type === 'damage') {
+             // For damage swords, stats are based on enchantments and not stars in the provided data
+             // This part might need adjustment if the data structure for damage swords changes to include star levels
+             return item.baseDamage;
+        }
+
+        if(item.type === 'scythe') {
+            switch(level) {
+                case 1: return item.one_star_stats;
+                case 2: return item.two_star_stats;
+                case 3: return item.three_star_stats;
+                default: return item.base_stats;
+            }
+        }
+
+        if(item.type === 'energy') {
+            // Find the base item and its evolutions
+            const baseItem = weaponData.energy.find(i => i.name.startsWith(item.name.split(' (')[0]) && !i.name.includes('Estrela'));
+            const evolutions = weaponData.energy.filter(i => i.name.startsWith(item.name.split(' (')[0]) && i.name.includes('Estrela'));
+            
+            switch(level) {
+                case 1: return evolutions.find(e => e.name.includes('1 Estrela'))?.stats || baseItem?.stats;
+                case 2: return evolutions.find(e => e.name.includes('2 Estrelas'))?.stats || baseItem?.stats;
+                case 3: return evolutions.find(e => e.name.includes('3 Estrelas'))?.stats || baseItem?.stats;
+                default: return baseItem?.stats;
+            }
+        }
+        
+        return equipped.stats;
+    }
+
     const isLoading = isUserLoading || isUserDataLoading;
     const baseEvolutionStars = [1, 2, 3];
 
@@ -124,7 +158,12 @@ export function WeaponSlots() {
         <div className='flex w-full flex-row gap-4 items-start'>
             {[0, 1, 2].map(slotIndex => {
                 const equipped = equippedWeapons[slotIndex];
+                const fullItemData = equipped ? 
+                    (weaponData[equipped.type as 'damage' | 'scythe' | 'energy'] || []).find(i => i.name === equipped.name) 
+                    : null;
                 
+                const displayedStat = getStatForLevel(fullItemData, equipped);
+
                 return (
                     <div key={slotIndex} className="flex flex-col items-center gap-2 w-full">
                         <Card 
@@ -186,7 +225,7 @@ export function WeaponSlots() {
                                         )}
                                         <p className="font-bold">{equipped.name}</p>
                                         <RarityBadge rarity={equipped.rarity} />
-                                        <p className="text-xs mt-2">{equipped.stats}</p>
+                                        <p className="text-xs mt-2">{displayedStat}</p>
                                     </>
                                 ) : (
                                     <div className="text-muted-foreground">
