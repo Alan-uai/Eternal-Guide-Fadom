@@ -115,16 +115,38 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
             <BonusDisplay items={equippedItems} category={subcollectionName} />
             <div className="grid grid-cols-5 gap-2 w-full">
                 {uniqueItems.map((item) => {
-                    const isEquipped = equippedItems?.some(i => i.id === item.id);
                     const equippedItemData = equippedItems?.find(i => i.id === item.id);
+                    const isEquipped = !!equippedItemData;
                     
                     const popoverOptions = item.stats || item.rarity_options || [];
                     const isProgressionPower = item.type === 'progression' && item.maxLevel;
 
-                    const selectedRarity = (equippedItemData as any)?.rarity || popoverOptions?.[0]?.rarity;
-                    const selectedOption = popoverOptions?.find((opt:any) => opt.rarity === selectedRarity);
-                    const selectedName = selectedOption?.name || (isProgressionPower ? `${((equippedItemData as any)?.leveling || 0)}/${item.maxLevel}` : '');
+                    let selectedRarity = 'Common'; // Default rarity if not specified
+                    let displayText = item.name;
 
+                    if (isEquipped) {
+                        if (isProgressionPower) {
+                            const currentLevel = (equippedItemData as any)?.leveling || 0;
+                            displayText = `${currentLevel}/${item.maxLevel}`;
+                            // You might want a different way to determine rarity for progression powers
+                            selectedRarity = 'Rare'; // Placeholder
+                        } else if (popoverOptions.length > 0) {
+                            const equippedRarity = (equippedItemData as any)?.rarity;
+                            const selectedOption = popoverOptions.find((opt: any) => opt.rarity === equippedRarity);
+                            if (selectedOption) {
+                                selectedRarity = selectedOption.rarity;
+                                displayText = selectedOption.name || item.name;
+                            } else {
+                                // Fallback if rarity doesn't match, maybe just use the item name
+                                selectedRarity = equippedRarity || 'Common';
+                                displayText = item.name;
+                            }
+                        } else {
+                            // Fallback for items without options
+                            selectedRarity = item.rarity || 'Common';
+                            displayText = item.name;
+                        }
+                    }
 
                     const cardBgClass = isEquipped ? getRarityClass(selectedRarity) : 'bg-muted/30 border-transparent';
                     const hasLeveling = item.leveling && typeof item.leveling.maxLevel !== 'undefined';
@@ -141,13 +163,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                                         cardBgClass
                                     )}
                                 >
-                                     {isEquipped && (
-                                        <div className='absolute top-1 text-xs font-semibold opacity-80 z-10 text-center px-1 truncate w-full'>
-                                            {selectedName}
-                                        </div>
-                                     )}
-
-                                    {hasLeveling && isEquipped && (
+                                     {hasLeveling && isEquipped && (
                                          <Popover open={levelingPopover === item.id} onOpenChange={(isOpen) => !isOpen && setLevelingPopover(null)}>
                                             <PopoverTrigger asChild>
                                                  <div 
@@ -174,13 +190,8 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                                         </Popover>
                                     )}
 
-                                    <p className="text-[10px] lg:text-xs font-bold leading-tight z-10 group-hover:scale-105 transition-transform">{item.name}</p>
+                                    <p className="text-[10px] lg:text-xs font-bold leading-tight z-10 group-hover:scale-105 transition-transform">{displayText}</p>
 
-                                     {isEquipped && (
-                                        <div className="absolute bottom-1 flex items-center justify-center w-full z-10 gap-2">
-                                            <RarityBadge rarity={selectedRarity} />
-                                        </div>
-                                     )}
                                 </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
