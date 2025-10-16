@@ -55,13 +55,13 @@ export const world5Data = {
         { id: 'rangaki-pet', name: 'Rangaki', rank: 'SS', rarity: 'Phantom', energy_bonus: '2.43k' }
     ],
     avatars: [
-        { id: 'nazuki-avatar', name: 'Nazuki', rank: 'E', rarity: 'Common', energy_bonus: '117', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'tenjaro-avatar', name: 'Tenjaro', rank: 'D', rarity: 'Uncommon', energy_bonus: '234', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'zentsu-avatar', name: 'Zentsu', rank: 'C', rarity: 'Rare', energy_bonus: '352', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'insake-avatar', name: 'Insake', rank: 'B', rarity: 'Epic', energy_bonus: '469', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'tamoka-avatar', name: 'Tamoka', rank: 'A', rarity: 'Legendary', energy_bonus: '586', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'shinabe-avatar', name: 'Shinabe', rank: 'S', rarity: 'Mythic', energy_bonus: '781', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'rangaki-avatar', name: 'Rangaki', rank: 'SS', rarity: 'Phantom', energy_bonus: '2340', leveling: { maxLevel: 150, costUnit: 'Coin' } }
+        { id: 'nazuki-avatar', name: 'Nazuki', rank: 'E', rarity: 'Common', energy_bonus: '117', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '702', stats_lv_150: '994' } },
+        { id: 'tenjaro-avatar', name: 'Tenjaro', rank: 'D', rarity: 'Uncommon', energy_bonus: '234', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '1.40k', stats_lv_150: '1.98k' } },
+        { id: 'zentsu-avatar', name: 'Zentsu', rank: 'C', rarity: 'Rare', energy_bonus: '352', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '2.11k', stats_lv_150: '2.99k' } },
+        { id: 'insake-avatar', name: 'Insake', rank: 'B', rarity: 'Epic', energy_bonus: '469', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '2.81k', stats_lv_150: '3.98k' } },
+        { id: 'tamoka-avatar', name: 'Tamoka', rank: 'A', rarity: 'Legendary', energy_bonus: '586', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '3.51k', stats_lv_150: '4.98k' } },
+        { id: 'shinabe-avatar', name: 'Shinabe', rank: 'S', rarity: 'Mythic', energy_bonus: '781', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '4.68k', stats_lv_150: '6.63k' } },
+        { id: 'rangaki-avatar', name: 'Rangaki', rank: 'SS', rarity: 'Phantom', energy_bonus: '2.43k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '14k', stats_lv_150: '19.9k' } }
     ],
     dungeons: [],
     shadows: [],

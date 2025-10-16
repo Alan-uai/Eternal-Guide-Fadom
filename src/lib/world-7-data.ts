@@ -66,13 +66,13 @@ export const world7Data = {
         { id: 'novi-chroni-pet', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '14.6k' }
     ],
     avatars: [
-        { id: 'noalle-avatar', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '732', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'megna-avatar', name: 'Megna', rank: 'D', rarity: 'Uncommon', energy_bonus: '1460', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'finrel-avatar', name: 'Finrel', rank: 'C', rarity: 'Rare', energy_bonus: '2190', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'aste-avatar', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '2930', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'yune-avatar', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '3660', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'yemi-avatar', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '4880', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'novi-chroni-avatar', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '14600', leveling: { maxLevel: 150, costUnit: 'Coin' } }
+        { id: 'noalle-avatar', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '732', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '4.39k', stats_lv_150: '6.22k' } },
+        { id: 'megna-avatar', name: 'Megna', rank: 'D', rarity: 'Uncommon', energy_bonus: '1.46k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '8.79k', stats_lv_150: '12.4k' } },
+        { id: 'finrel-avatar', name: 'Finrel', rank: 'C', rarity: 'Rare', energy_bonus: '2.19k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '13.1k', stats_lv_150: '18.6k' } },
+        { id: 'aste-avatar', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '2.93k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '17.5k', stats_lv_150: '24.9k' } },
+        { id: 'yune-avatar', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '3.66k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '21.9k', stats_lv_150: '31.1k' } },
+        { id: 'yemi-avatar', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '4.88k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '29.2k', stats_lv_150: '41.5k' } },
+        { id: 'novi-chroni-avatar', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '14.6k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '87.8k', stats_lv_150: '124k' } }
     ],
     shadows: [
         {

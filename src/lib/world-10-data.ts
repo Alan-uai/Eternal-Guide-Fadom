@@ -92,5 +92,9 @@ export const world10Data = {
             statType: 'energy',
             maxLevel: 20
         }
-    ]
+    ],
+    pets: [],
+    avatars: [],
+    dungeons: []
 };
+

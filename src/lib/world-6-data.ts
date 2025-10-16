@@ -60,13 +60,13 @@ export const world6Data = {
         { id: 'statue-of-god-pet', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '5.85k' }
     ],
     avatars: [
-        { id: 'weak-sung-avatar', name: 'Weak Sung', rank: 'E', rarity: 'Common', energy_bonus: '293', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'green-goblin-avatar', name: 'Green Goblin', rank: 'D', rarity: 'Uncommon', energy_bonus: '586', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'white-tiger-avatar', name: 'White Tiger', rank: 'C', rarity: 'Rare', energy_bonus: '879', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'cha-avatar', name: 'Cha', rank: 'B', rarity: 'Epic', energy_bonus: '1170', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'choi-avatar', name: 'Choi', rank: 'A', rarity: 'Legendary', energy_bonus: '1460', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'solo-sung-avatar', name: 'Solo Sung', rank: 'S', rarity: 'Mythic', energy_bonus: '1950', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'statue-of-god-avatar', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '5850', leveling: { maxLevel: 150, costUnit: 'Coin' } }
+        { id: 'weak-sung-avatar', name: 'Weak Sung', rank: 'E', rarity: 'Common', energy_bonus: '293', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '1.75k', stats_lv_150: '2.49k' } },
+        { id: 'green-goblin-avatar', name: 'Green Goblin', rank: 'D', rarity: 'Uncommon', energy_bonus: '586', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '3.51k', stats_lv_150: '4.98k' } },
+        { id: 'white-tiger-avatar', name: 'White Tiger', rank: 'C', rarity: 'Rare', energy_bonus: '879', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '5.27k', stats_lv_150: '7.47k' } },
+        { id: 'cha-avatar', name: 'Cha', rank: 'B', rarity: 'Epic', energy_bonus: '1.17k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '7.03k', stats_lv_150: '9.96k' } },
+        { id: 'choi-avatar', name: 'Choi', rank: 'A', rarity: 'Legendary', energy_bonus: '1.46k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '8.79k', stats_lv_150: '12.4k' } },
+        { id: 'solo-sung-avatar', name: 'Solo Sung', rank: 'S', rarity: 'Mythic', energy_bonus: '1.95k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '11.7k', stats_lv_150: '16.6k' } },
+        { id: 'statue-of-god-avatar', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '5.85k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '35.1k', stats_lv_150: '49.8k' } }
     ],
     shadows: [
         {

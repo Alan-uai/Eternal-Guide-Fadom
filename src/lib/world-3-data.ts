@@ -79,13 +79,13 @@ export const world3Data = {
         { id: 'eizen-pet', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '375' }
     ],
     avatars: [
-        { id: 'hime-avatar', name: 'Hime', rank: 'E', rarity: 'Common', energy_bonus: '19', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'ichige-avatar', name: 'Ichige', rank: 'D', rarity: 'Uncommon', energy_bonus: '38', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'uryua-avatar', name: 'Uryua', rank: 'C', rarity: 'Rare', energy_bonus: '56', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'rakiu-avatar', name: 'Rakiu', rank: 'B', rarity: 'Epic', energy_bonus: '75', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'yoichi-avatar', name: 'Yoichi', rank: 'A', rarity: 'Legendary', energy_bonus: '94', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'kahara-avatar', name: 'Kahara', rank: 'S', rarity: 'Mythic', energy_bonus: '125', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'eizen-avatar', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '375', leveling: { maxLevel: 150, costUnit: 'Coin' } }
+        { id: 'hime-avatar', name: 'Hime', rank: 'E', rarity: 'Common', energy_bonus: '19', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '114', stats_lv_150: '161.5' } },
+        { id: 'ichige-avatar', name: 'Ichige', rank: 'D', rarity: 'Uncommon', energy_bonus: '38', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '228', stats_lv_150: '323' } },
+        { id: 'uryua-avatar', name: 'Uryua', rank: 'C', rarity: 'Rare', energy_bonus: '56', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '336', stats_lv_150: '476' } },
+        { id: 'rakiu-avatar', name: 'Rakiu', rank: 'B', rarity: 'Epic', energy_bonus: '75', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '450', stats_lv_150: '637.5' } },
+        { id: 'yoichi-avatar', name: 'Yoichi', rank: 'A', rarity: 'Legendary', energy_bonus: '94', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '564', stats_lv_150: '799' } },
+        { id: 'kahara-avatar', name: 'Kahara', rank: 'S', rarity: 'Mythic', energy_bonus: '125', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '750', stats_lv_150: '1.06k' } },
+        { id: 'eizen-avatar', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '375', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '2.25k', stats_lv_150: '3.18k' } }
     ],
     dungeons: [],
   };

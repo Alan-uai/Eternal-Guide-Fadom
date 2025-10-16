@@ -57,13 +57,13 @@ export const world9Data = {
         { id: 'ken-turbo-pet', name: 'Ken Turbo', rank: 'SS', rarity: 'Phantom', energy_bonus: '91.5k' }
     ],
     avatars: [
-        { id: 'ken-avatar', name: 'Ken', rank: 'E', rarity: 'Common', energy_bonus: '4570', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'aira-avatar', name: 'Aira', rank: 'D', rarity: 'Uncommon', energy_bonus: '9150', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'jiji-avatar', name: 'Jiji', rank: 'C', rarity: 'Rare', energy_bonus: '13700', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'momo-avatar', name: 'Momo', rank: 'B', rarity: 'Epic', energy_bonus: '18300', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'alien-avatar', name: 'Alien', rank: 'A', rarity: 'Legendary', energy_bonus: '22800', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'saiko-avatar', name: 'Saiko', rank: 'S', rarity: 'Mythic', energy_bonus: '30500', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'ken-turbo-avatar', name: 'Ken Turbo', rank: 'SS', rarity: 'Phantom', energy_bonus: '91500', leveling: { maxLevel: 150, costUnit: 'Coin' } }
+        { id: 'ken-avatar', name: 'Ken', rank: 'E', rarity: 'Common', energy_bonus: '4.57k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '27.4k', stats_lv_150: '38.9k' } },
+        { id: 'aira-avatar', name: 'Aira', rank: 'D', rarity: 'Uncommon', energy_bonus: '9.15k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '54.9k', stats_lv_150: '77.8k' } },
+        { id: 'jiji-avatar', name: 'Jiji', rank: 'C', rarity: 'Rare', energy_bonus: '13.7k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '82.3k', stats_lv_150: '116k' } },
+        { id: 'momo-avatar', name: 'Momo', rank: 'B', rarity: 'Epic', energy_bonus: '18.3k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '109k', stats_lv_150: '155k' } },
+        { id: 'alien-avatar', name: 'Alien', rank: 'A', rarity: 'Legendary', energy_bonus: '22.8k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '137k', stats_lv_150: '194k' } },
+        { id: 'saiko-avatar', name: 'Saiko', rank: 'S', rarity: 'Mythic', energy_bonus: '30.5k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '183k', stats_lv_150: '259k' } },
+        { id: 'ken-turbo-avatar', name: 'Ken Turbo', rank: 'SS', rarity: 'Phantom', energy_bonus: '91.5k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '549k', stats_lv_150: '778k' } }
     ],
     shadows: [
         {

@@ -64,14 +64,14 @@ export const world8Data = {
         { id: 'madera-pet', name: 'Madera', rank: 'SS', rarity: 'Phantom', energy_bonus: '40.2k' }
     ],
     avatars: [
-        { id: 'sekuri-avatar', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1830', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'kid-norto-avatar', name: 'Kid Norto', rank: 'D', rarity: 'Uncommon', energy_bonus: '3660', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'kid-seske-avatar', name: 'Kid Seske', rank: 'C', rarity: 'Rare', energy_bonus: '5490', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'kakashki-avatar', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '7320', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'jiria-avatar', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '9150', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'tsuni-avatar', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '12200', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'itechi-avatar', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '36600', leveling: { maxLevel: 150, costUnit: 'Coin' } },
-        { id: 'madera-avatar', name: 'Madera', rank: 'SS', rarity: 'Phantom', energy_bonus: '40200', leveling: { maxLevel: 150, costUnit: 'Coin' } }
+        { id: 'sekuri-avatar', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1.83k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '10.9k', stats_lv_150: '15.5k' } },
+        { id: 'kid-norto-avatar', name: 'Kid Norto', rank: 'D', rarity: 'Uncommon', energy_bonus: '3.66k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '21.9k', stats_lv_150: '31.1k' } },
+        { id: 'kid-seske-avatar', name: 'Kid Seske', rank: 'C', rarity: 'Rare', energy_bonus: '5.49k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '32.9k', stats_lv_150: '46.6k' } },
+        { id: 'kakashki-avatar', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '7.32k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '43.9k', stats_lv_150: '62.2k' } },
+        { id: 'jiria-avatar', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '9.15k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '54.9k', stats_lv_150: '77.8k' } },
+        { id: 'tsuni-avatar', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '12.2k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '73.2k', stats_lv_150: '103k' } },
+        { id: 'itechi-avatar', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '36.6k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '219.6k', stats_lv_150: '311k' } },
+        { id: 'madera-avatar', name: 'Madera', rank: 'SS', rarity: 'Phantom', energy_bonus: '40.2k', leveling: { maxLevel: 150, costUnit: 'Soul', stats_lv_100: '241.2k', stats_lv_150: '342k' } }
     ],
     shadows: [
         {
