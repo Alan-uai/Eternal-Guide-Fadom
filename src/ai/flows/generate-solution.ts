@@ -124,6 +124,7 @@ Sua resposta DEVE ser uma string JSON de um array de objetos. Cada objeto repres
 ### REGRAS DE CÁLCULO E FORMATAÇÃO (OBRIGATÓRIO)
 - O jogo tem 21 mundos, cada um com conteúdo exclusivo.
 - O dano base de um jogador é igual à sua energia total. Isso pode ser modificado por poderes.
+- **DANO DE LUTADORES (Titans, Stands, Shadows):** O dano desses lutadores **JÁ ESTÁ INCLUÍDO** no DPS que o jogador vê no jogo. **NUNCA** calcule o dano de um lutador e o adicione ao DPS total do jogador, pois isso resultaria em contagem dupla. Apenas mencione o bônus percentual do lutador como uma informação adicional.
 - A gamepass "fast click" dá ao jogador 4 cliques por segundo. O DPS total deve ser calculado como (Dano * 4).
 - Ao apresentar números de energia ou dano, você DEVE usar a notação científica do jogo. Consulte o artigo "Abreviações de Notação Científica" para usar as abreviações corretas (k, M, B, T, qd, etc.).
 - Ao listar poderes ou itens, você DEVE especificar seus bônus:
