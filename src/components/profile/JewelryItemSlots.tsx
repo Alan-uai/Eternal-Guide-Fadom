@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Gem, Coins, Flame, Shield, Diamond, Ring, VenetianMask, Ear } from 'lucide-react';
+import { Loader2, PlusCircle, Gem, Coins, Flame, Shield, Diamond, VenetianMask, Ear } from 'lucide-react';
 import { RarityBadge } from './RarityBadge';
 import { allJewelry, type Jewelry } from '@/lib/jewelry-data';
 import { Separator } from '../ui/separator';
@@ -17,7 +17,7 @@ type JewelryItemType = 'ring' | 'bracelet' | 'necklace' | 'earring';
 type JewelryBonusType = 'energy' | 'coin' | 'damage' | 'luck';
 
 const jewelryItemIcons: Record<JewelryItemType, React.ElementType> = {
-    ring: Ring,
+    ring: Diamond, // Changed from Ring to Diamond
     bracelet: Diamond,
     necklace: VenetianMask,
     earring: Ear,
@@ -203,4 +203,3 @@ export function JewelryItemSlots() {
         </div>
     )
 }
-
