@@ -10,15 +10,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, PlusCircle, Star } from 'lucide-react';
 import { RarityBadge } from './RarityBadge';
-import { damageSwordsArticle } from '@/lib/wiki-articles/damage-swords';
-import { scythesArticle } from '@/lib/wiki-articles/scythes';
-import { swordsArticle } from '@/lib/wiki-articles/swords';
+import { damageSwords, scythes, energySwords } from '@/lib/weapon-data';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 
-const breathingEnchantments = ['Sun', 'Moon', 'Water', 'Thunder', 'Wind', 'Beast'];
-const stoneEnchantments = ['Attack', 'Speed', 'Critical'];
+const breathingEnchantments = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic', 'Phantom'];
+const stoneEnchantments = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic', 'Phantom', 'Supreme'];
 const passiveEnchantments = ['Lifesteal', 'Cooldown', 'AoE', 'Phantom', 'Supreme'];
 
 const parseMultiplier = (value?: string): number => {
@@ -56,11 +54,9 @@ export function WeaponSlots() {
 
     const weaponData = useMemo(() => {
         return {
-            damage: damageSwordsArticle.tables?.damageSwords.rows || [],
-            scythe: scythesArticle.tables?.scythes.rows || [],
-            energy: swordsArticle.tables 
-                ? Object.values(swordsArticle.tables).flatMap(table => table.rows)
-                : [],
+            damage: damageSwords,
+            scythe: scythes,
+            energy: energySwords,
         };
     }, []);
 
@@ -88,6 +84,18 @@ export function WeaponSlots() {
         }
 
         const updatedWeapon = { ...weaponToUpdate, ...newData };
+        
+        // Se a nova chave for um encantamento, e o outro encantamento não existir, defina-o como 'Common'
+        if (updatedWeapon.type === 'damage') {
+            if ('breathingEnchantment' in newData && !updatedWeapon.stoneEnchantment) {
+                updatedWeapon.stoneEnchantment = 'Common';
+            }
+            if ('stoneEnchantment' in newData && !updatedWeapon.breathingEnchantment) {
+                updatedWeapon.breathingEnchantment = 'Common';
+            }
+        }
+
+
         const newSlots = { ...currentData, [slotIndex]: updatedWeapon };
 
         setEquippedWeapons(newSlots);
@@ -105,22 +113,26 @@ export function WeaponSlots() {
     const handleItemSelect = async (item: any) => {
         if (selectedSlot === null || !userDocRef) return;
         
-        const typeOfWeapon = item.type || weaponType;
+        const typeOfWeapon = item.type;
         if(!typeOfWeapon) {
             toast({ variant: "destructive", title: "Erro", description: "Tipo de arma inválido."});
             return;
         }
 
-        const newWeaponData = {
+        const newWeaponData: any = {
             id: item.name, 
             name: item.name,
             rarity: item.rarity,
             type: typeOfWeapon,
-            evolutionLevel: 0, 
-            breathingEnchantment: null,
-            stoneEnchantment: null,
-            passiveEnchantment: null,
+            evolutionLevel: 0,
         };
+
+        if (typeOfWeapon === 'damage') {
+            newWeaponData.breathingEnchantment = null;
+            newWeaponData.stoneEnchantment = null;
+        } else if (typeOfWeapon === 'scythe') {
+             newWeaponData.passiveEnchantment = null;
+        }
 
         const newSlots = {
             ...equippedWeapons,
@@ -142,46 +154,37 @@ export function WeaponSlots() {
     };
     
     const getStatForLevel = (item: any, equipped: any) => {
-        if (!item || !equipped) return equipped?.stats;
+        if (!item || !equipped) return equipped?.stats || '0x';
 
         const level = equipped.evolutionLevel || 0;
-        
+        const evolutionKey = ['base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'][level] as keyof typeof item;
+
         if (equipped.type === 'damage') {
-             const statKey = ['base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'][level];
-             const baseDamage = parseMultiplier((item as any)[statKey] || '1x');
-             
-             const breathingMultiplier = equipped.breathingEnchantment ? 1.8 : 1;
-             const stoneMultiplier = equipped.stoneEnchantment ? 1.8 : 1;
-             
-             const finalDamage = baseDamage * breathingMultiplier * stoneMultiplier;
-             return `${finalDamage.toFixed(2)}x`;
+             const breathing = equipped.breathingEnchantment;
+             const stone = equipped.stoneEnchantment;
+             if(breathing && stone && item.enchantments) {
+                 const enchantData = item.enchantments[breathing]?.[stone];
+                 if(enchantData && enchantData[level as 0 | 1 | 2 | 3]) {
+                     return enchantData[level as 0 | 1 | 2 | 3];
+                 }
+             }
+             return item[evolutionKey] || item['base_damage'] || '0x';
         }
 
         if(equipped.type === 'scythe') {
-            const statKey = ['base_stats', 'one_star_stats', 'two_star_stats', 'three_star_stats'][level];
-            const baseDamage = parseMultiplier(item[statKey] || item.base_stats);
-            
-            let passiveMultiplier = 1;
-            if (equipped.passiveEnchantment === 'Phantom') {
-                passiveMultiplier = 1.8;
-            } else if (equipped.passiveEnchantment === 'Supreme') {
-                passiveMultiplier = 2.0;
+            const passive = equipped.passiveEnchantment;
+            if(passive && item.passives && item.passives[passive] && item.passives[passive][level as 0 | 1 | 2 | 3]) {
+                return item.passives[passive][level as 0 | 1 | 2 | 3];
             }
-
-            const finalDamage = baseDamage * passiveMultiplier;
-            return `${finalDamage.toFixed(2)}x`;
+             return item[evolutionKey] || item['base_damage'] || '0x';
         }
 
         if(equipped.type === 'energy') {
-            const baseItem = weaponData.energy.find(i => i.name.startsWith(item.name.split(' (')[0]) && !i.name.includes('Estrela'));
-            const evolutions = weaponData.energy.filter(i => i.name.startsWith(item.name.split(' (')[0]) && i.name.includes('Estrela'));
-            
-            const evoNames = ['1 Estrela', '2 Estrelas', '3 Estrelas'];
-            const selectedEvo = evolutions.find(e => e.name.includes(evoNames[level - 1]));
-            return selectedEvo?.stats || baseItem?.stats;
+            const statKey = ['base_stats', 'one_star_stats', 'two_star_stats', 'three_star_stats'][level] as keyof typeof item;
+            return item[statKey] || item.base_stats || '0x';
         }
         
-        return equipped.stats;
+        return item[evolutionKey] || '0x';
     }
 
     const isLoading = isUserLoading || isUserDataLoading;
@@ -248,7 +251,7 @@ export function WeaponSlots() {
                                                     </Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-1">
-                                                    {passiveEnchantments.filter(p => p === 'Phantom' || p === 'Supreme').map(enchant => (
+                                                    {passiveEnchantments.map(enchant => (
                                                         <Button key={enchant} variant="ghost" size="sm" className="w-full justify-start" onClick={(e) => { e.stopPropagation(); updateWeaponData(slotIndex, { passiveEnchantment: enchant }) }}>
                                                                 {enchant}
                                                         </Button>
@@ -308,7 +311,7 @@ export function WeaponSlots() {
                         <ScrollArea className="h-72">
                             <div className="space-y-2 py-4">
                                 {weaponType && weaponData[weaponType]
-                                    .filter(item => item.name && !item.name.includes('Estrela') && !item.name.includes('Star'))
+                                    .filter(item => item.name)
                                     .map((item: any, index: number) => (
                                      <Button key={index} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleItemSelect(item)}>
                                         <div className='flex flex-col items-start'>

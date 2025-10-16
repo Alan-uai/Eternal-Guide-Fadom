@@ -15,16 +15,16 @@ export const scythesArticle: Omit<WikiArticle, 'createdAt'> = {
   imageUrl: 'wiki-14',
   tables: {
     scythes: {
-      headers: ['name', 'rarity', 'base_stats', 'one_star_stats', 'two_star_stats', 'three_star_stats'],
+      headers: ['name', 'rarity', 'base_damage', 'one_star_damage', 'two_star_damage', 'three_star_damage'],
       rows: [
-        { name: 'Venomleaf', rarity: 'Comum', base_stats: '0.75x', one_star_stats: '1.5x', two_star_stats: '2.25x', three_star_stats: '3.75x' },
-        { name: 'Cryoscythe', rarity: 'Incomum', base_stats: '1x', one_star_stats: '2x', two_star_stats: '3x', three_star_stats: '5x' },
-        { name: 'Toxinfang', rarity: 'Raro', base_stats: '1.75x', one_star_stats: '3.5x', two_star_stats: '5.25x', three_star_stats: '8.75x' },
-        { name: 'Crimson Thorn', rarity: 'Lendário', base_stats: '2.2x', one_star_stats: '4.4x', two_star_stats: '6.6x', three_star_stats: '11x' },
-        { name: 'Bonehowl', rarity: 'Mítico', base_stats: '2.75x', one_star_stats: '5.5x', two_star_stats: '8.25x', three_star_stats: '13.75x' },
-        { name: 'Ashfang', rarity: 'Phantom', base_stats: '3.5x', one_star_stats: '7x', two_star_stats: '10.5x', three_star_stats: '17.5x' },
-        { name: 'Phantom Requiem', rarity: 'Phantom', base_stats: '4.25x', one_star_stats: '8.5x', two_star_stats: '12.75x', three_star_stats: '21.25x' },
-        { name: 'Stormreaver', rarity: 'Supremo', base_stats: '5x', one_star_stats: '10x', two_star_stats: '15x', three_star_stats: '25x' },
+        { name: 'Venomleaf', type: 'scythe', rarity: 'Comum', base_damage: '0.75x', one_star_damage: '1.5x', two_star_damage: '2.25x', three_star_damage: '3.75x' },
+        { name: 'Cryoscythe', type: 'scythe', rarity: 'Incomum', base_damage: '1x', one_star_damage: '2x', two_star_damage: '3x', three_star_damage: '5x' },
+        { name: 'Toxinfang', type: 'scythe', rarity: 'Raro', base_damage: '1.75x', one_star_damage: '3.5x', two_star_damage: '5.25x', three_star_damage: '8.75x' },
+        { name: 'Crimson Thorn', type: 'scythe', rarity: 'Lendário', base_damage: '2.2x', one_star_damage: '4.4x', two_star_damage: '6.6x', three_star_damage: '11x' },
+        { name: 'Bonehowl', type: 'scythe', rarity: 'Mítico', base_damage: '2.75x', one_star_damage: '5.5x', two_star_damage: '8.25x', three_star_damage: '13.75x' },
+        { name: 'Ashfang', type: 'scythe', rarity: 'Phantom', base_damage: '3.5x', one_star_damage: '7x', two_star_damage: '10.5x', three_star_damage: '17.5x' },
+        { name: 'Phantom Requiem', type: 'scythe', rarity: 'Phantom', base_damage: '4.25x', one_star_damage: '8.5x', two_star_damage: '12.75x', three_star_damage: '21.25x' },
+        { name: 'Stormreaver', type: 'scythe', rarity: 'Supremo', base_damage: '5x', one_star_damage: '10x', two_star_damage: '15x', three_star_damage: '25x' },
       ]
     }
   }
