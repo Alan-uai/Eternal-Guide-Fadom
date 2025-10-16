@@ -194,7 +194,7 @@ export function WeaponSlots() {
                 return (
                     <div key={slotIndex} className="flex flex-col items-center gap-2">
                         <Card 
-                            className="cursor-pointer hover:border-primary/50 transition-colors w-32 h-32 flex flex-col justify-between flex-shrink-0"
+                            className="cursor-pointer hover:border-primary/50 transition-colors w-22 h-22 flex flex-col justify-between flex-shrink-0"
                             onClick={() => handleSlotClick(slotIndex)}
                         >
                             <div className='p-4 text-center relative flex-grow flex flex-col items-center justify-center'>
@@ -269,7 +269,7 @@ export function WeaponSlots() {
                                     className={cn(
                                         'h-5 w-5 text-gray-500 transition-colors',
                                         equipped && 'cursor-pointer',
-                                        equipped && (equipped.evolutionLevel || 0) >= starLevel ? 'text-red-500 fill-red-500' : 'text-gray-600'
+                                        equipped && (equipped.evolutionLevel || 0) >= starLevel ? 'text-yellow-500 fill-yellow-500' : 'text-gray-600'
                                     )}
                                     onClick={(e) => {
                                         if (!equipped) return;
