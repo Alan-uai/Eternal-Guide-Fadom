@@ -14,7 +14,6 @@ import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, Upload, Sparkles } from 'lucide-react';
 import { extractStatsFromImage } from '@/ai/flows/extract-stats-from-image-flow';
-import { Separator } from '../ui/separator';
 import { useGlobalBonuses } from '@/hooks/use-global-bonuses';
 import { allGameData } from '@/lib/game-data-context';
 import { energyGainPerRank } from '@/lib/energy-gain-data';
@@ -46,6 +45,7 @@ const parseUserEnergy = (energyStr: string): number => {
     return isNaN(numberValue) ? 0 : numberValue;
 };
 
+
 const formatNumber = (num: number): string => {
     if (num < 1e3) return num.toFixed(2);
     const suffixes = ["", "k", "M", "B", "T", "qd", "Qn", "sx", "Sp", "O", "N", "de", "Ud", "dD", "tD", "qdD", "QnD", "sxD", "SpD", "OcD", "NvD", "Vgn", "UVg", "DVg", "TVg", "qtV", "QnV", "SeV", "SPG", "OVG", "NVG", "TGN", "UTG", "DTG", "tsTG", "qTG", "QnTG", "ssTG", "SpTG", "OcTG", "NoTG", "QDR", "uQDR", "dQDR", "tQDR"];
@@ -57,7 +57,7 @@ const formatNumber = (num: number): string => {
     return num.toExponential(2);
 };
 
-const createStatsSchema = (maxDamage: number, maxEnergyGain: number) => z.object({
+const createStatsSchema = (maxEnergyGain: number) => z.object({
     currentWorld: z.string()
         .min(1, 'O mundo atual é obrigatório.')
         .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
@@ -66,13 +66,12 @@ const createStatsSchema = (maxDamage: number, maxEnergyGain: number) => z.object
         .min(1, 'O rank é obrigatório.')
         .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
         .refine(val => parseInt(val, 10) <= MAX_RANK, { message: `O rank máximo é ${MAX_RANK}.` }),
-    totalDamage: z.string()
-        .min(1, 'O dano total é obrigatório.')
-        .refine(val => parseUserEnergy(val) <= maxDamage, { message: `O dano máximo é ${formatNumber(maxDamage)}.` }),
     energyGain: z.string()
         .min(1, 'O ganho de energia é obrigatório.')
         .refine(val => parseUserEnergy(val) <= maxEnergyGain, { message: `O ganho de energia máximo é ${formatNumber(maxEnergyGain)}.` }),
+    currentEnergy: z.string().optional(),
 });
+
 
 type StatsFormData = z.infer<ReturnType<typeof createStatsSchema>>;
 
@@ -88,10 +87,10 @@ export function WelcomePopover() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const imageInputRef = useRef<HTMLInputElement>(null);
 
-    const { bonuses: maxBonuses, isLoading: areBonusesLoading } = useGlobalBonuses("5.6e+34", true);
+    const { bonuses: maxBonuses, isLoading: areBonusesLoading } = useGlobalBonuses("0", true);
 
     const statsSchema = useMemo(() => {
-        return createStatsSchema(maxBonuses.damage, maxBonuses.energyGain);
+        return createStatsSchema(maxBonuses.energyGain);
     }, [maxBonuses]);
 
     const form = useForm<StatsFormData>({
@@ -99,8 +98,8 @@ export function WelcomePopover() {
         defaultValues: {
             currentWorld: '',
             rank: '',
-            totalDamage: '',
             energyGain: '',
+            currentEnergy: '',
         },
     });
 
@@ -116,13 +115,10 @@ export function WelcomePopover() {
     };
 
     const handleCalculateMaxStats = () => {
-        const maxWorld = allGameData.length;
-        const maxRank = Math.max(...Object.keys(energyGainPerRank).map(Number));
-
-        form.setValue('currentWorld', String(maxWorld));
-        form.setValue('rank', String(maxRank));
-        form.setValue('totalDamage', formatNumber(maxBonuses.damage));
+        form.setValue('currentWorld', String(MAX_WORLD));
+        form.setValue('rank', String(MAX_RANK));
         form.setValue('energyGain', formatNumber(maxBonuses.energyGain));
+        form.setValue('currentEnergy', formatNumber(maxBonuses.damage));
 
         toast({
             title: "Valores Máximos Calculados!",
@@ -146,7 +142,9 @@ export function WelcomePopover() {
             const energyRef = doc(firestore, 'users', user.uid, 'rank', 'current');
             await setDoc(energyRef, { value: parseInt(values.rank, 10) }, { merge: true });
 
-            localStorage.setItem('eternal-guide-current-energy', values.totalDamage);
+            if (values.currentEnergy) {
+              localStorage.setItem('eternal-guide-current-energy', values.currentEnergy);
+            }
 
             toast({ title: 'Perfil Atualizado!', description: 'Suas informações foram salvas.' });
             handleClose();
@@ -189,16 +187,17 @@ export function WelcomePopover() {
                     missingFields.push('Rank');
                 }
                 if (result.totalDamage) {
-                    form.setValue('totalDamage', result.totalDamage);
-                    foundFields.push('Dano');
+                    // Assuming totalDamage from screenshot reflects current accumulated energy
+                    form.setValue('currentEnergy', result.totalDamage);
+                    foundFields.push('Energia Atual');
                 } else {
-                    missingFields.push('Dano');
+                    missingFields.push('Energia Atual');
                 }
                 if (result.energyGain) {
                     form.setValue('energyGain', result.energyGain);
-                    foundFields.push('Energia');
+                    foundFields.push('Ganho de Energia');
                 } else {
-                    missingFields.push('Energia');
+                    missingFields.push('Ganho de Energia');
                 }
 
                 if (foundFields.length > 0) {
@@ -281,10 +280,10 @@ export function WelcomePopover() {
                         />
                          <FormField
                             control={form.control}
-                            name="totalDamage"
+                            name="currentEnergy"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Dano Total (DPS)</FormLabel>
+                                    <FormLabel>Energia Atual (Acumulada)</FormLabel>
                                     <FormControl>
                                         <Input placeholder="ex: 1.5sx" {...field} />
                                     </FormControl>

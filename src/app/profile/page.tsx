@@ -87,11 +87,11 @@ export default function ProfilePage() {
                  <Card>
                     <CardHeader>
                         <CardTitle>Bônus Totais</CardTitle>
-                        <CardDescription>Resumo de todos os bônus combinados de suas categorias. Insira sua energia atual para ver o cálculo de dano.</CardDescription>
+                        <CardDescription>Resumo de todos os bônus combinados de suas categorias. Insira sua energia acumulada para ver o cálculo de dano.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="max-w-xs">
-                            <Label htmlFor="current-energy" className="text-xs text-muted-foreground">Sua Energia Atual</Label>
+                            <Label htmlFor="current-energy" className="text-xs text-muted-foreground">Sua Energia Atual (Acumulada)</Label>
                             <div className='relative'>
                                  <Power className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                  <Input

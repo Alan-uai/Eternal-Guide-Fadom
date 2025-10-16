@@ -70,11 +70,11 @@ const parseUserEnergy = (energyStr: string): number => {
         tqdr: 1e132
     };
 
-    const suffix = Object.keys(suffixes).find(s => lowerStr.endsWith(s));
-    if (suffix) {
-        const numberPart = parseFloat(lowerStr.replace(suffix, ''));
+    const suffixKey = Object.keys(suffixes).reverse().find(s => lowerStr.endsWith(s));
+    if (suffixKey) {
+        const numberPart = parseFloat(lowerStr.replace(suffixKey, ''));
         if (isNaN(numberPart)) return 0;
-        return numberPart * suffixes[suffix];
+        return numberPart * suffixes[suffixKey];
     }
 
     return parseFloat(lowerStr) || 0;
@@ -138,9 +138,9 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
         };
         
         // Data processing logic
-        const processData = (calculateMax: boolean) => {
+        const processData = (calculateForMax: boolean) => {
             // Accessories
-            const accItems = calculateMax ? accessories.map(acc => ({ ...acc, rarity: acc.rarity_options.slice(-1)[0].rarity })) : accessoryItems.data;
+            const accItems = calculateForMax ? accessories.map(acc => ({ ...acc, rarity: acc.rarity_options.slice(-1)[0].rarity })) : accessoryItems.data;
             accItems?.forEach((item: any) => {
                 const fullAccessory = accessories.find(a => a.id === item.id);
                 const rarityOption = fullAccessory?.rarity_options.find(ro => ro.rarity === item.rarity);
@@ -153,7 +153,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             });
 
             // Gamepasses
-            const gpItems = calculateMax ? allGamepasses : gamepassItems.data;
+            const gpItems = calculateForMax ? allGamepasses : gamepassItems.data;
             gpItems?.forEach((item: any) => {
                 const gamepassData = allGamepasses.find(gp => gp.id === item.id);
                 if (gamepassData?.bonus_type && gamepassData.bonus_value) {
@@ -163,7 +163,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             });
 
              // Achievements
-            const achievementLevels = calculateMax ? generalAchievements.reduce((acc, ach) => ({...acc, [ach.id]: ach.maxLevel}), {}) : achievementItems;
+            const achievementLevels = calculateForMax ? generalAchievements.reduce((acc, ach) => ({...acc, [ach.id]: ach.maxLevel}), {}) : achievementItems;
             if (achievementLevels) {
                 generalAchievements.forEach(ach => {
                     const currentLevel = (achievementLevels as any)[ach.id] || 0;
@@ -174,14 +174,14 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             }
 
             // Index Tiers
-            const indexTiers = calculateMax ? { avatarTier: 23, petTier: 23 } : indexItems;
+            const indexTiers = calculateForMax ? { avatarTier: 23, petTier: 23 } : indexItems;
             if (indexTiers) {
                 bonuses.damage.bonuses.push(((indexTiers as any).avatarTier || 0) * 0.05);
                 bonuses.energy.bonuses.push(((indexTiers as any).petTier || 0) * 0.05);
             }
 
             // Obelisks
-            const obeliskLevels = calculateMax ? { damage: 20, energy: 20, lucky: 10 } : obeliskItems;
+            const obeliskLevels = calculateForMax ? { damage: 20, energy: 20, lucky: 10 } : obeliskItems;
             if(obeliskLevels) {
                 bonuses.damage.bonuses.push(((obeliskLevels as any).damage || 0) * 0.02);
                 bonuses.energy.bonuses.push(((obeliskLevels as any).energy || 0) * 0.02);
@@ -190,7 +190,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
 
             // Weapons
             const allWeaponsData = [...damageSwords, ...scythes, ...energySwords];
-            const equippedWeapons = calculateMax ? 
+            const equippedWeapons = calculateForMax ? 
                 { 
                   '0': { id: 'Venomstrike', name: 'Venomstrike', rarity: 'Phantom', type: 'damage', evolutionLevel: 3, breathingEnchantment: 'Supreme', stoneEnchantment: 'Supreme'},
                   '1': { id: 'Stormreaver', name: 'Stormreaver', rarity: 'Supremo', type: 'scythe', evolutionLevel: 3, passiveEnchantment: 'Supreme' },
@@ -214,7 +214,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             ];
             
             itemCollections.forEach(collectionInfo => {
-                const itemsToProcess = calculateMax ? allGameData.flatMap(w => w[collectionInfo.name] || []) : collectionInfo.data;
+                const itemsToProcess = calculateForMax ? allGameData.flatMap(w => w[collectionInfo.name] || []) : collectionInfo.data;
                 itemsToProcess?.forEach((item: any) => {
                     addBonus('damage', item.multiplier && item.statType === 'damage' ? item.multiplier : item.damage_bonus);
                     addBonus('energy', item.multiplier && item.statType === 'energy' ? item.multiplier : item.energy_bonus);
@@ -227,7 +227,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
         processData(calculateForMax);
         
         // Final Calculation
-        const rankValue = calculateForMax ? 115 : (rankData as any)?.value || 0;
+        const rankValue = calculateForMax ? Math.max(...Object.keys(energyGainPerRank).map(Number)) : (rankData as any)?.value || 0;
         const baseEnergyGainStr = (energyGainPerRank as Record<string, string>)[rankValue.toString()] || '0';
         const baseEnergyGain = parseFloat(baseEnergyGainStr.replace(/,/g, ''));
 
