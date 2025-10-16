@@ -69,8 +69,8 @@ const createStatsSchema = (maxEnergyGain: number) => z.object({
     energyGain: z.string()
         .min(1, 'O ganho de energia é obrigatório.')
         .refine(val => parseUserEnergy(val) <= maxEnergyGain, { message: `O ganho de energia máximo é ${formatNumber(maxEnergyGain)}.` }),
-    totalDamage: z.string().optional(),
-    currentEnergy: z.string().optional(),
+    totalDamage: z.string().min(1, 'O dano total é obrigatório.'),
+    currentEnergy: z.string().min(1, 'A energia acumulada é obrigatória.'),
 });
 
 
@@ -330,5 +330,3 @@ export function WelcomePopover() {
         </Dialog>
     );
 }
-
-    
