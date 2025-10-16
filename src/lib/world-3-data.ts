@@ -16,13 +16,13 @@ export const world3Data = {
             description: "Pode ser evoluído no Mundo 21 usando Reiatsu Lvl Tokens."
         },
         stats: [
-          { name: 'Gray Reiatsu', multiplier: '2x', rarity: 'Common', probability: 40.55 },
-          { name: 'Green Reiatsu', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
-          { name: 'Blue Reiatsu', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
-          { name: 'Pink Reiatsu', multiplier: '5x', rarity: 'Epic', probability: 5 },
-          { name: 'Yellow Reiatsu', multiplier: '6x', rarity: 'Legendary', probability: 1 },
-          { name: 'Red Reiatsu', multiplier: '8x', rarity: 'Mythic', probability: 0.5 },
-          { name: 'Black Reiatsu', multiplier: '10x', rarity: 'Phantom', probability: 0.05 },
+          { id: 'gray-reiatsu', name: 'Gray Reiatsu', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+          { id: 'green-reiatsu', name: 'Green Reiatsu', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+          { id: 'blue-reiatsu', name: 'Blue Reiatsu', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+          { id: 'pink-reiatsu', name: 'Pink Reiatsu', multiplier: '5x', rarity: 'Epic', probability: 5 },
+          { id: 'yellow-reiatsu', name: 'Yellow Reiatsu', multiplier: '6x', rarity: 'Legendary', probability: 1 },
+          { id: 'red-reiatsu', name: 'Red Reiatsu', multiplier: '8x', rarity: 'Mythic', probability: 0.5 },
+          { id: 'black-reiatsu', name: 'Black Reiatsu', multiplier: '10x', rarity: 'Phantom', probability: 0.05 },
         ],
       },
       {
@@ -38,13 +38,13 @@ export const world3Data = {
             description: "Pode ser evoluído no Mundo 21 usando Zanpakuto Lvl Tokens."
         },
         stats: [
-          { name: 'Common', multiplier: '2x', rarity: 'Common', probability: 40.55 },
-          { name: 'Uncommon', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
-          { name: 'Rare', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
-          { name: 'Epic', multiplier: '5x', rarity: 'Epic', probability: 5 },
-          { name: 'Legendary', multiplier: '6x', rarity: 'Legendary', probability: 1 },
-          { name: 'Mythical', multiplier: '7.5x', rarity: 'Mythic', probability: 0.5 },
-          { name: 'Phantom', multiplier: '10x', rarity: 'Phantom', probability: 0.05 },
+          { id: 'common-zanpakuto', name: 'Common', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+          { id: 'uncommon-zanpakuto', name: 'Uncommon', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+          { id: 'rare-zanpakuto', name: 'Rare', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+          { id: 'epic-zanpakuto', name: 'Epic', multiplier: '5x', rarity: 'Epic', probability: 5 },
+          { id: 'legendary-zanpakuto', name: 'Legendary', multiplier: '6x', rarity: 'Legendary', probability: 1 },
+          { id: 'mythical-zanpakuto', name: 'Mythical', multiplier: '7.5x', rarity: 'Mythic', probability: 0.5 },
+          { id: 'phantom-zanpakuto', name: 'Phantom', multiplier: '10x', rarity: 'Phantom', probability: 0.05 },
         ],
       },
       {

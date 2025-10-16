@@ -19,13 +19,13 @@ export const world5Data = {
             statType: 'damage',
             unlockCost: '2M',
             stats: [
-                { name: 'Dream Manipulation', multiplier: '2x', rarity: 'Common', probability: 40.55 },
-                { name: 'Blood Scythes', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
-                { name: 'Vase Teleportation', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
-                { name: 'Emotion Splitting', multiplier: '5x', rarity: 'Epic', probability: 5 },
-                { name: 'Destructive Death', multiplier: '8x', rarity: 'Legendary', probability: 1 },
-                { name: 'Cryokinesis', multiplier: '10x', rarity: 'Mythic', probability: 0.5 },
-                { name: 'Blood Control', multiplier: '12x', rarity: 'Phantom', probability: 0.05 },
+                { id: 'dream-manipulation', name: 'Dream Manipulation', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+                { id: 'blood-scythes', name: 'Blood Scythes', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+                { id: 'vase-teleportation', name: 'Vase Teleportation', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+                { id: 'emotion-splitting', name: 'Emotion Splitting', multiplier: '5x', rarity: 'Epic', probability: 5 },
+                { id: 'destructive-death', name: 'Destructive Death', multiplier: '8x', rarity: 'Legendary', probability: 1 },
+                { id: 'cryokinesis', name: 'Cryokinesis', multiplier: '10x', rarity: 'Mythic', probability: 0.5 },
+                { id: 'blood-control', name: 'Blood Control', multiplier: '12x', rarity: 'Phantom', probability: 0.05 },
             ]
         },
         {

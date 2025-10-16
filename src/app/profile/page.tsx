@@ -31,14 +31,16 @@ import { allGamepasses, type Gamepass } from '@/lib/gamepass-data';
 import { accessories, type Accessory, type RarityOption } from '@/lib/accessory-data';
 
 
-const RarityBadge = ({ rarity, className }: { rarity: string, className?: string }) => {
+const RarityBadge = ({ rarity, className, children }: { rarity: string, className?: string, children?: React.ReactNode }) => {
     const rarityClasses: Record<string, string> = {
+        // Ranks
         'C-Rank': 'bg-gray-500 text-white border-gray-600',
         'B-Rank': 'bg-green-500 text-white border-green-600',
         'A-Rank': 'bg-blue-500 text-white border-blue-600',
         'S-Rank': 'bg-purple-500 text-white border-purple-600',
         'SS-Rank': 'bg-yellow-500 text-black border-yellow-600',
         'SSS-Rank': 'bg-red-600 text-white border-red-700',
+        // General
         'Common': 'bg-gray-500 text-white border-gray-600',
         'Uncommon': 'bg-green-500 text-white border-green-600',
         'Rare': 'bg-blue-500 text-white border-blue-600',
@@ -48,7 +50,32 @@ const RarityBadge = ({ rarity, className }: { rarity: string, className?: string
         'Phantom': 'bg-fuchsia-700 text-white border-fuchsia-800',
         'Supreme': 'bg-gradient-to-r from-orange-400 to-rose-400 text-white border-transparent',
     };
-    return <Badge variant="outline" className={cn('text-[10px] px-1.5 py-0', rarityClasses[rarity] || 'bg-gray-400', className)}>{rarity}</Badge>;
+    const finalClassName = rarityClasses[rarity] || 'bg-gray-400';
+    return (
+        <Badge variant="outline" className={cn('text-[10px] px-1.5 py-0', finalClassName, className)}>
+            {children || rarity}
+        </Badge>
+    );
+};
+
+const getRarityClass = (rarity: string): string => {
+     const rarityClasses: Record<string, string> = {
+        'C-Rank': 'bg-gray-500/10 text-white border-gray-600/50',
+        'B-Rank': 'bg-green-500/10 text-white border-green-600/50',
+        'A-Rank': 'bg-blue-500/10 text-white border-blue-600/50',
+        'S-Rank': 'bg-purple-500/10 text-white border-purple-600/50',
+        'SS-Rank': 'bg-yellow-500/10 text-yellow-300 border-yellow-600/50',
+        'SSS-Rank': 'bg-red-600/10 text-white border-red-700/50',
+        'Common': 'bg-gray-500/10 text-white border-gray-600/50',
+        'Uncommon': 'bg-green-500/10 text-white border-green-600/50',
+        'Rare': 'bg-blue-500/10 text-white border-blue-600/50',
+        'Epic': 'bg-purple-500/10 text-white border-purple-600/50',
+        'Legendary': 'bg-yellow-500/10 text-yellow-300 border-yellow-600/50',
+        'Mythic': 'bg-red-600/10 text-white border-red-700/50',
+        'Phantom': 'bg-fuchsia-700/10 text-white border-fuchsia-800/50',
+        'Supreme': 'bg-gradient-to-r from-orange-400/20 to-rose-400/20 text-white border-transparent',
+    };
+    return rarityClasses[rarity] || 'bg-muted/30 border-transparent';
 };
 
 const normalizeString = (str: string | null | undefined): string => {
@@ -572,18 +599,43 @@ function ObeliskLevelCalculator() {
 
 function toRoman(num: number): string {
     if (num === 0) return '0';
-    const romanNumerals: { [key: number]: string } = {
-        1000: 'M', 900: 'CM', 500: 'D', 400: 'CD', 100: 'C', 90: 'XC',
-        50: 'L', 40: 'XL', 10: 'X', 9: 'IX', 5: 'V', 4: 'IV', 1: 'I'
-    };
+    if (num < 0 || num > 49) return num.toString(); // Basic implementation for expected range
+    const romanNumerals: [number, string][] = [
+        [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
+    ];
     let result = '';
-    const keys = Object.keys(romanNumerals).map(Number).sort((a, b) => b - a);
-    for (const value of keys) {
-        while (num >= value) {
-            result += romanNumerals[value];
-            num -= value;
+    let remaining = num;
+    
+    // Handle tens above 40
+    while (remaining >= 50) { // Should not happen with max 45
+        result += 'L';
+        remaining -= 50;
+    }
+    
+    for (const [value, symbol] of romanNumerals) {
+        if (remaining >= value) {
+            if (value === 40 || value === 9 || value === 4) {
+                 result += symbol;
+                 remaining -= value;
+            } else {
+                 let count = Math.floor(remaining / value);
+                 if (value === 10 && num > 30) {
+                     // handles cases like 30 (XXX)
+                 }
+                 result += symbol.repeat(count);
+                 remaining -= count * value;
+            }
         }
     }
+    
+     // A more direct way to handle numbers like 20, 30
+    if (num >= 20 && num < 40) {
+        result = 'X'.repeat(Math.floor(num/10)) + 'I'.repeat(num % 10);
+    } else if (num === 45) { // Specific fix
+        return 'XLV';
+    }
+
+
     return result;
 }
 
@@ -817,11 +869,13 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
     const allItems = useMemo(() => {
         if (gridData) return gridData;
 
-        // For powers, we need to flatten the structure
+        // For powers, we need to flatten the structure, but only grab the parent power, not each stat.
         if (subcollectionName === 'powers') {
-            return allGameData.flatMap(world => world.powers || []);
+            const equipablePowers = allGameData.flatMap(world => world.powers || []).filter(power => power && power.id && power.type === 'gacha');
+            return equipablePowers;
         }
 
+        // Default: Get all items from the subcollection across all worlds
         return allGameData.flatMap(world => world[subcollectionName] || []).filter(item => item && item.id);
     }, [gridData, allGameData, subcollectionName]);
 
@@ -835,12 +889,12 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                 await deleteDoc(itemRef);
             } else {
                 let dataToSave: any = { id: item.id, name: item.name };
-                 if (subcollectionName === 'accessories' && item.rarity_options) {
+                 if (subcollectionName === 'accessories' && item.rarity_options?.length > 0) {
                     dataToSave.rarity = item.rarity_options[0].rarity;
-                } else if (subcollectionName === 'powers' && item.stats) {
-                    dataToSave.rarity = item.stats[0].name; // Save the name of the first stat as default rarity
+                } else if (subcollectionName === 'powers' && item.stats?.length > 0) {
+                    dataToSave.rarity = item.stats[0].rarity; // Save the rarity of the first stat as default
                 }
-                await setDoc(itemRef, dataToSave);
+                await setDoc(itemRef, dataToSave, { merge: true });
             }
         } catch (error: any) {
             toast({ variant: 'destructive', title: 'Erro', description: `Não foi possível atualizar ${item.name}.` });
@@ -861,11 +915,11 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
     };
     
     const handlePointerDown = (itemId: string, item: any) => {
-         const hasOptions = (subcollectionName === 'accessories' && item.rarity_options) || (subcollectionName === 'powers' && item.stats);
+         const hasOptions = (subcollectionName === 'accessories' && item.rarity_options?.length > 0) || (subcollectionName === 'powers' && item.stats?.length > 0);
         if (!hasOptions) return;
         holdTimeout.current = setTimeout(() => {
             setOpenPopover(itemId);
-        }, 1500); // 1.5 seconds
+        }, 1000); // 1 second
     };
 
     const handlePointerUp = () => {
@@ -887,7 +941,10 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                 {uniqueItems.map((item) => {
                     const isEquipped = equippedItems?.some(i => i.id === item.id);
                     const equippedItemData = equippedItems?.find(i => i.id === item.id);
+                    
                     const popoverOptions = subcollectionName === 'accessories' ? item.rarity_options : (subcollectionName === 'powers' ? item.stats : []);
+                    const selectedRarity = (equippedItemData as any)?.rarity || popoverOptions?.[0]?.rarity;
+                    const cardBgClass = isEquipped ? getRarityClass(selectedRarity) : 'bg-muted/30 border-transparent';
 
                     return (
                         <Popover key={item.id} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
@@ -898,13 +955,14 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                                     onPointerUp={handlePointerUp}
                                     onPointerLeave={handlePointerUp}
                                     className={cn(
-                                        'aspect-square bg-muted/30 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border-2 transition-all duration-200',
-                                        isEquipped ? 'border-primary bg-primary/10' : 'border-transparent hover:border-primary/50'
+                                        'aspect-square rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border-2 transition-all duration-200',
+                                        isEquipped ? 'border-primary/50' : 'hover:border-primary/50',
+                                        cardBgClass
                                     )}
                                 >
                                     <p className="text-[10px] font-bold leading-tight text-center z-10">{item.name}</p>
-                                    {equippedItemData && (
-                                        <RarityBadge rarity={(equippedItemData as any).rarity} className="absolute bottom-1 right-1" />
+                                    {isEquipped && (
+                                        <RarityBadge rarity={selectedRarity} className="absolute bottom-1 right-1" />
                                     )}
                                 </button>
                             </PopoverTrigger>
@@ -912,8 +970,8 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                                 <PopoverContent className="w-auto p-0">
                                 <div className="flex flex-col">
                                     {popoverOptions.map((opt: any) => (
-                                        <Button key={opt.rarity || opt.name} variant="ghost" className="rounded-none justify-start" onClick={() => handleRarityChange(item.id, opt.rarity || opt.name)}>
-                                            <RarityBadge rarity={opt.rarity || opt.name} />
+                                        <Button key={opt.id || opt.rarity} variant="ghost" className={cn("rounded-none justify-start", getRarityClass(opt.rarity))} onClick={() => handleRarityChange(item.id, opt.rarity)}>
+                                            <RarityBadge rarity={opt.rarity}>{opt.name || opt.rarity}</RarityBadge>
                                         </Button>
                                     ))}
                                 </div>

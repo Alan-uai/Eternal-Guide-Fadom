@@ -9,14 +9,14 @@ export const world17Data = {
         statType: 'energy',
         unlockCost: 'N/A',
         stats: [
-          { name: 'Bureau', multiplier: '2x', rarity: 'Common' },
-          { name: 'Assistants', multiplier: '3x', rarity: 'Uncommon' },
-          { name: 'Rank 3', multiplier: '4.5x', rarity: 'Rare' },
-          { name: 'Rank 2', multiplier: '6x', rarity: 'Epic' },
-          { name: 'Rank 1', multiplier: '8x', rarity: 'Legendary' },
-          { name: 'First Class', multiplier: '10x', rarity: 'Mythic' },
-          { name: 'Associate Special Class', multiplier: '12x', rarity: 'Phantom' },
-          { name: 'Special Class', multiplier: '15x', rarity: 'Supreme' }
+          { id: 'bureau', name: 'Bureau', multiplier: '2x', rarity: 'Common' },
+          { id: 'assistants', name: 'Assistants', multiplier: '3x', rarity: 'Uncommon' },
+          { id: 'rank-3-inv', name: 'Rank 3', multiplier: '4.5x', rarity: 'Rare' },
+          { id: 'rank-2-inv', name: 'Rank 2', multiplier: '6x', rarity: 'Epic' },
+          { id: 'rank-1-inv', name: 'Rank 1', multiplier: '8x', rarity: 'Legendary' },
+          { id: 'first-class-inv', name: 'First Class', multiplier: '10x', rarity: 'Mythic' },
+          { id: 'associate-special-class', name: 'Associate Special Class', multiplier: '12x', rarity: 'Phantom' },
+          { id: 'special-class', name: 'Special Class', multiplier: '15x', rarity: 'Supreme' }
         ]
       },
       {
@@ -32,14 +32,14 @@ export const world17Data = {
             description: "Pode ser evoluído até o nível 50 usando Flesh Tokens para atingir um multiplicador de 18x."
         },
         stats: [
-          { name: 'Retto', multiplier: '1x', rarity: 'Common' },
-          { name: 'Hakuro', multiplier: '1.5x', rarity: 'Uncommon' },
-          { name: 'Shinku', multiplier: '2x', rarity: 'Rare' },
-          { name: 'Tetsuba', multiplier: '3x', rarity: 'Epic' },
-          { name: 'Shidare', multiplier: '5x', rarity: 'Legendary' },
-          { name: 'Hakuja', multiplier: '7x', rarity: 'Mythic' },
-          { name: 'Mukade', multiplier: '9x', rarity: 'Phantom' },
-          { name: 'Koumyaku', multiplier: '12x', rarity: 'Supreme' }
+          { id: 'retto', name: 'Retto', multiplier: '1x', rarity: 'Common' },
+          { id: 'hakuro', name: 'Hakuro', multiplier: '1.5x', rarity: 'Uncommon' },
+          { id: 'shinku', name: 'Shinku', multiplier: '2x', rarity: 'Rare' },
+          { id: 'tetsuba', name: 'Tetsuba', multiplier: '3x', rarity: 'Epic' },
+          { id: 'shidare', name: 'Shidare', multiplier: '5x', rarity: 'Legendary' },
+          { id: 'hakuja', name: 'Hakuja', multiplier: '7x', rarity: 'Mythic' },
+          { id: 'mukade', name: 'Mukade', multiplier: '9x', rarity: 'Phantom' },
+          { id: 'koumyaku', name: 'Koumyaku', multiplier: '12x', rarity: 'Supreme' }
         ]
       },
       {

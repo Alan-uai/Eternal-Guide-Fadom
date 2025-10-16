@@ -10,14 +10,14 @@ export const world13Data = {
         statType: 'energy',
         unlockCost: 'N/A',
         stats: [
-          { name: 'Phaneroplus', multiplier: '2x', rarity: 'Common', probability: 40.55 },
-          { name: 'Philinosoma', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
-          { name: 'Primigenius Honju', multiplier: '4.5x', rarity: 'Rare', probability: 19.9 },
-          { name: 'Preondactyl', multiplier: '6x', rarity: 'Epic', probability: 5 },
-          { name: 'Mixogastero', multiplier: '8x', rarity: 'Legendary', probability: 1 },
-          { name: 'No. 10', multiplier: '10x', rarity: 'Mythic', probability: 0.5 },
-          { name: 'No. 9', multiplier: '12x', rarity: 'Phantom', probability: 0.05 },
-          { name: 'No. 8', multiplier: '15x', rarity: 'Supreme', probability: 0.01 },
+          { id: 'phaneroplus', name: 'Phaneroplus', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+          { id: 'philinosoma', name: 'Philinosoma', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+          { id: 'primigenius-honju', name: 'Primigenius Honju', multiplier: '4.5x', rarity: 'Rare', probability: 19.9 },
+          { id: 'preondactyl', name: 'Preondactyl', multiplier: '6x', rarity: 'Epic', probability: 5 },
+          { id: 'mixogastero', name: 'Mixogastero', multiplier: '8x', rarity: 'Legendary', probability: 1 },
+          { id: 'no-10', name: 'No. 10', multiplier: '10x', rarity: 'Mythic', probability: 0.5 },
+          { id: 'no-9', name: 'No. 9', multiplier: '12x', rarity: 'Phantom', probability: 0.05 },
+          { id: 'no-8', name: 'No. 8', multiplier: '15x', rarity: 'Supreme', probability: 0.01 },
         ]
       },
       {

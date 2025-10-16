@@ -9,13 +9,13 @@ export const world6Data = {
         statType: 'energy',
         unlockCost: 'N/A', // O custo não foi especificado
         stats: [
-          { name: 'E-Rank', multiplier: '2x', rarity: 'Common' },
-          { name: 'D-Rank', multiplier: '3x', rarity: 'Uncommon' },
-          { name: 'C-Rank', multiplier: '4x', rarity: 'Rare' },
-          { name: 'B-Rank', multiplier: '5x', rarity: 'Epic' },
-          { name: 'A-Rank', multiplier: '8x', rarity: 'Legendary' },
-          { name: 'S-Rank', multiplier: '10x', rarity: 'Mythic' },
-          { name: 'National Level Hunter', multiplier: '12x', rarity: 'Phantom' }
+          { id: 'e-rank-hunter', name: 'E-Rank', multiplier: '2x', rarity: 'Common' },
+          { id: 'd-rank-hunter', name: 'D-Rank', multiplier: '3x', rarity: 'Uncommon' },
+          { id: 'c-rank-hunter', name: 'C-Rank', multiplier: '4x', rarity: 'Rare' },
+          { id: 'b-rank-hunter', name: 'B-Rank', multiplier: '5x', rarity: 'Epic' },
+          { id: 'a-rank-hunter', name: 'A-Rank', multiplier: '8x', rarity: 'Legendary' },
+          { id: 's-rank-hunter', name: 'S-Rank', multiplier: '10x', rarity: 'Mythic' },
+          { id: 'national-level-hunter', name: 'National Level Hunter', multiplier: '12x', rarity: 'Phantom' }
         ]
       },
       {

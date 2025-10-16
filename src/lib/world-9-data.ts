@@ -10,13 +10,13 @@ export const world9Data = {
             statType: 'energy',
             unlockCost: 'N/A', // Custo não especificado
             stats: [
-                { name: 'Illusion Casting', multiplier: '2x', rarity: 'Common' },
-                { name: 'Mind Swap', multiplier: '3x', rarity: 'Uncommon' },
-                { name: 'Brain Freeze Field', multiplier: '4x', rarity: 'Rare' },
-                { name: 'Kinetic Absorption', multiplier: '5x', rarity: 'Epic' },
-                { name: 'Precognition', multiplier: '8x', rarity: 'Legendary' },
-                { name: 'Psychic Barrier', multiplier: '10x', rarity: 'Mythic' },
-                { name: 'Energy Aura Blast', multiplier: '12x', rarity: 'Phantom' }
+                { id: 'illusion-casting', name: 'Illusion Casting', multiplier: '2x', rarity: 'Common' },
+                { id: 'mind-swap', name: 'Mind Swap', multiplier: '3x', rarity: 'Uncommon' },
+                { id: 'brain-freeze-field', name: 'Brain Freeze Field', multiplier: '4x', rarity: 'Rare' },
+                { id: 'kinetic-absorption', name: 'Kinetic Absorption', multiplier: '5x', rarity: 'Epic' },
+                { id: 'precognition', name: 'Precognition', multiplier: '8x', rarity: 'Legendary' },
+                { id: 'psychic-barrier', name: 'Psychic Barrier', multiplier: '10x', rarity: 'Mythic' },
+                { id: 'energy-aura-blast', name: 'Energy Aura Blast', multiplier: '12x', rarity: 'Phantom' }
             ]
         },
         {

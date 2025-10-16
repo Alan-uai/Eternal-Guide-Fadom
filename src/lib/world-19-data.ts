@@ -10,14 +10,14 @@ export const world19Data = {
         statType: 'energy',
         unlockCost: 'N/A',
         stats: [
-          { name: 'Company 1', multiplier: '2x', rarity: 'Common' },
-          { name: 'Company 2', multiplier: '3x', rarity: 'Uncommon' },
-          { name: 'Company 3', multiplier: '4.5x', rarity: 'Rare' },
-          { name: 'Company 4', multiplier: '6x', rarity: 'Epic' },
-          { name: 'Company 5', multiplier: '8x', rarity: 'Legendary' },
-          { name: 'Company 6', multiplier: '10x', rarity: 'Mythic' },
-          { name: 'Company 7', multiplier: '12x', rarity: 'Phantom' },
-          { name: 'Company 8', multiplier: '15x', rarity: 'Supreme' }
+          { id: 'company-1', name: 'Company 1', multiplier: '2x', rarity: 'Common' },
+          { id: 'company-2', name: 'Company 2', multiplier: '3x', rarity: 'Uncommon' },
+          { id: 'company-3', name: 'Company 3', multiplier: '4.5x', rarity: 'Rare' },
+          { id: 'company-4', name: 'Company 4', multiplier: '6x', rarity: 'Epic' },
+          { id: 'company-5', name: 'Company 5', multiplier: '8x', rarity: 'Legendary' },
+          { id: 'company-6', name: 'Company 6', multiplier: '10x', rarity: 'Mythic' },
+          { id: 'company-7', name: 'Company 7', multiplier: '12x', rarity: 'Phantom' },
+          { id: 'company-8', name: 'Company 8', multiplier: '15x', rarity: 'Supreme' }
         ]
       },
       {
@@ -27,16 +27,16 @@ export const world19Data = {
         statType: 'mixed',
         unlockCost: 'N/A',
         stats: [
-          { name: '1st Generation', multiplier: '1x', rarity: 'Common' },
-          { name: '1st Generation (lv.20)', multiplier: '1.2x', rarity: 'Common' },
-          { name: '2nd Generation', multiplier: '2x', rarity: 'Uncommon', damage_bonus: '0.2x' },
-          { name: '2nd Generation (lv.40)', multiplier: '2.8x', rarity: 'Uncommon', damage_bonus: '0.28x' },
-          { name: '3rd Generation', multiplier: '3x', rarity: 'Rare', damage_bonus: '0.4x' },
-          { name: '3rd Generation (Lv.60)', multiplier: '4.8x', rarity: 'Rare', damage_bonus: '0.64x' },
-          { name: 'Hybrid', multiplier: '4x', rarity: 'Epic', damage_bonus: '1x' },
-          { name: 'Hybrid (Lv.80)', multiplier: '7.2x', rarity: 'Epic', damage_bonus: '1.8x' },
-          { name: 'Adolla User', multiplier: '5x', rarity: 'Legendary', damage_bonus: '1.5x' },
-          { name: 'Adolla User (Lv.100)', multiplier: '10x', rarity: 'Legendary', damage_bonus: '3x' }
+          { id: '1st-gen', name: '1st Generation', multiplier: '1x', rarity: 'Common' },
+          { id: '1st-gen-lv20', name: '1st Generation (lv.20)', multiplier: '1.2x', rarity: 'Common' },
+          { id: '2nd-gen', name: '2nd Generation', multiplier: '2x', rarity: 'Uncommon', damage_bonus: '0.2x' },
+          { id: '2nd-gen-lv40', name: '2nd Generation (lv.40)', multiplier: '2.8x', rarity: 'Uncommon', damage_bonus: '0.28x' },
+          { id: '3rd-gen', name: '3rd Generation', multiplier: '3x', rarity: 'Rare', damage_bonus: '0.4x' },
+          { id: '3rd-gen-lv60', name: '3rd Generation (Lv.60)', multiplier: '4.8x', rarity: 'Rare', damage_bonus: '0.64x' },
+          { id: 'hybrid-pyro', name: 'Hybrid', multiplier: '4x', rarity: 'Epic', damage_bonus: '1x' },
+          { id: 'hybrid-pyro-lv80', name: 'Hybrid (Lv.80)', multiplier: '7.2x', rarity: 'Epic', damage_bonus: '1.8x' },
+          { id: 'adolla-user', name: 'Adolla User', multiplier: '5x', rarity: 'Legendary', damage_bonus: '1.5x' },
+          { id: 'adolla-user-lv100', name: 'Adolla User (Lv.100)', multiplier: '10x', rarity: 'Legendary', damage_bonus: '3x' }
         ]
       },
       {

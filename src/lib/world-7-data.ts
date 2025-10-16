@@ -10,13 +10,13 @@ export const world7Data = {
         statType: 'energy',
         unlockCost: 'N/A', // Custo não especificado
         stats: [
-          { name: 'Water Grimoire', multiplier: '2x', rarity: 'Common' },
-          { name: 'Fire Grimoire', multiplier: '3x', rarity: 'Uncommon' },
-          { name: 'Wind Grimoire', multiplier: '4x', rarity: 'Rare' },
-          { name: 'Dark Grimoire', multiplier: '5x', rarity: 'Epic' },
-          { name: 'Light Grimoire', multiplier: '8x', rarity: 'Legendary' },
-          { name: 'Anti-Magic Grimoire', multiplier: '10x', rarity: 'Mythic' },
-          { name: 'Time Magic Grimoire', multiplier: '12x', rarity: 'Phantom' }
+          { id: 'water-grimoire', name: 'Water Grimoire', multiplier: '2x', rarity: 'Common' },
+          { id: 'fire-grimoire', name: 'Fire Grimoire', multiplier: '3x', rarity: 'Uncommon' },
+          { id: 'wind-grimoire', name: 'Wind Grimoire', multiplier: '4x', rarity: 'Rare' },
+          { id: 'dark-grimoire', name: 'Dark Grimoire', multiplier: '5x', rarity: 'Epic' },
+          { id: 'light-grimoire', name: 'Light Grimoire', multiplier: '8x', rarity: 'Legendary' },
+          { id: 'anti-magic-grimoire', name: 'Anti-Magic Grimoire', multiplier: '10x', rarity: 'Mythic' },
+          { id: 'time-magic-grimoire', name: 'Time Magic Grimoire', multiplier: '12x', rarity: 'Phantom' }
         ]
       },
       {

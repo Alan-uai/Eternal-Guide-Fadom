@@ -10,10 +10,10 @@ export const world2Data = {
         statType: 'damage',
         unlockCost: '75k',
         stats: [
-          { name: 'Conquerors Haki', multiplier: '1.1x', rarity: 'Rare', probability: 19.9 },
-          { name: 'Red Hair', multiplier: '1.2x', rarity: 'Epic', probability: 5 },
-          { name: 'Emperor', multiplier: '1.3x', rarity: 'Legendary', probability: 1 },
-          { name: 'Yonko', multiplier: '1.4x', rarity: 'Mythic', probability: 0.5 },
+          { id: 'conquerors-haki', name: 'Conquerors Haki', multiplier: '1.1x', rarity: 'Rare', probability: 19.9 },
+          { id: 'red-hair', name: 'Red Hair', multiplier: '1.2x', rarity: 'Epic', probability: 5 },
+          { id: 'emperor', name: 'Emperor', multiplier: '1.3x', rarity: 'Legendary', probability: 1 },
+          { id: 'yonko', name: 'Yonko', multiplier: '1.4x', rarity: 'Mythic', probability: 0.5 },
         ],
       },
       {
@@ -23,13 +23,13 @@ export const world2Data = {
         statType: 'energy',
         unlockCost: '25k',
         stats: [
-            { name: 'Whitebeard Pirates', multiplier: '2x', rarity: 'Common', probability: 40.55 },
-            { name: 'Cross Guild', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
-            { name: 'Big Mom Pirates', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
-            { name: 'Beast pirates', multiplier: '5x', rarity: 'Epic', probability: 5 },
-            { name: 'Blackbeard Pirates', multiplier: '6x', rarity: 'Legendary', probability: 1 },
-            { name: 'Straw Hat Pirates', multiplier: '8x', rarity: 'Mythic', probability: 0.5 },
-            { name: 'Red-Haired Pirates', multiplier: '10x', rarity: 'Phantom', probability: 0.05 }
+            { id: 'whitebeard-pirates', name: 'Whitebeard Pirates', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+            { id: 'cross-guild', name: 'Cross Guild', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+            { id: 'big-mom-pirates', name: 'Big Mom Pirates', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+            { id: 'beast-pirates', name: 'Beast pirates', multiplier: '5x', rarity: 'Epic', probability: 5 },
+            { id: 'blackbeard-pirates', name: 'Blackbeard Pirates', multiplier: '6x', rarity: 'Legendary', probability: 1 },
+            { id: 'straw-hat-pirates', name: 'Straw Hat Pirates', multiplier: '8x', rarity: 'Mythic', probability: 0.5 },
+            { id: 'red-haired-pirates', name: 'Red-Haired Pirates', multiplier: '10x', rarity: 'Phantom', probability: 0.05 }
         ]
       },
       {
@@ -39,13 +39,13 @@ export const world2Data = {
         statType: 'damage',
         unlockCost: '35k',
         stats: [
-            { name: 'Common Chef', multiplier: '1x', rarity: 'Common', probability: 40.55 },
-            { name: 'Uncommon Chef', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
-            { name: 'Rare Chef', multiplier: '2x', rarity: 'Rare', probability: 19.9 },
-            { name: 'Epic Chef', multiplier: '3x', rarity: 'Epic', probability: 5 },
-            { name: 'Legendary Chef', multiplier: '5x', rarity: 'Legendary', probability: 1 },
-            { name: 'Mythical Chef', multiplier: '7x', rarity: 'Mythic', probability: 0.5 },
-            { name: 'Phantom Chef', multiplier: '10x', rarity: 'Phantom', probability: 0.05 }
+            { id: 'common-chef', name: 'Common Chef', multiplier: '1x', rarity: 'Common', probability: 40.55 },
+            { id: 'uncommon-chef', name: 'Uncommon Chef', multiplier: '1.5x', rarity: 'Uncommon', probability: 33 },
+            { id: 'rare-chef', name: 'Rare Chef', multiplier: '2x', rarity: 'Rare', probability: 19.9 },
+            { id: 'epic-chef', name: 'Epic Chef', multiplier: '3x', rarity: 'Epic', probability: 5 },
+            { id: 'legendary-chef', name: 'Legendary Chef', multiplier: '5x', rarity: 'Legendary', probability: 1 },
+            { id: 'mythical-chef', name: 'Mythical Chef', multiplier: '7x', rarity: 'Mythic', probability: 0.5 },
+            { id: 'phantom-chef', name: 'Phantom Chef', multiplier: '10x', rarity: 'Phantom', probability: 0.05 }
         ]
       },
       {
@@ -55,20 +55,20 @@ export const world2Data = {
         unlockCost: '55k',
         // statType is defined on individual stats because it's mixed
         stats: [
-          { name: 'Bomb Fruit', multiplier: '2x', statType: 'coin', rarity: 'Common' },
-          { name: 'Rubber Fruit', multiplier: '3x', statType: 'energy', rarity: 'Uncommon' },
-          { name: 'Sand Fruit', multiplier: '4x', statType: 'coin', rarity: 'Rare' },
-          { name: 'Flame Fruit', multiplier: '5x', statType: 'energy', rarity: 'Epic' },
-          { name: 'Smoke Fruit', multiplier: '6x', statType: 'energy', rarity: 'Legendary' },
-          { name: 'Magma Fruit', multiplier: '7x', statType: 'damage', rarity: 'Legendary' },
-          { name: 'Revive Fruit', multiplier: '8x', statType: 'energy', rarity: 'Mythic' },
-          { name: 'String Fruit', multiplier: '9x', statType: 'coin', rarity: 'Mythic' },
-          { name: 'Human Fruit', multiplier: '10x', statType: 'coin', rarity: 'Phantom' },
-          { name: 'Dark Fruit', multiplier: '11x', statType: 'coin', rarity: 'Phantom' },
-          { name: 'Quake Fruit', multiplier: '12x', statType: 'damage', rarity: 'Phantom' },
-          { name: 'Money Fruit', multiplier: '1x', statType: 'coin', rarity: 'Uncommon' },
-          { name: 'Phoenix Fruit', multiplier: '15x', statType: 'energy', rarity: 'Phantom' },
-          { name: 'Dough Fruit', multiplier: '10x', statType: 'energy', rarity: 'Phantom' },
+          { id: 'bomb-fruit', name: 'Bomb Fruit', multiplier: '2x', statType: 'coin', rarity: 'Common' },
+          { id: 'rubber-fruit', name: 'Rubber Fruit', multiplier: '3x', statType: 'energy', rarity: 'Uncommon' },
+          { id: 'sand-fruit', name: 'Sand Fruit', multiplier: '4x', statType: 'coin', rarity: 'Rare' },
+          { id: 'flame-fruit', name: 'Flame Fruit', multiplier: '5x', statType: 'energy', rarity: 'Epic' },
+          { id: 'smoke-fruit', name: 'Smoke Fruit', multiplier: '6x', statType: 'energy', rarity: 'Legendary' },
+          { id: 'magma-fruit', name: 'Magma Fruit', multiplier: '7x', statType: 'damage', rarity: 'Legendary' },
+          { id: 'revive-fruit', name: 'Revive Fruit', multiplier: '8x', statType: 'energy', rarity: 'Mythic' },
+          { id: 'string-fruit', name: 'String Fruit', multiplier: '9x', statType: 'coin', rarity: 'Mythic' },
+          { id: 'human-fruit', name: 'Human Fruit', multiplier: '10x', statType: 'coin', rarity: 'Phantom' },
+          { id: 'dark-fruit', name: 'Dark Fruit', multiplier: '11x', statType: 'coin', rarity: 'Phantom' },
+          { id: 'quake-fruit', name: 'Quake Fruit', multiplier: '12x', statType: 'damage', rarity: 'Phantom' },
+          { id: 'money-fruit', name: 'Money Fruit', multiplier: '1x', statType: 'coin', rarity: 'Uncommon' },
+          { id: 'phoenix-fruit', name: 'Phoenix Fruit', multiplier: '15x', statType: 'energy', rarity: 'Phantom' },
+          { id: 'dough-fruit', name: 'Dough Fruit', multiplier: '10x', statType: 'energy', rarity: 'Phantom' },
         ]
       },
       {

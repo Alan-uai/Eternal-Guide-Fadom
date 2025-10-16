@@ -10,13 +10,13 @@ export const world4Data = {
         statType: 'energy',
         unlockCost: '500k',
         stats: [
-          { name: 'Blazing Cataclysm', multiplier: '2x', rarity: 'Common', probability: 40.55 },
-          { name: 'Nullborn Phantom', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
-          { name: 'Infernal Crater', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
-          { name: 'Abyssal Tide', multiplier: '5x', rarity: 'Epic', probability: 5 },
-          { name: 'Verdant Calamity', multiplier: '6x', rarity: 'Legendary', probability: 1 },
-          { name: 'Soulbender', multiplier: '8x', rarity: 'Mythic', probability: 0.5 },
-          { name: 'Wandered Mind', multiplier: '10x', rarity: 'Phantom', probability: 0.05 },
+          { id: 'blazing-cataclysm', name: 'Blazing Cataclysm', multiplier: '2x', rarity: 'Common', probability: 40.55 },
+          { id: 'nullborn-phantom', name: 'Nullborn Phantom', multiplier: '3x', rarity: 'Uncommon', probability: 33 },
+          { id: 'infernal-crater', name: 'Infernal Crater', multiplier: '4x', rarity: 'Rare', probability: 19.9 },
+          { id: 'abyssal-tide', name: 'Abyssal Tide', multiplier: '5x', rarity: 'Epic', probability: 5 },
+          { id: 'verdant-calamity', name: 'Verdant Calamity', multiplier: '6x', rarity: 'Legendary', probability: 1 },
+          { id: 'soulbender', name: 'Soulbender', multiplier: '8x', rarity: 'Mythic', probability: 0.5 },
+          { id: 'wandered-mind', name: 'Wandered Mind', multiplier: '10x', rarity: 'Phantom', probability: 0.05 },
         ],
       },
       {
@@ -26,13 +26,13 @@ export const world4Data = {
         statType: 'damage',
         unlockCost: '1M',
         stats: [
-          { name: 'Bloodthorn', multiplier: '0.5x', rarity: 'Common', probability: 40.55 },
-          { name: 'Eclipse Warden', multiplier: '0.9x', rarity: 'Uncommon', probability: 33 },
-          { name: 'Obsidian Reaver', multiplier: '1.5x', rarity: 'Rare', probability: 19.9 },
-          { name: 'Aquarius Edge', multiplier: '2x', rarity: 'Epic', probability: 5 },
-          { name: 'Doomsoul', multiplier: '2.5x', rarity: 'Legendary', probability: 1 },
-          { name: 'Redmourne', multiplier: '3x', rarity: 'Mythic', probability: 0.5 },
-          { name: 'Venomstrike', multiplier: '4x', rarity: 'Phantom', probability: 0.05 },
+          { id: 'bloodthorn-sword', name: 'Bloodthorn', multiplier: '0.5x', rarity: 'Common', probability: 40.55 },
+          { id: 'eclipse-warden-sword', name: 'Eclipse Warden', multiplier: '0.9x', rarity: 'Uncommon', probability: 33 },
+          { id: 'obsidian-reaver-sword', name: 'Obsidian Reaver', multiplier: '1.5x', rarity: 'Rare', probability: 19.9 },
+          { id: 'aquarius-edge-sword', name: 'Aquarius Edge', multiplier: '2x', rarity: 'Epic', probability: 5 },
+          { id: 'doomsoul-sword', name: 'Doomsoul', multiplier: '2.5x', rarity: 'Legendary', probability: 1 },
+          { id: 'redmourne-sword', name: 'Redmourne', multiplier: '3x', rarity: 'Mythic', probability: 0.5 },
+          { id: 'venomstrike-sword', name: 'Venomstrike', multiplier: '4x', rarity: 'Phantom', probability: 0.05 },
         ],
       },
       {
@@ -51,13 +51,13 @@ export const world4Data = {
         unlockCost: '1.5M',
         statType: 'mixed',
         stats: [
-            { name: 'Common Curse', multiplier: '0.6x', statType: 'damage', rarity: 'Common', probability: 40.55 },
-            { name: 'Uncommon Curse', multiplier: '0.8x', statType: 'damage', rarity: 'Uncommon', probability: 33 },
-            { name: 'Rare Curse', multiplier: '1x', statType: 'damage', energy_crit_bonus: '1.00%', rarity: 'Rare', probability: 19.9 },
-            { name: 'Epic Curse', multiplier: '2x', statType: 'damage', energy_crit_bonus: '2.00%', rarity: 'Epic', probability: 5 },
-            { name: 'Legendary Curse', multiplier: '3x', statType: 'damage', energy_crit_bonus: '3.00%', rarity: 'Legendary', probability: 1 },
-            { name: 'Mythical Curse', multiplier: '4x', statType: 'damage', energy_crit_bonus: '4.00%', rarity: 'Mythic', probability: 0.5 },
-            { name: 'Phantom Curse', multiplier: '5x', statType: 'damage', energy_crit_bonus: '5.00%', rarity: 'Phantom', probability: 0.05 }
+            { id: 'common-curse', name: 'Common Curse', multiplier: '0.6x', statType: 'damage', rarity: 'Common', probability: 40.55 },
+            { id: 'uncommon-curse', name: 'Uncommon Curse', multiplier: '0.8x', statType: 'damage', rarity: 'Uncommon', probability: 33 },
+            { id: 'rare-curse', name: 'Rare Curse', multiplier: '1x', statType: 'damage', energy_crit_bonus: '1.00%', rarity: 'Rare', probability: 19.9 },
+            { id: 'epic-curse', name: 'Epic Curse', multiplier: '2x', statType: 'damage', energy_crit_bonus: '2.00%', rarity: 'Epic', probability: 5 },
+            { id: 'legendary-curse', name: 'Legendary Curse', multiplier: '3x', statType: 'damage', energy_crit_bonus: '3.00%', rarity: 'Legendary', probability: 1 },
+            { id: 'mythical-curse', name: 'Mythical Curse', multiplier: '4x', statType: 'damage', energy_crit_bonus: '4.00%', rarity: 'Mythic', probability: 0.5 },
+            { id: 'phantom-curse', name: 'Phantom Curse', multiplier: '5x', statType: 'damage', energy_crit_bonus: '5.00%', rarity: 'Phantom', probability: 0.05 }
         ]
       }
     ],
