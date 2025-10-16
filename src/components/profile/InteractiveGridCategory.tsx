@@ -57,10 +57,11 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
 
     }, [gridData, allGameData, subcollectionName, itemTypeFilter]);
 
-    const handleEquipItem = async (item: any, rarityOrLevel: string | number) => {
+    const handleEquipItem = async (item: any, rarityOrLevel?: string | number) => {
         if (!itemsQuery) return;
         
         let dataToSave: any = { id: item.id, name: item.name };
+        
         if (typeof rarityOrLevel === 'string') {
             dataToSave.rarity = rarityOrLevel;
         } else if (typeof rarityOrLevel === 'number') {
@@ -102,6 +103,14 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
         }
     };
 
+    const handleGamepassClick = (item: any, isEquipped: boolean) => {
+        if (isEquipped) {
+            handleUnequipItem(item.id);
+        } else {
+            handleEquipItem(item);
+        }
+    };
+
     if (isLoading) {
         return <div className="flex items-center justify-center h-full w-full"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
     }
@@ -128,21 +137,21 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                         if (isProgressionPower) {
                             const currentLevel = (equippedItemData as any)?.leveling || 0;
                             displayText = `${currentLevel}/${item.maxLevel}`;
-                            // You might want a different way to determine rarity for progression powers
                             selectedRarity = 'Rare'; // Placeholder
+                        } else if (subcollectionName === 'gamepasses') {
+                            selectedRarity = 'Epic'; // Placeholder for equipped gamepass color
+                            displayText = item.name;
                         } else if (popoverOptions.length > 0) {
                             const equippedRarity = (equippedItemData as any)?.rarity;
                             const selectedOption = popoverOptions.find((opt: any) => opt.rarity === equippedRarity);
-                            if (selectedOption) {
+                             if (selectedOption) {
                                 selectedRarity = selectedOption.rarity;
                                 displayText = selectedOption.name || item.name;
                             } else {
-                                // Fallback if rarity doesn't match, maybe just use the item name
                                 selectedRarity = equippedRarity || 'Common';
                                 displayText = item.name;
                             }
                         } else {
-                            // Fallback for items without options
                             selectedRarity = item.rarity || 'Common';
                             displayText = item.name;
                         }
@@ -152,11 +161,13 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                     const hasLeveling = item.leveling && typeof item.leveling.maxLevel !== 'undefined';
                     const currentLeveling = (equippedItemData as any)?.leveling || 0;
                     
+                    const isGamepass = subcollectionName === 'gamepasses';
+
                     return (
-                        <Popover key={item.id} open={openPopoverId === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopoverId(null)}>
+                        <Popover key={item.id} open={!isGamepass && openPopoverId === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopoverId(null)}>
                             <PopoverTrigger asChild>
                                 <button
-                                    onClick={() => setOpenPopoverId(item.id)}
+                                    onClick={() => isGamepass ? handleGamepassClick(item, isEquipped) : setOpenPopoverId(item.id)}
                                     className={cn(
                                         'aspect-square rounded-md flex flex-col items-center justify-center p-1 text-center relative overflow-hidden border-2 transition-all duration-200 group',
                                         isEquipped ? 'border-primary/50' : 'hover:border-primary/50',
@@ -198,7 +209,7 @@ export function InteractiveGridCategory({ subcollectionName, gridData, itemTypeF
                                 <div className="flex flex-col">
                                     {popoverOptions && popoverOptions.length > 0 && popoverOptions.map((opt: any) => (
                                         <Button key={opt.id || opt.rarity} variant="ghost" className={cn("rounded-none justify-start", getRarityClass(opt.rarity))} onClick={() => handleEquipItem(item, opt.rarity)}>
-                                            <RarityBadge rarity={opt.rarity}>{opt.name || opt.rarity}</RarityBadge>
+                                            <span className='font-semibold'>{opt.name || opt.rarity}</span>
                                         </Button>
                                     ))}
                                     {isProgressionPower && (

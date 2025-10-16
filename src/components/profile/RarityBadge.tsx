@@ -41,8 +41,8 @@ export const getRarityClass = (rarity: string): string => {
         'Epic': 'bg-purple-500/10 text-white border-purple-600/50',
         'Legendary': 'bg-yellow-500/10 text-yellow-300 border-yellow-600/50',
         'Mythic': 'bg-red-600/10 text-white border-red-700/50',
-        'Phantom': 'bg-fuchsia-700/10 text-white border-fuchsia-800/50',
-        'Supreme': 'bg-gradient-to-r from-orange-400/20 to-rose-400/20 text-white border-transparent',
+        'Phantom': 'bg-fuchsia-700/10 text-white border-fuchsia-800/50 glow-phantom',
+        'Supreme': 'bg-gradient-to-r from-orange-400/20 to-rose-400/20 text-white border-transparent glow-supreme',
     };
     return rarityClasses[rarity] || 'bg-muted/30 border-transparent';
 };
