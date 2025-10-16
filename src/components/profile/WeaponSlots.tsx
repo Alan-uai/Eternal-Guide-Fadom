@@ -45,11 +45,13 @@ export function WeaponSlots() {
     }, [firestore, user]);
     
     const { data: userData, isLoading: isUserDataLoading } = useDoc(userDocRef);
-    const [equippedWeapons, setEquippedWeapons] = useState<any>((userData as any)?.weaponSlots || {});
+    const [equippedWeapons, setEquippedWeapons] = useState<any>({});
     
     useEffect(() => {
         if (userData?.weaponSlots) {
             setEquippedWeapons(userData.weaponSlots);
+        } else {
+            setEquippedWeapons({});
         }
     }, [userData]);
 
@@ -269,7 +271,7 @@ export function WeaponSlots() {
                                     className={cn(
                                         'h-5 w-5 text-gray-500 transition-colors',
                                         equipped && 'cursor-pointer',
-                                        equipped && (equipped.evolutionLevel || 0) >= starLevel ? 'text-yellow-500 fill-yellow-500' : 'text-gray-600'
+                                        equipped && (equipped.evolutionLevel || 0) >= starLevel ? 'text-red-500 fill-red-500' : 'text-gray-600'
                                     )}
                                     onClick={(e) => {
                                         if (!equipped) return;
