@@ -22,15 +22,13 @@ export function CharacterInventory() {
                     </TabsList>
 
                      {profileCategories.map((category) => (
-                        <TabsContent key={category.subcollectionName} value={category.subcollectionName}>
-                            <div className='w-full rounded-md bg-muted/20 border-2 border-dashed flex flex-col items-center justify-center p-4 mt-4 min-h-64'>
-                                <CategoryDisplay 
-                                    subcollectionName={category.subcollectionName} 
-                                    isInteractiveGrid={category.isInteractiveGrid}
-                                    isWeaponSlots={category.isWeaponSlots}
-                                    itemTypeFilter={category.itemTypeFilter}
-                                />
-                            </div>
+                        <TabsContent key={category.subcollectionName} value={category.subcollectionName} className="mt-4">
+                            <CategoryDisplay 
+                                subcollectionName={category.subcollectionName} 
+                                isInteractiveGrid={category.isInteractiveGrid}
+                                isWeaponSlots={category.isWeaponSlots}
+                                itemTypeFilter={category.itemTypeFilter}
+                            />
                         </TabsContent>
                     ))}
                 </Tabs>
