@@ -42,7 +42,7 @@ export function FighterSlots() {
 
 
     const fighterData = useMemo(() => {
-        const titans = allGameData.flatMap(world => world.fighters?.filter((f: any) => f.type === 'Titan') || []);
+        const titans = allGameData.flatMap(world => world.fighters?.filter((f: any) => f.type === 'Titan').map((f:any) => ({...f, rarity: 'Comum'})) || []);
         const stands = allGameData.flatMap(world => world.stands || []);
         const shadows = allGameData.flatMap(world => world.shadows || []);
         return {
@@ -96,7 +96,7 @@ export function FighterSlots() {
         const newFighterData: any = {
             id: item.id, 
             name: item.name,
-            rarity: item.rarity,
+            rarity: item.rarity || 'Comum',
             type: type,
             evolutionLevel: 0,
         };
