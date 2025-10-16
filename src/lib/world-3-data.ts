@@ -76,16 +76,17 @@ export const world3Data = {
         { id: 'rakiu-pet', name: 'Rakiu', rank: 'B', rarity: 'Epic', energy_bonus: '75' },
         { id: 'yoichi-pet', name: 'Yoichi', rank: 'A', rarity: 'Legendary', energy_bonus: '94' },
         { id: 'kahara-pet', name: 'Kahara', rank: 'S', rarity: 'Mythic', energy_bonus: '125' },
-        { id: 'eizen-pet', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '281' }
+        { id: 'eizen-pet', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '375' }
     ],
     avatars: [
-        { id: 'hime-avatar', name: 'Hime', rank: 'E', rarity: 'Common', energy_bonus: '1' },
-        { id: 'ichige-avatar', name: 'Ichige', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
-        { id: 'uryua-avatar', name: 'Uryua', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
-        { id: 'rakiu-avatar', name: 'Rakiu', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'yoichi-avatar', name: 'Yoichi', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
-        { id: 'kahara-avatar', name: 'Kahara', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
-        { id: 'eizen-avatar', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
+        { id: 'hime-avatar', name: 'Hime', rank: 'E', rarity: 'Common', energy_bonus: '19' },
+        { id: 'ichige-avatar', name: 'Ichige', rank: 'D', rarity: 'Uncommon', energy_bonus: '38' },
+        { id: 'uryua-avatar', name: 'Uryua', rank: 'C', rarity: 'Rare', energy_bonus: '56' },
+        { id: 'rakiu-avatar', name: 'Rakiu', rank: 'B', rarity: 'Epic', energy_bonus: '75' },
+        { id: 'yoichi-avatar', name: 'Yoichi', rank: 'A', rarity: 'Legendary', energy_bonus: '94' },
+        { id: 'kahara-avatar', name: 'Kahara', rank: 'S', rarity: 'Mythic', energy_bonus: '125' },
+        { id: 'eizen-avatar', name: 'Eizen', rank: 'SS', rarity: 'Phantom', energy_bonus: '375' }
     ],
     dungeons: [],
   };
+  

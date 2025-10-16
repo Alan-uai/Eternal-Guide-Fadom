@@ -66,16 +66,16 @@ export const world1Data = {
         { id: 'kohan-pet', name: 'Kohan', rank: 'B', rarity: 'Epic', energy_bonus: '12' },
         { id: 'picco-pet', name: 'Picco', rank: 'A', rarity: 'Legendary', energy_bonus: '15' },
         { id: 'koku-pet', name: 'Koku', rank: 'S', rarity: 'Mythic', energy_bonus: '20' },
-        { id: 'kid-kohan-pet', name: 'Kid Kohan', rank: 'SS', rarity: 'Phantom', energy_bonus: '45' }
+        { id: 'kid-kohan-pet', name: 'Kid Kohan', rank: 'SS', rarity: 'Phantom', energy_bonus: '60' }
     ],
     avatars: [
-        { id: 'kriluni-avatar', name: 'Kriluni', rank: 'E', rarity: 'Common', energy_bonus: '1' },
-        { id: 'ymicha-avatar', name: 'Ymicha', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
-        { id: 'tian-shan-avatar', name: 'Tian Shan', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
-        { id: 'kohan-avatar', name: 'Kohan', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'picco-avatar', name: 'Picco', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
-        { id: 'koku-avatar', name: 'Koku', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
-        { id: 'kid-kohan-avatar', name: 'Kid Kohan', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
+        { id: 'kriluni-avatar', name: 'Kriluni', rank: 'E', rarity: 'Common', energy_bonus: '3' },
+        { id: 'ymicha-avatar', name: 'Ymicha', rank: 'D', rarity: 'Uncommon', energy_bonus: '6' },
+        { id: 'tian-shan-avatar', name: 'Tian Shan', rank: 'C', rarity: 'Rare', energy_bonus: '9' },
+        { id: 'kohan-avatar', name: 'Kohan', rank: 'B', rarity: 'Epic', energy_bonus: '12' },
+        { id: 'picco-avatar', name: 'Picco', rank: 'A', rarity: 'Legendary', energy_bonus: '15' },
+        { id: 'koku-avatar', name: 'Koku', rank: 'S', rarity: 'Mythic', energy_bonus: '20' },
+        { id: 'kid-kohan-avatar', name: 'Kid Kohan', rank: 'SS', rarity: 'Phantom', energy_bonus: '60' }
     ],
     dungeons: [
         {

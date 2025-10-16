@@ -77,16 +77,16 @@ export const world4Data = {
         { id: 'meki-pet', name: 'Meki', rank: 'B', rarity: 'Epic', energy_bonus: '188' },
         { id: 'tage-pet', name: 'Tage', rank: 'A', rarity: 'Legendary', energy_bonus: '234' },
         { id: 'gajo-pet', name: 'Gajo', rank: 'S', rarity: 'Mythic', energy_bonus: '313' },
-        { id: 'sakuni-pet', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '703' }
+        { id: 'sakuni-pet', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '938' }
     ],
     avatars: [
-        { id: 'itodo-avatar', name: 'Itodo', rank: 'E', rarity: 'Common', energy_bonus: '1' },
-        { id: 'nebara-avatar', name: 'Nebara', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
-        { id: 'magum-avatar', name: 'Magum', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
-        { id: 'meki-avatar', name: 'Meki', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'tage-avatar', name: 'Tage', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
-        { id: 'gajo-avatar', name: 'Gajo', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
-        { id: 'sakuni-avatar', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
+        { id: 'itodo-avatar', name: 'Itodo', rank: 'E', rarity: 'Common', energy_bonus: '47' },
+        { id: 'nebara-avatar', name: 'Nebara', rank: 'D', rarity: 'Uncommon', energy_bonus: '94' },
+        { id: 'magum-avatar', name: 'Magum', rank: 'C', rarity: 'Rare', energy_bonus: '141' },
+        { id: 'meki-avatar', name: 'Meki', rank: 'B', rarity: 'Epic', energy_bonus: '188' },
+        { id: 'tage-avatar', name: 'Tage', rank: 'A', rarity: 'Legendary', energy_bonus: '234' },
+        { id: 'gajo-avatar', name: 'Gajo', rank: 'S', rarity: 'Mythic', energy_bonus: '313' },
+        { id: 'sakuni-avatar', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '938' }
     ],
     dungeons: [
         {
@@ -96,3 +96,4 @@ export const world4Data = {
         }
     ],
   };
+  

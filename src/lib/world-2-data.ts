@@ -97,16 +97,16 @@ export const world2Data = {
         { id: 'senji-pet', name: 'Senji', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
         { id: 'zaro-pet', name: 'Zaro', rank: 'A', rarity: 'Legendary', energy_bonus: '38' },
         { id: 'loffy-pet', name: 'Loffy', rank: 'S', rarity: 'Mythic', energy_bonus: '50' },
-        { id: 'shanks-pet', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '113' }
+        { id: 'shanks-pet', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '150' }
     ],
     avatars: [
-        { id: 'nomi-avatar', name: 'Nomi', rank: 'E', rarity: 'Common', energy_bonus: '1' },
-        { id: 'usup-avatar', name: 'Usup', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
-        { id: 'robins-avatar', name: 'Robins', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'nomi-avatar', name: 'Nomi', rank: 'E', rarity: 'Common', energy_bonus: '8' },
+        { id: 'usup-avatar', name: 'Usup', rank: 'D', rarity: 'Uncommon', energy_bonus: '15' },
+        { id: 'robins-avatar', name: 'Robins', rank: 'C', rarity: 'Rare', energy_bonus: '23' },
         { id: 'senji-avatar', name: 'Senji', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'zaro-avatar', name: 'Zaro', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
-        { id: 'loffy-avatar', name: 'Loffy', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
-        { id: 'shanks-avatar', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
+        { id: 'zaro-avatar', name: 'Zaro', rank: 'A', rarity: 'Legendary', energy_bonus: '38' },
+        { id: 'loffy-avatar', name: 'Loffy', rank: 'S', rarity: 'Mythic', energy_bonus: '50' },
+        { id: 'shanks-avatar', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '150' }
     ],
     dungeons: [
         {

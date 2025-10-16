@@ -60,16 +60,18 @@ export const world8Data = {
         { id: 'kakashki-pet', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '7.32k' },
         { id: 'jiria-pet', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '9.15k' },
         { id: 'tsuni-pet', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '12.2k' },
-        { id: 'itechi-pet', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '27.4k' }
+        { id: 'itechi-pet', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '36.6k' },
+        { id: 'madera-pet', name: 'Madera', rank: 'SS', rarity: 'Phantom', energy_bonus: '40.2k' }
     ],
     avatars: [
-        { id: 'sekuri-avatar', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1' },
-        { id: 'kid-norto-avatar', name: 'Kid Norto', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
-        { id: 'kid-seske-avatar', name: 'Kid Seske', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
-        { id: 'kakashki-avatar', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'jiria-avatar', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
-        { id: 'tsuni-avatar', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
-        { id: 'itechi-avatar', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
+        { id: 'sekuri-avatar', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1.83k' },
+        { id: 'kid-norto-avatar', name: 'Kid Norto', rank: 'D', rarity: 'Uncommon', energy_bonus: '3.66k' },
+        { id: 'kid-seske-avatar', name: 'Kid Seske', rank: 'C', rarity: 'Rare', energy_bonus: '5.49k' },
+        { id: 'kakashki-avatar', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '7.32k' },
+        { id: 'jiria-avatar', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '9.15k' },
+        { id: 'tsuni-avatar', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '12.2k' },
+        { id: 'itechi-avatar', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '36.6k' },
+        { id: 'madera-avatar', name: 'Madera', rank: 'SS', rarity: 'Phantom', energy_bonus: '40.2k' }
     ],
     shadows: [
         {

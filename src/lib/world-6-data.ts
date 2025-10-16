@@ -57,16 +57,16 @@ export const world6Data = {
         { id: 'cha-pet', name: 'Cha', rank: 'B', rarity: 'Epic', energy_bonus: '1.17k' },
         { id: 'choi-pet', name: 'Choi', rank: 'A', rarity: 'Legendary', energy_bonus: '1.46k' },
         { id: 'solo-sung-pet', name: 'Solo Sung', rank: 'S', rarity: 'Mythic', energy_bonus: '1.95k' },
-        { id: 'statue-of-god-pet', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '4.39k' }
+        { id: 'statue-of-god-pet', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '5.85k' }
     ],
     avatars: [
-        { id: 'weak-sung-avatar', name: 'Weak Sung', rank: 'E', rarity: 'Common', energy_bonus: '1' },
-        { id: 'green-goblin-avatar', name: 'Green Goblin', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
-        { id: 'white-tiger-avatar', name: 'White Tiger', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
-        { id: 'cha-avatar', name: 'Cha', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'choi-avatar', name: 'Choi', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
-        { id: 'solo-sung-avatar', name: 'Solo Sung', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
-        { id: 'statue-of-god-avatar', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
+        { id: 'weak-sung-avatar', name: 'Weak Sung', rank: 'E', rarity: 'Common', energy_bonus: '293' },
+        { id: 'green-goblin-avatar', name: 'Green Goblin', rank: 'D', rarity: 'Uncommon', energy_bonus: '586' },
+        { id: 'white-tiger-avatar', name: 'White Tiger', rank: 'C', rarity: 'Rare', energy_bonus: '879' },
+        { id: 'cha-avatar', name: 'Cha', rank: 'B', rarity: 'Epic', energy_bonus: '1.17k' },
+        { id: 'choi-avatar', name: 'Choi', rank: 'A', rarity: 'Legendary', energy_bonus: '1.46k' },
+        { id: 'solo-sung-avatar', name: 'Solo Sung', rank: 'S', rarity: 'Mythic', energy_bonus: '1.95k' },
+        { id: 'statue-of-god-avatar', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '5.85k' }
     ],
     shadows: [
         {

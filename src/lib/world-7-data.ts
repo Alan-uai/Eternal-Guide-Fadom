@@ -63,16 +63,16 @@ export const world7Data = {
         { id: 'aste-pet', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '2.93k' },
         { id: 'yune-pet', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '3.66k' },
         { id: 'yemi-pet', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '4.88k' },
-        { id: 'novi-chroni-pet', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '10.9k' }
+        { id: 'novi-chroni-pet', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '14.6k' }
     ],
     avatars: [
-        { id: 'noalle-avatar', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '1' },
-        { id: 'megna-avatar', name: 'Megna', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
-        { id: 'finrel-avatar', name: 'Finrel', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
-        { id: 'aste-avatar', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'yune-avatar', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
-        { id: 'yemi-avatar', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
-        { id: 'novi-chroni-avatar', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
+        { id: 'noalle-avatar', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '732' },
+        { id: 'megna-avatar', name: 'Megna', rank: 'D', rarity: 'Uncommon', energy_bonus: '1.46k' },
+        { id: 'finrel-avatar', name: 'Finrel', rank: 'C', rarity: 'Rare', energy_bonus: '2.19k' },
+        { id: 'aste-avatar', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '2.93k' },
+        { id: 'yune-avatar', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '3.66k' },
+        { id: 'yemi-avatar', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '4.88k' },
+        { id: 'novi-chroni-avatar', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '14.6k' }
     ],
     shadows: [
         {
