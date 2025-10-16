@@ -66,6 +66,17 @@ export function InteractiveGridCategory({ subcollectionName, itemTypeFilter }: {
     const handleEquipItem = async (item: any, rarityOrLevel?: string | number) => {
         if (!itemsQuery) return;
         
+        // Aura limit check
+        if (subcollectionName === 'auras' && equippedItems && equippedItems.length >= 2) {
+             toast({
+                variant: 'destructive',
+                title: 'Limite de Auras Atingido',
+                description: 'Você só pode equipar no máximo 2 auras.',
+            });
+            setOpenPopoverId(null);
+            return;
+        }
+
         let dataToSave: any = { id: item.id, name: item.name };
         
         if (typeof rarityOrLevel === 'string') {
