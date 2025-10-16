@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useUser, useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -63,12 +63,22 @@ export function WeaponSlots() {
 
     const updateWeaponData = async (slotIndex: number, newData: object) => {
         if (!userDocRef) return;
-        const currentSlots = (userData as any)?.weaponSlots || {};
-        const updatedSlotData = { ...currentSlots[slotIndex], ...newData };
-        const newSlots = { ...currentSlots, [slotIndex]: updatedSlotData };
+        
+        // Ensure you're working with the latest state
+        const currentData = (userData as any)?.weaponSlots || {};
+        const weaponToUpdate = currentData[slotIndex];
+
+        if (!weaponToUpdate) {
+            toast({ variant: "destructive", title: "Erro", description: "Nenhuma arma equipada neste slot." });
+            return;
+        }
+
+        const updatedWeapon = { ...weaponToUpdate, ...newData };
+        const newSlots = { ...currentData, [slotIndex]: updatedWeapon };
 
         try {
             await updateDoc(userDocRef, { weaponSlots: newSlots });
+             // No toast here to avoid being too noisy on star clicks
         } catch (error) {
             console.error("Error updating weapon data:", error);
             toast({ variant: "destructive", title: "Erro", description: "Não foi possível atualizar os dados da arma." });
@@ -83,8 +93,8 @@ export function WeaponSlots() {
             id: item.name, // Use name as ID for simplicity here, could be a real ID
             name: item.name,
             rarity: item.rarity,
-            stats: item.three_star_stats || item.stats || item.baseDamage,
-            type: item.type || weaponType,
+            stats: item.baseDamage || item.stats || item.base_stats,
+            type: weaponType,
             evolutionLevel: 0, // Default evolution
             breathingEnchantment: null,
             stoneEnchantment: null,
@@ -111,12 +121,12 @@ export function WeaponSlots() {
     const baseEvolutionStars = [1, 2, 3];
 
     return (
-        <div className='flex flex-col md:flex-row gap-4 items-start'>
+        <div className='flex w-full flex-row gap-4 items-start'>
             {[0, 1, 2].map(slotIndex => {
                 const equipped = equippedWeapons[slotIndex];
                 
                 return (
-                    <div key={slotIndex} className="flex flex-col items-center gap-2 w-full md:w-1/3">
+                    <div key={slotIndex} className="flex flex-col items-center gap-2 w-full">
                         <Card 
                             className="cursor-pointer hover:border-primary/50 transition-colors h-48 w-full flex flex-col justify-between" 
                             onClick={() => handleSlotClick(slotIndex)}
@@ -187,7 +197,7 @@ export function WeaponSlots() {
                             </div>
                         </Card>
                         <div className='flex justify-center items-center gap-2 h-5'>
-                            {(equipped ? baseEvolutionStars : [1, 2, 3]).map(starLevel => (
+                            {baseEvolutionStars.map(starLevel => (
                                 <Star
                                     key={starLevel}
                                     className={cn(
@@ -198,7 +208,7 @@ export function WeaponSlots() {
                                     onClick={(e) => {
                                         if (!equipped) return;
                                         e.stopPropagation();
-                                        const newLevel = equipped.evolutionLevel === starLevel ? 0 : starLevel;
+                                        const newLevel = equipped.evolutionLevel === starLevel ? starLevel - 1 : starLevel;
                                         updateWeaponData(slotIndex, { evolutionLevel: newLevel });
                                     }}
                                 />
@@ -224,7 +234,9 @@ export function WeaponSlots() {
                     ) : (
                         <ScrollArea className="h-72">
                             <div className="space-y-2 py-4">
-                                {weaponType && weaponData[weaponType].filter(item => !item.name.includes('Estrela')).map((item: any, index: number) => (
+                                {weaponType && weaponData[weaponType]
+                                    .filter(item => item.name && !item.name.includes('Estrela') && !item.name.includes('Star'))
+                                    .map((item: any, index: number) => (
                                      <Button key={index} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleItemSelect(item)}>
                                         <div className='flex flex-col items-start'>
                                             <p>{item.name}</p>
