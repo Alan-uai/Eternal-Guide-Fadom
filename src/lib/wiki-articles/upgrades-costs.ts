@@ -4,8 +4,8 @@ export const upgradesCostsArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'upgrades-costs',
   title: 'Custos de Upgrades',
   summary: 'Uma referência completa dos custos para cada nível de upgrade para Velocidade de Estrela, Sorte, Chance Crítica de Energia, EXP e outros bônus gerais.',
-  content: `Esta página detalha os custos em moedas para cada nível de upgrade em várias categorias de bônus permanentes no jogo.`,
-  tags: ['custos', 'upgrade', 'evolução', 'preços', 'sorte', 'exp', 'dano', 'energia', 'moedas', 'guia'],
+  content: `Esta página detalha os custos em moedas para cada nível de upgrade em várias categorias de bônus permanentes no jogo, além dos custos em Exchange Tokens para expandir os slots do inventário.`,
+  tags: ['custos', 'upgrade', 'evolução', 'preços', 'sorte', 'exp', 'dano', 'energia', 'moedas', 'guia', 'inventário', 'token'],
   imageUrl: 'wiki-13', // Reusing scientific notation image as it relates to costs
   tables: {
     starSpeed: {
@@ -162,6 +162,21 @@ export const upgradesCostsArticle: Omit<WikiArticle, 'createdAt'> = {
         { 'Attack Range 2': 2, Costs: 750 },
         { 'Attack Range 2': 3, Costs: 1250 },
         { 'Attack Range 2': 4, Costs: 2500 },
+      ]
+    },
+    inventorySlots: {
+      headers: ['Upgrade', 'Champions', 'Accessories', 'Weapons', 'Titans', 'Stands', 'Jewelry'],
+      rows: [
+        { Upgrade: '1', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '2', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '3', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '4', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '5', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '6', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '7', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '8', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '9', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
+        { Upgrade: '10', Champions: '1k', Accessories: '1k', Weapons: '1k', Titans: '1k', Stands: '1k', Jewelry: '1k' },
       ]
     }
   },
