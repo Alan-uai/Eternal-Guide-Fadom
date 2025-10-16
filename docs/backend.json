@@ -194,9 +194,9 @@
             "type": "object",
             "description": "Stores the equipped weapons in the three slots.",
             "properties": {
-                "0": { "$ref": "#/backend/entities/UserItem" },
-                "1": { "$ref": "#/backend/entities/UserItem" },
-                "2": { "$ref": "#/backend/entities/UserItem" }
+                "0": { "$ref": "#/backend/entities/UserWeapon" },
+                "1": { "$ref": "#/backend/entities/UserWeapon" },
+                "2": { "$ref": "#/backend/entities/UserWeapon" }
             }
         }
       },
@@ -204,6 +204,21 @@
         "id",
         "email"
       ]
+    },
+    "UserWeapon": {
+      "title": "UserWeapon",
+      "description": "Represents a weapon equipped by a user, including its evolution and enchantments.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "rarity": { "type": "string" },
+        "type": { "type": "string", "enum": ["damage", "scythe", "energy"] },
+        "evolutionLevel": { "type": "number", "description": "The star level of the weapon (0-3)." },
+        "breathingEnchantment": { "type": "string", "nullable": true },
+        "stoneEnchantment": { "type": "string", "nullable": true },
+        "passiveEnchantment": { "type": "string", "nullable": true }
+      }
     },
     "UserItem": {
         "title": "UserItem",

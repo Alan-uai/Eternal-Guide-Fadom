@@ -8,9 +8,17 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle } from 'lucide-react';
+import { Loader2, PlusCircle, Star } from 'lucide-react';
 import { RarityBadge } from './RarityBadge';
 import { damageSwordsArticle, scythesArticle, swordsArticle } from '@/lib/wiki-data';
+import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+
+
+// Dummy data for enchantments - in a real app, this would come from a data file
+const breathingEnchantments = ['Sun', 'Moon', 'Water', 'Thunder', 'Wind', 'Beast'];
+const stoneEnchantments = ['Attack', 'Speed', 'Critical'];
+const passiveEnchantments = ['Lifesteal', 'Cooldown', 'AoE'];
 
 export function WeaponSlots() {
     const { user, isUserLoading } = useUser();
@@ -30,14 +38,12 @@ export function WeaponSlots() {
     const equippedWeapons = (userData as any)?.weaponSlots || {};
 
     const weaponData = useMemo(() => {
-        const energySwords = swordsArticle.tables 
-          ? Object.values(swordsArticle.tables).flatMap(table => table.rows)
-          : [];
-
         return {
             damage: damageSwordsArticle.tables?.damageSwords.rows || [],
             scythe: scythesArticle.tables?.scythes.rows || [],
-            energy: energySwords,
+            energy: swordsArticle.tables 
+                ? Object.values(swordsArticle.tables).flatMap(table => table.rows)
+                : [],
         };
     }, []);
 
@@ -53,22 +59,46 @@ export function WeaponSlots() {
         setStep('item');
     };
 
+    const updateWeaponData = async (slotIndex: number, newData: object) => {
+        if (!userDocRef) return;
+        const currentSlots = (userData as any)?.weaponSlots || {};
+        const updatedSlotData = { ...currentSlots[slotIndex], ...newData };
+        const newSlots = { ...currentSlots, [slotIndex]: updatedSlotData };
+
+        try {
+            await updateDoc(userDocRef, { weaponSlots: newSlots });
+        } catch (error) {
+            console.error("Error updating weapon data:", error);
+            toast({ variant: "destructive", title: "Erro", description: "Não foi possível atualizar os dados da arma." });
+        }
+    };
+
+
     const handleItemSelect = async (item: any) => {
         if (selectedSlot === null || !userDocRef) return;
+        
+        const newWeaponData = {
+            id: item.name, // Use name as ID for simplicity here, could be a real ID
+            name: item.name,
+            rarity: item.rarity,
+            stats: item.three_star_stats || item.stats,
+            type: weaponType,
+            evolutionLevel: 0, // Default evolution
+            breathingEnchantment: null,
+            stoneEnchantment: null,
+            passiveEnchantment: null,
+        };
+
         const newSlots = {
             ...equippedWeapons,
-            [selectedSlot]: {
-                name: item.name,
-                rarity: item.rarity,
-                stats: item.three_star_stats || item.stats
-            }
+            [selectedSlot]: newWeaponData
         };
 
         try {
             await updateDoc(userDocRef, { weaponSlots: newSlots });
             toast({ title: "Arma Equipada!", description: `${item.name} equipada no slot ${selectedSlot + 1}.` });
         } catch (error) {
-            toast({ variant: 'destructive', title: "Erro", description: "Não foi possível equipar a arma." });
+            toast({ variant: "destructive", title: "Erro", description: "Não foi possível equipar a arma." });
         } finally {
             setOpen(false);
         }
@@ -77,27 +107,102 @@ export function WeaponSlots() {
     const isLoading = isUserLoading || isUserDataLoading;
 
     return (
-        <div className='grid grid-cols-3 gap-4'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             {[0, 1, 2].map(slotIndex => {
                 const equipped = equippedWeapons[slotIndex];
+                
                 return (
-                    <Card key={slotIndex} onClick={() => handleSlotClick(slotIndex)} className="cursor-pointer hover:border-primary/50 transition-colors h-48 flex flex-col justify-center items-center">
-                        <CardContent className="p-4 text-center">
+                    <Card key={slotIndex} className="cursor-pointer hover:border-primary/50 transition-colors h-48 flex flex-col justify-between">
+                         <div className='p-4 text-center relative flex-grow flex flex-col items-center justify-center' onClick={() => handleSlotClick(slotIndex)}>
                              {isLoading ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
                             ) : equipped ? (
-                                <div>
+                                <>
+                                    {/* Top-Left: Stone / Gamepass */}
+                                    {equipped.type === 'damage' && (
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="absolute top-1 left-1 h-6 px-2 text-xs">
+                                                   {equipped.stoneEnchantment || 'Stone'}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-1">
+                                                 {stoneEnchantments.map(enchant => (
+                                                    <Button key={enchant} variant="ghost" size="sm" className="w-full justify-start" onClick={() => updateWeaponData(slotIndex, { stoneEnchantment: enchant })}>
+                                                        {enchant}
+                                                    </Button>
+                                                ))}
+                                            </PopoverContent>
+                                        </Popover>
+                                    )}
+
+                                    {/* Top-Right: Breathing / Passive */}
+                                     {equipped.type === 'damage' && (
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="absolute top-1 right-1 h-6 px-2 text-xs">
+                                                    {equipped.breathingEnchantment || 'Breathing'}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-1">
+                                                 {breathingEnchantments.map(enchant => (
+                                                    <Button key={enchant} variant="ghost" size="sm" className="w-full justify-start" onClick={() => updateWeaponData(slotIndex, { breathingEnchantment: enchant })}>
+                                                        {enchant}
+                                                    </Button>
+                                                ))}
+                                            </PopoverContent>
+                                        </Popover>
+                                     )}
+                                     {equipped.type === 'scythe' && (
+                                         <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="absolute top-1 right-1 h-6 px-2 text-xs">
+                                                    {equipped.passiveEnchantment || 'Passive'}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-1">
+                                                 {passiveEnchantments.map(enchant => (
+                                                    <Button key={enchant} variant="ghost" size="sm" className="w-full justify-start" onClick={() => updateWeaponData(slotIndex, { passiveEnchantment: enchant })}>
+                                                        {enchant}
+                                                    </Button>
+                                                ))}
+                                            </PopoverContent>
+                                        </Popover>
+                                     )}
+
+
                                     <p className="font-bold">{equipped.name}</p>
-                                    <p className="text-xs text-muted-foreground">{equipped.rarity}</p>
+                                    <RarityBadge rarity={equipped.rarity} />
                                     <p className="text-xs mt-2">{equipped.stats}</p>
-                                </div>
+                                </>
                             ) : (
                                 <div className="text-muted-foreground">
                                     <PlusCircle className="mx-auto h-8 w-8" />
                                     <p className="text-sm mt-2">Equipar Arma</p>
                                 </div>
                             )}
-                        </CardContent>
+                        </div>
+
+                        {equipped && (
+                            <CardContent className="p-2 border-t">
+                                <div className='flex justify-center items-center gap-2'>
+                                    {[1, 2, 3].map(starLevel => (
+                                        <Star
+                                            key={starLevel}
+                                            className={cn(
+                                                'h-5 w-5 text-gray-500 transition-colors',
+                                                (equipped.evolutionLevel || 0) >= starLevel && 'text-red-500 fill-red-500'
+                                            )}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const newLevel = equipped.evolutionLevel === starLevel ? 0 : starLevel;
+                                                updateWeaponData(slotIndex, { evolutionLevel: newLevel });
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </CardContent>
+                        )}
                     </Card>
                 )
             })}
@@ -111,9 +216,9 @@ export function WeaponSlots() {
                     </DialogHeader>
                     {step === 'type' ? (
                         <div className='grid grid-cols-1 gap-2 py-4'>
-                            <Button variant="outline" onClick={() => handleTypeSelect('damage')}>Dano (Espadas)</Button>
+                            <Button variant="outline" onClick={() => handleTypeSelect('damage')}>Dano (Espadas de Dano)</Button>
                             <Button variant="outline" onClick={() => handleTypeSelect('scythe')}>Foices</Button>
-                            <Button variant="outline" onClick={() => handleTypeSelect('energy')}>Energia (Espadas)</Button>
+                            <Button variant="outline" onClick={() => handleTypeSelect('energy')}>Energia (Espadas de Energia)</Button>
                         </div>
                     ) : (
                         <ScrollArea className="h-72">
