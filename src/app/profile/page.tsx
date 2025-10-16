@@ -314,8 +314,8 @@ const profileCategories = [
     { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras', isInteractiveGrid: true },
     { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets', isInteractiveGrid: true },
     { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons', isInteractiveGrid: true },
-    { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories', isInteractiveGrid: true, gridData: accessories },
-    { name: 'Gamepasses', icon: Wallet, description: 'Gamepasses que você possui.', subcollectionName: 'gamepasses', isInteractiveGrid: true, gridData: allGamepasses },
+    { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories', isInteractiveGrid: true },
+    { name: 'Gamepasses', icon: Wallet, description: 'Gamepasses que você possui.', subcollectionName: 'gamepasses', isInteractiveGrid: true },
     { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index', disableItemUpload: true },
     { name: 'Obeliscos', icon: Pyramid, description: 'Seu progresso nos obeliscos de poder.', subcollectionName: 'obelisks', disableItemUpload: true },
     { name: 'Conquistas', icon: Trophy, description: 'Calcule seus bônus de conquistas.', subcollectionName: 'achievements', disableItemUpload: true },
@@ -845,17 +845,12 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
 
         // For powers, we need to filter out non-equipable progression/mechanic items.
         if (subcollectionName === 'powers') {
-             // Only include items that are explicitly 'gacha' and not just 'progression'.
-             // This filters out items like "Haki Upgrade" or "Weapon Evolution".
-             // Also excludes items that are conceptually different, like 'Stands'.
+             // Only include items that are explicitly 'gacha'
             const equipablePowers = allGameData.flatMap(world => world.powers || [])
             .filter(power => 
                 power && 
                 power.id && 
-                power.type === 'gacha' && 
-                !power.name.toLowerCase().includes('stand') &&
-                !power.name.toLowerCase().includes('evolution') &&
-                !power.name.toLowerCase().includes('breathing')
+                power.type === 'gacha'
              );
             return equipablePowers;
         }
@@ -933,7 +928,7 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                     const cardBgClass = isEquipped ? getRarityClass(selectedRarity) : 'bg-muted/30 border-transparent';
 
                     return (
-                        <Popover key={`${item.id}-${(selectedOption as any)?.id || ''}`} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
+                        <Popover key={item.id} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
                             <PopoverTrigger asChild>
                                 <button
                                     onClick={() => handleItemClick(item)}
@@ -941,15 +936,21 @@ function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectio
                                     onPointerUp={handlePointerUp}
                                     onPointerLeave={handlePointerUp}
                                     className={cn(
-                                        'aspect-square rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border-2 transition-all duration-200',
+                                        'aspect-square rounded-md flex flex-col items-center justify-center p-2 text-center relative overflow-hidden border-2 transition-all duration-200',
                                         isEquipped ? 'border-primary/50' : 'hover:border-primary/50',
                                         cardBgClass
                                     )}
                                 >
-                                    <p className="text-[10px] font-bold leading-tight text-center z-10">{item.name}</p>
-                                    {isEquipped && (
-                                        <div className="absolute bottom-1 right-1 flex items-center gap-1">
-                                            <span className='text-[9px] opacity-70'>{selectedOption?.name || selectedRarity}</span>
+                                     {isEquipped && (
+                                        <div className='absolute top-1 text-xs font-semibold opacity-80'>
+                                            {selectedOption?.name}
+                                        </div>
+                                    )}
+
+                                    <p className="text-sm font-bold leading-tight z-10">{item.name}</p>
+
+                                     {isEquipped && (
+                                        <div className="absolute bottom-1 flex items-center justify-center w-full">
                                             <RarityBadge rarity={selectedRarity} />
                                         </div>
                                     )}
@@ -1128,3 +1129,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+    

@@ -206,7 +206,8 @@
             "rarity": {"type": "string"},
             "world": {"type": "string"},
             "avatarTier": {"type": "number"},
-            "petTier": {"type": "number"}
+            "petTier": {"type": "number"},
+            "leveling": { "type": "number", "description": "O nível de 'leveling' de um poder, se aplicável." }
         }
     },
     "UserAccessory": {
@@ -729,3 +730,5 @@
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. A new top-level collection 'achievements' is added to store all game achievements, which is separate from world-specific data."
   }
 }
+
+    
