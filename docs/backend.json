@@ -198,6 +198,16 @@
                 "1": { "$ref": "#/backend/entities/UserWeapon" },
                 "2": { "$ref": "#/backend/entities/UserWeapon" }
             }
+        },
+        "jewelrySlots": {
+          "type": "object",
+          "description": "Stores the equipped jewelry in the four slots.",
+          "properties": {
+            "energy": { "$ref": "#/backend/entities/UserJewelry" },
+            "coin": { "$ref": "#/backend/entities/UserJewelry" },
+            "damage": { "$ref": "#/backend/entities/UserJewelry" },
+            "luck": { "$ref": "#/backend/entities/UserJewelry" }
+          }
         }
       },
       "required": [
@@ -219,6 +229,18 @@
         "stoneEnchantment": { "type": "string", "nullable": true },
         "passiveEnchantment": { "type": "string", "nullable": true }
       }
+    },
+    "UserJewelry": {
+      "title": "UserJewelry",
+      "description": "Represents a piece of jewelry equipped by a user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "e.g., 'gold-energy-bracelet'" },
+        "name": { "type": "string", "description": "e.g., 'Gold Energy Bracelet'" },
+        "type": { "type": "string", "enum": ["energy", "coin", "damage", "luck"], "description": "The type of bonus the jewelry provides." },
+        "level": { "type": "string", "enum": ["bronze", "silver", "gold", "rose-gold"], "description": "The material/level of the jewelry." }
+      },
+      "required": ["id", "name", "type", "level"]
     },
     "UserItem": {
         "title": "UserItem",

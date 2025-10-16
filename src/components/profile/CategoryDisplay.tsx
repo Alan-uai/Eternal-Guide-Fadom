@@ -14,8 +14,9 @@ import { InteractiveGridCategory } from './InteractiveGridCategory';
 import { allGamepasses } from '@/lib/gamepass-data';
 import { accessories } from '@/lib/accessory-data';
 import { FighterSlots } from './FighterSlots';
+import { JewelrySlots } from './JewelrySlots';
 
-export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeaponSlots, isFighterSlots, itemTypeFilter }: { subcollectionName: string; isInteractiveGrid?: boolean; isWeaponSlots?: boolean; isFighterSlots?: boolean; itemTypeFilter?: string; }) {
+export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeaponSlots, isFighterSlots, isJewelrySlots, itemTypeFilter }: { subcollectionName: string; isInteractiveGrid?: boolean; isWeaponSlots?: boolean; isFighterSlots?: boolean; isJewelrySlots?: boolean; itemTypeFilter?: string; }) {
     const { user } = useUser();
     const { firestore } = useFirebase();
 
@@ -25,6 +26,7 @@ export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeapon
     if (subcollectionName === 'rank') return <RankSelector />;
     if (isWeaponSlots) return <WeaponSlots />;
     if (isFighterSlots) return <FighterSlots />;
+    if (isJewelrySlots) return <JewelrySlots />;
     if (isInteractiveGrid) {
         let gridData;
         if (subcollectionName === 'gamepasses') gridData = allGamepasses;

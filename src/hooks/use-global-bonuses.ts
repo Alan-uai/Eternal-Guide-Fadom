@@ -12,6 +12,7 @@ import { energyGainPerRank } from '@/lib/energy-gain-data';
 import { allGameData } from '@/lib/game-data-context';
 import { useApp } from '@/context/app-provider';
 import { allAuras } from '@/lib/aura-data';
+import { allJewelry } from '@/lib/jewelry-data';
 
 // Helper function to safely parse bonus values which can be strings like '1.5x' or '10%'
 const parseBonusValue = (value: string | undefined): { value: number; isMultiplier: boolean } => {
@@ -101,7 +102,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
     const petItems = useCollection(useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'pets') : null, [firestore, user]));
     const fighterItems = useCollection(useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'fighters') : null, [firestore, user]));
     
-    const { data: weaponSlotsData, isLoading: weaponsLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, `users/${user.uid}`) : null, [firestore, user]));
+    const { data: userDocData, isLoading: weaponsLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, `users/${user.uid}`) : null, [firestore, user]));
     const { data: rankData, isLoading: rankLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, 'users', user.uid, 'rank', 'current') : null, [firestore, user]));
 
     const isLoading = isUserLoading || isGameDataLoading || weaponsLoading || rankLoading || accessoryItems.isLoading || gamepassItems.isLoading || auraItems.isLoading || achievementsLoading || indexLoading || obelisksLoading || powerItems.isLoading || petItems.isLoading || fighterItems.isLoading;
@@ -144,6 +145,19 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
                 addBonus('movespeed', rarityOption.movespeed_bonus);
             });
 
+            // Jewelry
+            const jewelrySlots = (userDocData as any)?.jewelrySlots;
+            if (jewelrySlots) {
+                Object.values(jewelrySlots).forEach((jewel: any) => {
+                    if (jewel) {
+                        const jewelryData = allJewelry.find(j => j.id === jewel.id);
+                        if (jewelryData) {
+                            addBonus(jewelryData.type, jewelryData.bonus);
+                        }
+                    }
+                });
+            }
+
             // Gamepasses
             const gpItems = calculateForMaxFlag ? allGamepasses : gamepassItems.data;
             gpItems?.forEach((item: any) => {
@@ -159,7 +173,9 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
             equippedAuras?.forEach((item: any) => {
                  const auraData = allAuras.find(a => a.id === item.id);
                  if (auraData?.bonus_type && auraData.bonus_value) {
-                     addBonus(auraData.bonus_type, auraData.bonus_value);
+                    if (auraData.bonus_type !== 'drops') {
+                        addBonus(auraData.bonus_type, auraData.bonus_value);
+                    }
                  }
             });
 
@@ -196,7 +212,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
                   '0': { id: 'Venomstrike', name: 'Venomstrike', rarity: 'Phantom', type: 'damage', evolutionLevel: 3, breathingEnchantment: 'Supreme', stoneEnchantment: 'Supreme'},
                   '1': { id: 'Stormreaver', name: 'Stormreaver', rarity: 'Supremo', type: 'scythe', evolutionLevel: 3, passiveEnchantment: 'Supreme' },
                   '2': { id: 'Excalibur', name: 'Excalibur', rarity: 'Comum', type: 'energy', evolutionLevel: 3 }
-                } : (weaponSlotsData as any)?.weaponSlots;
+                } : (userDocData as any)?.weaponSlots;
             
             if(equippedWeapons) {
                 Object.values(equippedWeapons).forEach((weapon: any) => {
@@ -273,7 +289,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
 
     }, [
         accessoryItems.data, gamepassItems.data, auraItems.data, achievementItems, indexItems, obeliskItems,
-        powerItems.data, petItems.data, fighterItems.data, weaponSlotsData, rankData, currentEnergyInput, calculateForMax, isGameDataLoading, allGameData
+        powerItems.data, petItems.data, fighterItems.data, userDocData, rankData, currentEnergyInput, calculateForMax, isGameDataLoading, allGameData
     ]);
 
     return {
