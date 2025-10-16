@@ -14,3 +14,4 @@ export const profileCategories = [
     { name: 'Conquistas', icon: Trophy, description: 'Calcule seus bônus de conquistas.', subcollectionName: 'achievements', disableItemUpload: true },
     { name: 'Rank', icon: ShieldCheck, description: 'Seu rank atual no jogo.', subcollectionName: 'rank', disableItemUpload: true },
 ];
+

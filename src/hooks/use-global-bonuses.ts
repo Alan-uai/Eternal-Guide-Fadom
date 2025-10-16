@@ -297,3 +297,4 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
         isLoading
     };
 }
+

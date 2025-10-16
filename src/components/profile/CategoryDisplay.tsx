@@ -14,7 +14,7 @@ import { InteractiveGridCategory } from './InteractiveGridCategory';
 import { allGamepasses } from '@/lib/gamepass-data';
 import { accessories } from '@/lib/accessory-data';
 import { FighterSlots } from './FighterSlots';
-import { JewelrySlots } from './JewelrySlots';
+import { JewelryItemSlots } from './JewelryItemSlots';
 
 export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeaponSlots, isFighterSlots, isJewelrySlots, itemTypeFilter }: { subcollectionName: string; isInteractiveGrid?: boolean; isWeaponSlots?: boolean; isFighterSlots?: boolean; isJewelrySlots?: boolean; itemTypeFilter?: string; }) {
     const { user } = useUser();
@@ -26,7 +26,7 @@ export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeapon
     if (subcollectionName === 'rank') return <RankSelector />;
     if (isWeaponSlots) return <WeaponSlots />;
     if (isFighterSlots) return <FighterSlots />;
-    if (isJewelrySlots) return <JewelrySlots />;
+    if (isJewelrySlots) return <JewelryItemSlots />;
     if (isInteractiveGrid) {
         let gridData;
         if (subcollectionName === 'gamepasses') gridData = allGamepasses;
@@ -71,3 +71,4 @@ export function CategoryDisplay({ subcollectionName, isInteractiveGrid, isWeapon
         </>
     );
 }
+
