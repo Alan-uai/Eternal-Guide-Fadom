@@ -1,30 +1,35 @@
 export interface Jewelry {
     id: string;
     name: string;
-    type: 'energy' | 'coin' | 'damage' | 'luck';
+    itemType: 'bracelet' | 'ring' | 'necklace' | 'earring';
+    bonusType: 'energy' | 'coin' | 'damage' | 'luck';
     level: 'bronze' | 'silver' | 'gold' | 'rose-gold';
     bonus: string;
 }
 
-export const allJewelry: Jewelry[] = [
-    // Bronze
-    { id: 'bronze-energy-bracelet', name: 'Bronze Energy Bracelet', type: 'energy', level: 'bronze', bonus: '0.1x' },
-    { id: 'bronze-coin-bracelet', name: 'Bronze Coin Bracelet', type: 'coin', level: 'bronze', bonus: '0.1x' },
-    { id: 'bronze-damage-bracelet', name: 'Bronze Damage Bracelet', type: 'damage', level: 'bronze', bonus: '0.1x' },
-    { id: 'bronze-luck-bracelet', name: 'Bronze Luck Bracelet', type: 'luck', level: 'bronze', bonus: '5.00%' },
-    // Silver
-    { id: 'silver-energy-bracelet', name: 'Silver Energy Bracelet', type: 'energy', level: 'silver', bonus: '0.25x' },
-    { id: 'silver-coin-bracelet', name: 'Silver Coin Bracelet', type: 'coin', level: 'silver', bonus: '0.25x' },
-    { id: 'silver-damage-bracelet', name: 'Silver Damage Bracelet', type: 'damage', level: 'silver', bonus: '0.25x' },
-    { id: 'silver-luck-bracelet', name: 'Silver Luck Bracelet', type: 'luck', level: 'silver', bonus: '10.00%' },
-    // Gold
-    { id: 'gold-energy-bracelet', name: 'Gold Energy Bracelet', type: 'energy', level: 'gold', bonus: '0.5x' },
-    { id: 'gold-coin-bracelet', name: 'Gold Coin Bracelet', type: 'coin', level: 'gold', bonus: '0.5x' },
-    { id: 'gold-damage-bracelet', name: 'Gold Damage Bracelet', type: 'damage', level: 'gold', bonus: '0.5x' },
-    { id: 'gold-luck-bracelet', name: 'Gold Luck Bracelet', type: 'luck', level: 'gold', bonus: '20.00%' },
-    // Rose Gold
-    { id: 'rose-gold-energy-bracelet', name: 'Rose Gold Energy Bracelet', type: 'energy', level: 'rose-gold', bonus: '0.75x' },
-    { id: 'rose-gold-coin-bracelet', name: 'Rose Gold Coin Bracelet', type: 'coin', level: 'rose-gold', bonus: '0.75x' },
-    { id: 'rose-gold-damage-bracelet', name: 'Rose Gold Damage Bracelet', type: 'damage', level: 'rose-gold', bonus: '0.75x' },
-    { id: 'rose-gold-luck-bracelet', name: 'Rose Gold Luck Bracelet', type: 'luck', level: 'rose-gold', bonus: '35.00%' },
+const jewelryTypes: { name: string; type: Jewelry['itemType'] }[] = [
+    { name: "Bracelet", type: "bracelet" },
+    { name: "Ring", type: "ring" },
+    { name: "Necklace", type: "necklace" },
+    { name: "Earring", type: "earring" }
 ];
+
+const bonusLevels: { level: Jewelry['level'], bonuses: Record<Jewelry['bonusType'], string> }[] = [
+    { level: 'bronze', bonuses: { energy: '0.1x', coin: '0.1x', damage: '0.1x', luck: '5.00%' } },
+    { level: 'silver', bonuses: { energy: '0.25x', coin: '0.25x', damage: '0.25x', luck: '10.00%' } },
+    { level: 'gold', bonuses: { energy: '0.5x', coin: '0.5x', damage: '0.5x', luck: '20.00%' } },
+    { level: 'rose-gold', bonuses: { energy: '0.75x', coin: '0.75x', damage: '0.75x', luck: '35.00%' } }
+];
+
+export const allJewelry: Jewelry[] = jewelryTypes.flatMap(item => 
+    bonusLevels.flatMap(levelInfo => 
+        (Object.keys(levelInfo.bonuses) as Jewelry['bonusType'][]).map(bonusType => ({
+            id: `${levelInfo.level}-${bonusType}-${item.type}`,
+            name: `${levelInfo.level.charAt(0).toUpperCase() + levelInfo.level.slice(1)} ${bonusType.charAt(0).toUpperCase() + bonusType.slice(1)} ${item.name}`,
+            itemType: item.type,
+            bonusType: bonusType,
+            level: levelInfo.level,
+            bonus: levelInfo.bonuses[bonusType],
+        }))
+    )
+);

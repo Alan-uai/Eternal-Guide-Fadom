@@ -10,14 +10,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, PlusCircle, Gem, Coins, Flame, Shield } from 'lucide-react';
 import { RarityBadge } from './RarityBadge';
-import { allJewelry } from '@/lib/jewelry-data';
+import { allJewelry, type Jewelry } from '@/lib/jewelry-data';
 import { cn } from '@/lib/utils';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Separator } from '../ui/separator';
 
 
-type JewelryType = 'energy' | 'coin' | 'damage' | 'luck';
+type JewelrySlotType = 'energy' | 'coin' | 'damage' | 'luck';
 
-const jewelryIcons: Record<JewelryType, React.ElementType> = {
+const jewelryIcons: Record<JewelrySlotType, React.ElementType> = {
     energy: Gem,
     coin: Coins,
     damage: Flame,
@@ -28,7 +28,10 @@ export function JewelrySlots() {
     const { user, isUserLoading } = useUser();
     const { firestore } = useFirebase();
     const [open, setOpen] = useState(false);
-    const [selectedSlot, setSelectedSlot] = useState<JewelryType | null>(null);
+    const [selectedSlot, setSelectedSlot] = useState<JewelrySlotType | null>(null);
+    const [step, setStep] = useState<'type' | 'level'>('type');
+    const [selectedJewelryType, setSelectedJewelryType] = useState<Jewelry['itemType'] | null>(null);
+
     const { toast } = useToast();
 
     const userDocRef = useMemoFirebase(() => {
@@ -48,9 +51,16 @@ export function JewelrySlots() {
     }, [userData]);
 
 
-    const handleSlotClick = (slotType: JewelryType) => {
+    const handleSlotClick = (slotType: JewelrySlotType) => {
         setSelectedSlot(slotType);
+        setStep('type');
+        setSelectedJewelryType(null);
         setOpen(true);
+    };
+
+    const handleJewelryTypeSelect = (itemType: Jewelry['itemType']) => {
+        setSelectedJewelryType(itemType);
+        setStep('level');
     };
 
     const handleItemSelect = async (item: any) => {
@@ -60,7 +70,8 @@ export function JewelrySlots() {
             id: item.id, 
             name: item.name,
             level: item.level,
-            type: item.type,
+            bonusType: item.bonusType,
+            itemType: item.itemType
         };
 
         const newSlots = {
@@ -82,14 +93,44 @@ export function JewelrySlots() {
         }
     };
     
+    const handleUnequip = async () => {
+        if (selectedSlot === null || !userDocRef) return;
+
+        const newSlots = { ...equippedJewelry };
+        delete newSlots[selectedSlot];
+
+        setEquippedJewelry(newSlots);
+         try {
+            await updateDoc(userDocRef, { jewelrySlots: newSlots });
+            toast({ title: "Jóia Removida!"});
+        } catch (error) {
+            console.error(error);
+            setEquippedJewelry((userData as any)?.jewelrySlots || {});
+            toast({ variant: "destructive", title: "Erro", description: "Não foi possível remover a jóia." });
+        } finally {
+            setOpen(false);
+        }
+    }
+
+
     const getBonusForJewelry = (item: any) => {
         if (!item) return '0x';
-        const jewelryData = allJewelry.find(j => j.type === item.type && j.level === item.level);
+        const jewelryData = allJewelry.find(j => j.id === item.id);
         return jewelryData?.bonus || '0x';
     };
 
     const isLoading = isUserLoading || isUserDataLoading;
-    const slots: JewelryType[] = ['energy', 'coin', 'damage', 'luck'];
+    const slots: JewelrySlotType[] = ['energy', 'coin', 'damage', 'luck'];
+
+    const availableJewelryTypes = useMemo(() => {
+        return [...new Set(allJewelry.map(j => j.itemType))];
+    }, []);
+
+    const availableLevelsForItemType = useMemo(() => {
+        if (!selectedJewelryType || !selectedSlot) return [];
+        return allJewelry.filter(j => j.itemType === selectedJewelryType && j.bonusType === selectedSlot);
+    }, [selectedJewelryType, selectedSlot]);
+
 
     return (
         <div className='w-full'>
@@ -128,23 +169,33 @@ export function JewelrySlots() {
                     <DialogHeader>
                         <DialogTitle>Equipar Jóia de <span className='capitalize text-primary'>{selectedSlot}</span></DialogTitle>
                         <DialogDescription>
-                            Selecione o nível do bracelete para equipar.
+                           {step === 'type' && "Selecione o tipo de jóia (bracelete, anel, etc.)."}
+                           {step === 'level' && `Selecione o nível para o(a) ${selectedJewelryType}.`}
                         </DialogDescription>
                     </DialogHeader>
                     <ScrollArea className="h-72">
                         <div className="space-y-2 py-4">
-                            {allJewelry
-                                .filter(item => item.type === selectedSlot)
-                                .map((item: any, index: number) => (
-                                 <Button key={index} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleItemSelect(item)}>
+                           {step === 'type' && availableJewelryTypes.map(itemType => (
+                                <Button key={itemType} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleJewelryTypeSelect(itemType)}>
+                                    <p className='capitalize'>{itemType}</p>
+                                </Button>
+                           ))}
+                           {step === 'level' && availableLevelsForItemType.map((item: Jewelry) => (
+                                <Button key={item.id} variant="ghost" className="w-full justify-start h-auto" onClick={() => handleItemSelect(item)}>
                                     <div className='flex flex-col items-start'>
                                         <p>{item.name}</p>
                                         <RarityBadge rarity={item.level} />
                                     </div>
                                 </Button>
-                            ))}
+                           ))}
                         </div>
                     </ScrollArea>
+                    {equippedJewelry[selectedSlot!] && (
+                         <>
+                            <Separator />
+                            <Button variant="destructive" className="w-full" onClick={handleUnequip}>Remover Jóia do Slot</Button>
+                         </>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

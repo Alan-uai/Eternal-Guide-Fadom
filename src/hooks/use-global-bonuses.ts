@@ -152,7 +152,7 @@ export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: bo
                     if (jewel) {
                         const jewelryData = allJewelry.find(j => j.id === jewel.id);
                         if (jewelryData) {
-                            addBonus(jewelryData.type, jewelryData.bonus);
+                            addBonus(jewelryData.bonusType, jewelryData.bonus);
                         }
                     }
                 });
