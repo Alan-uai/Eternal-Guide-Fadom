@@ -19,15 +19,16 @@ import { Label } from '../ui/label';
 
 const enchantmentRarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic', 'Phantom', 'Supreme'];
 const rarityMultipliers: Record<string, number> = {
-    'Common': 1.0,
-    'Uncommon': 1.1,
-    'Rare': 1.2,
-    'Epic': 1.4,
-    'Legendary': 1.6,
-    'Mythic': 1.8,
-    'Phantom': 2.0,
-    'Supreme': 2.5
+    'Common': 1.0,    // 0% Bonus
+    'Uncommon': 1.1,  // 10% Bonus
+    'Rare': 1.2,      // 20% Bonus
+    'Epic': 1.4,      // 40% Bonus
+    'Legendary': 1.6, // 60% Bonus
+    'Mythic': 1.8,    // 80% Bonus
+    'Phantom': 2.0,   // 100% Bonus
+    'Supreme': 2.0    // 100% Bonus (Corrected from 2.5)
 };
+const shadowRarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic', 'Phantom', 'Supreme'];
 
 const getTitanDamage = (titanName: string, evolutionLevel: number): string => {
     const tables = [
@@ -119,16 +120,20 @@ export function FighterSlots() {
             toast({ variant: "destructive", title: "Erro", description: "Não foi possível atualizar os dados do lutador." });
         }
     };
-
+    
     const handleItemSelect = async (item: any) => {
         setSelectedItem(item);
         if (fighterType === 'Shadow') {
-            await equipFighter(item, 'Common'); // Equip shadow directly, level will be 0 by default
+            setStep('rarity');
         } else {
-            // For Titans and Stands, they are equipped directly with default enchantment
             await equipFighter(item, 'Common');
         }
     };
+
+    const handleRaritySelect = async (rarity: string) => {
+        if (!selectedItem) return;
+        await equipFighter(selectedItem, rarity);
+    }
 
     const equipFighter = async (item: any, rarity: string) => {
         if (selectedSlot === null || !userDocRef) return;
@@ -138,12 +143,14 @@ export function FighterSlots() {
             name: item.name,
             type: fighterType,
             evolutionLevel: 0,
+            rarity: item.rarity || 'Comum',
         };
         
         if (fighterType === 'Shadow') {
-            newFighterData.level = 0; // Default level for new shadows
+            newFighterData.level = 0;
+            newFighterData.rarity = rarity; // Set rarity from selection
         } else {
-            newFighterData.enchantment = rarity; // For Titans and Stands
+            newFighterData.enchantment = rarity;
         }
 
         const newSlots = { ...equippedFighters, [selectedSlot]: newFighterData };
@@ -165,15 +172,16 @@ export function FighterSlots() {
         if (!item || !equipped) return '0x';
 
         const level = equipped.evolutionLevel || 0;
-        const enchantment = equipped.enchantment || 'Common';
         
         if (equipped.type === 'Titan') {
+            const enchantment = equipped.enchantment || 'Common';
             const baseDamagePercent = parseFloat(getTitanDamage(equipped.name, level).replace('%',''));
             const finalDamage = baseDamagePercent * (rarityMultipliers[enchantment] || 1.0);
             return `Dano: ${finalDamage.toFixed(2)}%`;
         }
 
         if (equipped.type === 'Stand') {
+            const enchantment = equipped.enchantment || 'Common';
             const baseBonus = parseFloat(item.energy_bonus.replace('%',''));
             const finalBonus = baseBonus * (rarityMultipliers[enchantment] || 1.0);
             return `Bônus: ${finalBonus.toFixed(2)}%`;
@@ -181,11 +189,12 @@ export function FighterSlots() {
         
         if (equipped.type === 'Shadow') {
             const shadowLevel = equipped.level || 0;
-            const baseStat = item.stats?.find((s:any) => s.rarity === 'Supreme'); // Use supreme stat as base
-            if(baseStat) {
+            const rarity = equipped.rarity || 'Common';
+            const baseStat = item.stats?.find((s:any) => s.rarity === rarity);
+            if (baseStat && baseStat.bonus) {
                 const bonusValue = parseFloat(baseStat.bonus.replace('%', ''));
                 const finalBonus = (bonusValue / 100) * shadowLevel;
-                return `Bônus: ${finalBonus.toFixed(2)}%`;
+                 return `Bônus: +${finalBonus.toFixed(2)}%`;
             }
             return 'Selecione a raridade';
         }
@@ -233,8 +242,23 @@ export function FighterSlots() {
                                                 </SelectContent>
                                             </Select>
                                         )}
+                                        {equipped.type === 'Shadow' && (
+                                            <Select
+                                                value={equipped.rarity || 'Common'}
+                                                onValueChange={(newRarity) => updateFighterData(slotIndex, { rarity: newRarity })}
+                                            >
+                                                <SelectTrigger className="absolute top-1 right-1 h-6 px-2 text-xs w-auto focus:ring-0 focus:ring-offset-0 border-0 bg-transparent">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent onClick={(e) => e.stopPropagation()}>
+                                                    {shadowRarities.map(rarity => (
+                                                        <SelectItem key={rarity} value={rarity}>{rarity}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        )}
                                         <p className="font-bold text-sm">{equipped.name}</p>
-                                        <RarityBadge rarity={equipped.type === 'Shadow' ? 'Phantom' : equipped.enchantment} />
+                                        <RarityBadge rarity={equipped.rarity} />
                                         <p className="text-xs mt-2">{displayedStat}</p>
                                     </>
                                 ) : (
@@ -291,6 +315,7 @@ export function FighterSlots() {
                         <DialogDescription>
                             {step === 'type' && 'Selecione o tipo de lutador.'}
                             {step === 'item' && `Selecione um lutador do tipo ${fighterType}.`}
+                             {step === 'rarity' && `Selecione a raridade para ${selectedItem?.name}.`}
                         </DialogDescription>
                     </DialogHeader>
                     {step === 'type' && (
@@ -316,8 +341,24 @@ export function FighterSlots() {
                             </div>
                         </ScrollArea>
                     )}
+                    {step === 'rarity' && fighterType === 'Shadow' && (
+                         <ScrollArea className="h-72">
+                             <div className="space-y-2 py-4">
+                                {(selectedItem?.stats || shadowRarities).map((rarityOrStat: any) => {
+                                    const rarity = typeof rarityOrStat === 'string' ? rarityOrStat : rarityOrStat.rarity;
+                                    return (
+                                        <Button key={rarity} variant="ghost" className="w-full justify-start" onClick={() => handleRaritySelect(rarity)}>
+                                            <RarityBadge rarity={rarity} />
+                                        </Button>
+                                    )
+                                })}
+                             </div>
+                         </ScrollArea>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>
     )
 }
+
+    
