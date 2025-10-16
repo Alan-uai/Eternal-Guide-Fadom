@@ -3,11 +3,12 @@
 import { useMemo } from 'react';
 import { useUser, useFirebase, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
-import { accessories } from '@/lib/accessory-data';
+import { accessories, RarityOption as AccessoryRarityOption } from '@/lib/accessory-data';
 import { allGamepasses } from '@/lib/gamepass-data';
 import { generalAchievements } from '@/lib/achievements-data';
-import { damageSwords, scythes, energySwords } from '@/lib/weapon-data';
+import { damageSwords, scythes, energySwords, Weapon as WeaponData } from '@/lib/weapon-data';
 import { energyGainPerRank } from '@/lib/energy-gain-data';
+import { allGameData } from '@/lib/game-data-context';
 
 // Helper function to safely parse bonus values which can be strings like '1.5x' or '10%'
 const parseBonusValue = (value: string | undefined): { value: number; isMultiplier: boolean } => {
@@ -79,35 +80,38 @@ const parseUserEnergy = (energyStr: string): number => {
 }
 
 
-export function useGlobalBonuses(currentEnergyInput: string) {
+export function useGlobalBonuses(currentEnergyInput: string, calculateForMax: boolean = false) {
     const { user, isUserLoading } = useUser();
     const { firestore } = useFirebase();
 
-    // Fetch all necessary data collections individually
-    const accessoriesQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'accessories') : null, [firestore, user]);
-    const gamepassesQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'gamepasses') : null, [firestore, user]);
-    const achievementsQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'achievements') : null, [firestore, user]);
-    const indexQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'index') : null, [firestore, user]);
-    const obelisksQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'obelisks') : null, [firestore, user]);
-    const powersQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'powers') : null, [firestore, user]);
-    const aurasQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'auras') : null, [firestore, user]);
-    const petsQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'pets') : null, [firestore, user]);
-    const fightersQuery = useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'fighters') : null, [firestore, user]);
+    // Define all queries at the top level
+    const queries = {
+        accessories: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'accessories') : null, [firestore, user]),
+        gamepasses: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'gamepasses') : null, [firestore, user]),
+        achievements: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'achievements') : null, [firestore, user]),
+        index: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'index') : null, [firestore, user]),
+        obelisks: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'obelisks') : null, [firestore, user]),
+        powers: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'powers') : null, [firestore, user]),
+        auras: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'auras') : null, [firestore, user]),
+        pets: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'pets') : null, [firestore, user]),
+        fighters: useMemoFirebase(() => firestore && user ? collection(firestore, 'users', user.uid, 'fighters') : null, [firestore, user]),
+    };
 
-    const { data: accessoryItems, isLoading: accessoriesLoading } = useCollection(accessoriesQuery);
-    const { data: gamepassItems, isLoading: gamepassesLoading } = useCollection(gamepassesQuery);
-    const { data: achievementItems, isLoading: achievementsLoading } = useCollection(achievementsQuery);
-    const { data: indexItems, isLoading: indexLoading } = useCollection(indexQuery);
-    const { data: obeliskItems, isLoading: obelisksLoading } = useCollection(obelisksQuery);
-    const { data: powerItems, isLoading: powersLoading } = useCollection(powersQuery);
-    const { data: auraItems, isLoading: aurasLoading } = useCollection(aurasQuery);
-    const { data: petItems, isLoading: petsLoading } = useCollection(petsQuery);
-    const { data: fighterItems, isLoading: fightersLoading } = useCollection(fightersQuery);
+    // Use useCollection for each query
+    const accessoryItems = useCollection(queries.accessories);
+    const gamepassItems = useCollection(queries.gamepasses);
+    const achievementItems = useCollection(queries.achievements);
+    const indexItems = useCollection(queries.index);
+    const obeliskItems = useCollection(queries.obelisks);
+    const powerItems = useCollection(queries.powers);
+    const auraItems = useCollection(queries.auras);
+    const petItems = useCollection(queries.pets);
+    const fighterItems = useCollection(queries.fighters);
     
     const { data: weaponSlotsData, isLoading: weaponsLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, `users/${user.uid}`) : null, [firestore, user]));
     const { data: rankData, isLoading: rankLoading } = useDoc(useMemoFirebase(() => firestore && user ? doc(firestore, 'users', user.uid, 'rank', 'current') : null, [firestore, user]));
 
-    const isLoading = isUserLoading || weaponsLoading || rankLoading || accessoriesLoading || gamepassesLoading || achievementsLoading || indexLoading || obelisksLoading || powersLoading || aurasLoading || petsLoading || fightersLoading;
+    const isLoading = isUserLoading || weaponsLoading || rankLoading || accessoryItems.isLoading || gamepassItems.isLoading || achievementItems.isLoading || indexItems.isLoading || obelisksLoading.isLoading || powerItems.isLoading || auraItems.isLoading || petItems.isLoading || fighterItems.isLoading;
 
     const totalBonuses = useMemo(() => {
         const bonuses = {
@@ -126,75 +130,96 @@ export function useGlobalBonuses(currentEnergyInput: string) {
             else bonuses[category].bonuses.push(value);
         };
         
-        // Accessories
-        accessoryItems?.forEach((item: any) => {
-            const fullAccessory = accessories.find(a => a.id === item.id);
-            const rarityOption = fullAccessory?.rarity_options.find(ro => ro.rarity === item.rarity);
-            if (!rarityOption) return;
-            addBonus('damage', rarityOption.damage_bonus);
-            addBonus('energy', rarityOption.energy_bonus);
-            addBonus('coins', rarityOption.coins_bonus);
-            addBonus('exp', rarityOption.exp_bonus);
-            addBonus('movespeed', rarityOption.movespeed_bonus);
-        });
+        // Data processing logic
+        const processData = (calculateMax: boolean) => {
+            // Accessories
+            const accItems = calculateMax ? accessories.map(acc => ({ ...acc, rarity: acc.rarity_options.slice(-1)[0].rarity })) : accessoryItems.data;
+            accItems?.forEach((item: any) => {
+                const fullAccessory = accessories.find(a => a.id === item.id);
+                const rarityOption = fullAccessory?.rarity_options.find(ro => ro.rarity === item.rarity);
+                if (!rarityOption) return;
+                addBonus('damage', rarityOption.damage_bonus);
+                addBonus('energy', rarityOption.energy_bonus);
+                addBonus('coins', rarityOption.coins_bonus);
+                addBonus('exp', rarityOption.exp_bonus);
+                addBonus('movespeed', rarityOption.movespeed_bonus);
+            });
 
-        // Gamepasses
-        gamepassItems?.forEach((item: any) => {
-            const gamepassData = allGamepasses.find(gp => gp.id === item.id);
-            if (gamepassData?.bonus_type && gamepassData.bonus_value) {
-                // Gamepass values in data are multipliers (e.g., 2 for 2x)
-                bonuses[gamepassData.bonus_type].multipliers.push(gamepassData.bonus_value);
+            // Gamepasses
+            const gpItems = calculateMax ? allGamepasses : gamepassItems.data;
+            gpItems?.forEach((item: any) => {
+                const gamepassData = allGamepasses.find(gp => gp.id === item.id);
+                if (gamepassData?.bonus_type && gamepassData.bonus_value) {
+                    bonuses[gamepassData.bonus_type].multipliers.push(gamepassData.bonus_value);
+                }
+            });
+
+             // Achievements
+            const achievementLevels = calculateMax ? generalAchievements.reduce((acc, ach) => ({...acc, [ach.id]: ach.maxLevel}), {}) : achievementItems?.data?.[0];
+            if (achievementLevels) {
+                generalAchievements.forEach(ach => {
+                    const currentLevel = (achievementLevels as any)[ach.id] || 0;
+                    if (ach.progressionBonus.includes('energia')) bonuses.energy.bonuses.push(currentLevel * 0.05);
+                    if (ach.progressionBonus.includes('damage')) bonuses.damage.bonuses.push(currentLevel * 0.05);
+                    if (ach.progressionBonus.includes('coins')) bonuses.coins.bonuses.push(currentLevel * 0.05);
+                });
             }
-        });
 
-        // Achievements
-        const achievementLevels = achievementItems?.[0];
-        if (achievementLevels) {
-            generalAchievements.forEach(ach => {
-                const currentLevel = (achievementLevels as any)[ach.id] || 0;
-                if (ach.progressionBonus.includes('energia')) bonuses.energy.bonuses.push(currentLevel * 0.05);
-                if (ach.progressionBonus.includes('damage')) bonuses.damage.bonuses.push(currentLevel * 0.05);
-                if (ach.progressionBonus.includes('coins')) bonuses.coins.bonuses.push(currentLevel * 0.05);
+            // Index Tiers
+            const indexTiers = calculateMax ? { avatarTier: 23, petTier: 23 } : indexItems?.data?.[0];
+            if (indexTiers) {
+                bonuses.damage.bonuses.push(((indexTiers as any).avatarTier || 0) * 0.05);
+                bonuses.energy.bonuses.push(((indexTiers as any).petTier || 0) * 0.05);
+            }
+
+            // Obelisks
+            const obeliskLevels = calculateMax ? { damage: 20, energy: 20, lucky: 10 } : obeliskItems?.data?.[0];
+            if(obeliskLevels) {
+                bonuses.damage.bonuses.push(((obeliskLevels as any).damage || 0) * 0.02);
+                bonuses.energy.bonuses.push(((obeliskLevels as any).energy || 0) * 0.02);
+                bonuses.luck.bonuses.push(((obeliskLevels as any).lucky || 0) * 0.01);
+            }
+
+            // Weapons
+            const allWeaponsData = [...damageSwords, ...scythes, ...energySwords];
+            const equippedWeapons = calculateMax ? 
+                { 
+                  '0': { id: 'Venomstrike', name: 'Venomstrike', rarity: 'Phantom', type: 'damage', evolutionLevel: 3, breathingEnchantment: 'Supreme', stoneEnchantment: 'Supreme'},
+                  '1': { id: 'Stormreaver', name: 'Stormreaver', rarity: 'Supremo', type: 'scythe', evolutionLevel: 3, passiveEnchantment: 'Supreme' },
+                  '2': { id: 'Excalibur', name: 'Excalibur', rarity: 'Comum', type: 'energy', evolutionLevel: 3 }
+                } : (weaponSlotsData as any)?.weaponSlots;
+            
+            if(equippedWeapons) {
+                Object.values(equippedWeapons).forEach((weapon: any) => {
+                    const weaponBonuses = getWeaponBonus(weapon, allWeaponsData);
+                    bonuses.damage.multipliers.push(...weaponBonuses.damage.multipliers);
+                    bonuses.energy.multipliers.push(...weaponBonuses.energy.multipliers);
+                });
+            }
+            
+            // Powers, Auras, Pets, Fighters
+            const itemCollections = [
+                { data: powerItems.data, name: 'powers'},
+                { data: auraItems.data, name: 'auras'},
+                { data: petItems.data, name: 'pets'},
+                { data: fighterItems.data, name: 'fighters'},
+            ];
+            
+            itemCollections.forEach(collectionInfo => {
+                const itemsToProcess = calculateMax ? allGameData.flatMap(w => w[collectionInfo.name] || []) : collectionInfo.data;
+                itemsToProcess?.forEach((item: any) => {
+                    addBonus('damage', item.multiplier && item.statType === 'damage' ? item.multiplier : item.damage_bonus);
+                    addBonus('energy', item.multiplier && item.statType === 'energy' ? item.multiplier : item.energy_bonus);
+                    addBonus('coins', item.multiplier && item.statType === 'coin' ? item.multiplier : item.coins_bonus);
+                 });
             });
-        }
-        
-        // Index Tiers
-        const indexTiers = indexItems?.[0];
-        if (indexTiers) {
-            bonuses.damage.bonuses.push(((indexTiers as any).avatarTier || 0) * 0.05);
-            bonuses.energy.bonuses.push(((indexTiers as any).petTier || 0) * 0.05);
-        }
 
-        // Obelisks
-        const obeliskLevels = obeliskItems?.[0];
-        if(obeliskLevels) {
-            bonuses.damage.bonuses.push(((obeliskLevels as any).damage || 0) * 0.02);
-            bonuses.energy.bonuses.push(((obeliskLevels as any).energy || 0) * 0.02);
-            bonuses.luck.bonuses.push(((obeliskLevels as any).lucky || 0) * 0.01);
-        }
+        };
 
-        // Weapons
-        const allWeaponsData = [...damageSwords, ...scythes, ...energySwords];
-        const equippedWeapons = (weaponSlotsData as any)?.weaponSlots;
-        if(equippedWeapons) {
-            Object.values(equippedWeapons).forEach((weapon: any) => {
-                const weaponBonuses = getWeaponBonus(weapon, allWeaponsData);
-                bonuses.damage.multipliers.push(...weaponBonuses.damage.multipliers);
-                bonuses.energy.multipliers.push(...weaponBonuses.energy.multipliers);
-            });
-        }
-        
-        // Other item categories (Powers, Auras, Pets, Fighters)
-        [powerItems, auraItems, petItems, fighterItems].forEach(collection => {
-             collection?.forEach((item: any) => {
-                addBonus('damage', item.multiplier && item.statType === 'damage' ? item.multiplier : item.damage_bonus);
-                addBonus('energy', item.multiplier && item.statType === 'energy' ? item.multiplier : item.energy_bonus);
-                addBonus('coins', item.multiplier && item.statType === 'coin' ? item.multiplier : item.coins_bonus);
-             });
-        });
+        processData(calculateForMax);
         
         // Final Calculation
-        const rankValue = (rankData as any)?.value || 0;
+        const rankValue = calculateMax ? 115 : (rankData as any)?.value || 0;
         const baseEnergyGainStr = (energyGainPerRank as Record<string, string>)[rankValue.toString()] || '0';
         const baseEnergyGain = parseFloat(baseEnergyGainStr);
 
@@ -225,8 +250,8 @@ export function useGlobalBonuses(currentEnergyInput: string) {
         };
 
     }, [
-        accessoryItems, gamepassItems, achievementItems, indexItems, obeliskItems, 
-        powerItems, auraItems, petItems, fighterItems, weaponSlotsData, rankData, currentEnergyInput
+        accessoryItems.data, gamepassItems.data, achievementItems.data, indexItems.data, obeliskItems.data,
+        powerItems.data, auraItems.data, petItems.data, fighterItems.data, weaponSlotsData, rankData, currentEnergyInput, calculateForMax
     ]);
 
     return {

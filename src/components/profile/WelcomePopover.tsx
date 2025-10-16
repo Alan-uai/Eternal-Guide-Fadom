@@ -12,9 +12,12 @@ import { Button } from '@/components/ui/button';
 import { useUser, useFirebase } from '@/firebase';
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Upload } from 'lucide-react';
+import { Loader2, Save, Upload, Sparkles } from 'lucide-react';
 import { extractStatsFromImage } from '@/ai/flows/extract-stats-from-image-flow';
 import { Separator } from '../ui/separator';
+import { useGlobalBonuses } from '@/hooks/use-global-bonuses'; // Assuming this hook can be adapted
+import { allGameData } from '@/lib/game-data-context';
+import { energyGainPerRank } from '@/lib/energy-gain-data';
 
 const statsSchema = z.object({
     currentWorld: z.string().min(1, 'O mundo atual é obrigatório.'),
@@ -37,6 +40,10 @@ export function WelcomePopover() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const imageInputRef = useRef<HTMLInputElement>(null);
 
+    // Placeholder for max stats calculation logic
+    const { bonuses: maxBonuses, isLoading: areBonusesLoading } = useGlobalBonuses("5.6e+34", true);
+
+
     const form = useForm<StatsFormData>({
         resolver: zodResolver(statsSchema),
         defaultValues: {
@@ -56,6 +63,37 @@ export function WelcomePopover() {
     const handleClose = () => {
         setIsOpen(false);
         router.replace('/profile', { scroll: false });
+    };
+
+    const handleCalculateMaxStats = () => {
+        const maxWorld = allGameData.length;
+        const maxRank = Math.max(...Object.keys(energyGainPerRank).map(Number));
+
+        // Use the calculated max bonuses
+        const maxEnergyGain = maxBonuses.energyGain;
+        const maxDamage = maxBonuses.damage;
+        
+        function formatNumber(num: number): string {
+            if (num < 1e3) return num.toFixed(2);
+            const suffixes = ["", "k", "M", "B", "T", "qd", "Qn", "sx", "Sp", "O", "N", "de", "Ud", "dD", "tD", "qdD", "QnD", "sxD", "SpD", "OcD", "NvD", "Vgn", "UVg", "DVg", "TVg", "qtV", "QnV", "SeV", "SPG", "OVG", "NVG", "TGN", "UTG", "DTG", "tsTG", "qTG", "QnTG", "ssTG", "SpTG", "OcTG", "NoTG", "QDR", "uQDR", "dQDR", "tQDR"];
+            const i = Math.floor(Math.log10(num) / 3);
+            if (i < suffixes.length) {
+                const value = (num / Math.pow(1000, i));
+                return `${value.toFixed(2)}${suffixes[i]}`;
+            }
+            return num.toExponential(2);
+        }
+
+
+        form.setValue('currentWorld', String(maxWorld));
+        form.setValue('rank', String(maxRank));
+        form.setValue('totalDamage', formatNumber(maxDamage));
+        form.setValue('energyGain', formatNumber(maxEnergyGain));
+
+        toast({
+            title: "Valores Máximos Calculados!",
+            description: "Os campos foram preenchidos com os stats máximos teóricos."
+        });
     };
 
     const onSubmit = async (values: StatsFormData) => {
@@ -152,15 +190,19 @@ export function WelcomePopover() {
                 <DialogHeader>
                     <DialogTitle>Bem-vindo ao Guia Eterno!</DialogTitle>
                     <DialogDescription>
-                        Para começar, preencha suas estatísticas ou envie um screenshot do jogo.
+                        Para começar, preencha suas estatísticas, envie um screenshot do jogo ou calcule os stats máximos.
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="py-2">
+                <div className="grid grid-cols-2 gap-2 py-2">
                     <input type="file" ref={imageInputRef} onChange={handleImageUpload} style={{ display: 'none' }} accept="image/*" />
                     <Button variant="outline" className='w-full' onClick={() => imageInputRef.current?.click()} disabled={isAnalyzing}>
                          {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
                         {isAnalyzing ? 'Analisando...' : 'Enviar Imagem'}
+                    </Button>
+                     <Button variant="outline" className='w-full' onClick={handleCalculateMaxStats} disabled={areBonusesLoading}>
+                         {areBonusesLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                         Calcular Máximo
                     </Button>
                 </div>
 
@@ -169,8 +211,8 @@ export function WelcomePopover() {
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Ou
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Ou Preencha Manualmente
                     </span>
                   </div>
                 </div>
@@ -184,7 +226,7 @@ export function WelcomePopover() {
                                 <FormItem>
                                     <FormLabel>Mundo Atual</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="ex: Mundo 10" {...field} />
+                                        <Input placeholder="ex: 23" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
