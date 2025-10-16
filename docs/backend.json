@@ -350,15 +350,44 @@
             "coins": {
               "type": "object",
               "properties": {
-                "amount": { "type": "string", "description": "Amount of coins dropped." },
-                "probability": { "type": "number", "description": "Probability of dropping coins (0-1)." }
+                "amount": { "type": "string" },
+                "probability": { "type": "number" }
               }
             },
-            "tokens": {
+            "breathing_token": {
               "type": "object",
               "properties": {
-                "amount": { "type": "number", "description": "Amount of tokens dropped." },
-                "probability": { "type": "number", "description": "Probability of dropping tokens (0-1)." }
+                "amount": { "type": "string" },
+                "probability": { "type": "number" }
+              }
+            },
+            "demon_arts_token": {
+              "type": "object",
+              "properties": {
+                "amount": { "type": "string" },
+                "probability": { "type": "number" }
+              }
+            },
+            "avatar_soul": {
+              "type": "object",
+              "properties": {
+                "amount": { "type": "number" },
+                "probability": { "type": "number" }
+              }
+            },
+            "weapon": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "rarity": { "type": "string" },
+                "probability": { "type": "number" }
+              }
+            },
+            "aura": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "probability": { "type": "number" }
               }
             }
           }
@@ -391,7 +420,9 @@
                 "type": "object",
                 "properties": {
                     "maxLevel": { "type": "number" },
-                    "costUnit": { "type": "string" }
+                    "costUnit": { "type": "string" },
+                    "stats_lv_100": { "type": "string" },
+                    "stats_lv_150": { "type": "string" }
                 }
             }
         },

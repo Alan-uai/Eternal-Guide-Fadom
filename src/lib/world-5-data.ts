@@ -3,13 +3,13 @@ export const world5Data = {
     id: '005',
     name: 'World 5 - Slayer Village',
     npcs: [
-        { id: 'nazuki-npc', name: 'Nazuki', rank: 'E', exp: 75, hp: '14.2Sp', world: 'World 5' },
-        { id: 'tenjaro-npc', name: 'Tenjaro', rank: 'D', exp: 78, hp: '71Sp', world: 'World 5' },
-        { id: 'zentsu-npc', name: 'Zentsu', rank: 'C', exp: 82, hp: '355Sp', world: 'World 5' },
-        { id: 'insake-npc', name: 'Insake', rank: 'B', exp: 86, hp: '1.7O', world: 'World 5' },
-        { id: 'tamoka-npc', name: 'Tamoka', rank: 'A', exp: 91, hp: '8.8O', world: 'World 5' },
-        { id: 'shinabe-npc', name: 'Shinabe', rank: 'S', exp: 95, hp: '44O', world: 'World 5' },
-        { id: 'rangoki-boss', name: 'Rangoki', rank: 'SS', exp: 240, hp: '224O', world: 'World 5' },
+        { id: 'nazuki-npc', name: 'Nazuki', rank: 'E', exp: 75, hp: '100sx', world: 'World 5', drops: { coins: { amount: '500k', probability: 1 }, breathing_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.1 } } },
+        { id: 'tenjaro-npc', name: 'Tenjaro', rank: 'D', exp: 78, hp: '500sx', world: 'World 5', drops: { coins: { amount: '1M', probability: 1 }, breathing_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.11 } } },
+        { id: 'zentsu-npc', name: 'Zentsu', rank: 'C', exp: 82, hp: '2.5Sp', world: 'World 5', drops: { coins: { amount: '1.5M', probability: 1 }, breathing_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.125 }, weapon: { name: 'Yellow Nichirin', rarity: 'Lendária', probability: 0.1 } } },
+        { id: 'insake-npc', name: 'Insake', rank: 'B', exp: 86, hp: '12.5Sp', world: 'World 5', drops: { coins: { amount: '2M', probability: 1 }, breathing_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.15 } } },
+        { id: 'tamoka-npc', name: 'Tamoka', rank: 'A', exp: 91, hp: '62.5Sp', world: 'World 5', drops: { coins: { amount: '2.5M', probability: 1 }, demon_arts_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.2 } } },
+        { id: 'shinabe-npc', name: 'Shinabe', rank: 'S', exp: 95, hp: '312Sp', world: 'World 5', drops: { coins: { amount: '3M', probability: 1 }, demon_arts_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.25 } } },
+        { id: 'rangoki-boss', name: 'Rangaki', rank: 'SS', exp: 240, hp: '31.2de', world: 'World 5', drops: { coins: { amount: '7M', probability: 1 }, demon_arts_token: { amount: '3-5', probability: 0.1 }, breathing_token: { amount: '3-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.5 }, aura: { name: 'Flaming Aura', probability: 0.01 } } },
     ],
     powers: [
         {
@@ -67,5 +67,6 @@ export const world5Data = {
     shadows: [],
     stands: []
 };
+    
     
     
