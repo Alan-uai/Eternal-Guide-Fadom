@@ -51,22 +51,31 @@ export const world1Data = {
       },
     ],
     npcs: [
-        { id: 'world1-e-rank', name: 'E Rank NPC', rank: 'E', exp: 1, hp: '100k', world: 'World 1', drops: { coins: { amount: '10k', probability: 0.8 }, tokens: { amount: 1, probability: 0.1 } } },
-        { id: 'world1-d-rank', name: 'D Rank NPC', rank: 'D', exp: 2, hp: '500k', world: 'World 1', drops: { coins: { amount: '50k', probability: 0.8 } } },
-        { id: 'world1-c-rank', name: 'C Rank NPC', rank: 'C', exp: 3, hp: '2.5M', world: 'World 1', drops: { coins: { amount: '250k', probability: 0.8 } } },
-        { id: 'world1-b-rank', name: 'B Rank NPC', rank: 'B', exp: 4, hp: '12.5M', world: 'World 1', drops: { coins: { amount: '1.2M', probability: 0.8 } } },
-        { id: 'world1-a-rank', name: 'A Rank NPC', rank: 'A', exp: 5, hp: '62.5M', world: 'World 1', drops: { coins: { amount: '6M', probability: 0.8 } } },
-        { id: 'world1-s-rank', name: 'S Rank NPC', rank: 'S', exp: 6, hp: '312.5M', world: 'World 1', drops: { coins: { amount: '30M', probability: 0.8 } } },
-        { id: 'kid-kohan-boss', name: 'Kid Kohan', rank: 'SS', exp: 15, hp: '1.5B', world: 'World 1', drops: { coins: { amount: '150M', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'kriluni-npc', name: 'Kriluni', rank: 'E', exp: 1, hp: '100k', world: 'World 1' },
+        { id: 'ymicha-npc', name: 'Ymicha', rank: 'D', exp: 2, hp: '500k', world: 'World 1' },
+        { id: 'tian-shan-npc', name: 'Tian Shan', rank: 'C', exp: 3, hp: '2.5M', world: 'World 1' },
+        { id: 'kohan-npc', name: 'Kohan', rank: 'B', exp: 4, hp: '12.5M', world: 'World 1' },
+        { id: 'picco-npc', name: 'Picco', rank: 'A', exp: 5, hp: '62.5M', world: 'World 1' },
+        { id: 'koku-npc', name: 'Koku', rank: 'S', exp: 6, hp: '312.5M', world: 'World 1' },
+        { id: 'kid-kohan-boss', name: 'Kid Kohan', rank: 'SS', exp: 15, hp: '1.5B', world: 'World 1' },
     ],
     pets: [
-        { id: 'kriluni', name: 'Kriluni', rarity: 'Common', energy_bonus: '3' },
-        { id: 'ymicha', name: 'Ymicha', rarity: 'Uncommon', energy_bonus: '6' },
-        { id: 'tian-shan', name: 'Tian Shan', rarity: 'Rare', energy_bonus: '9' },
-        { id: 'kohan', name: 'Kohan', rarity: 'Epic', energy_bonus: '12' },
-        { id: 'picco', name: 'Picco', rarity: 'Legendary', energy_bonus: '15' },
-        { id: 'koku', name: 'Koku', rarity: 'Mythic', energy_bonus: '20' },
-        { id: 'kid-kohan-pet', name: 'Kid Kohan', rarity: 'Phantom', energy_bonus: '45' }
+        { id: 'kriluni-pet', name: 'Kriluni', rank: 'E', rarity: 'Common', energy_bonus: '3' },
+        { id: 'ymicha-pet', name: 'Ymicha', rank: 'D', rarity: 'Uncommon', energy_bonus: '6' },
+        { id: 'tian-shan-pet', name: 'Tian Shan', rank: 'C', rarity: 'Rare', energy_bonus: '9' },
+        { id: 'kohan-pet', name: 'Kohan', rank: 'B', rarity: 'Epic', energy_bonus: '12' },
+        { id: 'picco-pet', name: 'Picco', rank: 'A', rarity: 'Legendary', energy_bonus: '15' },
+        { id: 'koku-pet', name: 'Koku', rank: 'S', rarity: 'Mythic', energy_bonus: '20' },
+        { id: 'kid-kohan-pet', name: 'Kid Kohan', rank: 'SS', rarity: 'Phantom', energy_bonus: '45' }
+    ],
+    avatars: [
+        { id: 'kriluni-avatar', name: 'Kriluni', rank: 'E', rarity: 'Common', energy_bonus: '1' },
+        { id: 'ymicha-avatar', name: 'Ymicha', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
+        { id: 'tian-shan-avatar', name: 'Tian Shan', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'kohan-avatar', name: 'Kohan', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'picco-avatar', name: 'Picco', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
+        { id: 'koku-avatar', name: 'Koku', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
+        { id: 'kid-kohan-avatar', name: 'Kid Kohan', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
     ],
     dungeons: [
         {

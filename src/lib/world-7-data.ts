@@ -48,22 +48,31 @@ export const world7Data = {
       }
     ],
     npcs: [
-        { id: 'world7-e-rank', name: 'E Rank NPC', rank: 'E', exp: 240, hp: '350de', world: 'World 7', drops: { coins: { amount: '35de', probability: 0.8 } } },
-        { id: 'world7-d-rank', name: 'D Rank NPC', rank: 'D', exp: 264, hp: '1.7Ud', world: 'World 7', drops: { coins: { amount: '170de', probability: 0.8 } } },
-        { id: 'world7-c-rank', name: 'C Rank NPC', rank: 'C', exp: 290, hp: '8.7Ud', world: 'World 7', drops: { coins: { amount: '870de', probability: 0.8 } } },
-        { id: 'world7-b-rank', name: 'B Rank NPC', rank: 'B', exp: 319, hp: '43Ud', world: 'World 7', drops: { coins: { amount: '4.3Ud', probability: 0.8 } } },
-        { id: 'world7-a-rank', name: 'A Rank NPC', rank: 'A', exp: 351, hp: '218Ud', world: 'World 7', drops: { coins: { amount: '21Ud', probability: 0.8 } } },
-        { id: 'world7-s-rank', name: 'S Rank NPC', rank: 'S', exp: 386, hp: '1dD', world: 'World 7', drops: { coins: { amount: '100Ud', probability: 0.8 } } },
-        { id: 'novi-chrone-boss', name: 'Novi Chroni', rank: 'SS', exp: 960, hp: '5.4dD', world: 'World 7', drops: { coins: { amount: '540Ud', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'noalle-npc', name: 'Noalle', rank: 'E', exp: 240, hp: '350de', world: 'World 7' },
+        { id: 'megna-npc', name: 'Megna', rank: 'D', exp: 264, hp: '1.7Ud', world: 'World 7' },
+        { id: 'finrel-npc', name: 'Finrel', rank: 'C', exp: 290, hp: '8.7Ud', world: 'World 7' },
+        { id: 'aste-npc', name: 'Aste', rank: 'B', exp: 319, hp: '43Ud', world: 'World 7' },
+        { id: 'yune-npc', name: 'Yune', rank: 'A', exp: 351, hp: '218Ud', world: 'World 7' },
+        { id: 'yemi-npc', name: 'Yemi', rank: 'S', exp: 386, hp: '1dD', world: 'World 7' },
+        { id: 'novi-chrone-boss', name: 'Novi Chroni', rank: 'SS', exp: 960, hp: '5.4dD', world: 'World 7' },
     ],
     pets: [
-        { id: 'noalle', name: 'Noalle', rarity: 'Common', energy_bonus: '732' },
-        { id: 'megna', name: 'Megna', rarity: 'Uncommon', energy_bonus: '1.46k' },
-        { id: 'finrel', name: 'Finrel', rarity: 'Rare', energy_bonus: '2.19k' },
-        { id: 'aste', name: 'Aste', rarity: 'Epic', energy_bonus: '2.93k' },
-        { id: 'yune', name: 'Yune', rarity: 'Legendary', energy_bonus: '3.66k' },
-        { id: 'yemi', name: 'Yemi', rarity: 'Mythic', energy_bonus: '4.88k' },
-        { id: 'novi-chroni-pet', name: 'Novi Chroni', rarity: 'Phantom', energy_bonus: '10.9k' }
+        { id: 'noalle-pet', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '732' },
+        { id: 'megna-pet', name: 'Megna', rank: 'D', rarity: 'Uncommon', energy_bonus: '1.46k' },
+        { id: 'finrel-pet', name: 'Finrel', rank: 'C', rarity: 'Rare', energy_bonus: '2.19k' },
+        { id: 'aste-pet', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '2.93k' },
+        { id: 'yune-pet', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '3.66k' },
+        { id: 'yemi-pet', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '4.88k' },
+        { id: 'novi-chroni-pet', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '10.9k' }
+    ],
+    avatars: [
+        { id: 'noalle-avatar', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '1' },
+        { id: 'megna-avatar', name: 'Megna', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
+        { id: 'finrel-avatar', name: 'Finrel', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'aste-avatar', name: 'Aste', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'yune-avatar', name: 'Yune', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
+        { id: 'yemi-avatar', name: 'Yemi', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
+        { id: 'novi-chroni-avatar', name: 'Novi Chroni', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
     ],
     shadows: [
         {
@@ -85,5 +94,4 @@ export const world7Data = {
         }
     ]
 };
-
     

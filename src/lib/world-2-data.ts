@@ -82,22 +82,31 @@ export const world2Data = {
       }
     ],
     npcs: [
-        { id: 'world2-e-rank', name: 'E Rank NPC', rank: 'E', exp: 9, hp: '7.5B', world: 'World 2', drops: { coins: { amount: '750M', probability: 0.8 } } },
-        { id: 'world2-d-rank', name: 'D Rank NPC', rank: 'D', exp: 10, hp: '37.5B', world: 'World 2', drops: { coins: { amount: '3.7B', probability: 0.8 } } },
-        { id: 'world2-c-rank', name: 'C Rank NPC', rank: 'C', exp: 11, hp: '187.5B', world: 'World 2', drops: { coins: { amount: '18B', probability: 0.8 } } },
-        { id: 'world2-b-rank', name: 'B Rank NPC', rank: 'B', exp: 12, hp: '937.5B', world: 'World 2', drops: { coins: { amount: '90B', probability: 0.8 } } },
-        { id: 'world2-a-rank', name: 'A Rank NPC', rank: 'A', exp: 13, hp: '4.6T', world: 'World 2', drops: { coins: { amount: '460B', probability: 0.8 } } },
-        { id: 'world2-s-rank', name: 'S Rank NPC', rank: 'S', exp: 14, hp: '23.4T', world: 'World 2', drops: { coins: { amount: '2.3T', probability: 0.8 } } },
-        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 30, hp: '117T', world: 'World 2', drops: { coins: { amount: '11T', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'nomi-npc', name: 'Nomi', rank: 'E', exp: 9, hp: '7.5B', world: 'World 2' },
+        { id: 'usup-npc', name: 'Usup', rank: 'D', exp: 10, hp: '37.5B', world: 'World 2' },
+        { id: 'robins-npc', name: 'Robins', rank: 'C', exp: 11, hp: '187.5B', world: 'World 2' },
+        { id: 'senji-npc', name: 'Senji', rank: 'B', exp: 12, hp: '937.5B', world: 'World 2' },
+        { id: 'zaro-npc', name: 'Zaro', rank: 'A', exp: 13, hp: '4.6T', world: 'World 2' },
+        { id: 'loffy-npc', name: 'Loffy', rank: 'S', exp: 14, hp: '23.4T', world: 'World 2' },
+        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 30, hp: '117T', world: 'World 2' },
     ],
     pets: [
-        { id: 'nomi', name: 'Nomi', rarity: 'Common', energy_bonus: '8' },
-        { id: 'usup', name: 'Usup', rarity: 'Uncommon', energy_bonus: '15' },
-        { id: 'robins', name: 'Robins', rarity: 'Rare', energy_bonus: '23' },
-        { id: 'senji', name: 'Senji', rarity: 'Epic', energy_bonus: '30' },
-        { id: 'zaro', name: 'Zaro', rarity: 'Legendary', energy_bonus: '38' },
-        { id: 'loffy', name: 'Loffy', rarity: 'Mythic', energy_bonus: '50' },
-        { id: 'shanks-pet', name: 'Shanks', rarity: 'Phantom', energy_bonus: '113' }
+        { id: 'nomi-pet', name: 'Nomi', rank: 'E', rarity: 'Common', energy_bonus: '8' },
+        { id: 'usup-pet', name: 'Usup', rank: 'D', rarity: 'Uncommon', energy_bonus: '15' },
+        { id: 'robins-pet', name: 'Robins', rank: 'C', rarity: 'Rare', energy_bonus: '23' },
+        { id: 'senji-pet', name: 'Senji', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'zaro-pet', name: 'Zaro', rank: 'A', rarity: 'Legendary', energy_bonus: '38' },
+        { id: 'loffy-pet', name: 'Loffy', rank: 'S', rarity: 'Mythic', energy_bonus: '50' },
+        { id: 'shanks-pet', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '113' }
+    ],
+    avatars: [
+        { id: 'nomi-avatar', name: 'Nomi', rank: 'E', rarity: 'Common', energy_bonus: '1' },
+        { id: 'usup-avatar', name: 'Usup', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
+        { id: 'robins-avatar', name: 'Robins', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'senji-avatar', name: 'Senji', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'zaro-avatar', name: 'Zaro', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
+        { id: 'loffy-avatar', name: 'Loffy', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
+        { id: 'shanks-avatar', name: 'Shanks', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
     ],
     dungeons: [
         {

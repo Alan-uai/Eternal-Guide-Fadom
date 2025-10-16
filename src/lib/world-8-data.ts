@@ -44,23 +44,32 @@ export const world8Data = {
       }
     ],
     npcs: [
-        { id: 'world8-e-rank', name: 'E Rank NPC', rank: 'E', exp: 483, hp: '54dD', world: 'World 8', drops: { coins: { amount: '5.4dD', probability: 0.8 } } },
-        { id: 'world8-d-rank', name: 'D Rank NPC', rank: 'D', exp: 531, hp: '270dD', world: 'World 8', drops: { coins: { amount: '27dD', probability: 0.8 } } },
-        { id: 'world8-c-rank', name: 'C Rank NPC', rank: 'C', exp: 584, hp: '1.3tD', world: 'World 8', drops: { coins: { amount: '130dD', probability: 0.8 } } },
-        { id: 'world8-b-rank', name: 'B Rank NPC', rank: 'B', exp: 643, hp: '6.7tD', world: 'World 8', drops: { coins: { amount: '670dD', probability: 0.8 } } },
-        { id: 'world8-a-rank', name: 'A Rank NPC', rank: 'A', exp: 707, hp: '33tD', world: 'World 8', drops: { coins: { amount: '3.3tD', probability: 0.8 } } },
-        { id: 'world8-s-rank', name: 'S Rank NPC', rank: 'S', exp: 777, hp: '168tD', world: 'World 8', drops: { coins: { amount: '16tD', probability: 0.8 } } },
-        { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 1920, hp: '844tD', world: 'World 8', drops: { coins: { amount: '84tD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
-        { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 2880, hp: '1.6qdD', world: 'World 8', drops: { coins: { amount: '160tD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'sekuri-npc', name: 'Sekuri', rank: 'E', exp: 483, hp: '54dD', world: 'World 8' },
+        { id: 'kid-norto-npc', name: 'Kid Norto', rank: 'D', exp: 531, hp: '270dD', world: 'World 8' },
+        { id: 'kid-seske-npc', name: 'Kid Seske', rank: 'C', exp: 584, hp: '1.3tD', world: 'World 8' },
+        { id: 'kakashki-npc', name: 'Kakashki', rank: 'B', exp: 643, hp: '6.7tD', world: 'World 8' },
+        { id: 'jiria-npc', name: 'Jiria', rank: 'A', exp: 707, hp: '33tD', world: 'World 8' },
+        { id: 'tsuni-npc', name: 'Tsuni', rank: 'S', exp: 777, hp: '168tD', world: 'World 8' },
+        { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 1920, hp: '844tD', world: 'World 8' },
+        { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 2880, hp: '1.6qdD', world: 'World 8' },
     ],
     pets: [
-        { id: 'sekuri', name: 'Sekuri', rarity: 'Common', energy_bonus: '1.83k' },
-        { id: 'kid-norto', name: 'Kid Norto', rarity: 'Uncommon', energy_bonus: '3.66k' },
-        { id: 'kid-seske', name: 'Kid Seske', rarity: 'Rare', energy_bonus: '5.49k' },
-        { id: 'kakashki', name: 'Kakashki', rarity: 'Epic', energy_bonus: '7.32k' },
-        { id: 'jiria', name: 'Jiria', rarity: 'Legendary', energy_bonus: '9.15k' },
-        { id: 'tsuni', name: 'Tsuni', rarity: 'Mythic', energy_bonus: '12.2k' },
-        { id: 'itechi-pet', name: 'Itechi', rarity: 'Phantom', energy_bonus: '27.4k' }
+        { id: 'sekuri-pet', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1.83k' },
+        { id: 'kid-norto-pet', name: 'Kid Norto', rank: 'D', rarity: 'Uncommon', energy_bonus: '3.66k' },
+        { id: 'kid-seske-pet', name: 'Kid Seske', rank: 'C', rarity: 'Rare', energy_bonus: '5.49k' },
+        { id: 'kakashki-pet', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '7.32k' },
+        { id: 'jiria-pet', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '9.15k' },
+        { id: 'tsuni-pet', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '12.2k' },
+        { id: 'itechi-pet', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '27.4k' }
+    ],
+    avatars: [
+        { id: 'sekuri-avatar', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1' },
+        { id: 'kid-norto-avatar', name: 'Kid Norto', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
+        { id: 'kid-seske-avatar', name: 'Kid Seske', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'kakashki-avatar', name: 'Kakashki', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'jiria-avatar', name: 'Jiria', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
+        { id: 'tsuni-avatar', name: 'Tsuni', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
+        { id: 'itechi-avatar', name: 'Itechi', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
     ],
     shadows: [
         {

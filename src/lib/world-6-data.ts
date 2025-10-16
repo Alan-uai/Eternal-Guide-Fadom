@@ -42,22 +42,31 @@ export const world6Data = {
       }
     ],
     npcs: [
-        { id: 'world6-e-rank', name: 'E Rank NPC', rank: 'E', exp: 119, hp: '2.2N', world: 'World 6', drops: { coins: { amount: '220O', probability: 0.8 } } },
-        { id: 'world6-d-rank', name: 'D Rank NPC', rank: 'D', exp: 131, hp: '11.2N', world: 'World 6', drops: { coins: { amount: '1.1N', probability: 0.8 } } },
-        { id: 'world6-c-rank', name: 'C Rank NPC', rank: 'C', exp: 144, hp: '56N', world: 'World 6', drops: { coins: { amount: '5.6N', probability: 0.8 } } },
-        { id: 'world6-b-rank', name: 'B Rank NPC', rank: 'B', exp: 159, hp: '280N', world: 'World 6', drops: { coins: { amount: '28N', probability: 0.8 } } },
-        { id: 'world6-a-rank', name: 'A Rank NPC', rank: 'A', exp: 174, hp: '1.4de', world: 'World 6', drops: { coins: { amount: '140N', probability: 0.8 } } },
-        { id: 'world6-s-rank', name: 'S Rank NPC', rank: 'S', exp: 192, hp: '7de', world: 'World 6', drops: { coins: { amount: '700N', probability: 0.8 } } },
-        { id: 'statue-of-god-boss', name: 'Statue of God', rank: 'SS', exp: 480, hp: '35de', world: 'World 6', drops: { coins: { amount: '3.5de', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'weak-sung-npc', name: 'Weak Sung', rank: 'E', exp: 119, hp: '2.2N', world: 'World 6' },
+        { id: 'green-goblin-npc', name: 'Green Goblin', rank: 'D', exp: 131, hp: '11.2N', world: 'World 6' },
+        { id: 'white-tiger-npc', name: 'White Tiger', rank: 'C', exp: 144, hp: '56N', world: 'World 6' },
+        { id: 'cha-npc', name: 'Cha', rank: 'B', exp: 159, hp: '280N', world: 'World 6' },
+        { id: 'choi-npc', name: 'Choi', rank: 'A', exp: 174, hp: '1.4de', world: 'World 6' },
+        { id: 'solo-sung-npc', name: 'Solo Sung', rank: 'S', exp: 192, hp: '7de', world: 'World 6' },
+        { id: 'statue-of-god-boss', name: 'Statue of God', rank: 'SS', exp: 480, hp: '35de', world: 'World 6' },
     ],
     pets: [
-        { id: 'weak-sung', name: 'Weak Sung', rarity: 'Common', energy_bonus: '293' },
-        { id: 'green-goblin', name: 'Green Goblin', rarity: 'Uncommon', energy_bonus: '586' },
-        { id: 'white-tiger', name: 'White Tiger', rarity: 'Rare', energy_bonus: '879' },
-        { id: 'cha', name: 'Cha', rarity: 'Epic', energy_bonus: '1.17k' },
-        { id: 'choi', name: 'Choi', rarity: 'Legendary', energy_bonus: '1.46k' },
-        { id: 'solo-sung', name: 'Solo Sung', rarity: 'Mythic', energy_bonus: '1.95k' },
-        { id: 'statue-of-god-pet', name: 'Statue of God', rarity: 'Phantom', energy_bonus: '4.39k' }
+        { id: 'weak-sung-pet', name: 'Weak Sung', rank: 'E', rarity: 'Common', energy_bonus: '293' },
+        { id: 'green-goblin-pet', name: 'Green Goblin', rank: 'D', rarity: 'Uncommon', energy_bonus: '586' },
+        { id: 'white-tiger-pet', name: 'White Tiger', rank: 'C', rarity: 'Rare', energy_bonus: '879' },
+        { id: 'cha-pet', name: 'Cha', rank: 'B', rarity: 'Epic', energy_bonus: '1.17k' },
+        { id: 'choi-pet', name: 'Choi', rank: 'A', rarity: 'Legendary', energy_bonus: '1.46k' },
+        { id: 'solo-sung-pet', name: 'Solo Sung', rank: 'S', rarity: 'Mythic', energy_bonus: '1.95k' },
+        { id: 'statue-of-god-pet', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '4.39k' }
+    ],
+    avatars: [
+        { id: 'weak-sung-avatar', name: 'Weak Sung', rank: 'E', rarity: 'Common', energy_bonus: '1' },
+        { id: 'green-goblin-avatar', name: 'Green Goblin', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
+        { id: 'white-tiger-avatar', name: 'White Tiger', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'cha-avatar', name: 'Cha', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'choi-avatar', name: 'Choi', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
+        { id: 'solo-sung-avatar', name: 'Solo Sung', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
+        { id: 'statue-of-god-avatar', name: 'Statue of God', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
     ],
     shadows: [
         {

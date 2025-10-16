@@ -39,22 +39,31 @@ export const world9Data = {
         }
     ],
     npcs: [
-        { id: 'world9-e-rank', name: 'E Rank NPC', rank: 'E', exp: 972, hp: '16qdD', world: 'World 9', drops: { coins: { amount: '1.6qdD', probability: 0.8 } } },
-        { id: 'world9-d-rank', name: 'D Rank NPC', rank: 'D', exp: 1215, hp: '84qdD', world: 'World 9', drops: { coins: { amount: '8.4qdD', probability: 0.8 } } },
-        { id: 'world9-c-rank', name: 'C Rank NPC', rank: 'C', exp: 1518, hp: '422qdD', world: 'World 9', drops: { coins: { amount: '42qdD', probability: 0.8 } } },
-        { id: 'world9-b-rank', name: 'B Rank NPC', rank: 'B', exp: 1898, hp: '2.1QnD', world: 'World 9', drops: { coins: { amount: '210qdD', probability: 0.8 } } },
-        { id: 'world9-a-rank', name: 'A Rank NPC', rank: 'A', exp: 2373, hp: '10.5QnD', world: 'World 9', drops: { coins: { amount: '1QnD', probability: 0.8 } } },
-        { id: 'world9-s-rank', name: 'S Rank NPC', rank: 'S', exp: 3915, hp: '52QnD', world: 'World 9', drops: { coins: { amount: '5.2QnD', probability: 0.8 } } },
-        { id: 'ken-turbo-boss', name: 'Ken Turbo', rank: 'SS', exp: 5760, hp: '264QnD', world: 'World 9', drops: { coins: { amount: '26QnD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'ken-npc', name: 'Ken', rank: 'E', exp: 972, hp: '16qdD', world: 'World 9' },
+        { id: 'aira-npc', name: 'Aira', rank: 'D', exp: 1215, hp: '84qdD', world: 'World 9' },
+        { id: 'jiji-npc', name: 'Jiji', rank: 'C', exp: 1518, hp: '422qdD', world: 'World 9' },
+        { id: 'momo-npc', name: 'Momo', rank: 'B', exp: 1898, hp: '2.1QnD', world: 'World 9' },
+        { id: 'alien-npc', name: 'Alien', rank: 'A', exp: 2373, hp: '10.5QnD', world: 'World 9' },
+        { id: 'saiko-npc', name: 'Saiko', rank: 'S', exp: 3915, hp: '52QnD', world: 'World 9' },
+        { id: 'ken-turbo-boss', name: 'Ken Turbo', rank: 'SS', exp: 5760, hp: '264QnD', world: 'World 9' },
     ],
     pets: [
-        { id: 'ken', name: 'Ken', rarity: 'Common', energy_bonus: '4.57k' },
-        { id: 'aira', name: 'Aira', rarity: 'Uncommon', energy_bonus: '9.15k' },
-        { id: 'jiji', name: 'Jiji', rarity: 'Rare', energy_bonus: '13.7k' },
-        { id: 'momo', name: 'Momo', rarity: 'Epic', energy_bonus: '18.3k' },
-        { id: 'alien', name: 'Alien', rarity: 'Legendary', energy_bonus: '22.8k' },
-        { id: 'saiko', name: 'Saiko', rarity: 'Mythic', energy_bonus: '30.5k' },
-        { id: 'ken-turbo-pet', name: 'Ken Turbo', rarity: 'Phantom', energy_bonus: '68.6k' }
+        { id: 'ken-pet', name: 'Ken', rank: 'E', rarity: 'Common', energy_bonus: '4.57k' },
+        { id: 'aira-pet', name: 'Aira', rank: 'D', rarity: 'Uncommon', energy_bonus: '9.15k' },
+        { id: 'jiji-pet', name: 'Jiji', rank: 'C', rarity: 'Rare', energy_bonus: '13.7k' },
+        { id: 'momo-pet', name: 'Momo', rank: 'B', rarity: 'Epic', energy_bonus: '18.3k' },
+        { id: 'alien-pet', name: 'Alien', rank: 'A', rarity: 'Legendary', energy_bonus: '22.8k' },
+        { id: 'saiko-pet', name: 'Saiko', rank: 'S', rarity: 'Mythic', energy_bonus: '30.5k' },
+        { id: 'ken-turbo-pet', name: 'Ken Turbo', rank: 'SS', rarity: 'Phantom', energy_bonus: '68.6k' }
+    ],
+    avatars: [
+        { id: 'ken-avatar', name: 'Ken', rank: 'E', rarity: 'Common', energy_bonus: '1' },
+        { id: 'aira-avatar', name: 'Aira', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
+        { id: 'jiji-avatar', name: 'Jiji', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'momo-avatar', name: 'Momo', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'alien-avatar', name: 'Alien', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
+        { id: 'saiko-avatar', name: 'Saiko', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
+        { id: 'ken-turbo-avatar', name: 'Ken Turbo', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
     ],
     shadows: [
         {

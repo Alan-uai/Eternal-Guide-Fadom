@@ -3,13 +3,13 @@ export const world5Data = {
     id: '005',
     name: 'World 5 - Slayer Village',
     npcs: [
-        { id: 'world5-e-rank', name: 'E Rank NPC', rank: 'E', exp: 75, hp: '14.2Sp', world: 'World 5', drops: { coins: { amount: '1.4Sp', probability: 0.8 } } },
-        { id: 'world5-d-rank', name: 'D Rank NPC', rank: 'D', exp: 78, hp: '71Sp', world: 'World 5', drops: { coins: { amount: '7.1Sp', probability: 0.8 } } },
-        { id: 'world5-c-rank', name: 'C Rank NPC', rank: 'C', exp: 82, hp: '355Sp', world: 'World 5', drops: { coins: { amount: '35Sp', probability: 0.8 } } },
-        { id: 'world5-b-rank', name: 'B Rank NPC', rank: 'B', exp: 86, hp: '1.7O', world: 'World 5', drops: { coins: { amount: '170Sp', probability: 0.8 } } },
-        { id: 'world5-a-rank', name: 'A Rank NPC', rank: 'A', exp: 91, hp: '8.8O', world: 'World 5', drops: { coins: { amount: '880Sp', probability: 0.8 } } },
-        { id: 'world5-s-rank', name: 'S Rank NPC', rank: 'S', exp: 95, hp: '44O', world: 'World 5', drops: { coins: { amount: '4.4O', probability: 0.8 } } },
-        { id: 'rangoki-boss', name: 'Rangoki', rank: 'SS', exp: 240, hp: '224O', world: 'World 5', drops: { coins: { amount: '22O', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'nazuki-npc', name: 'Nazuki', rank: 'E', exp: 75, hp: '14.2Sp', world: 'World 5' },
+        { id: 'tenjaro-npc', name: 'Tenjaro', rank: 'D', exp: 78, hp: '71Sp', world: 'World 5' },
+        { id: 'zentsu-npc', name: 'Zentsu', rank: 'C', exp: 82, hp: '355Sp', world: 'World 5' },
+        { id: 'insake-npc', name: 'Insake', rank: 'B', exp: 86, hp: '1.7O', world: 'World 5' },
+        { id: 'tamoka-npc', name: 'Tamoka', rank: 'A', exp: 91, hp: '8.8O', world: 'World 5' },
+        { id: 'shinabe-npc', name: 'Shinabe', rank: 'S', exp: 95, hp: '44O', world: 'World 5' },
+        { id: 'rangoki-boss', name: 'Rangoki', rank: 'SS', exp: 240, hp: '224O', world: 'World 5' },
     ],
     powers: [
         {
@@ -46,17 +46,25 @@ export const world5Data = {
         }
     ],
     pets: [
-        { id: 'nazuki', name: 'Nazuki', rarity: 'Common', energy_bonus: '117' },
-        { id: 'tenjaro', name: 'Tenjaro', rarity: 'Uncommon', energy_bonus: '234' },
-        { id: 'zentsu', name: 'Zentsu', rarity: 'Rare', energy_bonus: '352' },
-        { id: 'insake', name: 'Insake', rarity: 'Epic', energy_bonus: '469' },
-        { id: 'tamoka', name: 'Tamoka', rarity: 'Legendary', energy_bonus: '586' },
-        { id: 'shinabe', name: 'Shinabe', rarity: 'Mythic', energy_bonus: '781' },
-        { id: 'rangaki', name: 'Rangaki', rarity: 'Phantom', energy_bonus: '1.75k' }
+        { id: 'nazuki-pet', name: 'Nazuki', rank: 'E', rarity: 'Common', energy_bonus: '117' },
+        { id: 'tenjaro-pet', name: 'Tenjaro', rank: 'D', rarity: 'Uncommon', energy_bonus: '234' },
+        { id: 'zentsu-pet', name: 'Zentsu', rank: 'C', rarity: 'Rare', energy_bonus: '352' },
+        { id: 'insake-pet', name: 'Insake', rank: 'B', rarity: 'Epic', energy_bonus: '469' },
+        { id: 'tamoka-pet', name: 'Tamoka', rank: 'A', rarity: 'Legendary', energy_bonus: '586' },
+        { id: 'shinabe-pet', name: 'Shinabe', rank: 'S', rarity: 'Mythic', energy_bonus: '781' },
+        { id: 'rangaki-pet', name: 'Rangaki', rank: 'SS', rarity: 'Phantom', energy_bonus: '1.75k' }
+    ],
+    avatars: [
+        { id: 'nazuki-avatar', name: 'Nazuki', rank: 'E', rarity: 'Common', energy_bonus: '1' },
+        { id: 'tenjaro-avatar', name: 'Tenjaro', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
+        { id: 'zentsu-avatar', name: 'Zentsu', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'insake-avatar', name: 'Insake', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'tamoka-avatar', name: 'Tamoka', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
+        { id: 'shinabe-avatar', name: 'Shinabe', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
+        { id: 'rangaki-avatar', name: 'Rangaki', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
     ],
     dungeons: [],
     shadows: [],
     stands: []
 };
-
     

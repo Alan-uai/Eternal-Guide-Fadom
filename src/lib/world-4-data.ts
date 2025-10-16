@@ -62,22 +62,31 @@ export const world4Data = {
       }
     ],
     npcs: [
-        { id: 'world4-e-rank', name: 'E Rank NPC', rank: 'E', exp: 39, hp: '91Qn', world: 'World 4', drops: { coins: { amount: '9.1Qn', probability: 0.8 } } },
-        { id: 'world4-d-rank', name: 'D Rank NPC', rank: 'D', exp: 41, hp: '455Qn', world: 'World 4', drops: { coins: { amount: '45Qn', probability: 0.8 } } },
-        { id: 'world4-c-rank', name: 'C Rank NPC', rank: 'C', exp: 43, hp: '2.2sx', world: 'World 4', drops: { coins: { amount: '220Qn', probability: 0.8 } } },
-        { id: 'world4-b-rank', name: 'B Rank NPC', rank: 'B', exp: 45, hp: '11.3sx', world: 'World 4', drops: { coins: { amount: '1.1sx', probability: 0.8 } } },
-        { id: 'world4-a-rank', name: 'A Rank NPC', rank: 'A', exp: 47, hp: '56sx', world: 'World 4', drops: { coins: { amount: '5.6sx', probability: 0.8 } } },
-        { id: 'world4-s-rank', name: 'S Rank NPC', rank: 'S', exp: 50, hp: '284sx', world: 'World 4', drops: { coins: { amount: '28sx', probability: 0.8 } } },
-        { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, hp: '1.4Sp', world: 'World 4', drops: { coins: { amount: '140sx', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'itodo-npc', name: 'Itodo', rank: 'E', exp: 39, hp: '91Qn', world: 'World 4' },
+        { id: 'nebara-npc', name: 'Nebara', rank: 'D', exp: 41, hp: '455Qn', world: 'World 4' },
+        { id: 'magum-npc', name: 'Magum', rank: 'C', exp: 43, hp: '2.2sx', world: 'World 4' },
+        { id: 'meki-npc', name: 'Meki', rank: 'B', exp: 45, hp: '11.3sx', world: 'World 4' },
+        { id: 'tage-npc', name: 'Tage', rank: 'A', exp: 47, hp: '56sx', world: 'World 4' },
+        { id: 'gajo-npc', name: 'Gajo', rank: 'S', exp: 50, hp: '284sx', world: 'World 4' },
+        { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, hp: '1.4Sp', world: 'World 4' },
     ],
     pets: [
-        { id: 'itodo', name: 'Itodo', rarity: 'Common', energy_bonus: '47' },
-        { id: 'nebara', name: 'Nebara', rarity: 'Uncommon', energy_bonus: '94' },
-        { id: 'magum', name: 'Magum', rarity: 'Rare', energy_bonus: '141' },
-        { id: 'meki', name: 'Meki', rarity: 'Epic', energy_bonus: '188' },
-        { id: 'tage', name: 'Tage', rarity: 'Legendary', energy_bonus: '234' },
-        { id: 'gajo', name: 'Gajo', rarity: 'Mythic', energy_bonus: '313' },
-        { id: 'sakuni-pet', name: 'Sakuni', rarity: 'Phantom', energy_bonus: '703' }
+        { id: 'itodo-pet', name: 'Itodo', rank: 'E', rarity: 'Common', energy_bonus: '47' },
+        { id: 'nebara-pet', name: 'Nebara', rank: 'D', rarity: 'Uncommon', energy_bonus: '94' },
+        { id: 'magum-pet', name: 'Magum', rank: 'C', rarity: 'Rare', energy_bonus: '141' },
+        { id: 'meki-pet', name: 'Meki', rank: 'B', rarity: 'Epic', energy_bonus: '188' },
+        { id: 'tage-pet', name: 'Tage', rank: 'A', rarity: 'Legendary', energy_bonus: '234' },
+        { id: 'gajo-pet', name: 'Gajo', rank: 'S', rarity: 'Mythic', energy_bonus: '313' },
+        { id: 'sakuni-pet', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '703' }
+    ],
+    avatars: [
+        { id: 'itodo-avatar', name: 'Itodo', rank: 'E', rarity: 'Common', energy_bonus: '1' },
+        { id: 'nebara-avatar', name: 'Nebara', rank: 'D', rarity: 'Uncommon', energy_bonus: '10' },
+        { id: 'magum-avatar', name: 'Magum', rank: 'C', rarity: 'Rare', energy_bonus: '20' },
+        { id: 'meki-avatar', name: 'Meki', rank: 'B', rarity: 'Epic', energy_bonus: '30' },
+        { id: 'tage-avatar', name: 'Tage', rank: 'A', rarity: 'Legendary', energy_bonus: '50' },
+        { id: 'gajo-avatar', name: 'Gajo', rank: 'S', rarity: 'Mythic', energy_bonus: '75' },
+        { id: 'sakuni-avatar', name: 'Sakuni', rank: 'SS', rarity: 'Phantom', energy_bonus: '100' }
     ],
     dungeons: [
         {
