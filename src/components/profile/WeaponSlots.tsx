@@ -44,8 +44,8 @@ export function WeaponSlots() {
         return doc(firestore, 'users', user.uid);
     }, [firestore, user]);
     
-    const [equippedWeapons, setEquippedWeapons] = useState<any>({});
     const { data: userData, isLoading: isUserDataLoading } = useDoc(userDocRef);
+    const [equippedWeapons, setEquippedWeapons] = useState<any>((userData as any)?.weaponSlots || {});
     
     useEffect(() => {
         if (userData?.weaponSlots) {
@@ -76,7 +76,7 @@ export function WeaponSlots() {
         setStep('item');
     };
 
-    const updateWeaponData = async (slotIndex: number, newData: object) => {
+     const updateWeaponData = async (slotIndex: number, newData: object) => {
         if (!userDocRef) return;
         
         const currentData = equippedWeapons;
@@ -90,12 +90,14 @@ export function WeaponSlots() {
         const updatedWeapon = { ...weaponToUpdate, ...newData };
         const newSlots = { ...currentData, [slotIndex]: updatedWeapon };
 
+        // Optimistic UI update
         setEquippedWeapons(newSlots);
 
         try {
             await updateDoc(userDocRef, { weaponSlots: newSlots });
         } catch (error) {
             console.error("Error updating weapon data:", error);
+            // Revert on error
             setEquippedWeapons((userData as any)?.weaponSlots || {});
             toast({ variant: "destructive", title: "Erro", description: "Não foi possível atualizar os dados da arma." });
         }
@@ -103,16 +105,19 @@ export function WeaponSlots() {
 
 
     const handleItemSelect = async (item: any) => {
-        if (selectedSlot === null || !userDocRef || !weaponType) {
-            toast({ variant: "destructive", title: "Erro", description: "Tipo de arma inválido ou slot não selecionado."});
-            return;
-        };
+        if (selectedSlot === null || !userDocRef) return;
         
+        const typeOfWeapon = item.type || weaponType;
+        if(!typeOfWeapon) {
+            toast({ variant: "destructive", title: "Erro", description: "Tipo de arma inválido."});
+            return;
+        }
+
         const newWeaponData = {
             id: item.name, 
             name: item.name,
             rarity: item.rarity,
-            type: weaponType,
+            type: typeOfWeapon,
             evolutionLevel: 0, 
             breathingEnchantment: null,
             stoneEnchantment: null,
@@ -144,11 +149,15 @@ export function WeaponSlots() {
         const level = equipped.evolutionLevel || 0;
         
         if (equipped.type === 'damage') {
-             const baseDamage = parseMultiplier(item.baseDamage);
-             // Assuming star evolution adds a simple multiplier for damage swords for now
-             // e.g., 1x for 0-star, 1.2x for 1-star, 1.5x for 2-star, 2x for 3-star
+             // Evolution multipliers for damage swords
              const starMultipliers = [1, 1.2, 1.5, 2];
-             const finalDamage = baseDamage * (starMultipliers[level] || 1);
+             let finalDamage = parseMultiplier(item.baseDamage) * (starMultipliers[level] || 1);
+             
+             // Enchantment multipliers
+             const breathingMultiplier = equipped.breathingEnchantment ? 1.8 : 1; // Example: 1.8x for Phantom
+             const stoneMultiplier = equipped.stoneEnchantment ? 1.8 : 1; // Example: 1.8x for Phantom
+             
+             finalDamage = finalDamage * breathingMultiplier * stoneMultiplier;
              return `${finalDamage.toFixed(2)}x`;
         }
 
@@ -183,9 +192,9 @@ export function WeaponSlots() {
                 const displayedStat = getStatForLevel(fullItemData, equipped);
 
                 return (
-                    <div key={slotIndex} className="flex flex-col items-center gap-2 w-32">
+                    <div key={slotIndex} className="flex flex-col items-center gap-2">
                         <Card 
-                            className="cursor-pointer hover:border-primary/50 transition-colors w-full aspect-square flex flex-col justify-between" 
+                            className="cursor-pointer hover:border-primary/50 transition-colors w-32 h-32 flex flex-col justify-between flex-shrink-0"
                             onClick={() => handleSlotClick(slotIndex)}
                         >
                             <div className='p-4 text-center relative flex-grow flex flex-col items-center justify-center'>
@@ -260,12 +269,13 @@ export function WeaponSlots() {
                                     className={cn(
                                         'h-5 w-5 text-gray-500 transition-colors',
                                         equipped && 'cursor-pointer',
-                                        equipped && (equipped.evolutionLevel || 0) >= starLevel && 'text-red-500 fill-red-500'
+                                        equipped && (equipped.evolutionLevel || 0) >= starLevel ? 'text-red-500 fill-red-500' : 'text-gray-600'
                                     )}
                                     onClick={(e) => {
                                         if (!equipped) return;
                                         e.stopPropagation();
-                                        const newLevel = equipped.evolutionLevel === starLevel ? starLevel - 1 : starLevel;
+                                        const currentLevel = equipped.evolutionLevel || 0;
+                                        const newLevel = currentLevel === starLevel ? starLevel - 1 : starLevel;
                                         updateWeaponData(slotIndex, { evolutionLevel: newLevel });
                                     }}
                                 />
