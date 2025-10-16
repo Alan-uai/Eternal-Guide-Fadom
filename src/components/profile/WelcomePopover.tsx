@@ -15,16 +15,27 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, Upload, Sparkles } from 'lucide-react';
 import { extractStatsFromImage } from '@/ai/flows/extract-stats-from-image-flow';
 import { Separator } from '../ui/separator';
-import { useGlobalBonuses } from '@/hooks/use-global-bonuses'; // Assuming this hook can be adapted
+import { useGlobalBonuses } from '@/hooks/use-global-bonuses';
 import { allGameData } from '@/lib/game-data-context';
 import { energyGainPerRank } from '@/lib/energy-gain-data';
 
+
+const MAX_RANK = Math.max(...Object.keys(energyGainPerRank).map(Number));
+const MAX_WORLD = allGameData.length;
+
 const statsSchema = z.object({
-    currentWorld: z.string().min(1, 'O mundo atual é obrigatório.'),
-    rank: z.string().min(1, 'O rank é obrigatório.'),
+    currentWorld: z.string()
+        .min(1, 'O mundo atual é obrigatório.')
+        .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
+        .refine(val => parseInt(val, 10) <= MAX_WORLD, { message: `O mundo máximo é ${MAX_WORLD}.` }),
+    rank: z.string()
+        .min(1, 'O rank é obrigatório.')
+        .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
+        .refine(val => parseInt(val, 10) <= MAX_RANK, { message: `O rank máximo é ${MAX_RANK}.` }),
     totalDamage: z.string().min(1, 'O dano total é obrigatório.'),
     energyGain: z.string().min(1, 'O ganho de energia é obrigatório.'),
 });
+
 
 type StatsFormData = z.infer<typeof statsSchema>;
 
