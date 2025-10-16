@@ -283,10 +283,10 @@ function GeneralItemUploader({ asShortcut = false }: { asShortcut?: boolean }) {
 }
 
 const profileCategories = [
-    { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', subcollectionName: 'powers' },
-    { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras' },
-    { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets' },
-    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons' },
+    { name: 'Poderes', icon: Flame, description: 'Seus poderes de gacha e progressão.', subcollectionName: 'powers', isInteractiveGrid: true },
+    { name: 'Auras', icon: Shield, description: 'Auras de chefe e outros buffs.', subcollectionName: 'auras', isInteractiveGrid: true },
+    { name: 'Pets', icon: PawPrint, description: 'Seus companheiros e seus bônus.', subcollectionName: 'pets', isInteractiveGrid: true },
+    { name: 'Armas', icon: Swords, description: 'Espadas, foices e outros equipamentos.', subcollectionName: 'weapons', isInteractiveGrid: true },
     { name: 'Acessórios', icon: User, description: 'Chapéus, capas e outros itens de vestuário.', subcollectionName: 'accessories', isInteractiveGrid: true, gridData: accessories },
     { name: 'Gamepasses', icon: Wallet, description: 'Gamepasses que você possui.', subcollectionName: 'gamepasses', isInteractiveGrid: true, gridData: allGamepasses },
     { name: 'Index', icon: Star, description: 'Tiers de avatares e pets.', subcollectionName: 'index', disableItemUpload: true },
@@ -725,8 +725,6 @@ function RankSelector() {
     );
 }
 
-// ... (BonusDisplay and CategoryDisplay would need updates, but let's implement InteractiveGridCategory first)
-
 function BonusDisplay({ items, category }: { items: any[], category: string }) {
     const totals = useMemo(() => {
         const bonusTotals = {
@@ -800,19 +798,32 @@ function BonusDisplay({ items, category }: { items: any[], category: string }) {
     )
 }
 
-function InteractiveGridCategory({ subcollectionName, allItems }: { subcollectionName: string; allItems: any[] }) {
+function InteractiveGridCategory({ subcollectionName, gridData }: { subcollectionName: string; gridData?: any[] }) {
     const { user } = useUser();
     const { firestore } = useFirebase();
+    const { allGameData } = useApp();
     const { toast } = useToast();
     
     const itemsQuery = useMemoFirebase(() => {
         if (!firestore || !user) return null;
         return collection(firestore, 'users', user.uid, subcollectionName);
     }, [firestore, user, subcollectionName]);
+
     const { data: equippedItems, isLoading } = useCollection(itemsQuery);
     
     const [openPopover, setOpenPopover] = useState<string | null>(null);
     const holdTimeout = useRef<NodeJS.Timeout>();
+    
+    const allItems = useMemo(() => {
+        if (gridData) return gridData;
+
+        // For powers, we need to flatten the structure
+        if (subcollectionName === 'powers') {
+            return allGameData.flatMap(world => world.powers || []);
+        }
+
+        return allGameData.flatMap(world => world[subcollectionName] || []).filter(item => item && item.id);
+    }, [gridData, allGameData, subcollectionName]);
 
     const handleItemClick = async (item: any) => {
         if (!itemsQuery) return;
@@ -823,10 +834,11 @@ function InteractiveGridCategory({ subcollectionName, allItems }: { subcollectio
             if (isEquipped) {
                 await deleteDoc(itemRef);
             } else {
-                let dataToSave: any = { id: item.id };
-                if (subcollectionName === 'accessories') {
-                    // Default to the first rarity if not specified
-                    dataToSave.rarity = item.rarity_options ? item.rarity_options[0].rarity : 'Common';
+                let dataToSave: any = { id: item.id, name: item.name };
+                 if (subcollectionName === 'accessories' && item.rarity_options) {
+                    dataToSave.rarity = item.rarity_options[0].rarity;
+                } else if (subcollectionName === 'powers' && item.stats) {
+                    dataToSave.rarity = item.stats[0].name; // Save the name of the first stat as default rarity
                 }
                 await setDoc(itemRef, dataToSave);
             }
@@ -848,8 +860,9 @@ function InteractiveGridCategory({ subcollectionName, allItems }: { subcollectio
         }
     };
     
-    const handlePointerDown = (itemId: string) => {
-        if (subcollectionName !== 'accessories') return;
+    const handlePointerDown = (itemId: string, item: any) => {
+         const hasOptions = (subcollectionName === 'accessories' && item.rarity_options) || (subcollectionName === 'powers' && item.stats);
+        if (!hasOptions) return;
         holdTimeout.current = setTimeout(() => {
             setOpenPopover(itemId);
         }, 1500); // 1.5 seconds
@@ -862,40 +875,45 @@ function InteractiveGridCategory({ subcollectionName, allItems }: { subcollectio
     if (isLoading) {
         return <div className="flex items-center justify-center h-full w-full"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
     }
+
+    const uniqueItems = allItems.filter((item, index, self) =>
+        index === self.findIndex((t) => (t.id === item.id))
+    );
     
     return (
         <div className="w-full">
             <BonusDisplay items={equippedItems} category={subcollectionName} />
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
-                {allItems.map((item) => {
+                {uniqueItems.map((item) => {
                     const isEquipped = equippedItems?.some(i => i.id === item.id);
-                    const equippedAccessory = subcollectionName === 'accessories' ? equippedItems?.find(i => i.id === item.id) : null;
+                    const equippedItemData = equippedItems?.find(i => i.id === item.id);
+                    const popoverOptions = subcollectionName === 'accessories' ? item.rarity_options : (subcollectionName === 'powers' ? item.stats : []);
 
                     return (
                         <Popover key={item.id} open={openPopover === item.id} onOpenChange={(isOpen) => !isOpen && setOpenPopover(null)}>
                             <PopoverTrigger asChild>
                                 <button
                                     onClick={() => handleItemClick(item)}
-                                    onPointerDown={() => handlePointerDown(item.id)}
+                                    onPointerDown={() => handlePointerDown(item.id, item)}
                                     onPointerUp={handlePointerUp}
-                                    onPointerLeave={handlePointerUp} // Cancel on drag out
+                                    onPointerLeave={handlePointerUp}
                                     className={cn(
                                         'aspect-square bg-muted/30 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border-2 transition-all duration-200',
                                         isEquipped ? 'border-primary bg-primary/10' : 'border-transparent hover:border-primary/50'
                                     )}
                                 >
                                     <p className="text-[10px] font-bold leading-tight text-center z-10">{item.name}</p>
-                                    {equippedAccessory && (
-                                        <RarityBadge rarity={(equippedAccessory as any).rarity} className="absolute bottom-1 right-1" />
+                                    {equippedItemData && (
+                                        <RarityBadge rarity={(equippedItemData as any).rarity} className="absolute bottom-1 right-1" />
                                     )}
                                 </button>
                             </PopoverTrigger>
-                            {subcollectionName === 'accessories' && (
+                             {popoverOptions && popoverOptions.length > 0 && (
                                 <PopoverContent className="w-auto p-0">
                                 <div className="flex flex-col">
-                                    {(item as Accessory).rarity_options.map((opt: RarityOption) => (
-                                        <Button key={opt.rarity} variant="ghost" className="rounded-none" onClick={() => handleRarityChange(item.id, opt.rarity)}>
-                                            <RarityBadge rarity={opt.rarity} />
+                                    {popoverOptions.map((opt: any) => (
+                                        <Button key={opt.rarity || opt.name} variant="ghost" className="rounded-none justify-start" onClick={() => handleRarityChange(item.id, opt.rarity || opt.name)}>
+                                            <RarityBadge rarity={opt.rarity || opt.name} />
                                         </Button>
                                     ))}
                                 </div>
@@ -909,16 +927,18 @@ function InteractiveGridCategory({ subcollectionName, allItems }: { subcollectio
     );
 }
 
-function CategoryDisplay({ subcollectionName, isInteractiveGrid, gridData }: { subcollectionName: string, isInteractiveGrid?: boolean, gridData?: any[] }) {
+function CategoryDisplay({ subcollectionName, isInteractiveGrid }: { subcollectionName: string, isInteractiveGrid?: boolean }) {
+    const { allGameData } = useApp();
     const { user } = useUser();
-    const firestore = useFirebase().firestore;
+    const { firestore } = useFirebase();
 
     if (subcollectionName === 'index') return <IndexTierCalculator />;
     if (subcollectionName === 'obelisks') return <ObeliskLevelCalculator />;
     if (subcollectionName === 'achievements') return <AchievementCalculator />;
     if (subcollectionName === 'rank') return <RankSelector />;
-    if (isInteractiveGrid && gridData) {
-        return <InteractiveGridCategory subcollectionName={subcollectionName} allItems={gridData} />;
+    if (isInteractiveGrid) {
+        const gridData = subcollectionName === 'gamepasses' ? allGamepasses : (subcollectionName === 'accessories' ? accessories : undefined);
+        return <InteractiveGridCategory subcollectionName={subcollectionName} gridData={gridData} />;
     }
 
     const itemsQuery = useMemoFirebase(() => {
@@ -949,7 +969,7 @@ function CategoryDisplay({ subcollectionName, isInteractiveGrid, gridData }: { s
             <BonusDisplay items={items} category={subcollectionName} />
             <div className="grid grid-cols-5 gap-2 w-full">
                 {items.map(item => (
-                    <div key={item.id} className="aspect-square bg-muted/50 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border">
+                     <div key={(item as any).id || (item as any).name} className="aspect-square bg-muted/50 rounded-md flex flex-col items-center justify-center p-1 relative overflow-hidden border">
                         <p className="text-[10px] font-bold leading-tight text-center z-10">{(item as any).name}</p>
                         <RarityBadge rarity={(item as any).rarity} className="absolute bottom-1 right-1 text-[8px] px-1 py-0 h-4" />
                     </div>
@@ -1051,7 +1071,6 @@ export default function ProfilePage() {
                                     <CategoryDisplay 
                                         subcollectionName={category.subcollectionName} 
                                         isInteractiveGrid={category.isInteractiveGrid}
-                                        gridData={category.gridData}
                                     />
                                 </div>
                             </CardContent>
