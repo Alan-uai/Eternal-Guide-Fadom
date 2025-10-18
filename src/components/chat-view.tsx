@@ -35,66 +35,73 @@ interface ParsedSection {
 }
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-    const parsedContent = useMemo(() => {
+    let parsedContent;
+    let isLikelyJson = false;
+
+    if (typeof content === 'string' && content.trim().startsWith('[')) {
+        isLikelyJson = true;
         try {
-            // Garante que o conteúdo é uma string antes de analisar.
-            const contentString = typeof content === 'string' ? content : JSON.stringify(content);
-            const parsed = JSON.parse(contentString);
-            return Array.isArray(parsed) ? parsed : [parsed];
+            parsedContent = JSON.parse(content);
         } catch (e) {
-            // Se não for JSON válido (pode ser durante o streaming), trata como texto simples.
-            return [{ marcador: 'texto_introdutorio', titulo: '', conteudo: content }];
+            // It's likely an incomplete JSON stream, so we'll render the raw text for now
+            parsedContent = null;
         }
-    }, [content]);
+    }
 
-  const introSection = parsedContent.find(s => s.marcador === 'texto_introdutorio');
-  const mainAnswerSection = parsedContent.find(s => s.marcador === 'inicio');
-  const accordionSections = parsedContent.filter(s => s.marcador === 'meio' || s.marcador === 'fim');
+    if (!isLikelyJson || !parsedContent) {
+        // Render raw text if it's not JSON or if parsing fails (streaming)
+        return (
+             <div
+                className="prose prose-sm dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: micromark(content) }}
+            />
+        )
+    }
 
-  // Determina qual item do acordeão deve vir aberto por padrão.
-  const defaultAccordionItem = accordionSections.length > 0 ? 'item-0' : undefined;
+    // It's valid JSON, so render the accordion structure
+    const introSection = parsedContent.find((s: any) => s.marcador === 'texto_introdutorio');
+    const mainAnswerSection = parsedContent.find((s: any) => s.marcador === 'inicio');
+    const accordionSections = parsedContent.filter((s: any) => s.marcador === 'meio' || s.marcador === 'fim');
 
-  return (
-    <div className='relative'>
-      {fromCache && (
-        <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
-          <Zap className='h-3 w-3' /> Instantâneo
-        </span>
-      )}
+    const defaultAccordionItem = accordionSections.length > 0 ? 'item-0' : undefined;
 
-      {/* Renderiza a parte introdutória */}
-      {introSection && (
-        <div
-          className="prose prose-sm dark:prose-invert max-w-none mb-4"
-          dangerouslySetInnerHTML={{ __html: micromark(introSection.conteudo) }}
-        />
-      )}
-      
-      {/* Renderiza a resposta principal (inicio) */}
-      {mainAnswerSection && (
-         <div className="prose prose-sm dark:prose-invert max-w-none font-semibold">
-           <div dangerouslySetInnerHTML={{ __html: micromark(mainAnswerSection.conteudo) }} />
-         </div>
-      )}
+    return (
+        <div className='relative'>
+            {fromCache && (
+                <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
+                <Zap className='h-3 w-3' /> Instantâneo
+                </span>
+            )}
 
+            {introSection && (
+                <div
+                className="prose prose-sm dark:prose-invert max-w-none mb-4"
+                dangerouslySetInnerHTML={{ __html: micromark(introSection.conteudo) }}
+                />
+            )}
+            
+            {mainAnswerSection && (
+                <div className="prose prose-sm dark:prose-invert max-w-none font-semibold">
+                <div dangerouslySetInnerHTML={{ __html: micromark(mainAnswerSection.conteudo) }} />
+                </div>
+            )}
 
-      {/* Renderiza o acordeão para as seções restantes */}
-      {accordionSections.length > 0 && (
-        <Accordion type="multiple" defaultValue={defaultAccordionItem ? [defaultAccordionItem] : []} className="w-full mt-4 border-t pt-4">
-          {accordionSections.map((section, index) => (
-            <AccordionItem value={`item-${index}`} key={index}>
-              <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
-                {section.titulo}
-              </AccordionTrigger>
-              <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6 pb-4">
-                <div dangerouslySetInnerHTML={{ __html: micromark(section.conteudo) }} />
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      )}
-    </div>
-  );
+            {accordionSections.length > 0 && (
+                <Accordion type="multiple" defaultValue={defaultAccordionItem ? [defaultAccordionItem] : []} className="w-full mt-4 border-t pt-4">
+                {accordionSections.map((section: ParsedSection, index: number) => (
+                    <AccordionItem value={`item-${index}`} key={index}>
+                    <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
+                        {section.titulo}
+                    </AccordionTrigger>
+                    <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6 pb-4">
+                        <div dangerouslySetInnerHTML={{ __html: micromark(section.conteudo) }} />
+                    </AccordionContent>
+                    </AccordionItem>
+                ))}
+                </Accordion>
+            )}
+        </div>
+    );
 }
 
 
@@ -303,8 +310,9 @@ export function ChatView() {
         const userMessageContent = messages[userMessageIndex]?.content;
 
         if(userMessageContent){
-            setMessages(prevMessages => prevMessages.filter(msg => msg.id !== messageId));
-            callAI(userMessageContent, messages.filter(msg => msg.id !== messageId && msg.role !== 'assistant'));
+            const historyWithoutBadAnswer = messages.slice(0, userMessageIndex + 1);
+            setMessages(historyWithoutBadAnswer);
+            callAI(userMessageContent, historyWithoutBadAnswer.filter(m => m.role === 'user'));
         }
     }
   };
@@ -340,19 +348,18 @@ export function ChatView() {
       const reader = stream.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = '';
-      let structuredContent = ''; // Store the parsed, valid JSON part
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) {
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: structuredContent || accumulatedContent } : msg
+              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: accumulatedContent } : msg
             )
           );
           setIsLoading(false);
           
-          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: structuredContent || accumulatedContent, question: prompt };
+          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent, question: prompt };
           const newCacheItem: CachedItem = { message: finalMessage, feedback: null, dataVersion: gameDataVersion };
           const normalizedPrompt = prompt.trim().toLowerCase();
           const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
@@ -362,22 +369,10 @@ export function ChatView() {
           break;
         }
         accumulatedContent += decoder.decode(value, { stream: true });
-        
-        try {
-            // Try to parse the accumulated content as JSON.
-            // This will only succeed when a complete JSON object has been streamed.
-            const parsed = JSON.parse(accumulatedContent);
-            // If parsing succeeds, we have a valid (potentially partial) structured response.
-            // We store this valid part to be used for rendering.
-            structuredContent = JSON.stringify(parsed);
-        } catch (e) {
-            // JSON is incomplete, do nothing and wait for more chunks.
-            // We will render the raw `accumulatedContent` for now.
-        }
 
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === assistantMessageId ? { ...msg, content: structuredContent || accumulatedContent } : msg
+            msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
           )
         );
       }
