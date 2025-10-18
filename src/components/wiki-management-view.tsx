@@ -336,24 +336,33 @@ export function WikiManagementView() {
     };
 
   const handlePopulateAll = async () => {
-    if (!firestore) return;
+    if (!firestore || !worldsFromFirestore || !articlesFromFirestore) return;
     setIsPopulatingAll(true);
-    toast({ title: 'Iniciando população...', description: 'Todos os dados locais (mundos e artigos) serão enviados ao Firestore.' });
+    toast({ title: 'Iniciando população...', description: 'Apenas novos dados locais serão adicionados ao Firestore.' });
+
     try {
         const batch = writeBatch(firestore);
 
-        // Populate world data from the centralized source
-        for (const worldData of allGameData) {
-            if (!worldData || !worldData.name) continue;
-            const worldName = worldData.name;
-            const worldDataJson = JSON.stringify(worldData);
-            // This function already handles batching internally, but for consistency,
-            // we call it here. It's safe to call it multiple times.
-            await seedWorldData({ worldName, worldDataJson });
+        // Filter for local data that is not in Firestore
+        const firestoreWorldIds = new Set(worldsFromFirestore.map(w => w.id));
+        const worldsToPopulate = allGameData.filter(w => w && w.id && !firestoreWorldIds.has(w.id));
+
+        const firestoreArticleIds = new Set(articlesFromFirestore.map(a => a.id));
+        const articlesToPopulate = allWikiArticles.filter(a => a && a.id && !firestoreArticleIds.has(a.id));
+
+        if (worldsToPopulate.length === 0 && articlesToPopulate.length === 0) {
+            toast({ title: 'Nenhum dado novo', description: 'Todos os dados locais já existem no Firestore.' });
+            setIsPopulatingAll(false);
+            return;
         }
         
-        // Populate wiki articles from the centralized source
-        for (const article of allWikiArticles) {
+        let populatedWorldsCount = 0;
+        for (const worldData of worldsToPopulate) {
+            await seedWorldData({ worldName: worldData.name, worldDataJson: JSON.stringify(worldData) });
+            populatedWorldsCount++;
+        }
+        
+        for (const article of articlesToPopulate) {
             const articleRef = doc(firestore, 'wikiContent', article.id);
             const articleWithTimestamp = { ...article, createdAt: serverTimestamp() };
             batch.set(articleRef, articleWithTimestamp);
@@ -362,7 +371,7 @@ export function WikiManagementView() {
         await batch.commit();
         
         await incrementDataVersion();
-        toast({ title: 'População Concluída!', description: `${allGameData.length} mundos e ${allWikiArticles.length} artigos foram populados/atualizados com sucesso.` });
+        toast({ title: 'População Concluída!', description: `${populatedWorldsCount} mundos e ${articlesToPopulate.length} artigos foram adicionados.` });
 
     } catch (error: any) {
          console.error('Erro ao popular todos os dados:', error);

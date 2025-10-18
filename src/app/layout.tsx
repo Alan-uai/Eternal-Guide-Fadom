@@ -8,6 +8,7 @@ import { MainNav } from '@/components/main-nav';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthDialog } from '@/components/auth-dialog';
 import { RaidTimer } from '@/components/raid-timer';
+import { CodesDisplay } from '@/components/codes-display';
 
 // We can't export metadata from a client component.
 // We can remove it or keep it for reference, but it won't be used.
@@ -38,6 +39,7 @@ export default function RootLayout({
               <MainNav />
             </header>
             <RaidTimer />
+            <CodesDisplay />
             <main className="flex flex-1 flex-col p-4 md:p-6 pt-12">
               {children}
             </main>
