@@ -59,6 +59,7 @@ export function CodesDisplay() {
         className="flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto"
         initial={false}
         animate={{ width: isExpanded ? 300 : 'auto' }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
         <div 
             className="w-full h-3 bg-background/80 backdrop-blur-sm shrink-0"
