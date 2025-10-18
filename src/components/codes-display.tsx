@@ -50,24 +50,21 @@ export function CodesDisplay() {
 
   return (
     <div className="fixed top-14 w-full flex justify-start z-40 pointer-events-none pl-4 md:pl-6">
-        <div className={cn(
-            "flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto",
-             isExpanded ? "w-48" : "auto"
-        )}>
+        <motion.div 
+            className={cn(
+                "flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto",
+                isExpanded ? "w-48 h-96" : "w-auto h-auto"
+            )}
+        >
             <div 
-                className="w-full h-3 bg-background/80 backdrop-blur-sm"
+                className="w-full h-3 bg-background/80 backdrop-blur-sm shrink-0"
                 style={{
                     clipPath: 'polygon(0% 0%, 100% 0%, 55% 100%, 45% 100%)'
                 }}
             />
-            <motion.div 
-                className="w-full bg-background/80 backdrop-blur-sm border-x border-b rounded-b-lg shadow-lg overflow-hidden flex flex-col items-center"
-                initial={false}
-                animate={{ height: isExpanded ? 'auto' : '2rem' }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-            >
+            <div className="w-full bg-background/80 backdrop-blur-sm border-x border-b rounded-b-lg shadow-lg overflow-hidden flex flex-col items-center flex-grow">
                 <div 
-                    className="flex items-center justify-center gap-1.5 h-8 px-2 cursor-pointer w-full"
+                    className="flex items-center justify-center gap-1.5 h-8 px-2 cursor-pointer w-full shrink-0"
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
                     <Gift className="h-4 w-4 text-muted-foreground" />
@@ -76,13 +73,13 @@ export function CodesDisplay() {
                 <AnimatePresence>
                 {isExpanded && (
                     <motion.div
-                        className="p-3 pt-1 text-center w-full"
+                        className="p-3 pt-1 text-center w-full h-full"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, delay: 0.1 }}
                     >
-                      <ScrollArea className="max-h-72 w-full pr-4">
+                      <ScrollArea className="h-full w-full pr-4">
                         <div className="space-y-3">
                             {codes.update.length > 0 && (
                                  <div className='space-y-1'>
@@ -137,8 +134,8 @@ export function CodesDisplay() {
                     </motion.div>
                 )}
                 </AnimatePresence>
-            </motion.div>
-        </div>
+            </div>
+        </motion.div>
     </div>
   );
 }
