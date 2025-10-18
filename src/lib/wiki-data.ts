@@ -22,6 +22,7 @@ import { titansArticle } from './wiki-articles/titans';
 import { upgradesCostsArticle } from './wiki-articles/upgrades-costs';
 import { world20RaidsArticle } from './wiki-articles/world-20-raids';
 import { worldBossesArticle } from './wiki-articles/world-bosses';
+import { jewelryCraftingArticle } from './wiki-articles/jewelry-crafting';
 
 export const allWikiArticles = [
     gettingStartedArticle,
@@ -47,6 +48,7 @@ export const allWikiArticles = [
     achievementsGuideArticle,
     starChancesArticle,
     upgradesCostsArticle,
+    jewelryCraftingArticle,
 ];
 
 // Adiciona o timestamp do servidor para cada artigo
