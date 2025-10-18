@@ -34,21 +34,30 @@ interface ParsedSection {
   conteudo: string;
 }
 
-// Nova função para extrair conteúdo legível de uma string JSON parcial
 const extractContentFromString = (str: string): string => {
   try {
-    // Tenta encontrar todos os valores de "conteudo" usando uma expressão regular
+    const titleRegex = /"titulo"\s*:\s*"((?:\\"|[^"])*)"/g;
     const contentRegex = /"conteudo"\s*:\s*"((?:\\"|[^"])*)"/g;
-    let match;
-    const contents: string[] = [];
-    while ((match = contentRegex.exec(str)) !== null) {
-      // Decodifica sequências de escape JSON, como \" ou \\
-      contents.push(match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+    
+    const titles = [...str.matchAll(titleRegex)].map(match => match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+    const contents = [...str.matchAll(contentRegex)].map(match => match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+    
+    let result = '';
+    const maxLength = Math.max(titles.length, contents.length);
+    
+    for (let i = 0; i < maxLength; i++) {
+      if (titles[i]) {
+        result += `**${titles[i]}**\n\n`;
+      }
+      if (contents[i]) {
+        result += `${contents[i]}\n\n`;
+      }
     }
-    if (contents.length > 0) {
-      return contents.join('\n\n');
+    
+    if (result.trim()) {
+      return result;
     }
-    // Se não encontrar "conteudo", retorna a string como um fallback, removendo a sintaxe inicial
+
     return str.replace(/^\[{"marcador":.*"conteudo":\s*"/, '').replace(/"}\]/, '');
   } catch {
     return str;
@@ -608,3 +617,5 @@ export function ChatView() {
     </div>
   );
 }
+
+    
