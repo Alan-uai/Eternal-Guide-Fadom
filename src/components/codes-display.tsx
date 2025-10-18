@@ -1,15 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gift } from 'lucide-react';
+import { Gift, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { upgradesCostsArticle } from '@/lib/wiki-articles/upgrades-costs';
+import { useToast } from '@/hooks/use-toast';
+import { Separator } from './ui/separator';
 
-const codes = upgradesCostsArticle.content.match(/`Update20`|`320KLikes`|`325KLikes`|`590KFav`|`595KFav`/g)?.map(c => c.replace(/`/g, '')) || [];
+const allCodesRaw = upgradesCostsArticle.content.match(/`Update20`|`320KLikes`|`325KLikes`|`590KFav`|`595KFav`/g)?.map(c => c.replace(/`/g, '')) || [];
+
+interface CategorizedCodes {
+  likes: string[];
+  fav: string[];
+  update: string[];
+}
 
 export function CodesDisplay() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { toast } = useToast();
+
+  const codes = useMemo((): CategorizedCodes => {
+    return allCodesRaw.reduce<CategorizedCodes>((acc, code) => {
+      if (code.toLowerCase().includes('like')) {
+        acc.likes.push(code);
+      } else if (code.toLowerCase().includes('fav')) {
+        acc.fav.push(code);
+      } else if (code.toLowerCase().includes('update')) {
+        acc.update.push(code);
+      }
+      return acc;
+    }, { likes: [], fav: [], update: [] });
+  }, []);
+
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({
+      title: 'Código Copiado!',
+      description: `${code} foi copiado para a área de transferência.`,
+    });
+  };
 
   return (
     <div className="fixed top-14 w-full flex justify-start z-40 pointer-events-none pl-4 md:pl-6">
@@ -30,7 +60,7 @@ export function CodesDisplay() {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
                 <div 
-                    className="flex items-center justify-center gap-1.5 h-8 px-2 cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 h-8 px-2 cursor-pointer w-full"
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
                     <Gift className="h-4 w-4 text-muted-foreground" />
@@ -45,13 +75,44 @@ export function CodesDisplay() {
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, delay: 0.1 }}
                     >
-                        <ul className="space-y-1">
-                            {codes.map(code => (
-                                <li key={code} className="text-sm font-mono text-primary bg-primary/10 rounded-md py-1">
-                                    {code}
-                                </li>
-                            ))}
-                        </ul>
+                        <div className="space-y-3">
+                            {codes.likes.length > 0 && (
+                                <div className='space-y-1'>
+                                    <p className='text-xs font-semibold text-muted-foreground'>Likes</p>
+                                    <ul className="space-y-1">
+                                        {codes.likes.map(code => (
+                                            <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
+                                                {code} <Copy className="h-3 w-3" />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            {codes.fav.length > 0 && (
+                                 <div className='space-y-1'>
+                                    <p className='text-xs font-semibold text-muted-foreground'>Fav</p>
+                                    <ul className="space-y-1">
+                                        {codes.fav.map(code => (
+                                            <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
+                                                {code} <Copy className="h-3 w-3" />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            {codes.update.length > 0 && (
+                                 <div className='space-y-1'>
+                                    <p className='text-xs font-semibold text-muted-foreground'>Update</p>
+                                    <ul className="space-y-1">
+                                        {codes.update.map(code => (
+                                            <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
+                                                {code} <Copy className="h-3 w-3" />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
                     </motion.div>
                 )}
                 </AnimatePresence>
