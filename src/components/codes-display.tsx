@@ -51,10 +51,7 @@ export function CodesDisplay() {
   return (
     <div className="fixed top-14 w-full flex justify-start z-40 pointer-events-none pl-4 md:pl-6">
         <motion.div 
-            className={cn(
-                "flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto",
-                isExpanded ? "w-48 h-96" : "w-auto h-auto"
-            )}
+            className="flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto w-auto"
         >
             <div 
                 className="w-full h-3 bg-background/80 backdrop-blur-sm shrink-0"

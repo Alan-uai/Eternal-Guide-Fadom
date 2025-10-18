@@ -70,10 +70,7 @@ export function RaidTimer() {
 
   return (
     <div className="fixed top-14 w-full flex justify-center z-40 pointer-events-none">
-        <div className={cn(
-            "flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto",
-             isExpanded ? "w-48" : "auto"
-        )}>
+        <div className="flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto w-auto">
             <div 
                 className="w-full h-3 bg-background/80 backdrop-blur-sm"
                 style={{
