@@ -40,13 +40,13 @@ export default function RootLayout({
               <MainNav />
             </header>
             <div className="fixed top-14 w-full flex justify-between z-40 pointer-events-none px-4 md:px-6">
-                <div className='flex justify-start'>
+                <div className='flex-1 flex justify-start'>
                     <CodesDisplay />
                 </div>
-                <div className='flex justify-center'>
+                <div className='flex-1 flex justify-center'>
                     <RaidTimer />
                 </div>
-                <div className='flex justify-end'>
+                <div className='flex-1 flex justify-end'>
                     <LocationsDisplay />
                 </div>
             </div>
