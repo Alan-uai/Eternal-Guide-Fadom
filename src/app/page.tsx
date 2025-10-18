@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ChatView } from '@/components/chat-view';
