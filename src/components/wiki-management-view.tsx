@@ -221,30 +221,33 @@ export function WikiManagementView() {
 
 
   const worldsCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'worlds') : null, [firestore]);
-  const { data: worlds, isLoading: areWorldsLoading } = useCollection(worldsCollectionRef as any);
+  const { data: worldsFromFirestore, isLoading: areWorldsLoading } = useCollection(worldsCollectionRef as any);
 
   const articlesCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'wikiContent') : null, [firestore]);
-  const { data: articles, isLoading: areArticlesLoading } = useCollection<WikiArticle>(articlesCollectionRef as any);
+  const { data: articlesFromFirestore, isLoading: areArticlesLoading } = useCollection<WikiArticle>(articlesCollectionRef as any);
 
   const combinedArticles = useMemo(() => {
-    const firestoreIds = new Set(articles?.map(a => a.id));
+    const firestoreIds = new Set(articlesFromFirestore?.map(a => a.id));
     const staticArticlesToAdd = allWikiArticles.filter(sa => !firestoreIds.has(sa.id));
-    return [...(articles || []), ...staticArticlesToAdd];
-  }, [articles]);
+    return [...(articlesFromFirestore || []), ...staticArticlesToAdd];
+  }, [articlesFromFirestore]);
 
-  const sortedWorlds = useMemo(() => {
-    if (!worlds) return [];
-    // Sort based on the numeric part of the ID string
-    return [...worlds].sort((a, b) => {
+  const combinedWorlds = useMemo(() => {
+    const firestoreIds = new Set(worldsFromFirestore?.map(w => w.id));
+    const staticWorldsToAdd = allGameData.filter(sw => !firestoreIds.has(sw.id));
+    const worlds = [...(worldsFromFirestore || []), ...staticWorldsToAdd];
+    
+    return worlds.sort((a, b) => {
         const idA = a.id ? parseInt(a.id, 10) : 0;
         const idB = b.id ? parseInt(b.id, 10) : 0;
         return idA - idB;
     });
-  }, [worlds]);
+  }, [worldsFromFirestore]);
+
 
     const handleViewContent = (title: string, data: any, id?: string, isWorld: boolean = false) => {
         let finalData = data;
-        const staticWorldData = allGameData.find(w => w.name.toLowerCase().replace(/[^a-z0-9]/g, '') === (id || '').replace(/-/g, ''));
+        const staticWorldData = allGameData.find(w => w.id === id);
         if (id && staticWorldData) {
             finalData = { ...staticWorldData, ...data };
         }
@@ -541,7 +544,7 @@ export function WikiManagementView() {
                   <span className="ml-3 text-muted-foreground">Carregando mundos...</span>
                 </div>
               ) : (
-                sortedWorlds?.map(world => {
+                combinedWorlds?.map(world => {
                   const fetchedSubcollections = getSubcollectionsForWorld(world.id);
                   return (
                     <Collapsible key={world.id} className="space-y-2">

@@ -7,6 +7,7 @@ import { gamepassTierListArticle } from './wiki-articles/gamepass-tier-list';
 import { gettingStartedArticle } from './wiki-articles/getting-started';
 import { guildWarsArticle } from './wiki-articles/guild-wars';
 import { howToGetStrongerArticle } from './wiki-articles/how-to-get-stronger';
+import { jewelryCraftingArticle } from './wiki-articles/jewelry-crafting';
 import { legendaryWeaponsArticle } from './wiki-articles/legendary-weapons';
 import { levelExpArticle } from './wiki-articles/level-exp';
 import { lobbyDungeonsArticle } from './wiki-articles/lobby-dungeons';
@@ -22,7 +23,7 @@ import { titansArticle } from './wiki-articles/titans';
 import { upgradesCostsArticle } from './wiki-articles/upgrades-costs';
 import { world20RaidsArticle } from './wiki-articles/world-20-raids';
 import { worldBossesArticle } from './wiki-articles/world-bosses';
-import { jewelryCraftingArticle } from './wiki-articles/jewelry-crafting';
+
 
 export const allWikiArticles = [
     gettingStartedArticle,
