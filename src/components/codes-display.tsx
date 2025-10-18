@@ -49,90 +49,90 @@ export function CodesDisplay() {
   };
 
   return (
-    <div className="fixed top-14 w-full flex justify-start z-40 pointer-events-none pl-4 md:pl-6">
-        <motion.div 
-            className="flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto w-auto"
-        >
+    <motion.div 
+        className="flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto"
+        initial={false}
+        animate={{ width: isExpanded ? 300 : 'auto' }}
+    >
+        <div 
+            className="w-full h-3 bg-background/80 backdrop-blur-sm shrink-0"
+            style={{
+                clipPath: 'polygon(0% 0%, 100% 0%, 55% 100%, 45% 100%)'
+            }}
+        />
+        <div className="w-full bg-background/80 backdrop-blur-sm border-x border-b rounded-b-lg shadow-lg overflow-hidden flex flex-col items-center flex-grow">
             <div 
-                className="w-full h-3 bg-background/80 backdrop-blur-sm shrink-0"
-                style={{
-                    clipPath: 'polygon(0% 0%, 100% 0%, 55% 100%, 45% 100%)'
-                }}
-            />
-            <div className="w-full bg-background/80 backdrop-blur-sm border-x border-b rounded-b-lg shadow-lg overflow-hidden flex flex-col items-center flex-grow">
-                <div 
-                    className="flex items-center justify-center gap-1.5 h-8 px-2 cursor-pointer w-full shrink-0"
-                    onClick={() => setIsExpanded(!isExpanded)}
-                >
-                    <Gift className="h-4 w-4 text-muted-foreground" />
-                    <span className='text-xs font-semibold'>Códigos</span>
-                </div>
-                <AnimatePresence>
-                {isExpanded && (
-                    <motion.div
-                        className="p-3 pt-1 text-center w-full h-72"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2, delay: 0.1 }}
-                    >
-                      <ScrollArea className="h-full w-full pr-4">
-                        <div className="space-y-3">
-                            {codes.update.length > 0 && (
-                                 <div className='space-y-1'>
-                                    <p className='text-xs font-semibold text-muted-foreground'>Update</p>
-                                    <ul className="space-y-1">
-                                        {codes.update.map(code => (
-                                            <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
-                                                {code} <Copy className="h-3 w-3" />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                             {codes.likes.length > 0 && (
-                                <div className='space-y-1'>
-                                    <p className='text-xs font-semibold text-muted-foreground'>Likes</p>
-                                    <ul className="space-y-1">
-                                        {codes.likes.map(code => (
-                                            <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
-                                                {code} <Copy className="h-3 w-3" />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                            {codes.fav.length > 0 && (
-                                 <div className='space-y-1'>
-                                    <p className='text-xs font-semibold text-muted-foreground'>Fav</p>
-                                    <ul className="space-y-1">
-                                        {codes.fav.map(code => (
-                                            <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
-                                                {code} <Copy className="h-3 w-3" />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                             {codes.visits.length > 0 && (
-                                 <div className='space-y-1'>
-                                    <p className='text-xs font-semibold text-muted-foreground'>Visits</p>
-                                    <ul className="space-y-1">
-                                        {codes.visits.map(code => (
-                                            <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
-                                                {code} <Copy className="h-3 w-3" />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
-                      </ScrollArea>
-                    </motion.div>
-                )}
-                </AnimatePresence>
+                className="flex items-center justify-center gap-1.5 h-8 px-2 cursor-pointer w-full shrink-0"
+                onClick={() => setIsExpanded(!isExpanded)}
+            >
+                <Gift className="h-4 w-4 text-muted-foreground" />
+                <span className='text-xs font-semibold'>Códigos</span>
             </div>
-        </motion.div>
-    </div>
+            <AnimatePresence>
+            {isExpanded && (
+                <motion.div
+                    className="p-3 pt-1 text-center w-full h-72"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2, delay: 0.1 }}
+                >
+                  <ScrollArea className="h-full w-full pr-4">
+                    <div className="space-y-3">
+                        {codes.update.length > 0 && (
+                             <div className='space-y-1'>
+                                <p className='text-xs font-semibold text-muted-foreground'>Update</p>
+                                <ul className="space-y-1">
+                                    {codes.update.map(code => (
+                                        <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
+                                            {code} <Copy className="h-3 w-3" />
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                         {codes.likes.length > 0 && (
+                            <div className='space-y-1'>
+                                <p className='text-xs font-semibold text-muted-foreground'>Likes</p>
+                                <ul className="space-y-1">
+                                    {codes.likes.map(code => (
+                                        <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
+                                            {code} <Copy className="h-3 w-3" />
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {codes.fav.length > 0 && (
+                             <div className='space-y-1'>
+                                <p className='text-xs font-semibold text-muted-foreground'>Fav</p>
+                                <ul className="space-y-1">
+                                    {codes.fav.map(code => (
+                                        <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
+                                            {code} <Copy className="h-3 w-3" />
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                         {codes.visits.length > 0 && (
+                             <div className='space-y-1'>
+                                <p className='text-xs font-semibold text-muted-foreground'>Visits</p>
+                                <ul className="space-y-1">
+                                    {codes.visits.map(code => (
+                                        <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
+                                            {code} <Copy className="h-3 w-3" />
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                  </ScrollArea>
+                </motion.div>
+            )}
+            </AnimatePresence>
+        </div>
+    </motion.div>
   );
 }
