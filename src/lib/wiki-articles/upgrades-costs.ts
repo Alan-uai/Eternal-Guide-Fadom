@@ -7,7 +7,7 @@ export const upgradesCostsArticle: Omit<WikiArticle, 'createdAt'> = {
   content: `Esta página detalha os custos em moedas para cada nível de upgrade em várias categorias de bônus permanentes no jogo, além dos custos em Exchange Tokens para expandir os slots do inventário.
 
 **Novos Códigos:**
-Use os códigos \`Update20\`, \`320KLikes\`, \`325KLikes\`, \`590KFav\`, e \`595KFav\` para recompensas!
+Use os códigos \`Update20\`, \`320KLikes\`, \`325KLikes\`, \`590KFav\`, \`595KFav\`, \`Update19P3\`, \`315KLikes\`, \`580KFav\`, \`585KFav\`, e \`150MVisits\` para recompensas!
   `,
   tags: ['custos', 'upgrade', 'evolução', 'preços', 'sorte', 'exp', 'dano', 'energia', 'moedas', 'guia', 'inventário', 'token', 'códigos'],
   imageUrl: 'wiki-13', // Reusing scientific notation image as it relates to costs

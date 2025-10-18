@@ -8,12 +8,13 @@ import { upgradesCostsArticle } from '@/lib/wiki-articles/upgrades-costs';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 
-const allCodesRaw = upgradesCostsArticle.content.match(/`Update20`|`320KLikes`|`325KLikes`|`590KFav`|`595KFav`/g)?.map(c => c.replace(/`/g, '')) || [];
+const allCodesRaw = upgradesCostsArticle.content.match(/`Update20`|`320KLikes`|`325KLikes`|`590KFav`|`595KFav`|`Update19P3`|`315KLikes`|`580KFav`|`585KFav`|`150MVisits`/g)?.map(c => c.replace(/`/g, '')) || [];
 
 interface CategorizedCodes {
   likes: string[];
   fav: string[];
   update: string[];
+  visits: string[];
 }
 
 export function CodesDisplay() {
@@ -22,15 +23,18 @@ export function CodesDisplay() {
 
   const codes = useMemo((): CategorizedCodes => {
     return allCodesRaw.reduce<CategorizedCodes>((acc, code) => {
-      if (code.toLowerCase().includes('like')) {
+      const lowerCode = code.toLowerCase();
+      if (lowerCode.includes('like')) {
         acc.likes.push(code);
-      } else if (code.toLowerCase().includes('fav')) {
+      } else if (lowerCode.includes('fav')) {
         acc.fav.push(code);
-      } else if (code.toLowerCase().includes('update')) {
+      } else if (lowerCode.includes('update')) {
         acc.update.push(code);
+      } else if (lowerCode.includes('visits')) {
+        acc.visits.push(code);
       }
       return acc;
-    }, { likes: [], fav: [], update: [] });
+    }, { likes: [], fav: [], update: [], visits: [] });
   }, []);
 
   const handleCopyCode = (code: string) => {
@@ -76,7 +80,19 @@ export function CodesDisplay() {
                         transition={{ duration: 0.2, delay: 0.1 }}
                     >
                         <div className="space-y-3">
-                            {codes.likes.length > 0 && (
+                            {codes.update.length > 0 && (
+                                 <div className='space-y-1'>
+                                    <p className='text-xs font-semibold text-muted-foreground'>Update</p>
+                                    <ul className="space-y-1">
+                                        {codes.update.map(code => (
+                                            <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
+                                                {code} <Copy className="h-3 w-3" />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                             {codes.likes.length > 0 && (
                                 <div className='space-y-1'>
                                     <p className='text-xs font-semibold text-muted-foreground'>Likes</p>
                                     <ul className="space-y-1">
@@ -100,11 +116,11 @@ export function CodesDisplay() {
                                     </ul>
                                 </div>
                             )}
-                            {codes.update.length > 0 && (
+                             {codes.visits.length > 0 && (
                                  <div className='space-y-1'>
-                                    <p className='text-xs font-semibold text-muted-foreground'>Update</p>
+                                    <p className='text-xs font-semibold text-muted-foreground'>Visits</p>
                                     <ul className="space-y-1">
-                                        {codes.update.map(code => (
+                                        {codes.visits.map(code => (
                                             <li key={code} onClick={() => handleCopyCode(code)} className="cursor-pointer text-sm font-mono text-primary bg-primary/10 rounded-md py-1 flex items-center justify-center gap-2 hover:bg-primary/20">
                                                 {code} <Copy className="h-3 w-3" />
                                             </li>
