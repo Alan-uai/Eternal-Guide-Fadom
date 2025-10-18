@@ -73,7 +73,7 @@ export function CodesDisplay() {
                 <AnimatePresence>
                 {isExpanded && (
                     <motion.div
-                        className="p-3 pt-1 text-center w-full h-full"
+                        className="p-3 pt-1 text-center w-full h-72"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
