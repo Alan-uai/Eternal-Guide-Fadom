@@ -93,30 +93,22 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
               const userRef = doc(firestore, 'users', firebaseUser.uid);
               const userSnap = await getDoc(userRef);
 
-              if (userSnap.exists()) {
-                 // Merge firestore profile data into the user object
-                 userProfile = { ...userProfile, ...userSnap.data() };
-              } else {
-                // If doc doesn't exist, it means handleUserLogin will create it.
-                // We can proceed with the default user object for now.
-              }
-              
-              // Determine if the user is new on the client side
-              const isNewUser = firebaseUser.metadata.creationTime === firebaseUser.metadata.lastSignInTime;
+              // A robust way to check for a new user is to see if their document exists in Firestore.
+              const isNewUser = !userSnap.exists();
 
               if (isNewUser) {
+                  // If it's a new user, call the server action to create the Firestore document.
+                  const userDataForAction = {
+                    id: firebaseUser.uid,
+                    email: firebaseUser.email,
+                    displayName: firebaseUser.displayName,
+                  };
+                  await handleUserLogin(userDataForAction);
                   router.push('/profile?new-user=true');
+              } else {
+                 // If the user document exists, merge its data into our user object.
+                 userProfile = { ...userProfile, ...userSnap.data() };
               }
-
-              // Create a simple, serializable object to send to the server action
-              const userData = {
-                id: firebaseUser.uid,
-                email: firebaseUser.email,
-                displayName: firebaseUser.displayName,
-                isNewUser: isNewUser
-              };
-
-              await handleUserLogin(userData);
             }
             setUserAuthState({ user: userProfile as User, isUserLoading: false, userError: null });
         } else {
