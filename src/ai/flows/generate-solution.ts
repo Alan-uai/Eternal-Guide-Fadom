@@ -112,6 +112,8 @@ Sua resposta DEVE ser uma string JSON de um array de objetos. Cada objeto repres
 2.  A seguir, crie um ou mais objetos com \`marcador: "meio"\`. Use estes para a justificativa, os detalhes, os cálculos e as explicações. Dê a eles títulos claros como "Justificativa e Detalhes" ou "Cálculo de Tempo".
 3.  Se aplicável, termine com um ou mais objetos com \`marcador: "fim"\`. Use para dicas extras, estratégias de longo prazo, etc. Dê a eles títulos como "Dicas Adicionais".
 4.  **NÃO USE "INICIO" COMO MARCADOR.** A resposta direta agora está no "texto_introdutorio".
+5.  **A SAÍDA FINAL DEVE SER UM ÚNICO OBJETO JSON**, com uma única chave "structuredResponse" contendo a string JSON do array. **EXEMPLO DE SAÍDA FINAL:** {"structuredResponse": "[{\\"marcador\\":\\"texto_introdutorio\\",\\"titulo\\":\\"Título\\",\\"conteudo\\":\\"Conteúdo...\\"}]"}
+
 
 ### Estratégia Principal de Raciocínio
 1.  **Primeiro, analise o CONTEÚDO DO WIKI abaixo para entender profundamente a pergunta do usuário.** Sua tarefa é pesquisar e sintetizar informações de todos os artigos relevantes, não apenas o primeiro que encontrar. Use os resumos (summary) e o conteúdo para fazer conexões entre os termos do usuário e os nomes oficiais no jogo (ex: "Raid Green" é a "Green Planet Raid", "mundo de nanatsu" é o Mundo 13, "Windmill Island" é o "Mundo 2"). Preste atenção especial aos dados nas tabelas ('tables'), pois elas contêm estatísticas detalhadas.
