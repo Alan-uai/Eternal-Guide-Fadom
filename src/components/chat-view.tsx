@@ -34,73 +34,90 @@ interface ParsedSection {
   conteudo: string;
 }
 
+// Nova função para extrair conteúdo legível de uma string JSON parcial
+const extractContentFromString = (str: string): string => {
+  try {
+    // Tenta encontrar todos os valores de "conteudo" usando uma expressão regular
+    const contentRegex = /"conteudo"\s*:\s*"((?:\\"|[^"])*)"/g;
+    let match;
+    const contents: string[] = [];
+    while ((match = contentRegex.exec(str)) !== null) {
+      // Decodifica sequências de escape JSON, como \" ou \\
+      contents.push(match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+    }
+    if (contents.length > 0) {
+      return contents.join('\n\n');
+    }
+    // Se não encontrar "conteudo", retorna a string como um fallback, removendo a sintaxe inicial
+    return str.replace(/^\[{"marcador":.*"conteudo":\s*"/, '').replace(/"}\]/, '');
+  } catch {
+    return str;
+  }
+};
+
+
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-    let parsedContent;
-    let isLikelyJson = false;
+    let parsedContent: ParsedSection[] | null = null;
+    let isJson = false;
 
-    if (typeof content === 'string' && content.trim().startsWith('[')) {
-        isLikelyJson = true;
-        try {
-            parsedContent = JSON.parse(content);
-        } catch (e) {
-            // It's likely an incomplete JSON stream, so we'll render the raw text for now
-            parsedContent = null;
+    // Tenta analisar o conteúdo como um JSON completo
+    try {
+        if (typeof content === 'string' && content.trim().startsWith('[')) {
+            const parsed = JSON.parse(content);
+            if (Array.isArray(parsed)) {
+                parsedContent = parsed;
+                isJson = true;
+            }
         }
+    } catch (e) {
+        // O JSON está incompleto, o que é esperado durante o streaming.
+        // `isJson` permanecerá `false`.
     }
 
-    if (!isLikelyJson || !parsedContent) {
-        // Render raw text if it's not JSON or if parsing fails (streaming)
+    // Se o JSON for válido e completo, renderiza a estrutura de acordeão.
+    if (isJson && parsedContent) {
+        const introSection = parsedContent.find((s) => s.marcador === 'texto_introdutorio');
+        const accordionSections = parsedContent.filter((s) => s.marcador === 'meio' || s.marcador === 'fim');
+        const defaultAccordionItem = accordionSections.length > 0 ? 'item-0' : undefined;
+
         return (
-             <div
-                className="prose prose-sm dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: micromark(content) }}
-            />
-        )
+            <div className='relative'>
+                 {fromCache && (
+                    <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
+                    <Zap className='h-3 w-3' /> Instantâneo
+                    </span>
+                )}
+                {introSection && (
+                    <div
+                        className="prose prose-sm dark:prose-invert max-w-none mb-4"
+                        dangerouslySetInnerHTML={{ __html: micromark(introSection.conteudo) }}
+                    />
+                )}
+                {accordionSections.length > 0 && (
+                    <Accordion type="multiple" defaultValue={defaultAccordionItem ? [defaultAccordionItem] : []} className="w-full mt-4 border-t pt-4">
+                        {accordionSections.map((section, index) => (
+                            <AccordionItem value={`item-${index}`} key={index}>
+                                <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
+                                    {section.titulo}
+                                </AccordionTrigger>
+                                <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6 pb-4">
+                                    <div dangerouslySetInnerHTML={{ __html: micromark(section.conteudo) }} />
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
+                )}
+            </div>
+        );
     }
 
-    // It's valid JSON, so render the accordion structure
-    const introSection = parsedContent.find((s: any) => s.marcador === 'texto_introdutorio');
-    const mainAnswerSection = parsedContent.find((s: any) => s.marcador === 'inicio');
-    const accordionSections = parsedContent.filter((s: any) => s.marcador === 'meio' || s.marcador === 'fim');
-
-    const defaultAccordionItem = accordionSections.length > 0 ? 'item-0' : undefined;
-
+    // Se o JSON estiver incompleto ou não for JSON, renderiza o texto extraído de forma inteligente.
+    const streamingText = extractContentFromString(content);
     return (
-        <div className='relative'>
-            {fromCache && (
-                <span className="absolute top-0 right-0 text-xs text-muted-foreground/70 flex items-center gap-1 z-10">
-                <Zap className='h-3 w-3' /> Instantâneo
-                </span>
-            )}
-
-            {introSection && (
-                <div
-                className="prose prose-sm dark:prose-invert max-w-none mb-4"
-                dangerouslySetInnerHTML={{ __html: micromark(introSection.conteudo) }}
-                />
-            )}
-            
-            {mainAnswerSection && (
-                <div className="prose prose-sm dark:prose-invert max-w-none font-semibold">
-                <div dangerouslySetInnerHTML={{ __html: micromark(mainAnswerSection.conteudo) }} />
-                </div>
-            )}
-
-            {accordionSections.length > 0 && (
-                <Accordion type="multiple" defaultValue={defaultAccordionItem ? [defaultAccordionItem] : []} className="w-full mt-4 border-t pt-4">
-                {accordionSections.map((section: ParsedSection, index: number) => (
-                    <AccordionItem value={`item-${index}`} key={index}>
-                    <AccordionTrigger className="text-sm font-semibold hover:no-underline text-left">
-                        {section.titulo}
-                    </AccordionTrigger>
-                    <AccordionContent className="prose prose-sm dark:prose-invert max-w-none pl-6 pb-4">
-                        <div dangerouslySetInnerHTML={{ __html: micromark(section.conteudo) }} />
-                    </AccordionContent>
-                    </AccordionItem>
-                ))}
-                </Accordion>
-            )}
-        </div>
+        <div
+            className="prose prose-sm dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: micromark(streamingText) }}
+        />
     );
 }
 
