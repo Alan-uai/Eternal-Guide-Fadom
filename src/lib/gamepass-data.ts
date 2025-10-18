@@ -21,6 +21,8 @@ export const allGamepasses: Gamepass[] = [
     { id: 'double-weapon', name: 'Double Weapon', category: 'Dano', bonus_type: null, bonus_value: null, description: "Permite equipar duas armas." },
     { id: 'extra-titan', name: 'Extra Titan', category: 'Dano', bonus_type: null, bonus_value: null, description: "+1 espaço para equipar titã." },
     { id: 'extra-stand', name: 'Extra Stand', category: 'Dano', bonus_type: null, bonus_value: null, description: "+1 espaço para equipar stand." },
+    { id: 'extra-shadow', name: 'Extra Shadow', category: 'Dano', bonus_type: null, bonus_value: null, description: "+1 espaço para equipar sombra (dano ou energia)." },
+
 
     // Utilidade
     { id: 'fast-roll', name: 'Fast Roll', category: 'Utilidade', bonus_type: null, bonus_value: null, description: "Rola poderes 10x mais rápido." },
@@ -28,4 +30,5 @@ export const allGamepasses: Gamepass[] = [
     { id: 'double-coins', name: 'Double Coins', category: 'Utilidade', bonus_type: 'coins', bonus_value: 2, description: "Dobra as moedas ganhas." },
     { id: 'remote-access', name: 'Remote Access', category: 'Utilidade', bonus_type: null, bonus_value: null, description: "Acesso remoto a várias funções." },
     { id: 'double-exp', name: 'Double Exp', category: 'Utilidade', bonus_type: 'exp', bonus_value: 2, description: "Dobra a EXP ganha." },
+    { id: 'double-aura', name: 'Double Aura', category: 'Utilidade', bonus_type: null, bonus_value: null, description: "Permite equipar duas auras simultaneamente." },
 ];
