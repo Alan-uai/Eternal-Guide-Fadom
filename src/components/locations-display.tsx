@@ -27,10 +27,15 @@ export function LocationsDisplay() {
       Poderes: {},
       NPCs: {},
       Bosses: {},
+      Raids: {},
     };
+
+    const worldOrder: string[] = [];
+    const raidsByWorld: Record<string, string[]> = {};
 
     allGameData.forEach(world => {
       if (!world.name) return;
+      worldOrder.push(world.name);
 
       // Process Powers
       if (world.powers && world.powers.length > 0) {
@@ -49,14 +54,53 @@ export function LocationsDisplay() {
           data[category][world.name].push(npc.name);
         });
       }
+      
+      // Process Raids/Dungeons
+      if (world.dungeons && world.dungeons.length > 0) {
+        let worldKey: string;
+        if (world.id === '001') {
+            worldKey = 'Lobby 1';
+        } else if (world.id === '020') {
+            worldKey = 'Lobby 2';
+        } else {
+            worldKey = world.name;
+        }
+        
+        if (!raidsByWorld[worldKey]) {
+            raidsByWorld[worldKey] = [];
+        }
+
+        world.dungeons.forEach((dungeon: any) => {
+            if (dungeon.name) {
+                raidsByWorld[worldKey].push(dungeon.name);
+            }
+        });
+      }
     });
+
+    const sortedRaidWorlds = Object.keys(raidsByWorld).sort((a, b) => {
+        if (a === 'Lobby 1') return -1;
+        if (b === 'Lobby 1') return 1;
+        if (a === 'Lobby 2') return 1;
+        if (b === 'Lobby 2') return -1;
+        const worldNumA = parseInt(a.match(/(\d+)/)?.[0] || '0', 10);
+        const worldNumB = parseInt(b.match(/(\d+)/)?.[0] || '0', 10);
+        return worldNumA - worldNumB;
+    });
+    
+    const orderedRaids: Record<string, string[]> = {};
+    for (const worldKey of sortedRaidWorlds) {
+        orderedRaids[worldKey] = raidsByWorld[worldKey];
+    }
+
+    data.Raids = orderedRaids;
 
     return data;
   }, [allGameData, isGameDataLoading]);
 
   return (
     <motion.div
-      className="flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto w-auto"
+      className="flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto"
       initial={false}
       animate={{ width: isExpanded ? 300 : 'auto' }}
     >
