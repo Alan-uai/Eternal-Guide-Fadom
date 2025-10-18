@@ -35,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 import { FirebaseError } from 'firebase/app';
 import { Github } from 'lucide-react';
 import { handleUserLogin } from '@/lib/auth-actions';
+import { useRouter } from 'next/navigation';
 
 const signUpSchema = z
   .object({
@@ -56,6 +57,7 @@ export function AuthDialog() {
   const { isAuthDialogOpen, setAuthDialogOpen } = useApp();
   const auth = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
 
   const signUpForm = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -117,16 +119,21 @@ export function AuthDialog() {
   async function onSignUp(values: z.infer<typeof signUpSchema>) {
     if (!auth) return;
     try {
+        let isNewUserFlow = false;
         if (auth.currentUser && auth.currentUser.isAnonymous) {
             const credential = EmailAuthProvider.credential(values.email, values.password);
-            // A chamada para handleUserLogin é agora tratada pelo onAuthStateChanged no provider
             await linkWithCredential(auth.currentUser, credential);
         } else {
-            // A chamada para handleUserLogin é agora tratada pelo onAuthStateChanged no provider
             await createUserWithEmailAndPassword(auth, values.email, values.password);
+            isNewUserFlow = true;
         }
       setAuthDialogOpen(false);
       toast({ title: 'Conta criada!', description: 'Sua conta foi criada com sucesso.' });
+      
+      if(isNewUserFlow){
+          router.push('/profile?new-user=true');
+      }
+
     } catch (error) {
       handleAuthError(error);
     }
@@ -135,7 +142,6 @@ export function AuthDialog() {
   async function onSignIn(values: z.infer<typeof signInSchema>) {
     if (!auth) return;
     try {
-      // A chamada para handleUserLogin é agora tratada pelo onAuthStateChanged no provider
       await signInWithEmailAndPassword(auth, values.email, values.password);
       setAuthDialogOpen(false);
       toast({ title: 'Login bem-sucedido!', description: 'Bem-vindo de volta.' });
@@ -282,3 +288,5 @@ export function AuthDialog() {
     </Dialog>
   );
 }
+
+    
