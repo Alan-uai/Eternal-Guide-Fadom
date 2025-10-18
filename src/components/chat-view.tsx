@@ -122,63 +122,59 @@ const suggestedPrompts = [
 ];
 
 function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
-    if (!prompt || !articles || articles.length === 0) {
-        return '';
-    }
+  if (!prompt || !articles || articles.length === 0) {
+    return '';
+  }
 
-    const lowerCasePrompt = prompt.toLowerCase();
+  const lowerCasePrompt = prompt.toLowerCase();
+  const promptWords = new Set(lowerCasePrompt.split(' ').filter(word => word.length > 3));
+
+  const scoredArticles = articles.map(article => {
+    let score = 0;
+    const lowerCaseTitle = article.title.toLowerCase();
+    const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
+    const contentString = article.content.toLowerCase();
     
-    // Prioritize direct title matches or substring matches
-    const directTitleMatch = articles.find(article => 
-      article.title.toLowerCase().includes(lowerCasePrompt) || 
-      lowerCasePrompt.includes(article.title.toLowerCase())
-    );
-
-    if (directTitleMatch) {
-       return `Title: ${directTitleMatch.title}\nSummary: ${directTitleMatch.summary}\nContent: ${directTitleMatch.content}\nTables: ${JSON.stringify(directTitleMatch.tables || {})}`;
+    // Title match (highest priority)
+    if (lowerCaseTitle.includes(lowerCasePrompt)) {
+      score += 100;
     }
 
+    promptWords.forEach(word => {
+      if (lowerCaseTitle.includes(word)) {
+        score += 20; // High score for title word match
+      }
+      if (tagsString.includes(word)) {
+        score += 10; // Medium score for tag match
+      }
+      if (contentString.includes(word)) {
+        score += 1; // Low score for content match
+      }
+    });
 
-    const scoredArticles = articles.map(article => {
-        let score = 0;
-        const lowerCaseTitle = article.title.toLowerCase();
-        const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
-
-        // Very high score for a direct match or substring in the title
-        if (lowerCaseTitle.includes(lowerCasePrompt) || lowerCasePrompt.includes(lowerCaseTitle)) {
-            score += 100;
-        }
-
-        // Check for partial matches of significant words in the title
-        const promptWords = lowerCasePrompt.split(' ').filter(word => word.length > 3);
-        promptWords.forEach(word => {
-            if (lowerCaseTitle.includes(word)) {
-                score += 15; // High score for title word match
-            }
-            if (tagsString.includes(word)) {
-                score += 5; // Medium score for tag match
-            }
-        });
-        
-        // Boost score for having table data
-        if(article.tables && Object.keys(article.tables).length > 0) {
-            score += 10;
-        }
-
-        return { article, score };
-    }).filter(item => item.score > 0)
-      .sort((a, b) => b.score - a.score);
-
-    const topArticles = scoredArticles.slice(0, 3);
-    
-    if (topArticles.length === 0) {
-        const gettingStarted = articles.find(a => a.id === 'getting-started');
-        return gettingStarted ? `Title: ${gettingStarted.title}\nSummary: ${gettingStarted.summary}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables)}` : '';
+    // Boost score for having table data if the prompt seems to ask for data
+    const asksForData = /qual|quanto|como|lista|tier|requisitos/.test(lowerCasePrompt);
+    if(asksForData && article.tables && Object.keys(article.tables).length > 0) {
+        score += 15;
     }
 
-    return topArticles
-        .map(({ article }) => `Title: ${article.title}\nSummary: ${article.summary}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables)}`)
-        .join('\n\n---\n\n');
+    return { article, score };
+  })
+  .filter(item => item.score > 0)
+  .sort((a, b) => b.score - a.score);
+
+  // Take the top 3 most relevant articles
+  const topArticles = scoredArticles.slice(0, 3);
+  
+  if (topArticles.length === 0) {
+      // Fallback to "getting-started" if no relevant articles are found
+      const gettingStarted = articles.find(a => a.id === 'getting-started');
+      return gettingStarted ? `Title: ${gettingStarted.title}\nSummary: ${gettingStarted.summary}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables || {})}}` : '';
+  }
+
+  return topArticles
+      .map(({ article }) => `Title: ${article.title}\nSummary: ${article.summary}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables || {})}}`)
+      .join('\n\n---\n\n');
 }
 
 
@@ -588,5 +584,3 @@ export function ChatView() {
     </div>
   );
 }
-
-    
