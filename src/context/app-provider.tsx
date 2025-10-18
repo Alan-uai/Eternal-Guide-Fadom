@@ -11,6 +11,7 @@ import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
 import { getAllGameData } from '@/firebase/firestore/data';
 
+type ActiveSidePanel = 'codes' | 'locations' | null;
 
 interface AppContextType {
   savedAnswers: SavedAnswer[];
@@ -23,6 +24,8 @@ interface AppContextType {
   gameDataVersion: string;
   allGameData: any[];
   isGameDataLoading: boolean;
+  activeSidePanel: ActiveSidePanel;
+  setActiveSidePanel: (panel: ActiveSidePanel) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -43,6 +46,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
   const [allGameData, setAllGameData] = useState<any[]>([]);
   const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
   const [isGameDataLoading, setIsGameDataLoading] = useState(true);
+  const [activeSidePanel, setActiveSidePanel] = useState<ActiveSidePanel>(null);
   
   const [isInitialAppLoad, setIsInitialAppLoad] = useState(true);
 
@@ -181,7 +185,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     }
   }, [user, firestore, isAnswerSaved, toast, setAuthDialogOpen]);
   
-  const value = { 
+  const value: AppContextType = { 
     savedAnswers: savedAnswers || [], 
     toggleSaveAnswer, 
     isAnswerSaved,
@@ -192,6 +196,8 @@ function AppStateProvider({ children }: { children: ReactNode }) {
     gameDataVersion,
     allGameData,
     isGameDataLoading,
+    activeSidePanel,
+    setActiveSidePanel,
   };
   
   if (isInitialAppLoad || isAdminLoading || (isGameDataLoading && allGameData.length === 0)) {

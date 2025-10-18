@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 import { useApp } from '@/context/app-provider';
@@ -15,8 +14,8 @@ interface LocationData {
 }
 
 export function LocationsDisplay() {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { allGameData, isGameDataLoading } = useApp();
+  const { activeSidePanel, setActiveSidePanel, allGameData, isGameDataLoading } = useApp();
+  const isExpanded = activeSidePanel === 'locations';
 
   const locations = useMemo((): LocationData => {
     if (isGameDataLoading || !allGameData) {
@@ -98,6 +97,10 @@ export function LocationsDisplay() {
     return data;
   }, [allGameData, isGameDataLoading]);
 
+  const togglePanel = () => {
+    setActiveSidePanel(isExpanded ? null : 'locations');
+  };
+
   return (
     <motion.div
       className="flex flex-col items-center transition-all duration-300 ease-in-out pointer-events-auto"
@@ -111,7 +114,7 @@ export function LocationsDisplay() {
       <div className="w-full bg-background/80 backdrop-blur-sm border-x border-b rounded-b-lg shadow-lg overflow-hidden flex flex-col items-center flex-grow">
         <div
           className="flex items-center justify-center gap-1.5 h-8 px-2 cursor-pointer w-full shrink-0"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={togglePanel}
         >
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <span className="text-xs font-semibold">Localidades</span>
@@ -119,37 +122,39 @@ export function LocationsDisplay() {
         <AnimatePresence>
           {isExpanded && (
             <motion.div
-              className="px-1 pt-1 text-left w-full h-80"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, delay: 0.1 }}
+              className="w-full"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-              <ScrollArea className="h-full w-full pr-3">
-                <Accordion type="multiple" className="w-full">
-                  {Object.entries(locations).map(([category, worlds]) => (
-                    Object.keys(worlds).length > 0 && (
-                      <AccordionItem value={category} key={category}>
-                        <AccordionTrigger className="text-sm font-semibold py-2">
-                          {category}
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-2 pl-2">
-                            {Object.entries(worlds).map(([world, items]) => (
-                              <div key={world}>
-                                <h4 className="text-xs font-bold text-primary mb-1">{world}</h4>
-                                <ul className="list-disc list-inside text-xs space-y-1">
-                                  {items.map(item => <li key={item}>{item}</li>)}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    )
-                  ))}
-                </Accordion>
-              </ScrollArea>
+              <div className="px-1 pt-1 text-left w-[300px] h-80">
+                <ScrollArea className="h-full w-full pr-3">
+                  <Accordion type="multiple" className="w-full">
+                    {Object.entries(locations).map(([category, worlds]) => (
+                      Object.keys(worlds).length > 0 && (
+                        <AccordionItem value={category} key={category}>
+                          <AccordionTrigger className="text-sm font-semibold py-2">
+                            {category}
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-2 pl-2">
+                              {Object.entries(worlds).map(([world, items]) => (
+                                <div key={world}>
+                                  <h4 className="text-xs font-bold text-primary mb-1">{world}</h4>
+                                  <ul className="list-disc list-inside text-xs space-y-1">
+                                    {items.map(item => <li key={item}>{item}</li>)}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      )
+                    ))}
+                  </Accordion>
+                </ScrollArea>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
