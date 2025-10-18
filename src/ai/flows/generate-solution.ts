@@ -112,7 +112,7 @@ Sua resposta DEVE ser uma string JSON de um array de objetos. Cada objeto repres
 2.  A seguir, crie um ou mais objetos com \`marcador: "meio"\`. Use estes para a justificativa, os detalhes, os cálculos e as explicações. Dê a eles títulos claros como "Justificativa e Detalhes" ou "Cálculo de Tempo".
 3.  Se aplicável, termine com um ou mais objetos com \`marcador: "fim"\`. Use para dicas extras, estratégias de longo prazo, etc. Dê a eles títulos como "Dicas Adicionais".
 4.  **NÃO USE "INICIO" COMO MARCADOR.** A resposta direta agora está no "texto_introdutorio".
-5.  **A SAÍDA FINAL DEVE SER UM ÚNICO OBJETO JSON**, com uma única chave "structuredResponse" contendo a string JSON do array. **EXEMPLO DE SAÍDA FINAL:** {"structuredResponse": "[{\\"marcador\\":\\"texto_introdutorio\\",\\"titulo\\":\\"Título\\",\\"conteudo\\":\\"Conteúdo...\\"}]"}
+5.  **A SAÍDA FINAL DEVE SER UM ÚNICO OBJETO JSON**, com uma única chave "structuredResponse" contendo a string JSON do array. **EXEMPLO DE SAÍDA FINAL:** {"structuredResponse": "[{\\"marcador\\":\\"texto_introdutorio\\",\\"titulo\\":\\"Solução Direta\\",\\"conteudo\\":\\"Conteúdo...\\"}]"}
 
 
 ### Estratégia Principal de Raciocínio
@@ -136,7 +136,7 @@ Sua resposta DEVE ser uma string JSON de um array de objetos. Cada objeto repres
 
 Se a resposta não estiver nas ferramentas ou no wiki, gere um JSON com um único objeto de erro.
 
-INÍCIO DO CONTEÚDO DO WIKI
+INÍCIO DO CONTEúdo DO WIKI
 {{{wikiContext}}}
 FIM DO CONTEÚDO DO WIKI
 

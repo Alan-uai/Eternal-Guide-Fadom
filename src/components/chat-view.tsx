@@ -37,8 +37,9 @@ interface ParsedSection {
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
   const parsedContent = useMemo(() => {
     try {
-      // Tenta analisar o JSON. Se falhar, trata o conteúdo como texto simples.
-      return JSON.parse(content) as ParsedSection[];
+      // Garante que o conteúdo é uma string antes de analisar.
+      const contentString = typeof content === 'string' ? content : JSON.stringify(content);
+      return JSON.parse(contentString) as ParsedSection[];
     } catch (e) {
       // Se não for JSON válido, retorna um objeto de fallback para renderização simples.
       return [{ marcador: 'texto_introdutorio', titulo: '', conteudo: content }];
