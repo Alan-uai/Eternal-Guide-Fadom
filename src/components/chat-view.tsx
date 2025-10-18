@@ -35,16 +35,17 @@ interface ParsedSection {
 }
 
 function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
-  const parsedContent = useMemo(() => {
-    try {
-      // Garante que o conteúdo é uma string antes de analisar.
-      const contentString = typeof content === 'string' ? content : JSON.stringify(content);
-      return JSON.parse(contentString) as ParsedSection[];
-    } catch (e) {
-      // Se não for JSON válido, retorna um objeto de fallback para renderização simples.
-      return [{ marcador: 'texto_introdutorio', titulo: '', conteudo: content }];
-    }
-  }, [content]);
+    const parsedContent = useMemo(() => {
+        try {
+            // Garante que o conteúdo é uma string antes de analisar.
+            const contentString = typeof content === 'string' ? content : JSON.stringify(content);
+            const parsed = JSON.parse(contentString);
+            return Array.isArray(parsed) ? parsed : [parsed];
+        } catch (e) {
+            // Se não for JSON válido (pode ser durante o streaming), trata como texto simples.
+            return [{ marcador: 'texto_introdutorio', titulo: '', conteudo: content }];
+        }
+    }, [content]);
 
   const introSection = parsedContent.find(s => s.marcador === 'texto_introdutorio');
   const mainAnswerSection = parsedContent.find(s => s.marcador === 'inicio');
@@ -123,56 +124,55 @@ const suggestedPrompts = [
 ];
 
 function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
-  if (!prompt || !articles || articles.length === 0) {
-    return '';
-  }
+    if (!prompt || !articles || articles.length === 0) {
+        return '';
+    }
 
-  const lowerCasePrompt = prompt.toLowerCase();
-  const promptWords = new Set(lowerCasePrompt.split(' ').filter(word => word.length > 3));
+    const lowerCasePrompt = prompt.toLowerCase();
+    const promptWords = new Set(lowerCasePrompt.split(' ').filter(word => word.length > 2));
 
-  const scoredArticles = articles.map(article => {
-    let score = 0;
-    const lowerCaseTitle = article.title.toLowerCase();
-    const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
-    const summaryString = article.summary.toLowerCase();
+    const scoredArticles = articles.map(article => {
+        let score = 0;
+        const lowerCaseTitle = article.title.toLowerCase();
+        const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
+        const summaryString = article.summary.toLowerCase();
+
+        // High score for exact or near-exact title matches
+        if (lowerCaseTitle.includes(lowerCasePrompt)) {
+            score += 100;
+        }
+
+        promptWords.forEach(word => {
+            if (lowerCaseTitle.includes(word)) score += 20;
+            if (tagsString.includes(word)) score += 15;
+            if (summaryString.includes(word)) score += 5;
+        });
+
+        // Boost for specific terms
+        if (/tier list|prioridade|melhor|pior/.test(lowerCasePrompt) && (tagsString.includes('tier list') || lowerCaseTitle.includes('tier list'))) {
+            score += 50;
+        }
+        if (/gamepass|passes/.test(lowerCasePrompt) && (tagsString.includes('gamepass') || lowerCaseTitle.includes('gamepass'))) {
+            score += 50;
+        }
+
+        return { article, score };
+    })
+    .filter(item => item.score > 10) // Increase threshold to filter out weak matches
+    .sort((a, b) => b.score - a.score);
+
+    // Take the top 3 most relevant articles
+    const topArticles = scoredArticles.slice(0, 3);
     
-    // Exact match in title (highest score)
-    if (lowerCaseTitle.includes(lowerCasePrompt)) {
-      score += 100;
+    if (topArticles.length === 0) {
+        // Fallback to "getting-started" if no relevant articles are found
+        const gettingStarted = articles.find(a => a.id === 'getting-started');
+        return gettingStarted ? `Title: ${gettingStarted.title}\nSummary: ${gettingStarted.summary}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables || {})}}` : '';
     }
 
-    // Keyword matching with scores
-    promptWords.forEach(word => {
-      if (lowerCaseTitle.includes(word)) score += 20;
-      if (tagsString.includes(word)) score += 10;
-      if (summaryString.includes(word)) score += 5;
-    });
-
-    // Boost for specific terms
-    if (/tier list|prioridade|melhor|pior/.test(lowerCasePrompt) && tagsString.includes('tier list')) {
-        score += 50;
-    }
-    if (/gamepass|passes/.test(lowerCasePrompt) && tagsString.includes('gamepass')) {
-        score += 50;
-    }
-
-    return { article, score };
-  })
-  .filter(item => item.score > 0)
-  .sort((a, b) => b.score - a.score);
-
-  // Take the top 3 most relevant articles
-  const topArticles = scoredArticles.slice(0, 3);
-  
-  if (topArticles.length === 0) {
-      // Fallback to "getting-started" if no relevant articles are found
-      const gettingStarted = articles.find(a => a.id === 'getting-started');
-      return gettingStarted ? `Title: ${gettingStarted.title}\nSummary: ${gettingStarted.summary}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables || {})}}` : '';
-  }
-
-  return topArticles
-      .map(({ article }) => `Title: ${article.title}\nSummary: ${article.summary}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables || {})}}`)
-      .join('\n\n---\n\n');
+    return topArticles
+        .map(({ article }) => `Title: ${article.title}\nSummary: ${article.summary}\nContent: ${article.content}\nTables: ${JSON.stringify(article.tables || {})}}`)
+        .join('\n\n---\n\n');
 }
 
 
@@ -340,18 +340,19 @@ export function ChatView() {
       const reader = stream.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = '';
+      let structuredContent = ''; // Store the parsed, valid JSON part
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) {
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: accumulatedContent } : msg
+              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: structuredContent || accumulatedContent } : msg
             )
           );
           setIsLoading(false);
           
-          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent, question: prompt };
+          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: structuredContent || accumulatedContent, question: prompt };
           const newCacheItem: CachedItem = { message: finalMessage, feedback: null, dataVersion: gameDataVersion };
           const normalizedPrompt = prompt.trim().toLowerCase();
           const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
@@ -361,9 +362,22 @@ export function ChatView() {
           break;
         }
         accumulatedContent += decoder.decode(value, { stream: true });
+        
+        try {
+            // Try to parse the accumulated content as JSON.
+            // This will only succeed when a complete JSON object has been streamed.
+            const parsed = JSON.parse(accumulatedContent);
+            // If parsing succeeds, we have a valid (potentially partial) structured response.
+            // We store this valid part to be used for rendering.
+            structuredContent = JSON.stringify(parsed);
+        } catch (e) {
+            // JSON is incomplete, do nothing and wait for more chunks.
+            // We will render the raw `accumulatedContent` for now.
+        }
+
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
+            msg.id === assistantMessageId ? { ...msg, content: structuredContent || accumulatedContent } : msg
           )
         );
       }

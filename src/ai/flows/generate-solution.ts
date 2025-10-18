@@ -80,12 +80,14 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
         console.error("Erro no fluxo de geração de solução (stream):", error);
         return new ReadableStream({
             start(controller) {
-                const errorJson = JSON.stringify([{
-                  marcador: 'texto_introdutorio',
-                  titulo: 'Erro',
-                  conteudo: 'Desculpe, não consegui processar sua pergunta. Tente reformulá-la.'
-                }]);
-                controller.enqueue(new TextEncoder().encode(errorJson));
+                const errorObject = {
+                    structuredResponse: JSON.stringify([{
+                        marcador: 'texto_introdutorio',
+                        titulo: 'Erro',
+                        conteudo: 'Desculpe, não consegui processar sua pergunta. Tente reformulá-la.'
+                    }])
+                };
+                controller.enqueue(new TextEncoder().encode(JSON.stringify(errorObject)));
                 controller.close();
             }
         });
@@ -136,7 +138,7 @@ Sua resposta DEVE ser uma string JSON de um array de objetos. Cada objeto repres
 
 Se a resposta não estiver nas ferramentas ou no wiki, gere um JSON com um único objeto de erro.
 
-INÍCIO DO CONTEúdo DO WIKI
+INÍCIO DO CONTEÚDO DO WIKI
 {{{wikiContext}}}
 FIM DO CONTEÚDO DO WIKI
 
@@ -157,21 +159,23 @@ const generateSolutionFlow = ai.defineFlow(
     outputSchema: GenerateSolutionOutputSchema,
   },
   async input => {
-    const fallbackResponse = JSON.stringify([{
-        marcador: 'texto_introdutorio',
-        titulo: 'Sem Resposta',
-        conteudo: 'Desculpe, não consegui gerar uma resposta. Por favor, tente reformular sua pergunta.'
-    }]);
+    const fallbackResponse = {
+        structuredResponse: JSON.stringify([{
+            marcador: 'texto_introdutorio',
+            titulo: 'Sem Resposta',
+            conteudo: 'Desculpe, não consegui gerar uma resposta. Por favor, tente reformular sua pergunta.'
+        }])
+    };
 
     try {
       const {output} = await prompt(input);
       if (!output || !output.structuredResponse) {
-        return { structuredResponse: fallbackResponse };
+        return fallbackResponse;
       }
       return output;
     } catch (error) {
       console.error("Erro no fluxo de geração de solução:", error);
-      return { structuredResponse: fallbackResponse };
+      return fallbackResponse;
     }
   }
 );
