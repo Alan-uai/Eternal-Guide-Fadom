@@ -9,7 +9,7 @@ export const world5Data = {
         { id: 'insake-npc', name: 'Insake', rank: 'B', exp: 86, hp: '12.5Sp', world: 'World 5', drops: { coins: { amount: '2M', probability: 1 }, breathing_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.15 } } },
         { id: 'tamoka-npc', name: 'Tamoka', rank: 'A', exp: 91, hp: '62.5Sp', world: 'World 5', drops: { coins: { amount: '2.5M', probability: 1 }, demon_arts_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.2 } } },
         { id: 'shinabe-npc', name: 'Shinabe', rank: 'S', exp: 95, hp: '312Sp', world: 'World 5', drops: { coins: { amount: '3M', probability: 1 }, demon_arts_token: { amount: '1-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.25 } } },
-        { id: 'rangoki-boss', name: 'Rangaki', rank: 'SS', exp: 240, hp: '31.2de', world: 'World 5', drops: { coins: { amount: '7M', probability: 1 }, demon_arts_token: { amount: '3-5', probability: 0.1 }, breathing_token: { amount: '3-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.5 }, aura: { name: 'Flaming Aura', probability: 0.01 } } },
+        { id: 'rangoki-boss', name: 'Rangaki', rank: 'SS', exp: 240, hp: '31.2de', world: 'World 5', drops: { coins: { amount: '7M', probability: 1 }, demon_arts_token: { amount: '3-5', probability: 0.1 }, breathing_token: { amount: '3-5', probability: 0.1 }, avatar_soul: { amount: 1, probability: 0.5 }, aura: { name: 'Flaming Aura', probability: 0.01 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/kurSF4mSLH55pKNls?invite=cr-MSxMOGQsMzA5MTAxNTU4' },
     ],
     powers: [
         {

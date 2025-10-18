@@ -63,7 +63,7 @@ export const world15Data = {
         { id: 'world15-b-rank', name: 'B Rank NPC', rank: 'B', exp: 206742, hp: '3.1QnV', world: 'World 15', drops: { coins: { amount: '310qtV', probability: 0.8 } } },
         { id: 'world15-a-rank', name: 'A Rank NPC', rank: 'A', exp: 227417, hp: '15QnV', world: 'World 15', drops: { coins: { amount: '1.5QnV', probability: 0.8 } } },
         { id: 'world15-s-rank', name: 'S Rank NPC', rank: 'S', exp: 250158, hp: '79QnV', world: 'World 15', drops: { coins: { amount: '7.9QnV', probability: 0.8 } } },
-        { id: 'the-paladin-boss', name: 'The Paladin', rank: 'SS', exp: 368640, hp: '397QnV', world: 'World 15', drops: { coins: { amount: '39QnV', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'the-paladin-boss', name: 'The Paladin', rank: 'SS', exp: 368640, hp: '397QnV', world: 'World 15', drops: { coins: { amount: '39QnV', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/kUUqqSLH1lfcYmDOH?invite=cr-MSw1NjUsMzA5MTAxNTU4&v=22' },
     ],
     shadows: [
         {

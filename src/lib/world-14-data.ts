@@ -81,7 +81,7 @@ export const world14Data = {
         { id: 'world14-b-rank', name: 'B Rank NPC', rank: 'B', exp: 206742, hp: '3.1QnV', world: 'World 14' },
         { id: 'world14-a-rank', name: 'A Rank NPC', rank: 'A', exp: 227417, hp: '15QnV', world: 'World 14' },
         { id: 'world14-s-rank', name: 'S Rank NPC', rank: 'S', exp: 250158, hp: '79QnV', world: 'World 14' },
-        { id: 'valzora-boss', name: 'Valzora', rank: 'SS', exp: 368640, hp: '397QnV', world: 'World 14' },
+        { id: 'valzora-boss', name: 'Valzora', rank: 'SS', exp: 368640, hp: '397QnV', world: 'World 14', videoUrl: 'https://medal.tv/de/games/roblox/clips/kUUpBMXPZC6xw76cU?invite=cr-MSxUa3YsMzA5MTAxNTU4&v=9' },
     ],
     shadows: [
         {

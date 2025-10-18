@@ -39,13 +39,13 @@ export const world16Data = {
       }
     ],
     npcs: [
-        { id: 'world16-e-rank', name: 'E Rank NPC', rank: 'E', exp: 312698, hp: '6.2SPG', world: 'World 16', drops: { coins: { amount: '620SeV', probability: 0.8 } } },
-        { id: 'world16-d-rank', name: 'D Rank NPC', rank: 'D', exp: 343968, hp: '31SPG', world: 'World 16', drops: { coins: { amount: '3.1SPG', probability: 0.8 } } },
-        { id: 'world16-c-rank', name: 'C Rank NPC', rank: 'C', exp: 378365, hp: '156SPG', world: 'World 16', drops: { coins: { amount: '15SPG', probability: 0.8 } } },
-        { id: 'world16-b-rank', name: 'B Rank NPC', rank: 'B', exp: 416201, hp: '782SPG', world: 'World 16', drops: { coins: { amount: '78SPG', probability: 0.8 } } },
-        { id: 'world16-a-rank', name: 'A Rank NPC', rank: 'A', exp: 457821, hp: '3.9OVG', world: 'World 16', drops: { coins: { amount: '390SPG', probability: 0.8 } } },
-        { id: 'world16-s-rank', name: 'S Rank NPC', rank: 'S', exp: 503603, hp: '19OVG', world: 'World 16', drops: { coins: { amount: '1.9OVG', probability: 0.8 } } },
-        { id: 'dio-boss', name: 'Dio', rank: 'SS', exp: 737280, hp: '97OVG', world: 'World 16', drops: { coins: { amount: '9.7OVG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'world16-e-rank', name: 'E Rank NPC', rank: 'E', exp: 629512, hp: '6.2SPG', world: 'World 16', drops: { coins: { amount: '620SeV', probability: 0.8 } } },
+        { id: 'world16-d-rank', name: 'D Rank NPC', rank: 'D', exp: 692464, hp: '31SPG', world: 'World 16', drops: { coins: { amount: '3.1SPG', probability: 0.8 } } },
+        { id: 'world16-c-rank', name: 'C Rank NPC', rank: 'C', exp: 761710, hp: '156SPG', world: 'World 16', drops: { coins: { amount: '15SPG', probability: 0.8 } } },
+        { id: 'world16-b-rank', name: 'B Rank NPC', rank: 'B', exp: 837881, hp: '782SPG', world: 'World 16', drops: { coins: { amount: '78SPG', probability: 0.8 } } },
+        { id: 'world16-a-rank', name: 'A Rank NPC', rank: 'A', exp: 921669, hp: '3.9OVG', world: 'World 16', drops: { coins: { amount: '390SPG', probability: 0.8 } } },
+        { id: 'world16-s-rank', name: 'S Rank NPC', rank: 'S', exp: 1013836, hp: '19OVG', world: 'World 16', drops: { coins: { amount: '1.9OVG', probability: 0.8 } } },
+        { id: 'dio-boss', name: 'Dio', rank: 'SS', exp: 1520754, hp: '97OVG', world: 'World 16', drops: { coins: { amount: '9.7OVG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/kXhWRGJIILo0hPhvz?invite=cr-MSxuUmksMzA5MTAxNTU4&v=19' },
     ],
     dungeons: [
         {

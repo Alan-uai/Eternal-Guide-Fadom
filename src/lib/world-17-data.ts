@@ -53,13 +53,13 @@ export const world17Data = {
       }
     ],
     npcs: [
-        { id: 'world17-e-rank', name: 'E Rank NPC', rank: 'E', exp: 629512, hp: '6.2SPG', world: 'World 17', drops: { coins: { amount: '620SeV', probability: 0.8 } } },
-        { id: 'world17-d-rank', name: 'D Rank NPC', rank: 'D', exp: 692464, hp: '31SPG', world: 'World 17', drops: { coins: { amount: '3.1SPG', probability: 0.8 } } },
-        { id: 'world17-c-rank', name: 'C Rank NPC', rank: 'C', exp: 761710, hp: '156SPG', world: 'World 17', drops: { coins: { amount: '15SPG', probability: 0.8 } } },
-        { id: 'world17-b-rank', name: 'B Rank NPC', rank: 'B', exp: 837881, hp: '782SPG', world: 'World 17', drops: { coins: { amount: '78SPG', probability: 0.8 } } },
-        { id: 'world17-a-rank', name: 'A Rank NPC', rank: 'A', exp: 921669, hp: '3.9OVG', world: 'World 17', drops: { coins: { amount: '390SPG', probability: 0.8 } } },
-        { id: 'world17-s-rank', name: 'S Rank NPC', rank: 'S', exp: 1013836, hp: '19OVG', world: 'World 17', drops: { coins: { amount: '1.9OVG', probability: 0.8 } } },
-        { id: 'arama-boss', name: 'Arama', rank: 'SS', exp: 1520754, hp: '97OVG', world: 'World 17', drops: { coins: { amount: '9.7OVG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'world17-e-rank', name: 'E Rank NPC', rank: 'E', exp: 1267295, hp: '97OVG', world: 'World 17', drops: { coins: { amount: '9.7OVG', probability: 0.8 } } },
+        { id: 'world17-d-rank', name: 'D Rank NPC', rank: 'D', exp: 1394024, hp: '488OVG', world: 'World 17', drops: { coins: { amount: '48OVG', probability: 0.8 } } },
+        { id: 'world17-c-rank', name: 'C Rank NPC', rank: 'C', exp: 1533427, hp: '2.4NVG', world: 'World 17', drops: { coins: { amount: '240OVG', probability: 0.8 } } },
+        { id: 'world17-b-rank', name: 'B Rank NPC', rank: 'B', exp: 1686770, hp: '12NVG', world: 'World 17', drops: { coins: { amount: '1.2NVG', probability: 0.8 } } },
+        { id: 'world17-a-rank', name: 'A Rank NPC', rank: 'A', exp: 1855446, hp: '61NVG', world: 'World 17', drops: { coins: { amount: '6.1NVG', probability: 0.8 } } },
+        { id: 'world17-s-rank', name: 'S Rank NPC', rank: 'S', exp: 2040991, hp: '305NVG', world: 'World 17', drops: { coins: { amount: '30NVG', probability: 0.8 } } },
+        { id: 'arama-boss', name: 'Arama', rank: 'SS', exp: 3061508, hp: '1.5TGN', world: 'World 17', drops: { coins: { amount: '150NVG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/l0h3JeBUIJm4ecYAo?invite=cr-MSwwRG0sMzA5MTAxNTU4&v=24' },
     ],
     shadows: [
         {

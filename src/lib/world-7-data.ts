@@ -54,7 +54,7 @@ export const world7Data = {
         { id: 'aste-npc', name: 'Aste', rank: 'B', exp: 319, hp: '43Ud', world: 'World 7' },
         { id: 'yune-npc', name: 'Yune', rank: 'A', exp: 351, hp: '218Ud', world: 'World 7' },
         { id: 'yemi-npc', name: 'Yemi', rank: 'S', exp: 386, hp: '1dD', world: 'World 7' },
-        { id: 'novi-chrone-boss', name: 'Novi Chroni', rank: 'SS', exp: 960, hp: '5.4dD', world: 'World 7' },
+        { id: 'novi-chrone-boss', name: 'Novi Chroni', rank: 'SS', exp: 960, hp: '5.4dD', world: 'World 7', videoUrl: 'https://medal.tv/de/games/roblox/clips/kygyx0Eq9crbZK4rF?invite=cr-MSxTVVAsMzA5MTAxNTU4' },
     ],
     pets: [
         { id: 'noalle-pet', name: 'Noalle', rank: 'E', rarity: 'Common', energy_bonus: '732' },

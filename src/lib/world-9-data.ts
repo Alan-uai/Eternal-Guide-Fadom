@@ -45,7 +45,7 @@ export const world9Data = {
         { id: 'momo-npc', name: 'Momo', rank: 'B', exp: 1898, hp: '2.1QnD', world: 'World 9' },
         { id: 'alien-npc', name: 'Alien', rank: 'A', exp: 2373, hp: '10.5QnD', world: 'World 9' },
         { id: 'saiko-npc', name: 'Saiko', rank: 'S', exp: 3915, hp: '52QnD', world: 'World 9' },
-        { id: 'ken-turbo-boss', name: 'Ken Turbo', rank: 'SS', exp: 5760, hp: '264QnD', world: 'World 9' },
+        { id: 'ken-turbo-boss', name: 'Ken Turbo', rank: 'SS', exp: 5760, hp: '264QnD', world: 'World 9', videoUrl: 'https://medal.tv/de/games/roblox/clips/kEjtnJtKOc4qEqOGw?invite=cr-MSxoZVUsMzA5MTAxNTU4' },
     ],
     pets: [
         { id: 'ken-pet', name: 'Ken', rank: 'E', rarity: 'Common', energy_bonus: '4.57k' },

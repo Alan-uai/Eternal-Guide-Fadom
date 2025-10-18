@@ -82,14 +82,14 @@ export const world18Data = {
       }
     ],
     npcs: [
-        { id: 'world18-e-rank', name: 'E Rank NPC', rank: 'E', exp: 1267295, hp: '97OVG', world: 'World 18', drops: { coins: { amount: '9.7OVG', probability: 0.8 } } },
-        { id: 'world18-d-rank', name: 'D Rank NPC', rank: 'D', exp: 1394024, hp: '488OVG', world: 'World 18', drops: { coins: { amount: '48OVG', probability: 0.8 } } },
-        { id: 'world18-c-rank', name: 'C Rank NPC', rank: 'C', exp: 1533427, hp: '2.4NVG', world: 'World 18', drops: { coins: { amount: '240OVG', probability: 0.8 } } },
-        { id: 'world18-b-rank', name: 'B Rank NPC', rank: 'B', exp: 1686770, hp: '12NVG', world: 'World 18', drops: { coins: { amount: '1.2NVG', probability: 0.8 } } },
-        { id: 'world18-a-rank', name: 'A Rank NPC', rank: 'A', exp: 1855446, hp: '61NVG', world: 'World 18', drops: { coins: { amount: '6.1NVG', probability: 0.8 } } },
-        { id: 'world18-s-rank', name: 'S Rank NPC', rank: 'S', exp: 2040991, hp: '305NVG', world: 'World 18', drops: { coins: { amount: '30NVG', probability: 0.8 } } },
-        { id: 'mr-chainsaw-boss', name: 'Mr Chainsaw', rank: 'SS', exp: 2551204, hp: '1.5TGN', world: 'World 18', drops: { coins: { amount: '150NVG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
-        { id: 'world18-sss-rank', name: 'SSS Rank NPC', rank: 'SSS', exp: 3189005, hp: '7.7TGN', world: 'World 18', drops: { coins: { amount: '770NVG', probability: 1 } } },
+        { id: 'world18-e-rank', name: 'E Rank NPC', rank: 'E', exp: 2551239, hp: '1.5TGN', world: 'World 18', drops: { coins: { amount: '150NVG', probability: 0.8 } } },
+        { id: 'world18-d-rank', name: 'D Rank NPC', rank: 'D', exp: 2806363, hp: '7.7TGN', world: 'World 18', drops: { coins: { amount: '770NVG', probability: 0.8 } } },
+        { id: 'world18-c-rank', name: 'C Rank NPC', rank: 'C', exp: 3086999, hp: '38TGN', world: 'World 18', drops: { coins: { amount: '3.8TGN', probability: 0.8 } } },
+        { id: 'world18-b-rank', name: 'B Rank NPC', rank: 'B', exp: 3395699, hp: '193TGN', world: 'World 18', drops: { coins: { amount: '19TGN', probability: 0.8 } } },
+        { id: 'world18-a-rank', name: 'A Rank NPC', rank: 'A', exp: 3735269, hp: '965TGN', world: 'World 18', drops: { coins: { amount: '96TGN', probability: 0.8 } } },
+        { id: 'world18-s-rank', name: 'S Rank NPC', rank: 'S', exp: 4108796, hp: '4.8UTG', world: 'World 18', drops: { coins: { amount: '480TGN', probability: 0.8 } } },
+        { id: 'mr-chainsaw-boss', name: 'Mr Chainsaw', rank: 'SS', exp: 5135995, hp: '24UTG', world: 'World 18', drops: { coins: { amount: '2.4UTG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/l2ZPku6S7w3f74fTT?invite=cr-MSx2dVcsMzA5MTAxNTU4&v=19' },
+        { id: 'world18-sss-rank', name: 'SSS Rank NPC', rank: 'SSS', exp: 6419993, hp: '121UTG', world: 'World 18', drops: { coins: { amount: '12UTG', probability: 1 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/l4MUigH8BtJIQsktT?invite=cr-MSxyMmksMzA5MTAxNTU4&v=13' },
     ],
     shadows: [
         {

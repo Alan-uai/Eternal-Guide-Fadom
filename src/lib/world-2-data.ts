@@ -88,7 +88,7 @@ export const world2Data = {
         { id: 'senji-npc', name: 'Senji', rank: 'B', exp: 12, hp: '937.5B', world: 'World 2' },
         { id: 'zaro-npc', name: 'Zaro', rank: 'A', exp: 13, hp: '4.6T', world: 'World 2' },
         { id: 'loffy-npc', name: 'Loffy', rank: 'S', exp: 14, hp: '23.4T', world: 'World 2' },
-        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 30, hp: '117T', world: 'World 2' },
+        { id: 'shanks-boss', name: 'Shanks', rank: 'SS', exp: 30, hp: '117T', world: 'World 2', videoUrl: 'https://medal.tv/de/games/roblox/clips/kurLprKrE11td2ij-?invite=cr-MSxwSUosMzA5MTAxNTU4' },
     ],
     pets: [
         { id: 'nomi-pet', name: 'Nomi', rank: 'E', rarity: 'Common', energy_bonus: '8' },

@@ -56,15 +56,15 @@ export const world19Data = {
       }
     ],
     npcs: [
-      { id: 'world19-e-rank', name: 'E Rank NPC', rank: 'E', exp: 2551239, hp: '7.7TGN', world: 'World 19', drops: { coins: { amount: '770NVG', probability: 0.8 } } },
-      { id: 'world19-d-rank', name: 'D Rank NPC', rank: 'D', exp: 2806363, hp: '38TGN', world: 'World 19', drops: { coins: { amount: '3.8TGN', probability: 0.8 } } },
-      { id: 'world19-c-rank', name: 'C Rank NPC', rank: 'C', exp: 3086999, hp: '193TGN', world: 'World 19', drops: { coins: { amount: '19TGN', probability: 0.8 } } },
-      { id: 'world19-b-rank', name: 'B Rank NPC', rank: 'B', exp: 3395699, hp: '965TGN', world: 'World 19', drops: { coins: { amount: '96TGN', probability: 0.8 } } },
-      { id: 'world19-a-rank', name: 'A Rank NPC', rank: 'A', exp: 3735269, hp: '4.8UTG', world: 'World 19', drops: { coins: { amount: '480TGN', probability: 0.8 } } },
-      { id: 'world19-s-rank', name: 'S Rank NPC', rank: 'S', exp: 4108796, hp: '24UTG', world: 'World 19', drops: { coins: { amount: '2.4UTG', probability: 0.8 } } },
-      { id: 'hero-of-hell-boss', name: 'Hero of Hell', rank: 'SS', exp: 5135995, hp: '121UTG', world: 'World 19', drops: { coins: { amount: '12UTG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
-      { id: 'leonardo-boss', name: 'Leonardo', rank: 'SS', exp: 5135995, hp: '121UTG', world: 'World 19', drops: { coins: { amount: '12UTG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
-      { id: 'bansho-boss', name: 'Bansho', rank: 'SSS', exp: 6419993, hp: '605UTG', world: 'World 19', drops: { coins: { amount: '60UTG', probability: 1 } } },
+      { id: 'world19-e-rank', name: 'E Rank NPC', rank: 'E', exp: 8024882, hp: '605UTG', world: 'World 19', drops: { coins: { amount: '60UTG', probability: 0.8 } } },
+      { id: 'world19-d-rank', name: 'D Rank NPC', rank: 'D', exp: 8827370, hp: '3DTG', world: 'World 19', drops: { coins: { amount: '300UTG', probability: 0.8 } } },
+      { id: 'world19-c-rank', name: 'C Rank NPC', rank: 'C', exp: 9710107, hp: '15DTG', world: 'World 19', drops: { coins: { amount: '1.5DTG', probability: 0.8 } } },
+      { id: 'world19-b-rank', name: 'B Rank NPC', rank: 'B', exp: 10681118, hp: '75DTG', world: 'World 19', drops: { coins: { amount: '7.5DTG', probability: 0.8 } } },
+      { id: 'world19-a-rank', name: 'A Rank NPC', rank: 'A', exp: 11749230, hp: '378DTG', world: 'World 19', drops: { coins: { amount: '37DTG', probability: 0.8 } } },
+      { id: 'world19-s-rank', name: 'S Rank NPC', rank: 'S', exp: 12924153, hp: '1.8tsTG', world: 'World 19', drops: { coins: { amount: '180DTG', probability: 0.8 } } },
+      { id: 'hero-of-hell-boss', name: 'Hero of Hell', rank: 'SS', exp: 16155191, hp: '9.4tsTG', world: 'World 19', drops: { coins: { amount: '940DTG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/l6erVhs1o52XgnQLw?invite=cr-MSwxSXAsMzA5MTAxNTU4&v=23' },
+      { id: 'leonardo-boss', name: 'Leonardo', rank: 'SS', exp: 16155191, hp: '9.4tsTG', world: 'World 19', drops: { coins: { amount: '940DTG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/l6erVhs1o52XgnQLw?invite=cr-MSwxSXAsMzA5MTAxNTU4&v=23' },
+      { id: 'bansho-boss', name: 'Bansho', rank: 'SSS', exp: 20193989, hp: '47qTG', world: 'World 19', drops: { coins: { amount: '4.7qTG', probability: 1 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/l6eu9NHK8sfQ9qo0I?invite=cr-MSxzeWQsMzA5MTAxNTU4&v=32' },
     ],
     shadows: [
         {

@@ -62,7 +62,7 @@ export const world10Data = {
         { id: 'world10-b-rank', name: 'B Rank NPC', rank: 'B', exp: 6513, hp: '33SpD', world: 'World 10', drops: { coins: { amount: '3.3SpD', probability: 0.8 } } },
         { id: 'world10-a-rank', name: 'A Rank NPC', rank: 'A', exp: 7164, hp: '166SpD', world: 'World 10', drops: { coins: { amount: '16SpD', probability: 0.8 } } },
         { id: 'world10-s-rank', name: 'S Rank NPC', rank: 'S', exp: 7881, hp: '830SpD', world: 'World 10', drops: { coins: { amount: '83SpD', probability: 0.8 } } },
-        { id: 'killas-godspeed-boss', name: 'Killas Godspeed', rank: 'SS', exp: 11520, hp: '4.1OcD', world: 'World 10', drops: { coins: { amount: '410SpD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'killas-godspeed-boss', name: 'Killas Godspeed', rank: 'SS', exp: 11520, hp: '4.1OcD', world: 'World 10', drops: { coins: { amount: '410SpD', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/kHyprteEO9LhXHbj8?invite=cr-MSxVUFIsMzA5MTAxNTU4' },
     ],
     shadows: [
         {
@@ -97,4 +97,3 @@ export const world10Data = {
     avatars: [],
     dungeons: []
 };
-

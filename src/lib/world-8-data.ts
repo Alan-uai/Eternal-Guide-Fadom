@@ -50,8 +50,8 @@ export const world8Data = {
         { id: 'kakashki-npc', name: 'Kakashki', rank: 'B', exp: 643, hp: '6.7tD', world: 'World 8' },
         { id: 'jiria-npc', name: 'Jiria', rank: 'A', exp: 707, hp: '33tD', world: 'World 8' },
         { id: 'tsuni-npc', name: 'Tsuni', rank: 'S', exp: 777, hp: '168tD', world: 'World 8' },
-        { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 1920, hp: '844tD', world: 'World 8' },
-        { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 2880, hp: '1.6qdD', world: 'World 8' },
+        { id: 'itechi-boss', name: 'Itechi', rank: 'SS', exp: 1920, hp: '844tD', world: 'World 8', videoUrl: 'https://medal.tv/de/games/roblox/clips/kBu5h6Im0kz9y_wjT?invite=cr-MSxNQUksMzA5MTAxNTU4' },
+        { id: 'madera-boss', name: 'Madera', rank: 'SS', exp: 2880, hp: '1.6qdD', world: 'World 8', videoUrl: 'https://medal.tv/de/games/roblox/clips/kBu8xd6Vy3lE5nDOv?invite=cr-MSxYeUcsMzA5MTAxNTU4' },
     ],
     pets: [
         { id: 'sekuri-pet', name: 'Sekuri', rank: 'E', rarity: 'Common', energy_bonus: '1.83k' },

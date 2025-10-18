@@ -48,7 +48,7 @@ export const world6Data = {
         { id: 'cha-npc', name: 'Cha', rank: 'B', exp: 159, hp: '280N', world: 'World 6' },
         { id: 'choi-npc', name: 'Choi', rank: 'A', exp: 174, hp: '1.4de', world: 'World 6' },
         { id: 'solo-sung-npc', name: 'Solo Sung', rank: 'S', exp: 192, hp: '7de', world: 'World 6' },
-        { id: 'statue-of-god-boss', name: 'Statue of God', rank: 'SS', exp: 480, hp: '35de', world: 'World 6' },
+        { id: 'statue-of-god-boss', name: 'Statue of God', rank: 'SS', exp: 480, hp: '35de', world: 'World 6', videoUrl: ['https://medal.tv/de/games/roblox/clips/kwqR5RhJmlHUslypt?invite=cr-MSxiUjIsMzA5MTAxNTU4', 'https://medal.tv/de/games/roblox/clips/kwrfK7BxWn8erwSoy?invite=cr-MSxGRUosMzA5MTAxNTU4'] },
     ],
     pets: [
         { id: 'weak-sung-pet', name: 'Weak Sung', rank: 'E', rarity: 'Common', energy_bonus: '293' },

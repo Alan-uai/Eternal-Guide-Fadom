@@ -56,14 +56,14 @@ export const world20Data = {
       }
     ],
     npcs: [
-      { id: 'world20-e-rank', name: 'E Rank NPC', rank: 'E', exp: 8024882, hp: '605UTG', world: 'World 20', drops: { coins: { amount: '60UTG', probability: 0.8 } } },
-      { id: 'world20-d-rank', name: 'D Rank NPC', rank: 'D', exp: 8827370, hp: '3DTG', world: 'World 20', drops: { coins: { amount: '300UTG', probability: 0.8 } } },
-      { id: 'world20-c-rank', name: 'C Rank NPC', rank: 'C', exp: 9710107, hp: '15DTG', world: 'World 20', drops: { coins: { amount: '1.5DTG', probability: 0.8 } } },
-      { id: 'world20-b-rank', name: 'B Rank NPC', rank: 'B', exp: 10681118, hp: '75DTG', world: 'World 20', drops: { coins: { amount: '7.5DTG', probability: 0.8 } } },
-      { id: 'world20-a-rank', name: 'A Rank NPC', rank: 'A', exp: 11749230, hp: '378DTG', world: 'World 20', drops: { coins: { amount: '37DTG', probability: 0.8 } } },
-      { id: 'world20-s-rank', name: 'S Rank NPC', rank: 'S', exp: 12924153, hp: '1.8tsTG', world: 'World 20', drops: { coins: { amount: '180DTG', probability: 0.8 } } },
-      { id: 'koku-ssj-boss', name: 'Koku SSJ', rank: 'SS', exp: 16155191, hp: '9.4tsTG', world: 'World 20', drops: { coins: { amount: '940DTG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
-      { id: 'frezi-final-form-boss', name: 'Frezi Final Form', rank: 'SSS', exp: 24232787, hp: '47qTG', world: 'World 20', drops: { coins: { amount: '4.7qTG', probability: 1 } } },
+      { id: 'world20-e-rank', name: 'E Rank NPC', rank: 'E', exp: 20193989, hp: '47qTG', world: 'World 20', drops: { coins: { amount: '4.7qTG', probability: 0.8 } } },
+      { id: 'world20-d-rank', name: 'D Rank NPC', rank: 'D', exp: 22213388, hp: '237qTG', world: 'World 20', drops: { coins: { amount: '23qTG', probability: 0.8 } } },
+      { id: 'world20-c-rank', name: 'C Rank NPC', rank: 'C', exp: 24434727, hp: '1.1QnTG', world: 'World 20', drops: { coins: { amount: '110qTG', probability: 0.8 } } },
+      { id: 'world20-b-rank', name: 'B Rank NPC', rank: 'B', exp: 26878199, hp: '5.9QnTG', world: 'World 20', drops: { coins: { amount: '590qTG', probability: 0.8 } } },
+      { id: 'world20-a-rank', name: 'A Rank NPC', rank: 'A', exp: 29566019, hp: '29QnTG', world: 'World 20', drops: { coins: { amount: '2.9QnTG', probability: 0.8 } } },
+      { id: 'world20-s-rank', name: 'S Rank NPC', rank: 'S', exp: 32522621, hp: '148QnTG', world: 'World 20', drops: { coins: { amount: '14QnTG', probability: 0.8 } } },
+      { id: 'koku-ssj-boss', name: 'Koku SSJ', rank: 'SS', exp: 48783932, hp: '744QnTG', world: 'World 20', drops: { coins: { amount: '74QnTG', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/la4KjuzWNGjdX6o0t?invite=cr-MSx2dDMsMzA5MTAxNTU4&v=15' },
+      { id: 'frezi-final-form-boss', name: 'Frezi Final Form', rank: 'SSS', exp: 73175898, hp: '3.7ssTG', world: 'World 20', drops: { coins: { amount: '370QnTG', probability: 1 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/la4DM9ohHQLUgw5sD?invite=cr-MSx6UkgsMzA5MTAxNTU4&v=27' },
     ],
     pets: [],
     dungeons: [

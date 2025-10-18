@@ -67,7 +67,7 @@ export const world3Data = {
       { id: 'rakiu-npc', name: 'Rakiu', rank: 'B', exp: 24, hp: '146qd', world: 'World 3' },
       { id: 'yoichi-npc', name: 'Yoichi', rank: 'A', exp: 25, hp: '734qd', world: 'World 3' },
       { id: 'kahara-npc', name: 'Kahara', rank: 'S', exp: 26, hp: '3.6Qn', world: 'World 3' },
-      { id: 'eizen-boss', name: 'Eizen', rank: 'SS', exp: 60, hp: '18Qn', world: 'World 3' },
+      { id: 'eizen-boss', name: 'Eizen', rank: 'SS', exp: 60, hp: '18Qn', world: 'World 3', videoUrl: 'https://medal.tv/de/games/roblox/clips/kurNlNFo63YGkTMnZ?invite=cr-MSxRTnQsMzA5MTAxNTU4' },
     ],
     pets: [
         { id: 'hime-pet', name: 'Hime', rank: 'E', rarity: 'Common', energy_bonus: '19' },

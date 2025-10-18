@@ -57,7 +57,7 @@ export const world1Data = {
         { id: 'kohan-npc', name: 'Kohan', rank: 'B', exp: 4, hp: '12.5M', world: 'World 1' },
         { id: 'picco-npc', name: 'Picco', rank: 'A', exp: 5, hp: '62.5M', world: 'World 1' },
         { id: 'koku-npc', name: 'Koku', rank: 'S', exp: 6, hp: '312.5M', world: 'World 1' },
-        { id: 'kid-kohan-boss', name: 'Kid Kohan', rank: 'SS', exp: 15, hp: '1.5B', world: 'World 1' },
+        { id: 'kid-kohan-boss', name: 'Kid Kohan', rank: 'SS', exp: 15, hp: '1.5B', world: 'World 1', videoUrl: 'https://medal.tv/de/games/roblox/clips/kurF3svOvD-eS9F7H?invite=cr-MSxGUk4sMzA5MTAxNTU4' },
     ],
     pets: [
         { id: 'kriluni-pet', name: 'Kriluni', rank: 'E', rarity: 'Common', energy_bonus: '3' },

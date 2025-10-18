@@ -46,7 +46,7 @@ export const world13Data = {
         { id: 'world13-b-rank', name: 'B Rank NPC', rank: 'B', exp: 51013, hp: '13DVg', world: 'World 13', drops: { coins: { amount: '1.3DVg', probability: 0.8 } } },
         { id: 'world13-a-rank', name: 'A Rank NPC', rank: 'A', exp: 56115, hp: '65DVg', world: 'World 13', drops: { coins: { amount: '6.5DVg', probability: 0.8 } } },
         { id: 'world13-s-rank', name: 'S Rank NPC', rank: 'S', exp: 61726, hp: '327DVg', world: 'World 13', drops: { coins: { amount: '32DVg', probability: 0.8 } } },
-        { id: 'number-8-boss', name: 'Number 8', rank: 'SS', exp: 92160, hp: '1.6TVg', world: 'World 13', drops: { coins: { amount: '160DVg', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'number-8-boss', name: 'Number 8', rank: 'SS', exp: 92160, hp: '1.6TVg', world: 'World 13', drops: { coins: { amount: '160DVg', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/kP6HV0AtQKNRT9X_k?invite=cr-MSxGQ2YsMzA5MTAxNTU4&v=28' },
     ],
     shadows: [
         {

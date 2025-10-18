@@ -80,7 +80,7 @@ export const world12Data = {
         { id: 'world12-b-rank', name: 'B Rank NPC', rank: 'B', exp: 25340, hp: '824Vgn', world: 'World 12', drops: { coins: { amount: '82Vgn', probability: 0.8 } } },
         { id: 'world12-a-rank', name: 'A Rank NPC', rank: 'A', exp: 27874, hp: '4.1UVg', world: 'World 12', drops: { coins: { amount: '410Vgn', probability: 0.8 } } },
         { id: 'world12-s-rank', name: 'S Rank NPC', rank: 'S', exp: 30662, hp: '20UVg', world: 'World 12', drops: { coins: { amount: '2UVg', probability: 0.8 } } },
-        { id: 'escanor-boss', name: 'Esanor', rank: 'SS', exp: 46080, hp: '104UVg', world: 'World 12', drops: { coins: { amount: '10UVg', probability: 1 }, tokens: { amount: 5, probability: 0.5 } } },
+        { id: 'escanor-boss', name: 'Esanor', rank: 'SS', exp: 46080, hp: '104UVg', world: 'World 12', drops: { coins: { amount: '10UVg', probability: 1 }, tokens: { amount: 5, probability: 0.5 } }, videoUrl: 'https://medal.tv/de/games/roblox/clips/kMz3fVnxWSwEHOWbH?invite=cr-MSxPY2YsMzA5MTAxNTU4' },
     ],
     shadows: [
         {

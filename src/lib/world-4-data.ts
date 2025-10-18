@@ -68,7 +68,7 @@ export const world4Data = {
         { id: 'meki-npc', name: 'Meki', rank: 'B', exp: 45, hp: '11.3sx', world: 'World 4' },
         { id: 'tage-npc', name: 'Tage', rank: 'A', exp: 47, hp: '56sx', world: 'World 4' },
         { id: 'gajo-npc', name: 'Gajo', rank: 'S', exp: 50, hp: '284sx', world: 'World 4' },
-        { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, hp: '1.4Sp', world: 'World 4' },
+        { id: 'sakuni-boss', name: 'Sakuni', rank: 'SS', exp: 120, hp: '1.4Sp', world: 'World 4', videoUrl: 'https://medal.tv/de/games/roblox/clips/kxFRqlwFr5gQANr-2?invite=cr-MSw5MlgsMzA5MTAxNTU4' },
     ],
     pets: [
         { id: 'itodo-pet', name: 'Itodo', rank: 'E', rarity: 'Common', energy_bonus: '47' },

@@ -53,8 +53,8 @@ export const world23Data = {
       { id: 'world23-b-rank', name: 'B Rank NPC', rank: 'B', exp: 170202947, hp: '', world: 'World 23' },
       { id: 'world23-a-rank', name: 'A Rank NPC', rank: 'A', exp: 187223241, hp: '', world: 'World 23' },
       { id: 'world23-s-rank', name: 'S Rank NPC', rank: 'S', exp: 205945566, hp: '', world: 'World 23' },
-      { id: 'world23-ss-rank', name: 'SS Rank NPC', rank: 'SS', exp: 257431957, hp: '', world: 'World 23' },
-      { id: 'world23-sss-rank', name: 'SSS Rank NPC', rank: 'SSS', exp: 386147935, hp: '', world: 'World 23' }
+      { id: 'bald-man-boss', name: 'Bald Man', rank: 'SS', exp: 257431957, hp: '', world: 'World 23', videoUrl: 'https://medal.tv/de/games/roblox/clips/liIQPGgPinSlfkQ1-?invite=cr-MSxVSEwsMzA5MTAxNTU4&v=30' },
+      { id: 'garou-boss', name: 'Garou', rank: 'SSS', exp: 386147935, hp: '', world: 'World 23', videoUrl: 'https://medal.tv/de/games/roblox/clips/liIVjRafWVpWUyT8u?invite=cr-MSxNTHcsMzA5MTAxNTU4&v=36' }
     ],
     pets: [],
     dungeons: [],
