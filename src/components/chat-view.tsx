@@ -133,29 +133,26 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
     let score = 0;
     const lowerCaseTitle = article.title.toLowerCase();
     const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
-    const contentString = article.content.toLowerCase();
+    const summaryString = article.summary.toLowerCase();
     
-    // Title match (highest priority)
+    // Exact match in title (highest score)
     if (lowerCaseTitle.includes(lowerCasePrompt)) {
       score += 100;
     }
 
+    // Keyword matching with scores
     promptWords.forEach(word => {
-      if (lowerCaseTitle.includes(word)) {
-        score += 20; // High score for title word match
-      }
-      if (tagsString.includes(word)) {
-        score += 10; // Medium score for tag match
-      }
-      if (contentString.includes(word)) {
-        score += 1; // Low score for content match
-      }
+      if (lowerCaseTitle.includes(word)) score += 20;
+      if (tagsString.includes(word)) score += 10;
+      if (summaryString.includes(word)) score += 5;
     });
 
-    // Boost score for having table data if the prompt seems to ask for data
-    const asksForData = /qual|quanto|como|lista|tier|requisitos/.test(lowerCasePrompt);
-    if(asksForData && article.tables && Object.keys(article.tables).length > 0) {
-        score += 15;
+    // Boost for specific terms
+    if (/tier list|prioridade|melhor|pior/.test(lowerCasePrompt) && tagsString.includes('tier list')) {
+        score += 50;
+    }
+    if (/gamepass|passes/.test(lowerCasePrompt) && tagsString.includes('gamepass')) {
+        score += 50;
     }
 
     return { article, score };
@@ -257,19 +254,23 @@ export function ChatView() {
 
     if (updatedCache[normalizedPrompt]) {
         updatedCache[normalizedPrompt].feedback = updatedFeedback;
+
+        // Invalidate cache if feedback is negative
+        if (updatedFeedback === 'negative') {
+            delete updatedCache[normalizedPrompt];
+            toast({ title: "Feedback enviado", description: "Obrigado! A resposta anterior foi removida e uma nova será gerada." });
+        }
+
         setQuestionCache(updatedCache);
         window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(updatedCache));
     }
 
     if (updatedFeedback === 'negative') {
-        toast({ title: "Feedback enviado", description: "Obrigado! Gerando uma nova resposta e enviando a anterior para revisão." });
-        
         // 1. Submit for review in the background
         if (firestore && user) {
              try {
                 const analysisResult = await analyzeNegativeFeedback({ question: prompt, negativeResponse: response });
                 
-                // This ID will be used for both collections to keep them in sync.
                 const feedbackId = nanoid();
                 
                 const feedbackData = {
@@ -284,16 +285,12 @@ export function ChatView() {
                     createdAt: serverTimestamp(),
                 };
 
-                // Save to the global collection for admin review
                 await setDoc(doc(firestore, 'negativeFeedback', feedbackId), feedbackData);
-                
-                // Save a copy to the user-specific subcollection for their profile view
                 await setDoc(doc(firestore, 'users', user.uid, 'negativeFeedback', feedbackId), {
                     question: prompt,
                     status: 'pending',
                     createdAt: feedbackData.createdAt,
                 });
-
 
             } catch (error) {
                 console.error("Erro ao salvar feedback negativo:", error);
