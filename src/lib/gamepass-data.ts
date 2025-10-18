@@ -19,6 +19,7 @@ export const allGamepasses: Gamepass[] = [
     // Dano
     { id: 'double-damage', name: 'Double Damage', category: 'Dano', bonus_type: 'damage', bonus_value: 2, description: "Dobra seu dano." },
     { id: 'double-weapon', name: 'Double Weapon', category: 'Dano', bonus_type: null, bonus_value: null, description: "Permite equipar duas armas." },
+    { id: 'tiple-weapon', name: 'Triple Weapon', category: 'Dano', bonus_type: null, bonus_value: null, description: "Permite equipar três armas." },
     { id: 'extra-titan', name: 'Extra Titan', category: 'Dano', bonus_type: null, bonus_value: null, description: "+1 espaço para equipar titã." },
     { id: 'extra-stand', name: 'Extra Stand', category: 'Dano', bonus_type: null, bonus_value: null, description: "+1 espaço para equipar stand." },
     { id: 'extra-shadow', name: 'Extra Shadow', category: 'Dano', bonus_type: null, bonus_value: null, description: "+1 espaço para equipar sombra (dano ou energia)." },

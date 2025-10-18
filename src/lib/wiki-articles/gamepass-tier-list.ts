@@ -29,8 +29,8 @@ Estas são as gamepasses que você deve ter no endgame.`,
     endgameTiers: {
       headers: ['Tier', 'Gamepass', 'Recomendação'],
       rows: [
-        { Tier: 'S', Gamepass: 'Fast Click, Fast Roll, Fast Star, 2x Damage, 2x Energy, Double Weapon Equip, Extra Titan, Double Aura', Recomendação: 'Deve ter no endgame.' },
-        { Tier: 'A', Gamepass: '+3 Champions Equip, +2 Champions Equip, 2x EXP, VIP, Extra Stand, Remote Gacha, 2x Coin, Extra Shadow', Recomendação: 'Deveria ter para um progresso mais rápido.' },
+        { Tier: 'S', Gamepass: 'Fast Click, Fast Roll, Fast Star, 2x Damage, 2x Energy, Double Weapon Equip, Triple Weapon Equip, Extra Shadow, Extra Titan, Double Aura', Recomendação: 'Deve ter no endgame.' },
+        { Tier: 'A', Gamepass: '+3 Champions Equip, +2 Champions Equip, 2x EXP, VIP, Extra Stand, Remote Gacha, 2x Coin', Recomendação: 'Deveria ter para um progresso mais rápido.' },
         { Tier: 'B', Gamepass: '2x Soul, +2 Gacha, +5 Star Open, Super Luck, Extra Luck, Lucky', Recomendação: 'Principalmente Qualidade de Vida e economia de tempo.' },
         { Tier: 'C', Gamepass: '+10 Backpack Space, +20 Backpack Space', Recomendação: 'Não é realmente necessário, mas é bom ter no endgame.' },
       ],
