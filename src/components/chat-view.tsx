@@ -446,7 +446,6 @@ export function ChatView() {
     }
   
     // Otherwise (no cache, stale cache, or negative feedback), call the AI.
-    // The history should include all previous messages, user and assistant
     const historyForAI = newMessages;
     callAI(values.prompt, historyForAI);
   }
@@ -468,9 +467,9 @@ export function ChatView() {
   const isSendDisabled = isLoading || isWikiLoading;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-3.5rem)]">
-      <div className="flex-1 overflow-hidden relative">
-        <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
+    <div className="flex flex-col flex-grow h-full">
+      <div className="flex-grow relative">
+        <ScrollArea className="absolute inset-0" viewportRef={scrollAreaRef}>
           <div className="p-4 md:p-6 space-y-6">
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground pt-10 md:pt-16">
