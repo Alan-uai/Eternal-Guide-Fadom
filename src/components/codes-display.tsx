@@ -6,9 +6,7 @@ import { Gift, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { upgradesCostsArticle } from '@/lib/wiki-articles/upgrades-costs';
 import { useToast } from '@/hooks/use-toast';
-import { Separator } from './ui/separator';
-
-const allCodesRaw = upgradesCostsArticle.content.match(/`[^`]+`/g)?.map(c => c.replace(/`/g, '')) || [];
+import { ScrollArea } from './ui/scroll-area';
 
 interface CategorizedCodes {
   likes: string[];
@@ -20,6 +18,11 @@ interface CategorizedCodes {
 export function CodesDisplay() {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
+
+  const allCodesRaw = useMemo(() => {
+    const codeRegex = /`([^`]+)`/g;
+    return upgradesCostsArticle.content.match(codeRegex)?.map(c => c.replace(/`/g, '')) || [];
+  }, []);
 
   const codes = useMemo((): CategorizedCodes => {
     return allCodesRaw.reduce<CategorizedCodes>((acc, code) => {
@@ -35,7 +38,7 @@ export function CodesDisplay() {
       }
       return acc;
     }, { likes: [], fav: [], update: [], visits: [] });
-  }, []);
+  }, [allCodesRaw]);
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -79,6 +82,7 @@ export function CodesDisplay() {
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, delay: 0.1 }}
                     >
+                      <ScrollArea className="max-h-72 w-full pr-4">
                         <div className="space-y-3">
                             {codes.update.length > 0 && (
                                  <div className='space-y-1'>
@@ -129,6 +133,7 @@ export function CodesDisplay() {
                                 </div>
                             )}
                         </div>
+                      </ScrollArea>
                     </motion.div>
                 )}
                 </AnimatePresence>
