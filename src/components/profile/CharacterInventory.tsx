@@ -15,7 +15,7 @@ export function CharacterInventory() {
             </CardHeader>
             <CardContent>
                 <Tabs defaultValue="powers" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 h-auto">
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-6 h-auto">
                         {profileCategories.map(category => (
                             <TabsTrigger key={category.subcollectionName} value={category.subcollectionName}>{category.name}</TabsTrigger>
                         ))}
@@ -28,6 +28,7 @@ export function CharacterInventory() {
                                 isInteractiveGrid={category.isInteractiveGrid}
                                 isWeaponSlots={category.isWeaponSlots}
                                 isFighterSlots={(category as any).isFighterSlots}
+                                isJewelrySlots={(category as any).isJewelrySlots}
                                 itemTypeFilter={category.itemTypeFilter}
                             />
                         </TabsContent>
