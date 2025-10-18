@@ -8,7 +8,7 @@ import { upgradesCostsArticle } from '@/lib/wiki-articles/upgrades-costs';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 
-const allCodesRaw = upgradesCostsArticle.content.match(/`Update20`|`320KLikes`|`325KLikes`|`590KFav`|`595KFav`|`Update19P3`|`315KLikes`|`580KFav`|`585KFav`|`150MVisits`/g)?.map(c => c.replace(/`/g, '')) || [];
+const allCodesRaw = upgradesCostsArticle.content.match(/`[^`]+`/g)?.map(c => c.replace(/`/g, '')) || [];
 
 interface CategorizedCodes {
   likes: string[];
@@ -28,7 +28,7 @@ export function CodesDisplay() {
         acc.likes.push(code);
       } else if (lowerCode.includes('fav')) {
         acc.fav.push(code);
-      } else if (lowerCode.includes('update')) {
+      } else if (lowerCode.includes('update') || lowerCode.includes('upd')) {
         acc.update.push(code);
       } else if (lowerCode.includes('visits')) {
         acc.visits.push(code);
