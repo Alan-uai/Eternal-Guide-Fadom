@@ -21,6 +21,7 @@ import { world20Data } from '@/lib/world-20-data';
 import { world21Data } from '@/lib/world-21-data';
 import { world22Data } from '@/lib/world-22-data';
 import { world23Data } from '@/lib/world-23-data';
+import { world24Data } from '@/lib/world-24-data';
 
 
 export const allGameData = [
@@ -47,4 +48,5 @@ export const allGameData = [
   world21Data,
   world22Data,
   world23Data,
+  world24Data,
 ];

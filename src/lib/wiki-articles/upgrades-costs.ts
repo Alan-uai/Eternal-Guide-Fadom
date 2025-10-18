@@ -4,8 +4,12 @@ export const upgradesCostsArticle: Omit<WikiArticle, 'createdAt'> = {
   id: 'upgrades-costs',
   title: 'Custos de Upgrades',
   summary: 'Uma referência completa dos custos para cada nível de upgrade para Velocidade de Estrela, Sorte, Chance Crítica de Energia, EXP e outros bônus gerais.',
-  content: `Esta página detalha os custos em moedas para cada nível de upgrade em várias categorias de bônus permanentes no jogo, além dos custos em Exchange Tokens para expandir os slots do inventário.`,
-  tags: ['custos', 'upgrade', 'evolução', 'preços', 'sorte', 'exp', 'dano', 'energia', 'moedas', 'guia', 'inventário', 'token'],
+  content: `Esta página detalha os custos em moedas para cada nível de upgrade em várias categorias de bônus permanentes no jogo, além dos custos em Exchange Tokens para expandir os slots do inventário.
+
+**Novos Códigos:**
+Use os códigos \`Update20\`, \`320KLikes\`, \`325KLikes\`, \`590KFav\`, e \`595KFav\` para recompensas!
+  `,
+  tags: ['custos', 'upgrade', 'evolução', 'preços', 'sorte', 'exp', 'dano', 'energia', 'moedas', 'guia', 'inventário', 'token', 'códigos'],
   imageUrl: 'wiki-13', // Reusing scientific notation image as it relates to costs
   tables: {
     starSpeed: {
@@ -138,6 +142,11 @@ export const upgradesCostsArticle: Omit<WikiArticle, 'createdAt'> = {
             { Upgrade: 38, Custo: '100N' },
             { Upgrade: 39, Custo: '1.5de' },
             { Upgrade: 40, Custo: '20de' },
+            { Upgrade: 41, Custo: '150de' },
+            { Upgrade: 42, Custo: '1Ud' },
+            { Upgrade: 43, Custo: '15Ud' },
+            { Upgrade: 44, Custo: '500Ud' },
+            { Upgrade: 45, Custo: '5DD' },
         ]
     },
     attackRange1: {
