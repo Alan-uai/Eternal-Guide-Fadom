@@ -58,8 +58,10 @@ const extractContentFromString = (str: string): string => {
       return result;
     }
 
+    // Fallback for very incomplete JSON strings
     return str.replace(/^\[{"marcador":.*"conteudo":\s*"/, '').replace(/"}\]/, '');
   } catch {
+    // If regex fails for any reason, return the raw string
     return str;
   }
 };
@@ -338,7 +340,7 @@ export function ChatView() {
         if(userMessageContent){
             const historyWithoutBadAnswer = messages.slice(0, userMessageIndex + 1);
             setMessages(historyWithoutBadAnswer);
-            callAI(userMessageContent, historyWithoutBadAnswer.filter(m => m.role === 'user'));
+            callAI(userMessageContent, historyWithoutBadAnswer);
         }
     }
   };
@@ -444,7 +446,8 @@ export function ChatView() {
     }
   
     // Otherwise (no cache, stale cache, or negative feedback), call the AI.
-    const historyForAI = newMessages.filter(m => m.role === 'user');
+    // The history should include all previous messages, user and assistant
+    const historyForAI = newMessages;
     callAI(values.prompt, historyForAI);
   }
 
@@ -617,5 +620,3 @@ export function ChatView() {
     </div>
   );
 }
-
-    
