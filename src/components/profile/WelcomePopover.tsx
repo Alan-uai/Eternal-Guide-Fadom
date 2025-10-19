@@ -57,7 +57,7 @@ const formatNumber = (num: number): string => {
     return num.toExponential(2);
 };
 
-const createStatsSchema = (maxEnergyGain: number) => z.object({
+const createStatsSchema = () => z.object({
     currentWorld: z.string()
         .min(1, 'O mundo atual é obrigatório.')
         .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
@@ -66,9 +66,7 @@ const createStatsSchema = (maxEnergyGain: number) => z.object({
         .min(1, 'O rank é obrigatório.')
         .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
         .refine(val => parseInt(val, 10) <= MAX_RANK, { message: `O rank máximo é ${MAX_RANK}.` }),
-    energyGain: z.string()
-        .min(1, 'O ganho de energia é obrigatório.')
-        .refine(val => parseUserEnergy(val) <= maxEnergyGain, { message: `O ganho de energia máximo é ${formatNumber(maxEnergyGain)}.` }),
+    energyGain: z.string().min(1, 'O ganho de energia é obrigatório.'),
     totalDamage: z.string().min(1, 'O dano total é obrigatório.'),
     currentEnergy: z.string().min(1, 'A energia acumulada é obrigatória.'),
 });
@@ -91,8 +89,8 @@ export function WelcomePopover() {
     const { bonuses: maxBonuses, isLoading: areBonusesLoading } = useGlobalBonuses("0", true);
 
     const statsSchema = useMemo(() => {
-        return createStatsSchema(maxBonuses.energyGain);
-    }, [maxBonuses]);
+        return createStatsSchema();
+    }, []);
 
     const form = useForm<StatsFormData>({
         resolver: zodResolver(statsSchema),
@@ -119,7 +117,7 @@ export function WelcomePopover() {
     const handleCalculateMaxStats = () => {
         form.setValue('currentWorld', String(MAX_WORLD));
         form.setValue('rank', String(MAX_RANK));
-        form.setValue('energyGain', formatNumber(maxBonuses.energyGain));
+        form.setValue('energyGain', 'Automático (baseado nos seus itens)');
         form.setValue('totalDamage', formatNumber(maxBonuses.damage));
 
         toast({
