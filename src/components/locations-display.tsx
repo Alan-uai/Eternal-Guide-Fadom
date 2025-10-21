@@ -156,14 +156,17 @@ export function LocationsDisplay() {
                                     <ul className="text-xs space-y-1">
                                       {items.map((item, index) => (
                                         <li key={item.id || item.name || index}>
-                                          {item.videoUrl ? (
-                                            <button onClick={() => handleItemClick(item)} className='w-full text-left flex items-center gap-1.5 hover:underline'>
+                                          <button
+                                              onClick={() => item.videoUrl && handleItemClick(item)}
+                                              className={cn(
+                                                  'w-full text-left flex items-center gap-1.5',
+                                                  item.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
+                                              )}
+                                              disabled={!item.videoUrl}
+                                          >
                                               <span className="pl-4">{item.name}</span>
-                                              <PlayCircle className='inline h-3 w-3 text-primary/70' />
-                                            </button>
-                                          ) : (
-                                            <span className='pl-4'>{item.name}</span>
-                                          )}
+                                              {item.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
+                                          </button>
                                         </li>
                                       ))}
                                     </ul>
@@ -192,7 +195,7 @@ export function LocationsDisplay() {
             <iframe
               src={videoUrl}
               className='w-full h-full rounded-lg'
-              allow="autoplay; fullscreen"
+              allow="scripts; autoplay; fullscreen"
               allowFullScreen
             ></iframe>
           )}
