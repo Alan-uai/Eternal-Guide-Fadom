@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -104,9 +105,14 @@ export function LocationsDisplay() {
 
   const handleItemClick = (item: any) => {
     if (item.videoUrl) {
-      const url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
-      const embedUrl = url.replace('/clips/', '/clip/').split('?')[0] + '/embed';
-      setVideoUrl(embedUrl);
+      let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
+      // Extract the clip ID from the URL, which is usually after '/clips/' and before '?'
+      const clipIdMatch = url.match(/\/clips\/([a-zA-Z0-9_-]+)/);
+      if (clipIdMatch && clipIdMatch[1]) {
+        const clipId = clipIdMatch[1];
+        const embedUrl = `https://medal.tv/clip/${clipId}/embed`;
+        setVideoUrl(embedUrl);
+      }
     }
   }
 
@@ -157,14 +163,14 @@ export function LocationsDisplay() {
                                       {items.map((item, index) => (
                                         <li key={item.id || item.name || index}>
                                           <button
-                                              onClick={() => item.videoUrl && handleItemClick(item)}
+                                              onClick={() => handleItemClick(item)}
                                               className={cn(
                                                   'w-full text-left flex items-center gap-1.5',
                                                   item.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
                                               )}
                                               disabled={!item.videoUrl}
                                           >
-                                              <span className="pl-4">{item.name}</span>
+                                              <span>{item.name}</span>
                                               {item.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
                                           </button>
                                         </li>
