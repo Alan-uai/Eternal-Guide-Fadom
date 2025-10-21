@@ -7,6 +7,8 @@ import { useApp } from '@/context/app-provider';
 import { ScrollArea } from './ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 
 interface LocationData {
   [category: string]: {
@@ -32,7 +34,7 @@ export function LocationsDisplay() {
     };
 
     const worldOrder: string[] = [];
-    const raidsByWorld: Record<string, string[]> = {};
+    const raidsByWorld: Record<string, any[]> = {};
 
     allGameData.forEach(world => {
       if (!world.name) return;
@@ -102,7 +104,8 @@ export function LocationsDisplay() {
 
   const handleItemClick = (item: any) => {
     if (item.videoUrl) {
-      const embedUrl = item.videoUrl.replace('/clips/', '/clip/').split('?')[0] + '/embed';
+      const url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
+      const embedUrl = url.replace('/clips/', '/clip/').split('?')[0] + '/embed';
       setVideoUrl(embedUrl);
     }
   }
@@ -150,11 +153,17 @@ export function LocationsDisplay() {
                                 {Object.entries(worlds).map(([world, items]) => (
                                   <div key={world}>
                                     <h4 className="text-xs font-bold text-primary mb-1">{world}</h4>
-                                    <ul className="list-disc list-inside text-xs space-y-1">
+                                    <ul className="text-xs space-y-1">
                                       {items.map((item, index) => (
-                                        <li key={item.id || item.name || index} onClick={() => handleItemClick(item)} className={item.videoUrl ? 'cursor-pointer hover:text-primary' : ''}>
-                                          {item.name}
-                                          {item.videoUrl && <PlayCircle className='inline h-3 w-3 ml-1 text-primary/70' />}
+                                        <li key={item.id || item.name || index}>
+                                          {item.videoUrl ? (
+                                            <button onClick={() => handleItemClick(item)} className='w-full text-left flex items-center gap-1.5 hover:underline'>
+                                              <span className="pl-4">{item.name}</span>
+                                              <PlayCircle className='inline h-3 w-3 text-primary/70' />
+                                            </button>
+                                          ) : (
+                                            <span className='pl-4'>{item.name}</span>
+                                          )}
                                         </li>
                                       ))}
                                     </ul>
@@ -179,12 +188,14 @@ export function LocationsDisplay() {
           <DialogHeader className='absolute top-2 right-2 z-10'>
              <DialogTitle className='sr-only'>Vídeo de Localização</DialogTitle>
           </DialogHeader>
-          <iframe
-            src={videoUrl || ''}
-            className='w-full h-full rounded-lg'
-            allow="autoplay; fullscreen"
-            allowFullScreen
-          ></iframe>
+          {videoUrl && (
+            <iframe
+              src={videoUrl}
+              className='w-full h-full rounded-lg'
+              allow="autoplay; fullscreen"
+              allowFullScreen
+            ></iframe>
+          )}
         </DialogContent>
       </Dialog>
     </>
