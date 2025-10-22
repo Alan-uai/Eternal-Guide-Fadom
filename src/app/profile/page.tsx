@@ -232,10 +232,40 @@ function MyStatsForm() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <FormField control={form.control} name="currentWorld" render={({ field }) => (
-                                <FormItem><FormLabel>Mundo Atual</FormLabel><FormControl><Input placeholder="ex: 23" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem>
+                                    <FormLabel>Mundo Atual</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <ScrollArea className="h-72">
+                                                {allGameData.map((world, index) => (
+                                                    <SelectItem key={world.id} value={String(index + 1)}>{world.name}</SelectItem>
+                                                ))}
+                                            </ScrollArea>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
                             )}/>
-                            <FormField control={form.control} name="rank" render={({ field }) => (
-                                <FormItem><FormLabel>Seu Rank</FormLabel><FormControl><Input type="number" placeholder="ex: 115" {...field} /></FormControl><FormMessage /></FormItem>
+                             <FormField control={form.control} name="rank" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Seu Rank</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <ScrollArea className="h-72">
+                                                {Array.from({ length: MAX_RANK }, (_, i) => i + 1).map(rankNum => (
+                                                    <SelectItem key={rankNum} value={String(rankNum)}>Rank {rankNum}</SelectItem>
+                                                ))}
+                                            </ScrollArea>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
                             )}/>
                         </div>
                         
