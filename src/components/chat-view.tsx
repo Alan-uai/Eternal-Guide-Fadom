@@ -310,7 +310,7 @@ export function ChatView() {
                     question: prompt,
                     status: 'pending',
                     createdAt: feedbackData.createdAt,
-                });
+                }, { merge: true });
 
             } catch (error) {
                 console.error("Erro ao salvar feedback negativo:", error);
@@ -396,21 +396,19 @@ export function ChatView() {
           break;
         }
         
-        const chunkStr = decoder.decode(value, { stream: true });
         try {
+            const chunkStr = decoder.decode(value);
+            // Assuming the stream sends complete JSON objects for each chunk
             const parsedChunk = JSON.parse(chunkStr);
-            if(parsedChunk.generalChunk) {
-                accumulatedContent.generalResponse += parsedChunk.generalChunk;
-            }
-            if(parsedChunk.personalizedChunk) {
-                accumulatedContent.personalizedResponse += parsedChunk.personalizedChunk;
-            }
-             if(parsedChunk.final) { // Handle potential error object from stream
-                accumulatedContent = parsedChunk.final;
-            }
+            accumulatedContent = {
+              generalResponse: parsedChunk.generalResponse ?? accumulatedContent.generalResponse,
+              personalizedResponse: parsedChunk.personalizedResponse ?? accumulatedContent.personalizedResponse,
+            };
         } catch (e) {
-           // This can happen if a chunk isn't a full JSON object, which is expected.
-           // We just continue accumulating.
+           // This can happen if a chunk isn't a full JSON object, which is expected with streaming.
+           // A more robust solution might buffer chunks until a full JSON object can be parsed.
+           // For now, we'll log the error and continue, which might result in partially displayed data.
+           console.warn("Could not parse streaming chunk, might be incomplete JSON.", e);
         }
 
         setMessages((prev) =>

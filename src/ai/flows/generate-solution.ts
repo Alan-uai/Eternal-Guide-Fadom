@@ -29,6 +29,7 @@ const getGameDataTool = ai.defineTool(
   }
 );
 
+
 const MessageSchema = z.object({
   role: z.enum(['user', 'assistant']),
   content: z.string(),
@@ -81,38 +82,27 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
         
         return new ReadableStream({
             async start(controller) {
-                let previousGeneral = '';
-                let previousPersonalized = '';
-                let generalDone = false;
+                let accumulatedContent = { generalResponse: '', personalizedResponse: '' };
+                let isFinalChunk = false;
 
                 for await (const chunk of stream) {
-                    const currentGeneral = chunk.output?.generalResponse;
-                    const currentPersonalized = chunk.output?.personalizedResponse;
-
-                    if (currentGeneral && !generalDone) {
-                        const newText = currentGeneral.substring(previousGeneral.length);
-                        if (newText) {
-                            controller.enqueue(new TextEncoder().encode(JSON.stringify({ generalChunk: newText })));
-                        }
-                        previousGeneral = currentGeneral;
-                        
-                        // Heuristic to detect if the general part is "done" (e.g., valid JSON)
-                        try {
-                            JSON.parse(currentGeneral);
-                            generalDone = true; // Mark as done if it's a complete JSON
-                        } catch (e) {
-                            // Not yet a complete JSON, continue streaming general part
-                        }
+                    if (chunk.output?.generalResponse) {
+                        accumulatedContent.generalResponse = chunk.output.generalResponse;
+                    }
+                    if (chunk.output?.personalizedResponse) {
+                        accumulatedContent.personalizedResponse = chunk.output.personalizedResponse;
                     }
 
-                    if (currentPersonalized && generalDone) {
-                         const newText = currentPersonalized.substring(previousPersonalized.length);
-                         if (newText) {
-                            controller.enqueue(new TextEncoder().encode(JSON.stringify({ personalizedChunk: newText })));
-                         }
-                         previousPersonalized = currentPersonalized;
+                    // Check if this is the final chunk from the stream.
+                    // This is a heuristic and might need adjustment based on Genkit's streaming behavior.
+                    if (!chunk.isStreaming) {
+                       isFinalChunk = true;
                     }
+
+                    // Encode and send the current accumulated content
+                    controller.enqueue(new TextEncoder().encode(JSON.stringify(accumulatedContent)));
                 }
+
                 controller.close();
             }
         });
@@ -128,7 +118,7 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
                     }]),
                      personalizedResponse: JSON.stringify([])
                 };
-                controller.enqueue(new TextEncoder().encode(JSON.stringify({ final: errorObject })));
+                controller.enqueue(new TextEncoder().encode(JSON.stringify(errorObject)));
                 controller.close();
             }
         });
@@ -141,6 +131,9 @@ export const prompt = ai.definePrompt({
   input: {schema: GenerateSolutionInputSchema},
   output: {schema: GenerateSolutionOutputSchema},
   tools: [getGameDataTool],
+  customHbsHelpers: {
+    jsonStringify: (context: any) => JSON.stringify(context),
+  },
   prompt: `Você é um assistente especialista no jogo Anime Eternal. Sua tarefa é fornecer DUAS respostas para a pergunta do usuário: uma geral e uma personalizada.
 
 **ESTRUTURA DA RESPOSTA (JSON OBRIGATÓRIO):**
@@ -161,7 +154,7 @@ O valor de cada chave DEVE ser uma string JSON de um array de objetos.
 - **REGRAS:**
     1.  Comece com \`marcador: "texto_introdutorio"\` para a resposta direta.
     2.  Use \`marcador: "meio"\` para detalhes e justificativas.
-    3.  Use a ferramenta \`getGameData\` sempre que precisar de estatísticas específicas.
+    3.  Use a ferramenta \`getGameData\` sempre que precisar de estatísticas específicas. Se um item tiver um \`videoUrl\`, inclua-o na resposta como um link Markdown, por exemplo: \`[Ver Localização em Vídeo](url_do_video)\`.
     4.  Se a pergunta for sobre "DPS para sair do mundo", use a regra da comunidade: HP do NPC Rank S do mundo atual, dividido por 10.
     5.  Se o \`wikiContext\` não tiver a resposta, indique isso claramente.
 
@@ -175,11 +168,11 @@ O valor de cada chave DEVE ser uma string JSON de um array de objetos.
 - **REGRAS:**
     1.  **SE O PERFIL DO USUÁRIO ESTIVER VAZIO OU NÃO FOR FORNECIDO:** Sua resposta DEVE ser um JSON contendo UM ÚNICO objeto:
         \`\`\`json
-        {
+        [{
           "marcador": "texto_introdutorio",
           "titulo": "Resposta Personalizada",
           "conteudo": "Preencha os dados gerais do seu perfil para dados detalhados, e para dados super detalhados monte seu perfil com as categorias de poderes, auras...listadas logo abaixo."
-        }
+        }]
         \`\`\`
     2.  **SE O PERFIL FORNECIDO:**
         *   **Para Cálculos (tempo, dano, etc.):** Use as estatísticas do \`userProfile\` (dano, energia, etc.) para fazer o cálculo exato e apresentá-lo na seção de conteúdo.
@@ -225,11 +218,6 @@ const generateSolutionFlow = ai.defineFlow(
     outputSchema: GenerateSolutionOutputSchema,
   },
   async input => {
-    // Helper para registrar a função jsonStringify se não existir
-    ai.handlebars.registerHelper('jsonStringify', function(context) {
-        return JSON.stringify(context);
-    });
-    
     const fallbackResponse = {
         generalResponse: JSON.stringify([{
             marcador: 'texto_introdutorio',
