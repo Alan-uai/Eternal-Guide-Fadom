@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, LogOut, Save, Upload, Sparkles } from 'lucide-react';
+import { User, LogOut, Save, Upload, Sparkles, AlertCircle } from 'lucide-react';
 import Head from 'next/head';
 import { useToast } from '@/hooks/use-toast';
 import { useUser, useFirebase, useAuth } from '@/firebase';
@@ -27,6 +27,7 @@ import { energyGainPerRank } from '@/lib/energy-gain-data';
 import { extractStatsFromImage } from '@/ai/flows/extract-stats-from-image-flow';
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const MAX_RANK = 205;
 const MAX_PRESTIGE = 5;
@@ -357,8 +358,29 @@ function MyStatsForm() {
 
 export default function ProfilePage() {
     const auth = useAuth();
-    const { isUserLoading } = useUser();
+    const { user, isUserLoading } = useUser();
     const { toast } = useToast();
+    const [hasStats, setHasStats] = useState(true);
+
+     useEffect(() => {
+        if (user) {
+            const checkStats = async () => {
+                const userRef = doc(useFirebase().firestore, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    if (!data.rank && !data.totalDamage) {
+                        setHasStats(false);
+                    } else {
+                        setHasStats(true);
+                    }
+                } else {
+                    setHasStats(false);
+                }
+            };
+            checkStats();
+        }
+    }, [user]);
 
     const handleSignOut = async () => {
         if (auth) {
@@ -402,6 +424,16 @@ export default function ProfilePage() {
                         </Button>
                     </div>
                 </header>
+
+                {!hasStats && (
+                    <Alert>
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Complete seu Perfil!</AlertTitle>
+                        <AlertDescription>
+                            Preencha suas estatísticas abaixo para receber dicas e cálculos personalizados da IA.
+                        </AlertDescription>
+                    </Alert>
+                )}
 
                 <MyStatsForm />
                 

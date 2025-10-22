@@ -134,7 +134,7 @@ export const prompt = ai.definePrompt({
   customHbsHelpers: {
     jsonStringify: (context: any) => JSON.stringify(context),
   },
-  prompt: `Você é um assistente especialista no jogo Anime Eternal. Sua tarefa é fornecer DUAS respostas para a pergunta do usuário: uma geral e uma personalizada.
+  prompt: `Você é um assistente especialista no jogo Anime Eternal. Sua tarefa é fornecer DUAS respostas para a pergunta do usuário: uma geral e uma personalizada (se houver dados do perfil).
 
 **ESTRUTURA DA RESPOSTA (JSON OBRIGATÓRIO):**
 Sua resposta DEVE ser um único objeto JSON com duas chaves: \`generalResponse\` e \`personalizedResponse\`.
@@ -160,24 +160,19 @@ O valor de cada chave DEVE ser uma string JSON de um array de objetos.
 
 ---
 
-### TAREFA 2: Gerar a \`personalizedResponse\`
+### TAREFA 2: Gerar a \`personalizedResponse\` (SE o \`userProfile\` for fornecido)
 
+{{#if userProfile}}
 - **FOCO:** Use APENAS o \`userProfile\` fornecido. **IGNORE O \`wikiContext\` E AS FERRAMENTAS PARA ESTA TAREFA.**
 - **OBJETIVO:** Fornecer uma resposta curta e direta, aplicando a lógica do jogo aos dados específicos do usuário.
 
 - **REGRAS:**
-    1.  **SE O PERFIL DO USUÁRIO ESTIVER VAZIO OU NÃO FOR FORNECIDO:** Sua resposta DEVE ser um JSON contendo UM ÚNICO objeto:
-        \`\`\`json
-        [{
-          "marcador": "texto_introdutorio",
-          "titulo": "Resposta Personalizada",
-          "conteudo": "Preencha os dados gerais do seu perfil para dados detalhados, e para dados super detalhados monte seu perfil com as categorias de poderes, auras...listadas logo abaixo."
-        }]
-        \`\`\`
-    2.  **SE O PERFIL FORNECIDO:**
-        *   **Para Cálculos (tempo, dano, etc.):** Use as estatísticas do \`userProfile\` (dano, energia, etc.) para fazer o cálculo exato e apresentá-lo na seção de conteúdo.
-        *   **Para Estratégias ("o que fazer?"):** Compare os itens do \`userProfile\` com os itens mencionados na pergunta. Sua resposta deve focar no que o usuário **precisa obter**, listando itens que ele **não tem**.
-        *   Mantenha a resposta concisa e focada na aplicação para o usuário.
+    *   **Para Cálculos (tempo, dano, etc.):** Use as estatísticas do \`userProfile\` (dano, energia, etc.) para fazer o cálculo exato e apresentá-lo na seção de conteúdo.
+    *   **Para Estratégias ("o que fazer?"):** Compare os itens do \`userProfile\` com os itens mencionados na pergunta. Sua resposta deve focar no que o usuário **precisa obter**, listando itens que ele **não tem**.
+    *   Mantenha a resposta concisa e focada na aplicação para o usuário.
+{{else}}
+- A \`personalizedResponse\` DEVE ser uma string JSON de um array vazio: \`[]\`.
+{{/if}}
 
 ---
 
@@ -224,19 +219,18 @@ const generateSolutionFlow = ai.defineFlow(
             titulo: 'Sem Resposta',
             conteudo: 'Desculpe, não consegui gerar uma resposta. Por favor, tente reformular sua pergunta.'
         }]),
-        personalizedResponse: JSON.stringify([{
-            marcador: 'texto_introdutorio',
-            titulo: 'Sem Resposta Personalizada',
-            conteudo: 'Não foi possível gerar uma resposta personalizada. Verifique os dados do seu perfil.'
-        }])
+        personalizedResponse: JSON.stringify([])
     };
 
     try {
       const {output} = await prompt(input);
-      if (!output || !output.generalResponse || !output.personalizedResponse) {
+      if (!output || !output.generalResponse) {
         return fallbackResponse;
       }
-      return output;
+      return {
+        generalResponse: output.generalResponse,
+        personalizedResponse: output.personalizedResponse || JSON.stringify([])
+      };
     } catch (error) {
       console.error("Erro no fluxo de geração de solução:", error);
       return fallbackResponse;

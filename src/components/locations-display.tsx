@@ -34,12 +34,10 @@ export function LocationsDisplay() {
       Raids: {},
     };
 
-    const worldOrder: string[] = [];
     const raidsByWorld: Record<string, any[]> = {};
 
     allGameData.forEach(world => {
       if (!world.name) return;
-      worldOrder.push(world.name);
 
       if (world.powers && world.powers.length > 0) {
         if (!data.Poderes[world.name]) data.Poderes[world.name] = [];
@@ -51,7 +49,7 @@ export function LocationsDisplay() {
       if (world.npcs && world.npcs.length > 0) {
         world.npcs.forEach((npc: any) => {
           if (!npc.name) return;
-          const category = npc.rank === 'SS' || npc.rank === 'SSS' ? 'Bosses' : 'NPCs';
+          const category = (npc.rank === 'SS' || npc.rank === 'SSS') ? 'Bosses' : 'NPCs';
           if (!data[category][world.name]) data[category][world.name] = [];
           data[category][world.name].push(npc);
         });
@@ -59,7 +57,7 @@ export function LocationsDisplay() {
       
       if (world.dungeons && world.dungeons.length > 0) {
         let worldKey: string;
-        if (world.id === '001') {
+         if (world.id === '001') {
             worldKey = 'Lobby 1';
         } else if (world.id === '020') {
             worldKey = 'Lobby 2';

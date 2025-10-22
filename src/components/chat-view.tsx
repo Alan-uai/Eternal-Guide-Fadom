@@ -52,7 +52,18 @@ function renderStructuredContent(content: string, fromCache?: boolean) {
       // Incomplete JSON during streaming is expected
     }
 
-    if (isJson && parsedContent) {
+    if (!isJson && !parsedContent) {
+         // Fallback for streaming or non-JSON content
+        const cleanContent = content.replace(/\\"/g, '"').replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
+        return (
+            <div
+                className="prose prose-sm dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: micromark(cleanContent) }}
+            />
+        );
+    }
+    
+    if (parsedContent && parsedContent.length > 0) {
         const introSection = parsedContent.find(s => s.marcador === 'texto_introdutorio');
         const accordionSections = parsedContent.filter(s => s.marcador === 'meio' || s.marcador === 'fim');
         const defaultAccordionItem = accordionSections.length > 0 ? 'item-0' : undefined;
@@ -88,29 +99,32 @@ function renderStructuredContent(content: string, fromCache?: boolean) {
         );
     }
 
-    // Fallback for streaming or non-JSON content
-    const cleanContent = content.replace(/\\"/g, '"').replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
-    return (
-        <div
-            className="prose prose-sm dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: micromark(cleanContent) }}
-        />
-    );
+    return null; // Return null if content is an empty JSON array string '[]'
 }
 
 function AssistantMessage({ message, fromCache }: { message: Message; fromCache?: boolean }) {
     // The content is now an object { generalResponse, personalizedResponse }
     const { generalResponse, personalizedResponse } = message.content as any;
+    
+    const generalContent = generalResponse ? renderStructuredContent(generalResponse, fromCache) : null;
+    const personalizedContent = personalizedResponse ? renderStructuredContent(personalizedResponse, fromCache) : null;
 
     return (
         <div>
-            <h3 className="font-semibold text-foreground mb-2">Resposta Geral</h3>
-            {renderStructuredContent(generalResponse || '', fromCache)}
+            {generalContent && (
+                 <div>
+                    <h3 className="font-semibold text-foreground mb-2">Resposta Geral</h3>
+                    {generalContent}
+                 </div>
+            )}
             
-            <Separator className="my-4" />
-            
-            <h3 className="font-semibold text-foreground mb-2">Resposta Personalizada</h3>
-            {renderStructuredContent(personalizedResponse || '', fromCache)}
+            {personalizedContent && (
+                <>
+                    <Separator className="my-4" />
+                    <h3 className="font-semibold text-foreground mb-2">Resposta Personalizada</h3>
+                    {personalizedContent}
+                </>
+            )}
         </div>
     );
 }
@@ -347,24 +361,31 @@ export function ChatView() {
       const relevantWikiContext = findRelevantArticles(prompt, wikiArticles);
       const historyForAI = history.map(({ id, fromCache, isStreaming, question, ...rest }) => rest);
       
-      let userProfile = {};
+      let userProfile: any = {};
       if (user && firestore) {
           const userDocSnap = await getDoc(doc(firestore, 'users', user.uid));
           if (userDocSnap.exists()) {
-              userProfile = { stats: userDocSnap.data() };
+              const data = userDocSnap.data();
+              // Only include stats if they are present
+              if (data.rank || data.totalDamage) {
+                userProfile.stats = data;
+              }
           }
           for (const category of profileCategories) {
               const itemsSnap = await getDocs(collection(firestore, 'users', user.uid, category.subcollectionName));
               if (!itemsSnap.empty) {
-                  (userProfile as any)[category.subcollectionName] = itemsSnap.docs.map(d => d.data());
+                  userProfile[category.subcollectionName] = itemsSnap.docs.map(d => d.data());
               }
           }
       }
+      // If userProfile object is empty, don't send it.
+      const profileToSend = Object.keys(userProfile).length > 0 ? userProfile : undefined;
+
 
       const stream = await generateSolutionStream({
         problemDescription: prompt,
         wikiContext: relevantWikiContext,
-        userProfile: userProfile,
+        userProfile: profileToSend,
         history: historyForAI,
       });
 
