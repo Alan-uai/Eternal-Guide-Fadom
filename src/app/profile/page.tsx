@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { User, LogOut, Save, Upload, Sparkles } from 'lucide-react';
 import Head from 'next/head';
 import { useToast } from '@/hooks/use-toast';
-import { useUser, useFirebase } from '@/firebase';
+import { useUser, useFirebase, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
 import { GeneralItemUploader } from '@/components/profile/GeneralItemUploader';
@@ -25,6 +25,7 @@ import { allGameData } from '@/lib/game-data-context';
 import { energyGainPerRank } from '@/lib/energy-gain-data';
 import { extractStatsFromImage } from '@/ai/flows/extract-stats-from-image-flow';
 import { useRouter } from 'next/navigation';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 const MAX_RANK = Math.max(...Object.keys(energyGainPerRank).map(Number));
