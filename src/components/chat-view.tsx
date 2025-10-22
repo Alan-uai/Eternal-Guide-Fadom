@@ -24,6 +24,7 @@ import { addDoc, collection, serverTimestamp, doc, setDoc, getDoc, getDocs } fro
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { profileCategories } from '@/lib/profile-config';
+import { Separator } from './ui/separator';
 
 const chatSchema = z.object({
   prompt: z.string().min(1, 'A pergunta não pode estar vazia.'),
@@ -35,61 +36,25 @@ interface ParsedSection {
   conteudo: string;
 }
 
-const extractContentFromString = (str: string): string => {
-  try {
-    const titleRegex = /"titulo"\s*:\s*"((?:\\"|[^"])*)"/g;
-    const contentRegex = /"conteudo"\s*:\s*"((?:\\"|[^"])*)"/g;
-    
-    const titles = [...str.matchAll(titleRegex)].map(match => match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
-    const contents = [...str.matchAll(contentRegex)].map(match => match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
-    
-    let result = '';
-    const maxLength = Math.max(titles.length, contents.length);
-    
-    for (let i = 0; i < maxLength; i++) {
-      if (titles[i]) {
-        result += `**${titles[i]}**\n\n`;
-      }
-      if (contents[i]) {
-        result += `${contents[i]}\n\n`;
-      }
-    }
-    
-    if (result.trim()) {
-      return result;
-    }
-
-    // Fallback for very incomplete JSON strings
-    return str.replace(/^\[{"marcador":.*"conteudo":\s*"/, '').replace(/"}\]/, '');
-  } catch {
-    // If regex fails for any reason, return the raw string
-    return str;
-  }
-};
-
-
-function AssistantMessage({ content, fromCache }: { content: string; fromCache?: boolean }) {
+function renderStructuredContent(content: string, fromCache?: boolean) {
     let parsedContent: ParsedSection[] | null = null;
     let isJson = false;
 
-    // Tenta analisar o conteúdo como um JSON completo
     try {
         if (typeof content === 'string' && content.trim().startsWith('[')) {
             const parsed = JSON.parse(content);
-            if (Array.isArray(parsed)) {
+            if (Array.isArray(parsed) && parsed.every(p => p.marcador && p.titulo && p.conteudo)) {
                 parsedContent = parsed;
                 isJson = true;
             }
         }
     } catch (e) {
-        // O JSON está incompleto, o que é esperado durante o streaming.
-        // `isJson` permanecerá `false`.
+      // Incomplete JSON during streaming is expected
     }
 
-    // Se o JSON for válido e completo, renderiza a estrutura de acordeão.
     if (isJson && parsedContent) {
-        const introSection = parsedContent.find((s) => s.marcador === 'texto_introdutorio');
-        const accordionSections = parsedContent.filter((s) => s.marcador === 'meio' || s.marcador === 'fim');
+        const introSection = parsedContent.find(s => s.marcador === 'texto_introdutorio');
+        const accordionSections = parsedContent.filter(s => s.marcador === 'meio' || s.marcador === 'fim');
         const defaultAccordionItem = accordionSections.length > 0 ? 'item-0' : undefined;
 
         return (
@@ -123,15 +88,33 @@ function AssistantMessage({ content, fromCache }: { content: string; fromCache?:
         );
     }
 
-    // Se o JSON estiver incompleto ou não for JSON, renderiza o texto extraído de forma inteligente.
-    const streamingText = extractContentFromString(content);
+    // Fallback for streaming or non-JSON content
+    const cleanContent = content.replace(/\\"/g, '"').replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
     return (
         <div
             className="prose prose-sm dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: micromark(streamingText) }}
+            dangerouslySetInnerHTML={{ __html: micromark(cleanContent) }}
         />
     );
 }
+
+function AssistantMessage({ message, fromCache }: { message: Message; fromCache?: boolean }) {
+    // The content is now an object { generalResponse, personalizedResponse }
+    const { generalResponse, personalizedResponse } = message.content as any;
+
+    return (
+        <div>
+            <h3 className="font-semibold text-foreground mb-2">Resposta Geral</h3>
+            {renderStructuredContent(generalResponse || '', fromCache)}
+            
+            <Separator className="my-4" />
+            
+            <h3 className="font-semibold text-foreground mb-2">Resposta Personalizada</h3>
+            {renderStructuredContent(personalizedResponse || '', fromCache)}
+        </div>
+    );
+}
+
 
 
 const TypingIndicator = () => (
@@ -353,7 +336,7 @@ export function ChatView() {
     const assistantMessage: Message = {
       id: assistantMessageId,
       role: 'assistant',
-      content: '',
+      content: { generalResponse: '', personalizedResponse: '' } as any, // Start with empty object
       isStreaming: true,
       question: prompt,
     };
@@ -391,19 +374,19 @@ export function ChatView() {
 
       const reader = stream.getReader();
       const decoder = new TextDecoder();
-      let accumulatedContent = '';
+      let accumulatedContent = { generalResponse: '', personalizedResponse: '' };
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) {
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: accumulatedContent } : msg
+              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: accumulatedContent as any } : msg
             )
           );
           setIsLoading(false);
           
-          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent, question: prompt };
+          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent as any, question: prompt };
           const newCacheItem: CachedItem = { message: finalMessage, feedback: null, dataVersion: gameDataVersion };
           const normalizedPrompt = prompt.trim().toLowerCase();
           const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
@@ -412,11 +395,27 @@ export function ChatView() {
 
           break;
         }
-        accumulatedContent += decoder.decode(value, { stream: true });
+        
+        const chunkStr = decoder.decode(value, { stream: true });
+        try {
+            const parsedChunk = JSON.parse(chunkStr);
+            if(parsedChunk.generalChunk) {
+                accumulatedContent.generalResponse += parsedChunk.generalChunk;
+            }
+            if(parsedChunk.personalizedChunk) {
+                accumulatedContent.personalizedResponse += parsedChunk.personalizedChunk;
+            }
+             if(parsedChunk.final) { // Handle potential error object from stream
+                accumulatedContent = parsedChunk.final;
+            }
+        } catch (e) {
+           // This can happen if a chunk isn't a full JSON object, which is expected.
+           // We just continue accumulating.
+        }
 
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
+            msg.id === assistantMessageId ? { ...msg, content: accumulatedContent as any } : msg
           )
         );
       }
@@ -537,12 +536,12 @@ export function ChatView() {
                       : 'bg-card'
                   )}
                 >
-                  {message.isStreaming && !message.content ? (
+                  {message.isStreaming && !(message.content as any).generalResponse ? (
                     <TypingIndicator />
                   ) : message.role === 'assistant' ? (
-                    <AssistantMessage content={message.content} fromCache={message.fromCache} />
+                    <AssistantMessage message={message} fromCache={message.fromCache} />
                   ) : (
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <p className="whitespace-pre-wrap">{message.content as string}</p>
                   )}
                   
                   {message.role === 'assistant' && !message.isStreaming && message.content && (
@@ -551,7 +550,7 @@ export function ChatView() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-primary"
-                            onClick={() => handleFeedback(message.id, message.question || '', message.content, 'positive')}
+                            onClick={() => handleFeedback(message.id, message.question || '', JSON.stringify(message.content), 'positive')}
                           >
                             <ThumbsUp className={cn('h-4 w-4', feedback[message.id] === 'positive' && 'fill-primary text-primary')} />
                           </Button>
@@ -559,7 +558,7 @@ export function ChatView() {
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                            onClick={() => handleFeedback(message.id, message.question || '', message.content, 'negative')}
+                            onClick={() => handleFeedback(message.id, message.question || '', JSON.stringify(message.content), 'negative')}
                           >
                             <ThumbsDown className={cn('h-4 w-4', feedback[message.id] === 'negative' && 'fill-destructive text-destructive')} />
                           </Button>

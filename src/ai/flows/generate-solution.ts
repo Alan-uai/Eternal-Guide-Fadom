@@ -54,13 +54,17 @@ const GenerateSolutionInputSchema = z.object({
 });
 export type GenerateSolutionInput = z.infer<typeof GenerateSolutionInputSchema>;
 
-const GenerateSolutionOutputSchema = z.object({
-  structuredResponse: z
+const StructuredResponseSchema = z
     .string()
     .describe(
       'Uma string JSON de um array de objetos. Cada objeto deve ter: `marcador` ("texto_introdutorio", "inicio", "meio", "fim"), `titulo` (string), e `conteudo` (string, formatado em Markdown).'
-    ),
+    );
+
+const GenerateSolutionOutputSchema = z.object({
+  generalResponse: StructuredResponseSchema,
+  personalizedResponse: StructuredResponseSchema,
 });
+
 
 export type GenerateSolutionOutput = z.infer<typeof GenerateSolutionOutputSchema>;
 
@@ -72,18 +76,41 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
     try {
         const { stream } = await prompt.stream(input);
         
+        // This stream now returns an object { generalResponse, personalizedResponse }
+        // We need to decide how to stream this. A simple way is to stream them sequentially.
+        
         return new ReadableStream({
             async start(controller) {
-                let previousText = '';
+                let previousGeneral = '';
+                let previousPersonalized = '';
+                let generalDone = false;
+
                 for await (const chunk of stream) {
-                    const currentText = chunk.output?.structuredResponse;
-                    if (currentText) {
-                        // Compare the current text with the previous one to find the new part.
-                        const newText = currentText.substring(previousText.length);
+                    const currentGeneral = chunk.output?.generalResponse;
+                    const currentPersonalized = chunk.output?.personalizedResponse;
+
+                    if (currentGeneral && !generalDone) {
+                        const newText = currentGeneral.substring(previousGeneral.length);
                         if (newText) {
-                            controller.enqueue(new TextEncoder().encode(newText));
+                            controller.enqueue(new TextEncoder().encode(JSON.stringify({ generalChunk: newText })));
                         }
-                        previousText = currentText; // Update the previous text
+                        previousGeneral = currentGeneral;
+                        
+                        // Heuristic to detect if the general part is "done" (e.g., valid JSON)
+                        try {
+                            JSON.parse(currentGeneral);
+                            generalDone = true; // Mark as done if it's a complete JSON
+                        } catch (e) {
+                            // Not yet a complete JSON, continue streaming general part
+                        }
+                    }
+
+                    if (currentPersonalized && generalDone) {
+                         const newText = currentPersonalized.substring(previousPersonalized.length);
+                         if (newText) {
+                            controller.enqueue(new TextEncoder().encode(JSON.stringify({ personalizedChunk: newText })));
+                         }
+                         previousPersonalized = currentPersonalized;
                     }
                 }
                 controller.close();
@@ -94,76 +121,89 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
         return new ReadableStream({
             start(controller) {
                 const errorObject = {
-                    structuredResponse: JSON.stringify([{
+                    generalResponse: JSON.stringify([{
                         marcador: 'texto_introdutorio',
                         titulo: 'Erro',
                         conteudo: 'Desculpe, não consegui processar sua pergunta. Tente reformulá-la.'
-                    }])
+                    }]),
+                     personalizedResponse: JSON.stringify([])
                 };
-                controller.enqueue(new TextEncoder().encode(JSON.stringify(errorObject)));
+                controller.enqueue(new TextEncoder().encode(JSON.stringify({ final: errorObject })));
                 controller.close();
             }
         });
     }
 }
 
+
 export const prompt = ai.definePrompt({
   name: 'generateSolutionPrompt',
   input: {schema: GenerateSolutionInputSchema},
   output: {schema: GenerateSolutionOutputSchema},
   tools: [getGameDataTool],
-  prompt: `Você é um assistente especialista no jogo Anime Eternal e também uma calculadora estratégica. Sua resposta DEVE ser em Português-BR.
+  prompt: `Você é um assistente especialista no jogo Anime Eternal. Sua tarefa é fornecer DUAS respostas para a pergunta do usuário: uma geral e uma personalizada.
 
 **ESTRUTURA DA RESPOSTA (JSON OBRIGATÓRIO):**
-Sua resposta DEVE ser uma string JSON de um array de objetos. Cada objeto representa uma seção da resposta.
+Sua resposta DEVE ser um único objeto JSON com duas chaves: \`generalResponse\` e \`personalizedResponse\`.
+O valor de cada chave DEVE ser uma string JSON de um array de objetos.
 
-**Estrutura de cada objeto JSON:**
-- \`marcador\`: Use "texto_introdutorio", "inicio", "meio", ou "fim".
-- \`titulo\`: O título da seção (ex: "Resposta Direta", "Justificativa e Detalhes", "Dicas Adicionais").
+**Estrutura de cada objeto JSON dentro do array:**
+- \`marcador\`: Use "texto_introdutorio", "meio", ou "fim".
+- \`titulo\`: O título da seção (ex: "Solução Direta", "Justificativa").
 - \`conteudo\`: O conteúdo da seção em formato Markdown.
 
-**REGRAS DE ESTRUTURAÇÃO DO JSON:**
-1.  **SEMPRE** comece com um objeto com \`marcador: "texto_introdutorio"\`. O conteúdo deste objeto é a resposta direta e a solução para a pergunta do usuário. O título pode ser "Solução Direta".
-2.  A seguir, crie um ou mais objetos com \`marcador: "meio"\`. Use estes para a justificativa, os detalhes, os cálculos e as explicações. Dê a eles títulos claros como "Justificativa e Detalhes" ou "Cálculo de Tempo".
-3.  Se aplicável, termine com um ou mais objetos com \`marcador: "fim"\`. Use para dicas extras, estratégias de longo prazo, etc. Dê a eles títulos como "Dicas Adicionais".
-4.  **NÃO USE "INICIO" COMO MARCADOR.** A resposta direta agora está no "texto_introdutorio".
-5.  **A SAÍDA FINAL DEVE SER UM ÚNICO OBJETO JSON**, com uma única chave "structuredResponse" contendo a string JSON do array. **EXEMPLO DE SAÍDA FINAL:** {"structuredResponse": "[{\\"marcador\\":\\"texto_introdutorio\\",\\"titulo\\":\\"Solução Direta\\",\\"conteudo\\":\\"Conteúdo...\\"}]"}
+---
 
+### TAREFA 1: Gerar a \`generalResponse\`
 
-### Estratégia Principal de Raciocínio
-1.  **INTEGRE OS DADOS DO PERFIL DO USUÁRIO:** Se o \`userProfile\` for fornecido, use-o como a principal fonte de verdade sobre o progresso do jogador.
-    *   **Para Cálculos:** Se a pergunta envolver tempo ou dano (ex: "quanto tempo para derrotar X?"), use o \`userProfile.stats.totalDamage\` como base para seus cálculos.
-    *   **Para Estratégias:** Se a pergunta for sobre "como melhorar", "o que pegar", etc., **compare** os itens que o usuário já possui (\`userProfile.powers\`, \`userProfile.auras\`, etc.) com os itens disponíveis no mundo dele (usando a ferramenta \`getGameData\`). Sua sugestão DEVE focar nos itens que ele **ainda não tem**.
-    *   Se o perfil do usuário não for fornecido, dê conselhos gerais e sugira que ele preencha o perfil para obter ajuda personalizada.
+- **FOCO:** Use APENAS o \`wikiContext\` e as ferramentas. **NÃO USE O \`userProfile\` PARA ESTA TAREFA.**
+- **OBJETIVO:** Fornecer uma resposta completa, imparcial e baseada nos dados brutos do jogo.
+- **REGRAS:**
+    1.  Comece com \`marcador: "texto_introdutorio"\` para a resposta direta.
+    2.  Use \`marcador: "meio"\` para detalhes e justificativas.
+    3.  Use a ferramenta \`getGameData\` sempre que precisar de estatísticas específicas.
+    4.  Se a pergunta for sobre "DPS para sair do mundo", use a regra da comunidade: HP do NPC Rank S do mundo atual, dividido por 10.
+    5.  Se o \`wikiContext\` não tiver a resposta, indique isso claramente.
 
-2.  **ANALISE O WIKI:** Use o \`wikiContext\` para entender o vocabulário do jogador e os conceitos do jogo. Faça conexões entre os termos do usuário e os nomes oficiais no jogo (ex: "Raid Green" é a "Green Planet Raid", "mundo de nanatsu" é o Mundo 13).
+---
 
-3.  **USE A FERRAMENTA 'getGameData' SEMPRE QUE POSSÍVEL.** Após ter uma compreensão do tópico, use a ferramenta para buscar estatísticas detalhadas de itens do mundo relevante. Não dê sugestões genéricas como "pegue poderes melhores". Em vez disso, use a ferramenta para listar OS NOMES ESPECÍFICOS dos poderes, acessórios, pets, etc., que podem ajudar, especialmente aqueles que o usuário não possui, de acordo com o \`userProfile\`.
+### TAREFA 2: Gerar a \`personalizedResponse\`
 
-4.  **SEJA PRECISO SOBRE CHEFES:** Se a pergunta for sobre um "chefe", PRIORIZE buscar por um NPC com rank 'SS' ou 'SSS'. Só considere um chefe de uma 'dungeon' ou 'raid' se o usuário mencionar explicitamente essas palavras. Se um item tiver um \`videoUrl\`, inclua-o na resposta como um link Markdown, por exemplo: \`[Ver Localização em Vídeo](url_do_video)\`.
+- **FOCO:** Use APENAS o \`userProfile\` fornecido. **IGNORE O \`wikiContext\` E AS FERRAMENTAS PARA ESTA TAREFA.**
+- **OBJETIVO:** Fornecer uma resposta curta e direta, aplicando a lógica do jogo aos dados específicos do usuário.
 
-5.  **Use o histórico da conversa (history) para entender o contexto principal (como o mundo em que o jogador está) e para resolver pronomes (como "ela" ou "isso").** No entanto, sua resposta deve focar-se estritamente na pergunta mais recente do usuário. Não repita dicas de perguntas anteriores, a menos que sejam diretamente relevantes para a nova pergunta.
+- **REGRAS:**
+    1.  **SE O PERFIL DO USUÁRIO ESTIVER VAZIO OU NÃO FOR FORNECIDO:** Sua resposta DEVE ser um JSON contendo UM ÚNICO objeto:
+        \`\`\`json
+        {
+          "marcador": "texto_introdutorio",
+          "titulo": "Resposta Personalizada",
+          "conteudo": "Preencha os dados gerais do seu perfil para dados detalhados, e para dados super detalhados monte seu perfil com as categorias de poderes, auras...listadas logo abaixo."
+        }
+        \`\`\`
+    2.  **SE O PERFIL FORNECIDO:**
+        *   **Para Cálculos (tempo, dano, etc.):** Use as estatísticas do \`userProfile\` (dano, energia, etc.) para fazer o cálculo exato e apresentá-lo na seção de conteúdo.
+        *   **Para Estratégias ("o que fazer?"):** Compare os itens do \`userProfile\` com os itens mencionados na pergunta. Sua resposta deve focar no que o usuário **precisa obter**, listando itens que ele **não tem**.
+        *   Mantenha a resposta concisa e focada na aplicação para o usuário.
 
-6.  **Regra da Comunidade para Avançar de Mundo:** Se o usuário perguntar sobre o "DPS para sair do mundo", a regra da comunidade é: **pegar a vida (HP) do NPC de Rank S do mundo atual e dividir por 10**. Como você não tem o HP dos NPCs em sua base de dados, instrua o usuário a encontrar o NPC de Rank S no jogo, verificar o HP dele e fazer o cálculo.
+---
 
-### REGRAS DE CÁLCULO E FORMATAÇÃO (OBRIGATÓRIO)
-- O dano base de um jogador é igual à sua energia total. Isso pode ser modificado por poderes.
-- **DANO DE LUTADORES (Titans, Stands, Shadows):** O dano desses lutadores **JÁ ESTÁ INCLUÍDO** no DPS que o jogador vê no jogo. **NUNCA** calcule o dano de um lutador e o adicione ao DPS total do jogador.
-- A gamepass "fast click" dá ao jogador 4 cliques por segundo. O DPS total deve ser calculado como (Dano * 4).
-- Ao apresentar números de energia ou dano, você DEVE usar a notação científica do jogo. Consulte o artigo "Abreviações de Notação Científica" para usar as abreviações corretas.
-- Ao listar poderes ou itens, você DEVE especificar seus bônus.
+### CONTEXTO PARA AMBAS AS TAREFAS
 
-Se a resposta não estiver nas ferramentas ou no wiki, gere um JSON com um único objeto de erro.
+**Regras Gerais de Formatação e Cálculo:**
+- A gamepass "fast click" dá ao jogador 4 cliques por segundo. DPS total = (Dano * 4).
+- Use a notação científica do jogo ao apresentar números (consulte o artigo "Abreviações de Notação Científica").
+- O dano de lutadores JÁ ESTÁ incluído no DPS do jogo. NÃO o adicione novamente.
 
 {{#if userProfile}}
-INÍCIO DO PERFIL DO USUÁRIO
+INÍCIO DO PERFIL DO USUÁRIO (PARA TAREFA 2)
 \`\`\`json
 {{{jsonStringify userProfile}}}
 \`\`\`
 FIM DO PERFIL DO USUÁRIO
 {{/if}}
 
-INÍCIO DO CONTEÚDO DO WIKI
+INÍCIO DO CONTEÚDO DO WIKI (PARA TAREFA 1)
 {{{wikiContext}}}
 FIM DO CONTEÚDO DO WIKI
 
@@ -191,16 +231,21 @@ const generateSolutionFlow = ai.defineFlow(
     });
     
     const fallbackResponse = {
-        structuredResponse: JSON.stringify([{
+        generalResponse: JSON.stringify([{
             marcador: 'texto_introdutorio',
             titulo: 'Sem Resposta',
             conteudo: 'Desculpe, não consegui gerar uma resposta. Por favor, tente reformular sua pergunta.'
+        }]),
+        personalizedResponse: JSON.stringify([{
+            marcador: 'texto_introdutorio',
+            titulo: 'Sem Resposta Personalizada',
+            conteudo: 'Não foi possível gerar uma resposta personalizada. Verifique os dados do seu perfil.'
         }])
     };
 
     try {
       const {output} = await prompt(input);
-      if (!output || !output.structuredResponse) {
+      if (!output || !output.generalResponse || !output.personalizedResponse) {
         return fallbackResponse;
       }
       return output;
