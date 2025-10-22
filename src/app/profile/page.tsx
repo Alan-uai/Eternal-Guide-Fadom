@@ -245,9 +245,9 @@ function MyStatsForm() {
                                 <div className="flex gap-2">
                                      <FormField control={form.control} name="totalDamageValue" render={({ field }) => ( <FormControl><Input placeholder="ex: 1.5" {...field} /></FormControl>)} />
                                      <FormField control={form.control} name="totalDamageSuffix" render={({ field }) => (
-                                         <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                         <Select onValueChange={(v) => field.onChange(v === 'none' ? '' : v)} defaultValue={field.value} value={field.value}>
                                              <FormControl><SelectTrigger className="w-[120px]"><SelectValue placeholder="Sigla" /></SelectTrigger></FormControl>
-                                             <SelectContent><ScrollArea className="h-72">{suffixes.map(s => <SelectItem key={s || 'none'} value={s}>{s || 'Nenhuma'}</SelectItem>)}</ScrollArea></SelectContent>
+                                             <SelectContent><ScrollArea className="h-72">{suffixes.map(s => <SelectItem key={s || 'none'} value={s || 'none'}>{s || 'Nenhuma'}</SelectItem>)}</ScrollArea></SelectContent>
                                          </Select>
                                      )} />
                                 </div>
@@ -260,9 +260,9 @@ function MyStatsForm() {
                                 <div className="flex gap-2">
                                      <FormField control={form.control} name="currentEnergyValue" render={({ field }) => ( <FormControl><Input placeholder="ex: 1.5" {...field} /></FormControl>)} />
                                      <FormField control={form.control} name="currentEnergySuffix" render={({ field }) => (
-                                         <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                         <Select onValueChange={(v) => field.onChange(v === 'none' ? '' : v)} defaultValue={field.value} value={field.value}>
                                              <FormControl><SelectTrigger className="w-[120px]"><SelectValue placeholder="Sigla" /></SelectTrigger></FormControl>
-                                             <SelectContent><ScrollArea className="h-72">{suffixes.map(s => <SelectItem key={s || 'none'} value={s}>{s || 'Nenhuma'}</SelectItem>)}</ScrollArea></SelectContent>
+                                             <SelectContent><ScrollArea className="h-72">{suffixes.map(s => <SelectItem key={s || 'none'} value={s || 'none'}>{s || 'Nenhuma'}</SelectItem>)}</ScrollArea></SelectContent>
                                          </Select>
                                      )} />
                                 </div>
@@ -275,9 +275,9 @@ function MyStatsForm() {
                                 <div className="flex gap-2">
                                      <FormField control={form.control} name="energyGainValue" render={({ field }) => ( <FormControl><Input placeholder="ex: 87.04" {...field} /></FormControl>)} />
                                      <FormField control={form.control} name="energyGainSuffix" render={({ field }) => (
-                                         <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                         <Select onValueChange={(v) => field.onChange(v === 'none' ? '' : v)} defaultValue={field.value} value={field.value}>
                                              <FormControl><SelectTrigger className="w-[120px]"><SelectValue placeholder="Sigla" /></SelectTrigger></FormControl>
-                                             <SelectContent><ScrollArea className="h-72">{suffixes.map(s => <SelectItem key={s || 'none'} value={s}>{s || 'Nenhuma'}</SelectItem>)}</ScrollArea></SelectContent>
+                                             <SelectContent><ScrollArea className="h-72">{suffixes.map(s => <SelectItem key={s || 'none'} value={s || 'none'}>{s || 'Nenhuma'}</SelectItem>)}</ScrollArea></SelectContent>
                                          </Select>
                                      )} />
                                 </div>
