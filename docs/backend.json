@@ -17,23 +17,23 @@
     "Achievement": {
       "title": "Achievement",
       "type": "object",
-      "description": "Representa uma conquista no jogo.",
+      "description": "Represents a game achievement.",
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
         "type": { "type": "string", "enum": ["general", "raid_rooms", "total_raids"] },
-        "category": { "type": "string", "description": "Categoria geral da conquista (ex: 'Friends', 'Coins', 'Energy', 'Raid')" },
-        "maxLevel": { "type": "number", "description": "Nível máximo para conquistas de progressão." },
-        "requirement": { "type": "string", "description": "Requisito para completar a conquista (ex: '100N', '1250h')." },
-        "progressionBonus": { "type": "string", "description": "Descrição do bônus de progressão (ex: '5% de energia a cada lvl')." },
+        "category": { "type": "string", "description": "General achievement category (e.g., 'Friends', 'Coins', 'Energy', 'Raid')" },
+        "maxLevel": { "type": "number", "description": "Maximum level for progression achievements." },
+        "requirement": { "type": "string", "description": "Requirement to complete the achievement (e.g., '100N', '1250h')." },
+        "progressionBonus": { "type": "string", "description": "Description of the progression bonus (e.g., '5% de energia a cada lvl')." },
         "tiers": {
           "type": "array",
-          "description": "Níveis específicos para conquistas de raid.",
+          "description": "Specific tiers for raid achievements.",
           "items": {
             "type": "object",
             "properties": {
-              "requirement": { "type": "string", "description": "O requisito do nível (ex: 'Room 10', '25 Completions')." },
-              "bonus": { "type": "string", "description": "O bônus concedido neste nível." }
+              "requirement": { "type": "string", "description": "The requirement for the tier (e.g., 'Room 10', '25 Completions')." },
+              "bonus": { "type": "string", "description": "The bonus granted at this tier." }
             },
             "required": ["requirement", "bonus"]
           }
@@ -199,6 +199,18 @@
                 "2": { "$ref": "#/backend/entities/UserWeapon" }
             }
         },
+         "fighterSlots": {
+            "type": "object",
+            "description": "Stores the equipped fighters (Titans, Stands, Shadows).",
+            "properties": {
+                "0": { "$ref": "#/backend/entities/UserFighter" },
+                "1": { "$ref": "#/backend/entities/UserFighter" },
+                "2": { "$ref": "#/backend/entities/UserFighter" },
+                "3": { "$ref": "#/backend/entities/UserFighter" },
+                "4": { "$ref": "#/backend/entities/UserFighter" },
+                "5": { "$ref": "#/backend/entities/UserFighter" }
+            }
+        },
         "jewelrySlots": {
           "type": "object",
           "description": "Stores the equipped jewelry in the four slots.",
@@ -228,6 +240,20 @@
         "breathingEnchantment": { "type": "string", "nullable": true },
         "stoneEnchantment": { "type": "string", "nullable": true },
         "passiveEnchantment": { "type": "string", "nullable": true }
+      }
+    },
+    "UserFighter": {
+      "title": "UserFighter",
+      "description": "Represents a fighter (Titan, Stand, Shadow) equipped by a user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "rarity": { "type": "string" },
+        "type": { "type": "string", "enum": ["Titan", "Stand", "Shadow"] },
+        "evolutionLevel": { "type": "number", "description": "The star level of the fighter (0-3)." },
+        "enchantment": { "type": "string", "nullable": true, "description": "Rarity enchantment for Titans/Stands." },
+        "level": { "type": "number", "nullable": true, "description": "Leveling for Shadows." }
       }
     },
     "UserJewelry": {
@@ -627,6 +653,14 @@
           "description": "Stores the items a user has."
         }
       },
+        {
+        "path": "/users/{userId}/fighters/{itemId}",
+        "definition": {
+          "entityName": "UserItem",
+          "schema": { "$ref": "#/backend/entities/UserItem" },
+          "description": "Stores the items a user has."
+        }
+      },
       {
         "path": "/users/{userId}/accessories/{accessoryId}",
         "definition": {
@@ -807,5 +841,3 @@
     "reasoning": "The Firestore structure is organized with 'worlds' as the top-level collection to logically separate game content. Each world document contains sub-collections for 'powers', 'npcs', 'pets', 'dungeons', 'accessories', 'shadows' and 'stands', creating a hierarchical and scalable data model. This allows for efficient querying of specific game data. For example, to get all shadows for 'World 7', you query the '/worlds/world7/shadows' sub-collection. A new top-level collection 'achievements' is added to store all game achievements, which is separate from world-specific data."
   }
 }
-
-    

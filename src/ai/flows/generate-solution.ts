@@ -34,9 +34,22 @@ const MessageSchema = z.object({
   content: z.string(),
 });
 
+const UserProfileSchema = z.object({
+    stats: z.any().optional().describe("Estatísticas gerais do usuário, como rank, dano, etc."),
+    powers: z.array(z.any()).optional().describe("Poderes que o usuário possui."),
+    auras: z.array(z.any()).optional().describe("Auras que o usuário possui."),
+    pets: z.array(z.any()).optional().describe("Pets que o usuário possui."),
+    weapons: z.array(z.any()).optional().describe("Armas que o usuário possui."),
+    fighters: z.array(z.any()).optional().describe("Lutadores (Titãs, Stands, etc.) que o usuário possui."),
+    accessories: z.array(z.any()).optional().describe("Acessórios que o usuário possui."),
+    gamepasses: z.array(z.any()).optional().describe("Gamepasses que o usuário possui."),
+}).optional();
+
+
 const GenerateSolutionInputSchema = z.object({
   problemDescription: z.string().describe('A description of the player is encountering in Anime Eternal.'),
   wikiContext: z.string().describe('The entire content of the game wiki to be used as a knowledge base.'),
+  userProfile: UserProfileSchema.describe("O perfil do usuário, contendo suas estatísticas e itens equipados. Use isso para personalizar as respostas."),
   history: z.array(MessageSchema).optional().describe('The previous messages in the conversation.'),
 });
 export type GenerateSolutionInput = z.infer<typeof GenerateSolutionInputSchema>;
@@ -118,25 +131,37 @@ Sua resposta DEVE ser uma string JSON de um array de objetos. Cada objeto repres
 
 
 ### Estratégia Principal de Raciocínio
-1.  **Primeiro, analise o CONTEÚDO DO WIKI abaixo para entender profundamente a pergunta do usuário.** Sua tarefa é pesquisar e sintetizar informações de todos os artigos relevantes, não apenas o primeiro que encontrar. Use os resumos (summary) e o conteúdo para fazer conexões entre os termos do usuário e os nomes oficiais no jogo (ex: "Raid Green" é a "Green Planet Raid", "mundo de nanatsu" é o Mundo 13, "Windmill Island" é o "Mundo 2"). Preste atenção especial aos dados nas tabelas ('tables'), pois elas contêm estatísticas detalhadas.
-2.  **USE A FERRAMENTA 'getGameData' SEMPRE QUE POSSÍVEL.** Após ter uma compreensão do tópico com base na Wiki, **você DEVE OBRIGATORIAMENTE usar a ferramenta 'getGameData' para buscar estatísticas detalhadas de itens do mundo relevante.** Não dê sugestões genéricas como "pegue poderes melhores". Em vez disso, use a ferramenta para listar OS NOMES ESPECÍFICOS dos poderes, acessórios, pets, etc., daquele mundo que podem ajudar o jogador. Seja específico.
-3.  **SEJA PRECISO SOBRE CHEFES:** Se a pergunta for sobre um "chefe", PRIORIZE buscar por um NPC com rank 'SS' ou 'SSS'. Só considere um chefe de uma 'dungeon' ou 'raid' se o usuário mencionar explicitamente essas palavras.
-4.  **Use o histórico da conversa (history) para entender o contexto principal (como o mundo em que o jogador está) e para resolver pronomes (como "ela" ou "isso").** No entanto, sua resposta deve focar-se estritamente na pergunta mais recente do usuário. Não repita dicas de perguntas anteriores, a menos que sejam diretamente relevantes para a nova pergunta. Por exemplo, se a pergunta anterior era sobre "dano" e a nova é sobre "poder", foque sua resposta apenas em "poder".
-5.  **Pense Estrategicamente:** Ao responder a uma pergunta sobre a "melhor" maneira de fazer algo (ex: "melhor poder para o Mundo 4"), não se limite apenas às opções desse mundo. Se houver um poder, arma, gamepass ou item significativamente superior no mundo seguinte (ex: Mundo 5) e o jogador estiver próximo de avançar, ofereça uma dica estratégica. Sugira que pode valer a pena focar em avançar de mundo para obter esse item melhor, explicando o porquê.
-6.  **Regra da Comunidade para Avançar de Mundo:** Se o usuário perguntar sobre o "DPS para sair do mundo" ou algo similar, entenda que ele quer saber o dano necessário para avançar para o próximo mundo. A regra da comunidade é: **pegar a vida (HP) do NPC de Rank S do mundo atual e dividir por 10**. Explique essa regra ao usuário. Como você não tem o HP dos NPCs na sua base de dados, instrua o usuário a encontrar o NPC de Rank S no jogo, verificar o HP dele e fazer o cálculo.
+1.  **INTEGRE OS DADOS DO PERFIL DO USUÁRIO:** Se o \`userProfile\` for fornecido, use-o como a principal fonte de verdade sobre o progresso do jogador.
+    *   **Para Cálculos:** Se a pergunta envolver tempo ou dano (ex: "quanto tempo para derrotar X?"), use o \`userProfile.stats.totalDamage\` como base para seus cálculos.
+    *   **Para Estratégias:** Se a pergunta for sobre "como melhorar", "o que pegar", etc., **compare** os itens que o usuário já possui (\`userProfile.powers\`, \`userProfile.auras\`, etc.) com os itens disponíveis no mundo dele (usando a ferramenta \`getGameData\`). Sua sugestão DEVE focar nos itens que ele **ainda não tem**.
+    *   Se o perfil do usuário não for fornecido, dê conselhos gerais e sugira que ele preencha o perfil para obter ajuda personalizada.
+
+2.  **ANALISE O WIKI:** Use o \`wikiContext\` para entender o vocabulário do jogador e os conceitos do jogo. Faça conexões entre os termos do usuário e os nomes oficiais no jogo (ex: "Raid Green" é a "Green Planet Raid", "mundo de nanatsu" é o Mundo 13).
+
+3.  **USE A FERRAMENTA 'getGameData' SEMPRE QUE POSSÍVEL.** Após ter uma compreensão do tópico, use a ferramenta para buscar estatísticas detalhadas de itens do mundo relevante. Não dê sugestões genéricas como "pegue poderes melhores". Em vez disso, use a ferramenta para listar OS NOMES ESPECÍFICOS dos poderes, acessórios, pets, etc., que podem ajudar, especialmente aqueles que o usuário não possui, de acordo com o \`userProfile\`.
+
+4.  **SEJA PRECISO SOBRE CHEFES:** Se a pergunta for sobre um "chefe", PRIORIZE buscar por um NPC com rank 'SS' ou 'SSS'. Só considere um chefe de uma 'dungeon' ou 'raid' se o usuário mencionar explicitamente essas palavras. Se um item tiver um \`videoUrl\`, inclua-o na resposta como um link Markdown, por exemplo: \`[Ver Localização em Vídeo](url_do_video)\`.
+
+5.  **Use o histórico da conversa (history) para entender o contexto principal (como o mundo em que o jogador está) e para resolver pronomes (como "ela" ou "isso").** No entanto, sua resposta deve focar-se estritamente na pergunta mais recente do usuário. Não repita dicas de perguntas anteriores, a menos que sejam diretamente relevantes para a nova pergunta.
+
+6.  **Regra da Comunidade para Avançar de Mundo:** Se o usuário perguntar sobre o "DPS para sair do mundo", a regra da comunidade é: **pegar a vida (HP) do NPC de Rank S do mundo atual e dividir por 10**. Como você não tem o HP dos NPCs em sua base de dados, instrua o usuário a encontrar o NPC de Rank S no jogo, verificar o HP dele e fazer o cálculo.
 
 ### REGRAS DE CÁLCULO E FORMATAÇÃO (OBRIGATÓRIO)
-- O jogo tem 21 mundos, cada um com conteúdo exclusivo.
 - O dano base de um jogador é igual à sua energia total. Isso pode ser modificado por poderes.
-- **DANO DE LUTADORES (Titans, Stands, Shadows):** O dano desses lutadores **JÁ ESTÁ INCLUÍDO** no DPS que o jogador vê no jogo. **NUNCA** calcule o dano de um lutador e o adicione ao DPS total do jogador, pois isso resultaria em contagem dupla. Apenas mencione o bônus percentual do lutador como uma informação adicional.
+- **DANO DE LUTADORES (Titans, Stands, Shadows):** O dano desses lutadores **JÁ ESTÁ INCLUÍDO** no DPS que o jogador vê no jogo. **NUNCA** calcule o dano de um lutador e o adicione ao DPS total do jogador.
 - A gamepass "fast click" dá ao jogador 4 cliques por segundo. O DPS total deve ser calculado como (Dano * 4).
-- Ao apresentar números de energia ou dano, você DEVE usar a notação científica do jogo. Consulte o artigo "Abreviações de Notação Científica" para usar as abreviações corretas (k, M, B, T, qd, etc.).
-- Ao listar poderes ou itens, você DEVE especificar seus bônus:
-    - Para 'gacha': especifique o status de cada nível (energia/dano) e bônus de 'energy_crit_bonus' se houver.
-    - Para 'progression': se for 'mixed', liste todos os bônus; para outros, apenas o 'maxBoost'.
-    - Para chance de obter um poder, use a propriedade 'probability' e a raridade.
+- Ao apresentar números de energia ou dano, você DEVE usar a notação científica do jogo. Consulte o artigo "Abreviações de Notação Científica" para usar as abreviações corretas.
+- Ao listar poderes ou itens, você DEVE especificar seus bônus.
 
 Se a resposta não estiver nas ferramentas ou no wiki, gere um JSON com um único objeto de erro.
+
+{{#if userProfile}}
+INÍCIO DO PERFIL DO USUÁRIO
+\`\`\`json
+{{{jsonStringify userProfile}}}
+\`\`\`
+FIM DO PERFIL DO USUÁRIO
+{{/if}}
 
 INÍCIO DO CONTEÚDO DO WIKI
 {{{wikiContext}}}
@@ -152,6 +177,7 @@ HISTÓRICO DA CONVERSA:
 Descrição do Problema: {{{problemDescription}}}`,
 });
 
+
 const generateSolutionFlow = ai.defineFlow(
   {
     name: 'generateSolutionFlow',
@@ -159,6 +185,11 @@ const generateSolutionFlow = ai.defineFlow(
     outputSchema: GenerateSolutionOutputSchema,
   },
   async input => {
+    // Helper para registrar a função jsonStringify se não existir
+    ai.handlebars.registerHelper('jsonStringify', function(context) {
+        return JSON.stringify(context);
+    });
+    
     const fallbackResponse = {
         structuredResponse: JSON.stringify([{
             marcador: 'texto_introdutorio',

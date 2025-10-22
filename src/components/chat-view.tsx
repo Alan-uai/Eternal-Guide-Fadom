@@ -19,10 +19,11 @@ import { useToast } from '@/hooks/use-toast';
 import { micromark } from 'micromark';
 import { Card, CardContent } from './ui/card';
 import { nanoid } from 'nanoid';
-import { useUser, useFirebase } from '@/firebase';
-import { addDoc, collection, serverTimestamp, doc, setDoc } from 'firebase/firestore';
+import { useUser, useFirebase, useCollection, useDoc, useMemoFirebase } from '@/firebase';
+import { addDoc, collection, serverTimestamp, doc, setDoc, getDoc, getDocs } from 'firebase/firestore';
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { profileCategories } from '@/lib/profile-config';
 
 const chatSchema = z.object({
   prompt: z.string().min(1, 'A pergunta não pode estar vazia.'),
@@ -362,10 +363,25 @@ export function ChatView() {
     try {
       const relevantWikiContext = findRelevantArticles(prompt, wikiArticles);
       const historyForAI = history.map(({ id, fromCache, isStreaming, question, ...rest }) => rest);
+      
+      let userProfile = {};
+      if (user && firestore) {
+          const userDocSnap = await getDoc(doc(firestore, 'users', user.uid));
+          if (userDocSnap.exists()) {
+              userProfile = { stats: userDocSnap.data() };
+          }
+          for (const category of profileCategories) {
+              const itemsSnap = await getDocs(collection(firestore, 'users', user.uid, category.subcollectionName));
+              if (!itemsSnap.empty) {
+                  (userProfile as any)[category.subcollectionName] = itemsSnap.docs.map(d => d.data());
+              }
+          }
+      }
 
       const stream = await generateSolutionStream({
         problemDescription: prompt,
         wikiContext: relevantWikiContext,
+        userProfile: userProfile,
         history: historyForAI,
       });
 
