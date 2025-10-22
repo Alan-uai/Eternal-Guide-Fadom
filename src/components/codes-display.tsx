@@ -1,10 +1,10 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Gift, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { upgradesCostsArticle } from '@/lib/wiki-articles/upgrades-costs';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from './ui/scroll-area';
 import { useApp } from '@/context/app-provider';
@@ -17,14 +17,17 @@ interface CategorizedCodes {
 }
 
 export function CodesDisplay() {
-  const { activeSidePanel, setActiveSidePanel } = useApp();
+  const { activeSidePanel, setActiveSidePanel, wikiArticles } = useApp();
   const isExpanded = activeSidePanel === 'codes';
   const { toast } = useToast();
 
   const allCodesRaw = useMemo(() => {
+    const upgradesCostsArticle = wikiArticles.find(a => a.id === 'upgrades-costs');
+    if (!upgradesCostsArticle) return [];
+    
     const codeRegex = /`([^`]+)`/g;
     return upgradesCostsArticle.content.match(codeRegex)?.map(c => c.replace(/`/g, '')) || [];
-  }, []);
+  }, [wikiArticles]);
 
   const codes = useMemo((): CategorizedCodes => {
     return allCodesRaw.reduce<CategorizedCodes>((acc, code) => {

@@ -106,7 +106,6 @@ export function LocationsDisplay() {
   const handleItemClick = (item: any) => {
     if (item.videoUrl) {
       let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
-      // Extract the clip ID from the URL, which is usually after '/clips/' and before '?'
       const clipIdMatch = url.match(/\/clips\/([a-zA-Z0-9_-]+)/);
       if (clipIdMatch && clipIdMatch[1]) {
         const clipId = clipIdMatch[1];

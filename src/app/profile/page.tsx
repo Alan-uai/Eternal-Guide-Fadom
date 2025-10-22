@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRef, useMemo, useEffect, useState } from 'react';
@@ -27,21 +28,18 @@ import { extractStatsFromImage } from '@/ai/flows/extract-stats-from-image-flow'
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-
-const MAX_RANK = Math.max(...Object.keys(energyGainPerRank).map(Number));
+const MAX_RANK = 205;
+const MAX_PRESTIGE = 5;
+const MAX_LEVEL = 270;
 const MAX_WORLD = allGameData.length;
 
 const suffixes = ["", "k", "M", "B", "T", "qd", "Qn", "sx", "Sp", "O", "N", "de", "Ud", "dD", "tD", "qdD", "QnD", "sxD", "SpD", "OcD", "NvD", "Vgn", "UVg", "DVg", "TVg", "qtV", "QnV", "SeV", "SPG", "OVG", "NVG", "TGN", "UTG", "DTG", "tsTG", "qTG", "QnTG", "ssTG", "SpTG", "OcTG", "NoTG", "QDR", "uQDR", "dQDR", "tQDR"];
 
 const statsSchema = z.object({
-    currentWorld: z.string()
-        .min(1, 'O mundo atual é obrigatório.')
-        .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
-        .refine(val => parseInt(val, 10) <= MAX_WORLD, { message: `O mundo máximo é ${MAX_WORLD}.` }),
-    rank: z.string()
-        .min(1, 'O rank é obrigatório.')
-        .refine(val => !isNaN(parseInt(val, 10)), { message: 'Deve ser um número.' })
-        .refine(val => parseInt(val, 10) <= MAX_RANK, { message: `O rank máximo é ${MAX_RANK}.` }),
+    currentWorld: z.string().min(1, 'O mundo atual é obrigatório.'),
+    rank: z.string().min(1, 'O rank é obrigatório.'),
+    prestige: z.string().min(1, 'O prestígio é obrigatório.'),
+    level: z.string().min(1, 'O nível é obrigatório.'),
     energyGainValue: z.string().min(1, 'O valor é obrigatório.'),
     energyGainSuffix: z.string(),
     totalDamageValue: z.string().min(1, 'O valor é obrigatório.'),
@@ -51,16 +49,6 @@ const statsSchema = z.object({
 });
 
 type StatsFormData = z.infer<typeof statsSchema>;
-
-
-const parseWithSuffix = (valueStr: string, suffix: string) => {
-    if (!valueStr) return 0;
-    const value = parseFloat(valueStr);
-    if (isNaN(value)) return 0;
-    const power = suffixes.indexOf(suffix);
-    if (power === -1) return value;
-    return value * Math.pow(1000, power);
-};
 
 const formatWithSuffix = (num: number): { value: string, suffix: string } => {
     if (num < 1000) return { value: num.toFixed(2), suffix: '' };
@@ -86,6 +74,8 @@ function MyStatsForm() {
         defaultValues: {
             currentWorld: '',
             rank: '',
+            prestige: '0',
+            level: '1',
             energyGainValue: '',
             energyGainSuffix: '',
             totalDamageValue: '',
@@ -105,6 +95,8 @@ function MyStatsForm() {
                     form.reset({
                         currentWorld: data.currentWorld || '',
                         rank: data.rank ? String(data.rank) : '',
+                        prestige: data.prestige ? String(data.prestige) : '0',
+                        level: data.level ? String(data.level) : '1',
                         ...splitValueAndSuffix(localStorage.getItem('eternal-guide-current-energy') || '', 'currentEnergy'),
                         ...splitValueAndSuffix(data.totalDamage || '', 'totalDamage'),
                         ...splitValueAndSuffix(data.energyGain || '', 'energyGain'),
@@ -129,9 +121,11 @@ function MyStatsForm() {
         const { value, suffix } = formatWithSuffix(maxBonuses.damage);
         form.setValue('currentWorld', String(MAX_WORLD));
         form.setValue('rank', String(MAX_RANK));
+        form.setValue('prestige', String(MAX_PRESTIGE));
+        form.setValue('level', String(MAX_LEVEL));
         form.setValue('totalDamageValue', value);
         form.setValue('totalDamageSuffix', suffix);
-        form.setValue('energyGainValue', '');
+        form.setValue('energyGainValue', 'Automático');
         form.setValue('energyGainSuffix', '');
         form.setValue('currentEnergyValue', '');
         form.setValue('currentEnergySuffix', '');
@@ -156,13 +150,12 @@ function MyStatsForm() {
             await updateDoc(userRef, {
                 currentWorld: values.currentWorld,
                 rank: parseInt(values.rank, 10),
+                prestige: parseInt(values.prestige, 10),
+                level: parseInt(values.level, 10),
                 totalDamage: `${values.totalDamageValue}${values.totalDamageSuffix}`,
                 energyGain: `${values.energyGainValue}${values.energyGainSuffix}`,
             });
             
-            const rankRef = doc(firestore, 'users', user.uid, 'rank', 'current');
-            await setDoc(rankRef, { value: parseInt(values.rank, 10) }, { merge: true });
-
             if (values.currentEnergyValue) {
                 localStorage.setItem('eternal-guide-current-energy', currentEnergyCombined);
             }
@@ -258,8 +251,44 @@ function MyStatsForm() {
                                         </FormControl>
                                         <SelectContent>
                                             <ScrollArea className="h-72">
-                                                {Array.from({ length: MAX_RANK }, (_, i) => i + 1).map(rankNum => (
+                                                {Array.from({ length: MAX_RANK + 1 }, (_, i) => i).map(rankNum => (
                                                     <SelectItem key={rankNum} value={String(rankNum)}>Rank {rankNum}</SelectItem>
+                                                ))}
+                                            </ScrollArea>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}/>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="prestige" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Prestígio Atual</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {Array.from({ length: MAX_PRESTIGE + 1 }, (_, i) => i).map(pNum => (
+                                                <SelectItem key={pNum} value={String(pNum)}>Prestígio {pNum}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}/>
+                             <FormField control={form.control} name="level" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nível Atual</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <ScrollArea className="h-72">
+                                                {Array.from({ length: MAX_LEVEL + 1 }, (_, i) => i).map(levelNum => (
+                                                    <SelectItem key={levelNum} value={String(levelNum)}>Nível {levelNum}</SelectItem>
                                                 ))}
                                             </ScrollArea>
                                         </SelectContent>

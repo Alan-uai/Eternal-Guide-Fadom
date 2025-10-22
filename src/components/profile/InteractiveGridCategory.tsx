@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useRef } from 'react';
@@ -16,7 +17,6 @@ import { Loader2, Trash2 } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { allGamepasses } from '@/lib/gamepass-data';
 import { accessories } from '@/lib/accessory-data';
-import { allAuras } from '@/lib/aura-data';
 
 export function InteractiveGridCategory({ subcollectionName, itemTypeFilter }: { subcollectionName: string; gridData?: any[]; itemTypeFilter?: string; }) {
     const { user } = useUser();
@@ -38,8 +38,6 @@ export function InteractiveGridCategory({ subcollectionName, itemTypeFilter }: {
     const allItems = useMemo(() => {
         if (subcollectionName === 'gamepasses') return allGamepasses;
         if (subcollectionName === 'accessories') return accessories;
-        if (subcollectionName === 'auras') return allAuras;
-
 
         let items;
         const nonEquippablePowerNames = [
