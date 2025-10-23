@@ -50,7 +50,6 @@ export function LocationsDisplay() {
   };
 
   const handleItemClick = (item: any) => {
-    // Correctly access the videoUrl from the nested 'drops' property
     if (item?.drops?.videoUrl) {
       let url = Array.isArray(item.drops.videoUrl) ? item.drops.videoUrl[0] : item.drops.videoUrl;
       setVideoUrl(url);
