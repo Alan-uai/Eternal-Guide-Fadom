@@ -133,7 +133,7 @@ export const prompt = ai.definePrompt({
   output: {schema: GenerateSolutionOutputSchema},
   tools: [getGameDataTool],
   customHbsHelpers: {
-    jsonStringify: (context: any) => JSON.stringify(context),
+    jsonStringify: (context: any) => JSON.stringify(context, null, 2),
   },
   prompt: `Você é um assistente especialista no jogo Anime Eternal. Sua tarefa é fornecer DUAS respostas para a pergunta do usuário: uma geral e uma personalizada (se houver dados do perfil).
 
@@ -238,4 +238,3 @@ const generateSolutionFlow = ai.defineFlow(
     }
   }
 );
-
