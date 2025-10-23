@@ -59,6 +59,24 @@ const formatWithSuffix = (num: number): { value: string, suffix: string } => {
     return { value: value.toFixed(2), suffix: suffixes[i] || '' };
 };
 
+const parseSuffixedNumber = (value: string, suffix: string): number => {
+    const numericValue = parseFloat(value);
+    if (isNaN(numericValue)) return 0;
+    
+    const suffixMap: Record<string, number> = {
+        k: 1e3, M: 1e6, B: 1e9, T: 1e12, qd: 1e15, Qn: 1e18, sx: 1e21, Sp: 1e24,
+        O: 1e27, N: 1e30, de: 1e33, Ud: 1e36, dD: 1e39, tD: 1e42, qdD: 1e45, QnD: 1e48,
+        sxD: 1e51, SpD: 1e54, OcD: 1e57, NvD: 1e60, Vgn: 1e63, UVg: 1e66, DVg: 1e69,
+        TVg: 1e72, qtV: 1e75, QnV: 1e78, SeV: 1e81, SPG: 1e84, OVG: 1e87, NVG: 1e90,
+        TGN: 1e93, UTG: 1e96, DTG: 1e99, tsTG: 1e102, qTG: 1e105, QnTG: 1e108, ssTG: 1e111,
+        SpTG: 1e114, OcTG: 1e117, NoTG: 1e120, QDR: 1e123, uQDR: 1e126, dQDR: 1e129,
+        tQDR: 1e132
+    };
+
+    const multiplier = suffixMap[suffix] || 1;
+    return numericValue * multiplier;
+};
+
 const updateUserProfileJson = async (userId: string, firestore: any) => {
     if (!userId || !firestore) return;
     try {
@@ -169,22 +187,20 @@ function MyStatsForm() {
         try {
             const userRef = doc(firestore, 'users', user.uid);
             
-            const currentEnergyCombined = `${values.currentEnergyValue}${values.currentEnergySuffix}`;
-
-            await updateDoc(userRef, {
+            const dataToSave = {
                 currentWorld: values.currentWorld,
                 rank: parseInt(values.rank, 10),
                 prestige: parseInt(values.prestige, 10),
                 level: parseInt(values.level, 10),
                 totalDamage: `${values.totalDamageValue}${values.totalDamageSuffix}`,
+                totalDamage_numeric: parseSuffixedNumber(values.totalDamageValue, values.totalDamageSuffix),
                 energyGain: `${values.energyGainValue}${values.energyGainSuffix}`,
-                currentEnergy: currentEnergyCombined, // Save combined energy to Firestore
-            });
-            
-            // Still save to local storage for immediate UI updates if needed elsewhere
-            if (values.currentEnergyValue) {
-                localStorage.setItem('eternal-guide-current-energy', currentEnergyCombined);
-            }
+                energyGain_numeric: parseSuffixedNumber(values.energyGainValue, values.energyGainSuffix),
+                currentEnergy: `${values.currentEnergyValue}${values.currentEnergySuffix}`,
+                currentEnergy_numeric: parseSuffixedNumber(values.currentEnergyValue, values.currentEnergySuffix),
+            };
+
+            await updateDoc(userRef, dataToSave);
             
             await updateUserProfileJson(user.uid, firestore);
 
@@ -475,3 +491,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+    
