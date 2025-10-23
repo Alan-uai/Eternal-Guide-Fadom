@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -12,10 +11,9 @@ import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
-interface LocationData {
-  [category: string]: {
-    [world: string]: any[];
-  };
+interface BossLocation {
+  worldName: string;
+  bosses: any[];
 }
 
 export function LocationsDisplay() {
@@ -23,70 +21,29 @@ export function LocationsDisplay() {
   const isExpanded = activeSidePanel === 'locations';
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
-  const locations = useMemo((): LocationData => {
+  const bossLocations = useMemo((): BossLocation[] => {
     if (isGameDataLoading || !allGameData || allGameData.length === 0) {
-      return {};
+      return [];
     }
-
-    const data: LocationData = {
-      Poderes: {},
-      NPCs: {},
-      Bosses: {},
-      Raids: {},
-    };
-
+  
+    const locations: BossLocation[] = [];
+  
     allGameData.forEach(world => {
-      if (!world || !world.name) return;
-      const worldName = world.name;
-
-      if (world.powers && world.powers.length > 0) {
-        if (!data.Poderes[worldName]) data.Poderes[worldName] = [];
-        world.powers.forEach((power: any) => {
-          if (power.name) data.Poderes[worldName].push(power);
-        });
-      }
-      
-      if (world.npcs && world.npcs.length > 0) {
-        world.npcs.forEach((npc: any) => {
-          if (!npc.name) return;
-          const category = (npc.rank === 'SS' || npc.rank === 'SSS') ? 'Bosses' : 'NPCs';
-          if (!data[category][worldName]) data[category][worldName] = [];
-          data[category][worldName].push(npc);
-        });
-      }
-      
-      if (world.dungeons && world.dungeons.length > 0) {
-        if (!data.Raids[worldName]) data.Raids[worldName] = [];
-        world.dungeons.forEach((dungeon: any) => {
-            if (dungeon.name) {
-                data.Raids[worldName].push(dungeon);
-            }
-        });
+      if (world?.npcs && Array.isArray(world.npcs) && world.npcs.length > 0) {
+        const bossesInWorld = world.npcs.filter((npc: any) => npc && (npc.rank === 'SS' || npc.rank === 'SSS'));
+        
+        if (bossesInWorld.length > 0) {
+          locations.push({
+            worldName: world.name,
+            bosses: bossesInWorld,
+          });
+        }
       }
     });
-
-    const lobbyRaids: { name: string, videoUrl?: string }[] = [];
-    allGameData.forEach(world => {
-      if (world.dungeons) {
-        world.dungeons.forEach((d:any) => {
-          if (d.name.includes('Easy') || d.name.includes('Medium') || d.name.includes('Hard') || d.name.includes('Insane') || d.name.includes('Crazy') || d.name.includes('Nightmare') || d.name.includes('Leaf')) {
-            lobbyRaids.push(d);
-          }
-        });
-      }
-    });
-    
-    if(lobbyRaids.length > 0) {
-        if (!data.Raids['Lobby']) data.Raids['Lobby'] = [];
-        lobbyRaids.forEach(raid => {
-            if (!data.Raids['Lobby'].some(existing => existing.name === raid.name)) {
-                data.Raids['Lobby'].push(raid);
-            }
-        });
-    }
-
-    return data;
+  
+    return locations;
   }, [allGameData, isGameDataLoading]);
+
 
   const togglePanel = () => {
     setActiveSidePanel(isExpanded ? null : 'locations');
@@ -122,7 +79,7 @@ export function LocationsDisplay() {
             onClick={togglePanel}
           >
             <MapPin className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-semibold">Localidades</span>
+            <span className="text-xs font-semibold">Bosses</span>
           </div>
           <AnimatePresence>
             {isExpanded && (
@@ -139,41 +96,32 @@ export function LocationsDisplay() {
                         <div className='flex items-center justify-center h-full'><Loader2 className='h-6 w-6 animate-spin text-primary' /></div>
                     ) : (
                         <Accordion type="multiple" className="w-full">
-                        {Object.entries(locations).map(([category, worlds]) => (
-                            Object.keys(worlds).length > 0 && (
-                            <AccordionItem value={category} key={category}>
-                                <AccordionTrigger className="text-sm font-semibold py-2">
-                                {category}
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                <div className="space-y-2 pl-2">
-                                    {Object.entries(worlds).map(([world, items]) => (
-                                    <div key={world}>
-                                        <h4 className="text-xs font-bold text-primary mb-1">{world}</h4>
-                                        <ul className="text-xs space-y-1">
-                                        {items.map((item, index) => (
-                                            <li key={item.id || item.name || index}>
-                                            <button
-                                                onClick={() => handleItemClick(item)}
-                                                className={cn(
-                                                    'w-full text-left flex items-center gap-1.5',
-                                                    item.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
-                                                )}
-                                                disabled={!item.videoUrl}
-                                            >
-                                                <span>{item.name}</span>
-                                                {item.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
-                                            </button>
-                                            </li>
-                                        ))}
-                                        </ul>
-                                    </div>
-                                    ))}
-                                </div>
-                                </AccordionContent>
+                          {bossLocations.map(({ worldName, bosses }) => (
+                            <AccordionItem value={worldName} key={worldName}>
+                              <AccordionTrigger className="text-sm font-semibold py-2">
+                                {worldName}
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                <ul className="text-xs space-y-1 pl-2">
+                                  {bosses.map((boss, index) => (
+                                    <li key={boss.id || boss.name || index}>
+                                      <button
+                                        onClick={() => handleItemClick(boss)}
+                                        className={cn(
+                                          'w-full text-left flex items-center gap-1.5',
+                                          boss.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
+                                        )}
+                                        disabled={!boss.videoUrl}
+                                      >
+                                        <span>{boss.name}</span>
+                                        {boss.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
+                                      </button>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </AccordionContent>
                             </AccordionItem>
-                            )
-                        ))}
+                          ))}
                         </Accordion>
                     )}
                   </ScrollArea>
