@@ -50,8 +50,9 @@ export function LocationsDisplay() {
   };
 
   const handleItemClick = (item: any) => {
-    if (item.videoUrl) {
-      let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
+    // Correctly access the videoUrl from the nested 'drops' property
+    if (item?.drops?.videoUrl) {
+      let url = Array.isArray(item.drops.videoUrl) ? item.drops.videoUrl[0] : item.drops.videoUrl;
       setVideoUrl(url);
     }
   }
@@ -104,12 +105,12 @@ export function LocationsDisplay() {
                                         onClick={() => handleItemClick(boss)}
                                         className={cn(
                                           'w-full text-left flex items-center gap-1.5',
-                                          boss.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
+                                          boss.drops?.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
                                         )}
-                                        disabled={!boss.videoUrl}
+                                        disabled={!boss.drops?.videoUrl}
                                       >
                                         <span>{boss.name}</span>
-                                        {boss.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
+                                        {boss.drops?.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
                                       </button>
                                     </li>
                                   ))}
