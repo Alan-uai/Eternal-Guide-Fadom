@@ -6,8 +6,6 @@ import { MapPin, PlayCircle } from 'lucide-react';
 import { useApp } from '@/context/app-provider';
 import { ScrollArea } from './ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
@@ -19,7 +17,6 @@ interface BossLocation {
 export function LocationsDisplay() {
   const { activeSidePanel, setActiveSidePanel, allGameData, isGameDataLoading } = useApp();
   const isExpanded = activeSidePanel === 'locations';
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const bossLocations = useMemo((): BossLocation[] => {
     if (isGameDataLoading || !allGameData || allGameData.length === 0) {
@@ -52,7 +49,8 @@ export function LocationsDisplay() {
   const handleItemClick = (item: any) => {
     if (item?.videoUrl) {
       let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
-      setVideoUrl(url);
+      // Abrir o vídeo em uma nova aba, que é a abordagem mais confiável
+      window.open(url, '_blank');
     }
   }
 
@@ -126,28 +124,6 @@ export function LocationsDisplay() {
           </AnimatePresence>
         </div>
       </motion.div>
-
-      <Dialog open={!!videoUrl} onOpenChange={(isOpen) => !isOpen && setVideoUrl(null)}>
-        <DialogContent className="max-w-3xl h-auto p-0 border-0 bg-transparent">
-          <DialogHeader className='absolute top-2 right-2 z-10'>
-             <DialogTitle className='sr-only'>Vídeo de Localização</DialogTitle>
-          </DialogHeader>
-          {videoUrl && (
-             <video
-              key={videoUrl}
-              className="w-full h-full rounded-lg"
-              autoPlay
-              muted
-              loop
-              controls
-              playsInline
-            >
-              <source src={videoUrl} type="video/mov" />
-              Seu navegador não suporta a tag de vídeo.
-            </video>
-          )}
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
