@@ -136,13 +136,13 @@ export function LocationsDisplay() {
              <video
               key={videoUrl}
               className="w-full h-full rounded-lg"
-              src={videoUrl}
               autoPlay
               muted
               loop
               controls
               playsInline
             >
+              <source src={videoUrl} type="video/mov" />
               Seu navegador não suporta a tag de vídeo.
             </video>
           )}
