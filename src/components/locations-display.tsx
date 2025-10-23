@@ -25,13 +25,13 @@ export function LocationsDisplay() {
     if (isGameDataLoading || !allGameData || allGameData.length === 0) {
       return [];
     }
-  
+
     const locations: BossLocation[] = [];
-  
+
     allGameData.forEach(world => {
       if (world?.npcs && Array.isArray(world.npcs) && world.npcs.length > 0) {
         const bossesInWorld = world.npcs.filter((npc: any) => npc && (npc.rank === 'SS' || npc.rank === 'SSS'));
-        
+
         if (bossesInWorld.length > 0) {
           locations.push({
             worldName: world.name,
@@ -40,7 +40,7 @@ export function LocationsDisplay() {
         }
       }
     });
-  
+
     return locations;
   }, [allGameData, isGameDataLoading]);
 
@@ -50,8 +50,8 @@ export function LocationsDisplay() {
   };
 
   const handleItemClick = (item: any) => {
-    if (item?.drops?.videoUrl) {
-      let url = Array.isArray(item.drops.videoUrl) ? item.drops.videoUrl[0] : item.drops.videoUrl;
+    if (item?.videoUrl) {
+      let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
       setVideoUrl(url);
     }
   }
@@ -104,12 +104,12 @@ export function LocationsDisplay() {
                                         onClick={() => handleItemClick(boss)}
                                         className={cn(
                                           'w-full text-left flex items-center gap-1.5',
-                                          boss.drops?.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
+                                          boss.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
                                         )}
-                                        disabled={!boss.drops?.videoUrl}
+                                        disabled={!boss.videoUrl}
                                       >
                                         <span>{boss.name}</span>
-                                        {boss.drops?.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
+                                        {boss.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
                                       </button>
                                     </li>
                                   ))}
@@ -128,7 +128,7 @@ export function LocationsDisplay() {
       </motion.div>
 
       <Dialog open={!!videoUrl} onOpenChange={(isOpen) => !isOpen && setVideoUrl(null)}>
-        <DialogContent className="max-w-3xl h-[80vh] p-0 border-0 bg-transparent">
+        <DialogContent className="max-w-3xl h-auto p-0 border-0 bg-transparent">
           <DialogHeader className='absolute top-2 right-2 z-10'>
              <DialogTitle className='sr-only'>Vídeo de Localização</DialogTitle>
           </DialogHeader>
