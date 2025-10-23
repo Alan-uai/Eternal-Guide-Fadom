@@ -1,8 +1,30 @@
+
 // src/firebase/firestore/data.ts
 'use server';
 
 import { initializeFirebaseServer } from '@/firebase/server';
 import { collection, getDocs, query, where, doc, getDoc, collectionGroup } from 'firebase/firestore';
+import { headers } from 'next/headers';
+import { User, getAuth } from 'firebase/auth';
+
+
+// Helper function to get the current logged-in user on the server
+// This is a simplified example; a real app would use a more robust auth check (e.g., from headers/cookies)
+async function getCurrentUser(): Promise<User | null> {
+    const auth = getAuth(initializeFirebaseServer().firebaseApp);
+    // In a real server context, you'd get the user from the request headers/session.
+    // For this example, we'll assume a way to get the current user exists.
+    // This is a placeholder and might need a proper implementation depending on the auth flow.
+    if(auth.currentUser) {
+        return auth.currentUser;
+    }
+    
+    // A more realistic scenario for Next.js app router server components
+    // might involve passing the user ID from the client or using a session management library.
+    // As a fallback for this specific setup, we'll return null if no user is directly available.
+    return null; 
+}
+
 
 // Helper function to parse multiplier string to a number
 function parseMultiplier(multiplier: string): number {
@@ -92,7 +114,7 @@ export async function getAllGameData() {
         const worldsSnapshot = await getDocs(collection(firestore, 'worlds'));
         const worldsData = worldsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const subcollectionNames = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories'];
+        const subcollectionNames = ['powers', 'npcs', 'pets', 'dungeons', 'shadows', 'stands', 'accessories', 'fighters'];
 
         const allDataPromises = worldsData.map(async (world) => {
             const worldWithSubcollections: any = { ...world };
@@ -121,5 +143,32 @@ export async function getAllGameData() {
     } catch (error) {
         console.error('Error fetching all game data:', error);
         return { error: 'An error occurred while fetching all game data from Firestore.' };
+    }
+}
+
+export async function getUserProfileJson() {
+    const { firestore } = initializeFirebaseServer();
+    const user = await getCurrentUser(); // This is a placeholder for getting the user server-side
+
+    if (!user) {
+        // This is a critical part. If there's no user, we can't fetch a profile.
+        // The AI needs to handle this case gracefully.
+        return []; 
+    }
+
+    try {
+        const userRef = doc(firestore, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists() && userSnap.data().userProfile) {
+            return userSnap.data().userProfile;
+        } else {
+            // Return an empty array or object if the profile doesn't exist,
+            // so the AI knows the profile is empty.
+            return [];
+        }
+    } catch (error) {
+        console.error('Error fetching user profile JSON:', error);
+        return { error: 'Failed to fetch user profile.' };
     }
 }

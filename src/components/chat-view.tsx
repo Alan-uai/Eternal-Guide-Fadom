@@ -20,7 +20,7 @@ import { micromark } from 'micromark';
 import { Card, CardContent } from './ui/card';
 import { nanoid } from 'nanoid';
 import { useUser, useFirebase, useCollection, useDoc, useMemoFirebase } from '@/firebase';
-import { addDoc, collection, serverTimestamp, doc, setDoc, getDoc, getDocs } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, doc, setDoc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { analyzeNegativeFeedback } from '@/ai/flows/analyze-negative-feedback-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { profileCategories } from '@/lib/profile-config';
@@ -53,7 +53,6 @@ function renderStructuredContent(content: string, fromCache?: boolean) {
     }
 
     if (!isJson && !parsedContent) {
-         // Fallback for streaming or non-JSON content
         const cleanContent = content.replace(/\\"/g, '"').replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
         return (
             <div
@@ -103,8 +102,8 @@ function renderStructuredContent(content: string, fromCache?: boolean) {
 }
 
 function AssistantMessage({ message, fromCache }: { message: Message; fromCache?: boolean }) {
-    // The content is now an object { generalResponse, personalizedResponse }
-    const { generalResponse, personalizedResponse } = message.content as any;
+    const contentObj = typeof message.content === 'string' ? JSON.parse(message.content || '{}') : message.content;
+    const { generalResponse, personalizedResponse } = contentObj as any;
     
     const generalContent = generalResponse ? renderStructuredContent(generalResponse, fromCache) : null;
     const personalizedContent = personalizedResponse ? renderStructuredContent(personalizedResponse, fromCache) : null;
@@ -113,7 +112,7 @@ function AssistantMessage({ message, fromCache }: { message: Message; fromCache?
         <div>
             {generalContent && (
                  <div>
-                    <h3 className="font-semibold text-foreground mb-2">Resposta Geral</h3>
+                    {personalizedContent && <h3 className="font-semibold text-foreground mb-2">Resposta Geral</h3>}
                     {generalContent}
                  </div>
             )}
@@ -170,7 +169,6 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
         const tagsString = Array.isArray(article.tags) ? article.tags.join(' ').toLowerCase() : '';
         const summaryString = article.summary.toLowerCase();
 
-        // High score for exact or near-exact title matches
         if (lowerCaseTitle.includes(lowerCasePrompt)) {
             score += 100;
         }
@@ -181,7 +179,6 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
             if (summaryString.includes(word)) score += 5;
         });
 
-        // Boost for specific terms
         if (/tier list|prioridade|melhor|pior/.test(lowerCasePrompt) && (tagsString.includes('tier list') || lowerCaseTitle.includes('tier list'))) {
             score += 50;
         }
@@ -191,14 +188,12 @@ function findRelevantArticles(prompt: string, articles: WikiArticle[]): string {
 
         return { article, score };
     })
-    .filter(item => item.score > 10) // Increase threshold to filter out weak matches
+    .filter(item => item.score > 10)
     .sort((a, b) => b.score - a.score);
 
-    // Take the top 3 most relevant articles
     const topArticles = scoredArticles.slice(0, 3);
     
     if (topArticles.length === 0) {
-        // Fallback to "getting-started" if no relevant articles are found
         const gettingStarted = articles.find(a => a.id === 'getting-started');
         return gettingStarted ? `Title: ${gettingStarted.title}\nSummary: ${gettingStarted.summary}\nContent: ${gettingStarted.content}\nTables: ${JSON.stringify(gettingStarted.tables || {})}}` : '';
     }
@@ -289,7 +284,6 @@ export function ChatView() {
     if (updatedCache[normalizedPrompt]) {
         updatedCache[normalizedPrompt].feedback = updatedFeedback;
 
-        // Invalidate cache if feedback is negative
         if (updatedFeedback === 'negative') {
             delete updatedCache[normalizedPrompt];
             toast({ title: "Feedback enviado", description: "Obrigado! A resposta anterior foi removida e uma nova será gerada." });
@@ -300,7 +294,6 @@ export function ChatView() {
     }
 
     if (updatedFeedback === 'negative') {
-        // 1. Submit for review in the background
         if (firestore && user) {
              try {
                 const analysisResult = await analyzeNegativeFeedback({ question: prompt, negativeResponse: response });
@@ -331,7 +324,6 @@ export function ChatView() {
             }
         }
 
-        // 2. Remove the bad answer from the current chat view and trigger regeneration
         const userMessageIndex = messages.findIndex(msg => msg.role === 'assistant' && msg.id === messageId) - 1;
         const userMessageContent = messages[userMessageIndex]?.content;
 
@@ -360,32 +352,10 @@ export function ChatView() {
     try {
       const relevantWikiContext = findRelevantArticles(prompt, wikiArticles);
       const historyForAI = history.map(({ id, fromCache, isStreaming, question, ...rest }) => rest);
-      
-      let userProfile: any = {};
-      if (user && firestore) {
-          const userDocSnap = await getDoc(doc(firestore, 'users', user.uid));
-          if (userDocSnap.exists()) {
-              const data = userDocSnap.data();
-              // Only include stats if they are present
-              if (data.rank || data.totalDamage) {
-                userProfile.stats = data;
-              }
-          }
-          for (const category of profileCategories) {
-              const itemsSnap = await getDocs(collection(firestore, 'users', user.uid, category.subcollectionName));
-              if (!itemsSnap.empty) {
-                  userProfile[category.subcollectionName] = itemsSnap.docs.map(d => d.data());
-              }
-          }
-      }
-      // If userProfile object is empty, don't send it.
-      const profileToSend = Object.keys(userProfile).length > 0 ? userProfile : undefined;
-
 
       const stream = await generateSolutionStream({
         problemDescription: prompt,
         wikiContext: relevantWikiContext,
-        userProfile: profileToSend,
         history: historyForAI,
       });
 
@@ -400,14 +370,15 @@ export function ChatView() {
       while (true) {
         const { value, done } = await reader.read();
         if (done) {
+          const finalMessageContent = accumulatedContent;
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: accumulatedContent as any } : msg
+              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: finalMessageContent as any } : msg
             )
           );
           setIsLoading(false);
           
-          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: accumulatedContent as any, question: prompt };
+          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: finalMessageContent as any, question: prompt };
           const newCacheItem: CachedItem = { message: finalMessage, feedback: null, dataVersion: gameDataVersion };
           const normalizedPrompt = prompt.trim().toLowerCase();
           const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
@@ -418,17 +389,22 @@ export function ChatView() {
         }
         
         try {
-            const chunkStr = decoder.decode(value);
-            // Assuming the stream sends complete JSON objects for each chunk
-            const parsedChunk = JSON.parse(chunkStr);
-            accumulatedContent = {
-              generalResponse: parsedChunk.generalResponse ?? accumulatedContent.generalResponse,
-              personalizedResponse: parsedChunk.personalizedResponse ?? accumulatedContent.personalizedResponse,
-            };
+            const chunkStr = decoder.decode(value, {stream: true});
+            // Naive JSON parsing. A more robust implementation would handle partial JSON objects.
+            const jsonObjects = chunkStr.split('}').filter(Boolean).map(s => s + '}');
+            jsonObjects.forEach(jsonStr => {
+                try {
+                    const parsedChunk = JSON.parse(jsonStr);
+                    accumulatedContent = {
+                        generalResponse: parsedChunk.generalResponse ?? accumulatedContent.generalResponse,
+                        personalizedResponse: parsedChunk.personalizedResponse ?? accumulatedContent.personalizedResponse,
+                    };
+                } catch (e) {
+                     // Ignore parsing errors for incomplete chunks
+                }
+            });
+
         } catch (e) {
-           // This can happen if a chunk isn't a full JSON object, which is expected with streaming.
-           // A more robust solution might buffer chunks until a full JSON object can be parsed.
-           // For now, we'll log the error and continue, which might result in partially displayed data.
            console.warn("Could not parse streaming chunk, might be incomplete JSON.", e);
         }
 
@@ -464,7 +440,6 @@ export function ChatView() {
     const normalizedPrompt = values.prompt.trim().toLowerCase();
     const cachedItem = questionCache[normalizedPrompt];
 
-    // If cache exists and is valid, serve it.
     if (cachedItem && cachedItem.message && cachedItem.feedback !== 'negative' && cachedItem.dataVersion === gameDataVersion) {
         const cachedAnswerWithId = {
             ...cachedItem.message,
@@ -479,7 +454,6 @@ export function ChatView() {
         return;
     }
   
-    // Otherwise (no cache, stale cache, or negative feedback), call the AI.
     const historyForAI = newMessages;
     callAI(values.prompt, historyForAI);
   }
@@ -555,7 +529,7 @@ export function ChatView() {
                       : 'bg-card'
                   )}
                 >
-                  {message.isStreaming && !(message.content as any).generalResponse ? (
+                  {message.isStreaming && !((message.content as any)?.generalResponse) ? (
                     <TypingIndicator />
                   ) : message.role === 'assistant' ? (
                     <AssistantMessage message={message} fromCache={message.fromCache} />

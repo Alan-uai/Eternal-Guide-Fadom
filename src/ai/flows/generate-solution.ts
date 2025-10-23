@@ -11,7 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getGameData } from '@/firebase/firestore/data';
+import { getGameData, getUserProfileJson } from '@/firebase/firestore/data';
 
 
 const getGameDataTool = ai.defineTool(
@@ -30,28 +30,28 @@ const getGameDataTool = ai.defineTool(
   }
 );
 
+const getUserProfileTool = ai.defineTool(
+    {
+        name: 'getUserProfile',
+        description: 'Get the current user\'s profile, including their stats and all equipped items, to provide personalized advice and calculations.',
+        inputSchema: z.object({}), // No input needed, it gets the current user automatically
+        outputSchema: z.unknown(),
+    },
+    async () => {
+        return await getUserProfileJson();
+    }
+)
+
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'assistant']),
   content: z.string(),
 });
 
-const UserProfileSchema = z.object({
-    stats: z.any().optional().describe("Estatísticas gerais do usuário, como rank, dano, etc."),
-    powers: z.array(z.any()).optional().describe("Poderes que o usuário possui."),
-    auras: z.array(z.any()).optional().describe("Auras que o usuário possui."),
-    pets: z.array(z.any()).optional().describe("Pets que o usuário possui."),
-    weapons: z.array(z.any()).optional().describe("Armas que o usuário possui."),
-    fighters: z.array(z.any()).optional().describe("Lutadores (Titãs, Stands, etc.) que o usuário possui."),
-    accessories: z.array(z.any()).optional().describe("Acessórios que o usuário possui."),
-    gamepasses: z.array(z.any()).optional().describe("Gamepasses que o usuário possui."),
-}).optional();
-
 
 const GenerateSolutionInputSchema = z.object({
   problemDescription: z.string().describe('A description of the player is encountering in Anime Eternal.'),
   wikiContext: z.string().describe('The entire content of the game wiki to be used as a knowledge base.'),
-  userProfile: UserProfileSchema.describe("O perfil do usuário, contendo suas estatísticas e itens equipados. Use isso para personalizar as respostas."),
   history: z.array(MessageSchema).optional().describe('The previous messages in the conversation.'),
 });
 export type GenerateSolutionInput = z.infer<typeof GenerateSolutionInputSchema>;
@@ -78,13 +78,9 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
     try {
         const { stream } = await prompt.stream(input);
         
-        // This stream now returns an object { generalResponse, personalizedResponse }
-        // We need to decide how to stream this. A simple way is to stream them sequentially.
-        
         return new ReadableStream({
             async start(controller) {
                 let accumulatedContent = { generalResponse: '', personalizedResponse: '' };
-                let isFinalChunk = false;
 
                 for await (const chunk of stream) {
                     if (chunk.output?.generalResponse) {
@@ -94,13 +90,6 @@ export async function generateSolutionStream(input: GenerateSolutionInput) {
                         accumulatedContent.personalizedResponse = chunk.output.personalizedResponse;
                     }
 
-                    // Check if this is the final chunk from the stream.
-                    // This is a heuristic and might need adjustment based on Genkit's streaming behavior.
-                    if (!chunk.isStreaming) {
-                       isFinalChunk = true;
-                    }
-
-                    // Encode and send the current accumulated content
                     controller.enqueue(new TextEncoder().encode(JSON.stringify(accumulatedContent)));
                 }
 
@@ -131,11 +120,8 @@ export const prompt = ai.definePrompt({
   name: 'generateSolutionPrompt',
   input: {schema: GenerateSolutionInputSchema},
   output: {schema: GenerateSolutionOutputSchema},
-  tools: [getGameDataTool],
-  customHbsHelpers: {
-    jsonStringify: (context: any) => JSON.stringify(context, null, 2),
-  },
-  prompt: `Você é um assistente especialista no jogo Anime Eternal. Sua tarefa é fornecer DUAS respostas para a pergunta do usuário: uma geral e uma personalizada (se houver dados do perfil).
+  tools: [getGameDataTool, getUserProfileTool],
+  prompt: `Você é um assistente especialista no jogo Anime Eternal. Sua tarefa é fornecer DUAS respostas para a pergunta do usuário: uma geral e uma personalizada.
 
 **ESTRUTURA DA RESPOSTA (JSON OBRIGATÓRIO):**
 Sua resposta DEVE ser um único objeto JSON com duas chaves: \`generalResponse\` e \`personalizedResponse\`.
@@ -150,30 +136,26 @@ O valor de cada chave DEVE ser uma string JSON de um array de objetos.
 
 ### TAREFA 1: Gerar a \`generalResponse\`
 
-- **FOCO:** Use APENAS o \`wikiContext\` e as ferramentas. **NÃO USE O \`userProfile\` PARA ESTA TAREFA.**
+- **FOCO:** Use APENAS o \`wikiContext\` e a ferramenta \`getGameData\`.
 - **OBJETIVO:** Fornecer uma resposta completa, imparcial e baseada nos dados brutos do jogo.
 - **REGRAS:**
     1.  Comece com \`marcador: "texto_introdutorio"\` para a resposta direta.
     2.  Use \`marcador: "meio"\` para detalhes e justificativas.
-    3.  Use a ferramenta \`getGameData\` sempre que precisar de estatísticas específicas. Se um item tiver um \`videoUrl\`, inclua-o na resposta como um link Markdown, por exemplo: \`[Ver Localização em Vídeo](url_do_video)\`.
-    4.  Se a pergunta for sobre "DPS para sair do mundo", use a regra da comunidade: HP do NPC Rank S do mundo atual, dividido por 10.
-    5.  Se o \`wikiContext\` não tiver a resposta, indique isso claramente.
+    3.  Se a pergunta for sobre "DPS para sair do mundo", use a regra da comunidade: HP do NPC Rank S do mundo atual, dividido por 10.
+    4.  Se o \`wikiContext\` não tiver a resposta, indique isso claramente.
 
 ---
 
-### TAREFA 2: Gerar a \`personalizedResponse\` (SE o \`userProfile\` for fornecido)
+### TAREFA 2: Gerar a \`personalizedResponse\`
 
-{{#if userProfile}}
-- **FOCO:** Use APENAS o \`userProfile\` fornecido. **IGNORE O \`wikiContext\` E AS FERRAMENTAS PARA ESTA TAREFA.**
+- **FOCO:** Use a ferramenta \`getUserProfile\` para obter os dados do jogador.
 - **OBJETIVO:** Fornecer uma resposta curta e direta, aplicando a lógica do jogo aos dados específicos do usuário.
-
 - **REGRAS:**
-    *   **Para Cálculos (tempo, dano, etc.):** Use as estatísticas do \`userProfile\` (dano, energia, etc.) para fazer o cálculo exato e apresentá-lo na seção de conteúdo.
-    *   **Para Estratégias ("o que fazer?"):** Compare os itens do \`userProfile\` com os itens mencionados na pergunta. Sua resposta deve focar no que o usuário **precisa obter**, listando itens que ele **não tem**.
-    *   Mantenha a resposta concisa e focada na aplicação para o usuário.
-{{else}}
-- A \`personalizedResponse\` DEVE ser uma string JSON de um array vazio: \`[]\`.
-{{/if}}
+    *   **Se a ferramenta \`getUserProfile\` retornar dados:**
+        *   **Para Cálculos (tempo, dano, etc.):** Use as estatísticas do perfil para fazer o cálculo exato e apresentá-lo na seção de conteúdo.
+        *   **Para Estratégias ("o que fazer?"):** Compare os itens do perfil com os itens mencionados na pergunta. Sua resposta deve focar no que o usuário **precisa obter**, listando itens que ele **não tem**.
+    *   **Se a ferramenta \`getUserProfile\` retornar um array vazio ou um erro:**
+        *   A \`personalizedResponse\` DEVE ser uma string JSON de um array vazio: \`[]\`. NÃO gere nenhuma mensagem para o usuário.
 
 ---
 
@@ -183,14 +165,6 @@ O valor de cada chave DEVE ser uma string JSON de um array de objetos.
 - A gamepass "fast click" dá ao jogador 4 cliques por segundo. DPS total = (Dano * 4).
 - Use a notação científica do jogo ao apresentar números (consulte o artigo "Abreviações de Notação Científica").
 - O dano de lutadores JÁ ESTÁ incluído no DPS do jogo. NÃO o adicione novamente.
-
-{{#if userProfile}}
-INÍCIO DO PERFIL DO USUÁRIO (PARA TAREFA 2)
-\`\`\`json
-{{{jsonStringify userProfile}}}
-\`\`\`
-FIM DO PERFIL DO USUÁRIO
-{{/if}}
 
 INÍCIO DO CONTEÚDO DO WIKI (PARA TAREFA 1)
 {{{wikiContext}}}
@@ -238,5 +212,3 @@ const generateSolutionFlow = ai.defineFlow(
     }
   }
 );
-
-    

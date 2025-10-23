@@ -20,7 +20,7 @@ import { CharacterInventory } from '@/components/profile/CharacterInventory';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { useGlobalBonuses } from '@/hooks/use-global-bonuses';
 import { allGameData } from '@/lib/game-data-context';
 import { energyGainPerRank } from '@/lib/energy-gain-data';
@@ -28,6 +28,7 @@ import { extractStatsFromImage } from '@/ai/flows/extract-stats-from-image-flow'
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { profileCategories } from '@/lib/profile-config';
 
 const MAX_RANK = 205;
 const MAX_PRESTIGE = 5;
@@ -56,6 +57,28 @@ const formatWithSuffix = (num: number): { value: string, suffix: string } => {
     const i = Math.floor(Math.log10(num) / 3);
     const value = (num / Math.pow(1000, i));
     return { value: value.toFixed(2), suffix: suffixes[i] || '' };
+};
+
+const updateUserProfileJson = async (userId: string, firestore: any) => {
+    if (!userId || !firestore) return;
+    try {
+        const userRef = doc(firestore, 'users', userId);
+        const userSnap = await getDoc(userRef);
+        let profileJson: any = {};
+        if (userSnap.exists()) {
+            profileJson.stats = userSnap.data();
+        }
+
+        for (const category of profileCategories) {
+            const itemsSnap = await getDocs(collection(firestore, 'users', userId, category.subcollectionName));
+            if (!itemsSnap.empty) {
+                profileJson[category.subcollectionName] = itemsSnap.docs.map(d => d.data());
+            }
+        }
+        await updateDoc(userRef, { userProfile: profileJson });
+    } catch (error) {
+        console.error("Failed to update user profile JSON:", error);
+    }
 };
 
 function MyStatsForm() {
@@ -160,6 +183,8 @@ function MyStatsForm() {
             if (values.currentEnergyValue) {
                 localStorage.setItem('eternal-guide-current-energy', currentEnergyCombined);
             }
+            
+            await updateUserProfileJson(user.uid, firestore);
 
             toast({ title: 'Perfil Atualizado!', description: 'Suas informações foram salvas.' });
 
@@ -359,13 +384,14 @@ function MyStatsForm() {
 export default function ProfilePage() {
     const auth = useAuth();
     const { user, isUserLoading } = useUser();
+    const { firestore } = useFirebase();
     const { toast } = useToast();
     const [hasStats, setHasStats] = useState(true);
 
      useEffect(() => {
         if (user && user.uid && firestore) {
             const checkStats = async () => {
-                const userRef = doc(useFirebase().firestore, 'users', user.uid);
+                const userRef = doc(firestore, 'users', user.uid);
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     const data = userSnap.data();
@@ -380,7 +406,7 @@ export default function ProfilePage() {
             };
             checkStats();
         }
-    }, [user]);
+    }, [user, firestore]);
 
     const handleSignOut = async () => {
         if (auth) {
