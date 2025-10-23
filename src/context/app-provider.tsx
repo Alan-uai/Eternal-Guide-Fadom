@@ -10,6 +10,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAdmin } from '@/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
 import { getAllGameData } from '@/firebase/firestore/data';
+import { allGameData as staticGameData } from '@/lib/game-data-context';
 
 type ActiveSidePanel = 'codes' | 'locations' | null;
 
@@ -99,21 +100,36 @@ function AppStateProvider({ children }: { children: ReactNode }) {
                     return;
                 }
             }
-
-            // If no cache or version mismatch, fetch fresh data
-            const freshData = await getAllGameData();
-            if (freshData && !freshData.error) {
-                setAllGameData(freshData);
-                localStorage.setItem(GAME_DATA_CACHE_KEY, JSON.stringify({ version: gameDataVersion, data: freshData }));
+            
+            // If cache is invalid or missing, fetch from Firestore
+            const firestoreData = await getAllGameData();
+            
+            let combinedData;
+            if (firestoreData && !firestoreData.error) {
+                // Merge firestore data with static data, giving firestore precedence
+                const firestoreMap = new Map(firestoreData.map((item: any) => [item.id, item]));
+                combinedData = staticGameData.map(staticItem => {
+                    const firestoreItem = firestoreMap.get(staticItem.id);
+                    return firestoreItem ? { ...staticItem, ...firestoreItem } : staticItem;
+                });
+            } else {
+                // If firestore fetch fails, fallback to static data
+                console.warn("Could not fetch game data from Firestore, falling back to static data.");
+                combinedData = staticGameData;
             }
+
+            setAllGameData(combinedData);
+            localStorage.setItem(GAME_DATA_CACHE_KEY, JSON.stringify({ version: gameDataVersion, data: combinedData }));
+
         } catch (error) {
-            console.error("Failed to load all game data:", error);
+            console.error("Failed to load all game data, falling back to static:", error);
+            setAllGameData(staticGameData); // Fallback on any error
         } finally {
             setIsGameDataLoading(false);
         }
     };
     
-    if (gameDataVersion !== '1.0.0' || !isMetadataLoading) {
+    if (gameDataVersion || !isMetadataLoading) {
       loadGameData();
     }
 
