@@ -47,10 +47,18 @@ export function LocationsDisplay() {
   };
 
   const handleItemClick = (item: any) => {
-    if (item?.videoUrl) {
-      let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
-      // Abrir o vídeo em uma nova aba, que é a abordagem mais confiável
-      window.open(url, '_blank');
+    const url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
+    if (url) {
+      // Create a temporary anchor element
+      const a = document.createElement('a');
+      a.href = url;
+      
+      // Use the download attribute to force download
+      a.download = ''; // Let the browser determine the filename
+      
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   }
 
