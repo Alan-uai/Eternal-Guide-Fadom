@@ -108,6 +108,10 @@ function AssistantMessage({ message, fromCache }: { message: Message; fromCache?
     const generalContent = generalResponse ? renderStructuredContent(generalResponse, fromCache) : null;
     const personalizedContent = personalizedResponse ? renderStructuredContent(personalizedResponse, fromCache) : null;
 
+    if (!generalContent && !personalizedContent) {
+        return <TypingIndicator />;
+    }
+
     return (
         <div>
             {generalContent && (
@@ -365,12 +369,12 @@ export function ChatView() {
 
       const reader = stream.getReader();
       const decoder = new TextDecoder();
-      let accumulatedContent = { generalResponse: '', personalizedResponse: '' };
+      let accumulatedRawText = '';
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) {
-          const finalMessageContent = accumulatedContent;
+          const finalMessageContent = JSON.parse(accumulatedRawText || '{}');
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: finalMessageContent as any } : msg
@@ -388,31 +392,18 @@ export function ChatView() {
           break;
         }
         
+        accumulatedRawText += decoder.decode(value, { stream: true });
+        
         try {
-            const chunkStr = decoder.decode(value, {stream: true});
-            // Naive JSON parsing. A more robust implementation would handle partial JSON objects.
-            const jsonObjects = chunkStr.split('}').filter(Boolean).map(s => s + '}');
-            jsonObjects.forEach(jsonStr => {
-                try {
-                    const parsedChunk = JSON.parse(jsonStr);
-                    accumulatedContent = {
-                        generalResponse: parsedChunk.generalResponse ?? accumulatedContent.generalResponse,
-                        personalizedResponse: parsedChunk.personalizedResponse ?? accumulatedContent.personalizedResponse,
-                    };
-                } catch (e) {
-                     // Ignore parsing errors for incomplete chunks
-                }
-            });
-
+            const parsedContent = JSON.parse(accumulatedRawText);
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId ? { ...msg, content: parsedContent as any } : msg
+              )
+            );
         } catch (e) {
-           console.warn("Could not parse streaming chunk, might be incomplete JSON.", e);
+           // This is expected for incomplete JSON chunks. We'll just wait for more data.
         }
-
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === assistantMessageId ? { ...msg, content: accumulatedContent as any } : msg
-          )
-        );
       }
     } catch (error) {
       console.error('Erro ao gerar solução:', error);

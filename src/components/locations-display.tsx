@@ -10,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface LocationData {
   [category: string]: {
@@ -23,7 +24,7 @@ export function LocationsDisplay() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const locations = useMemo((): LocationData => {
-    if (isGameDataLoading || !allGameData) {
+    if (isGameDataLoading || !allGameData || allGameData.length === 0) {
       return {};
     }
 
@@ -34,65 +35,51 @@ export function LocationsDisplay() {
       Raids: {},
     };
 
-    const raidsByWorld: Record<string, any[]> = {};
-
     allGameData.forEach(world => {
       if (!world.name) return;
+      const worldName = world.name;
 
       if (world.powers && world.powers.length > 0) {
-        if (!data.Poderes[world.name]) data.Poderes[world.name] = [];
+        if (!data.Poderes[worldName]) data.Poderes[worldName] = [];
         world.powers.forEach((power: any) => {
-          if (power.name) data.Poderes[world.name].push(power);
+          if (power.name) data.Poderes[worldName].push(power);
         });
       }
-
+      
       if (world.npcs && world.npcs.length > 0) {
         world.npcs.forEach((npc: any) => {
           if (!npc.name) return;
           const category = (npc.rank === 'SS' || npc.rank === 'SSS') ? 'Bosses' : 'NPCs';
-          if (!data[category][world.name]) data[category][world.name] = [];
-          data[category][world.name].push(npc);
+          if (!data[category][worldName]) data[category][worldName] = [];
+          data[category][worldName].push(npc);
         });
       }
       
       if (world.dungeons && world.dungeons.length > 0) {
-        let worldKey: string;
-         if (world.id === '001') {
-            worldKey = 'Lobby 1';
-        } else if (world.id === '020') {
-            worldKey = 'Lobby 2';
-        } else {
-            worldKey = world.name;
-        }
-        
-        if (!raidsByWorld[worldKey]) {
-            raidsByWorld[worldKey] = [];
-        }
-
+        if (!data.Raids[worldName]) data.Raids[worldName] = [];
         world.dungeons.forEach((dungeon: any) => {
             if (dungeon.name) {
-                raidsByWorld[worldKey].push(dungeon);
+                data.Raids[worldName].push(dungeon);
             }
         });
       }
     });
 
-    const sortedRaidWorlds = Object.keys(raidsByWorld).sort((a, b) => {
-        if (a === 'Lobby 1') return -1;
-        if (b === 'Lobby 1') return 1;
-        if (a === 'Lobby 2') return 1;
-        if (b === 'Lobby 2') return -1;
-        const worldNumA = parseInt(a.match(/(\d+)/)?.[0] || '0', 10);
-        const worldNumB = parseInt(b.match(/(\d+)/)?.[0] || '0', 10);
-        return worldNumA - worldNumB;
-    });
-    
-    const orderedRaids: Record<string, any[]> = {};
-    for (const worldKey of sortedRaidWorlds) {
-        orderedRaids[worldKey] = raidsByWorld[worldKey];
+    // Special handling for lobby dungeons which might be in World 1 or 20 data
+    const lobbyRaids: { name: string, videoUrl?: string }[] = [];
+    const lobbyWorld1 = allGameData.find(w => w.id === '001');
+    const lobbyWorld20 = allGameData.find(w => w.id === '020');
+
+    if (lobbyWorld1?.dungeons) {
+        lobbyWorld1.dungeons.forEach((d:any) => lobbyRaids.push(d));
+    }
+    if (lobbyWorld20?.dungeons) {
+        lobbyWorld20.dungeons.forEach((d:any) => lobbyRaids.push(d));
+    }
+    if(lobbyRaids.length > 0) {
+        data.Raids['Lobby'] = lobbyRaids;
     }
 
-    data.Raids = orderedRaids;
 
     return data;
   }, [allGameData, isGameDataLoading]);
@@ -144,43 +131,47 @@ export function LocationsDisplay() {
               >
                 <div className="px-1 pt-1 text-left w-[300px] h-80">
                   <ScrollArea className="h-full w-full pr-3">
-                    <Accordion type="multiple" className="w-full">
-                      {Object.entries(locations).map(([category, worlds]) => (
-                        Object.keys(worlds).length > 0 && (
-                          <AccordionItem value={category} key={category}>
-                            <AccordionTrigger className="text-sm font-semibold py-2">
-                              {category}
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="space-y-2 pl-2">
-                                {Object.entries(worlds).map(([world, items]) => (
-                                  <div key={world}>
-                                    <h4 className="text-xs font-bold text-primary mb-1">{world}</h4>
-                                    <ul className="text-xs space-y-1">
-                                      {items.map((item, index) => (
-                                        <li key={item.id || item.name || index}>
-                                          <button
-                                              onClick={() => handleItemClick(item)}
-                                              className={cn(
-                                                  'w-full text-left flex items-center gap-1.5',
-                                                  item.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
-                                              )}
-                                              disabled={!item.videoUrl}
-                                          >
-                                              <span>{item.name}</span>
-                                              {item.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
-                                          </button>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                ))}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        )
-                      ))}
-                    </Accordion>
+                    {isGameDataLoading ? (
+                        <div className='flex items-center justify-center h-full'><Loader2 className='h-6 w-6 animate-spin text-primary' /></div>
+                    ) : (
+                        <Accordion type="multiple" className="w-full">
+                        {Object.entries(locations).map(([category, worlds]) => (
+                            Object.keys(worlds).length > 0 && (
+                            <AccordionItem value={category} key={category}>
+                                <AccordionTrigger className="text-sm font-semibold py-2">
+                                {category}
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                <div className="space-y-2 pl-2">
+                                    {Object.entries(worlds).map(([world, items]) => (
+                                    <div key={world}>
+                                        <h4 className="text-xs font-bold text-primary mb-1">{world}</h4>
+                                        <ul className="text-xs space-y-1">
+                                        {items.map((item, index) => (
+                                            <li key={item.id || item.name || index}>
+                                            <button
+                                                onClick={() => handleItemClick(item)}
+                                                className={cn(
+                                                    'w-full text-left flex items-center gap-1.5',
+                                                    item.videoUrl ? 'cursor-pointer hover:underline' : 'cursor-default'
+                                                )}
+                                                disabled={!item.videoUrl}
+                                            >
+                                                <span>{item.name}</span>
+                                                {item.videoUrl && <PlayCircle className='inline h-3 w-3 text-primary/70' />}
+                                            </button>
+                                            </li>
+                                        ))}
+                                        </ul>
+                                    </div>
+                                    ))}
+                                </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                            )
+                        ))}
+                        </Accordion>
+                    )}
                   </ScrollArea>
                 </div>
               </motion.div>
