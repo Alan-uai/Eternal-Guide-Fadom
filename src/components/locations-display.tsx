@@ -52,10 +52,6 @@ export function LocationsDisplay() {
   const handleItemClick = (item: any) => {
     if (item.videoUrl) {
       let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
-      // Convert standard clip URL to embeddable URL
-      if (url.includes('/clips/')) {
-        url = url.replace('/clips/', '/embed/');
-      }
       setVideoUrl(url);
     }
   }
@@ -132,17 +128,23 @@ export function LocationsDisplay() {
       </motion.div>
 
       <Dialog open={!!videoUrl} onOpenChange={(isOpen) => !isOpen && setVideoUrl(null)}>
-        <DialogContent className="max-w-3xl h-[80vh] p-0 border-0">
+        <DialogContent className="max-w-3xl h-[80vh] p-0 border-0 bg-transparent">
           <DialogHeader className='absolute top-2 right-2 z-10'>
              <DialogTitle className='sr-only'>Vídeo de Localização</DialogTitle>
           </DialogHeader>
           {videoUrl && (
-            <iframe
+             <video
+              key={videoUrl}
+              className="w-full h-full rounded-lg"
               src={videoUrl}
-              className='w-full h-full rounded-lg'
-              allow="scripts; autoplay; fullscreen"
-              allowFullScreen
-            ></iframe>
+              autoPlay
+              muted
+              loop
+              controls
+              playsInline
+            >
+              Seu navegador não suporta a tag de vídeo.
+            </video>
           )}
         </DialogContent>
       </Dialog>
