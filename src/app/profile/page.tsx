@@ -121,7 +121,7 @@ function MyStatsForm() {
                         rank: data.rank ? String(data.rank) : '',
                         prestige: data.prestige ? String(data.prestige) : '0',
                         level: data.level ? String(data.level) : '1',
-                        ...splitValueAndSuffix(localStorage.getItem('eternal-guide-current-energy') || '', 'currentEnergy'),
+                        ...splitValueAndSuffix(data.currentEnergy || '', 'currentEnergy'),
                         ...splitValueAndSuffix(data.totalDamage || '', 'totalDamage'),
                         ...splitValueAndSuffix(data.energyGain || '', 'energyGain'),
                     });
@@ -178,8 +178,10 @@ function MyStatsForm() {
                 level: parseInt(values.level, 10),
                 totalDamage: `${values.totalDamageValue}${values.totalDamageSuffix}`,
                 energyGain: `${values.energyGainValue}${values.energyGainSuffix}`,
+                currentEnergy: currentEnergyCombined, // Save combined energy to Firestore
             });
             
+            // Still save to local storage for immediate UI updates if needed elsewhere
             if (values.currentEnergyValue) {
                 localStorage.setItem('eternal-guide-current-energy', currentEnergyCombined);
             }
