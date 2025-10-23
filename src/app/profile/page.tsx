@@ -193,11 +193,11 @@ function MyStatsForm() {
                 prestige: parseInt(values.prestige, 10),
                 level: parseInt(values.level, 10),
                 totalDamage: `${values.totalDamageValue}${values.totalDamageSuffix}`,
-                totalDamage_numeric: parseSuffixedNumber(values.totalDamageValue, values.totalDamageSuffix),
+                totalDamage_numeric_scientific: parseSuffixedNumber(values.totalDamageValue, values.totalDamageSuffix),
                 energyGain: `${values.energyGainValue}${values.energyGainSuffix}`,
-                energyGain_numeric: parseSuffixedNumber(values.energyGainValue, values.energyGainSuffix),
+                energyGain_numeric_scientific: parseSuffixedNumber(values.energyGainValue, values.energyGainSuffix),
                 currentEnergy: `${values.currentEnergyValue}${values.currentEnergySuffix}`,
-                currentEnergy_numeric: parseSuffixedNumber(values.currentEnergyValue, values.currentEnergySuffix),
+                currentEnergy_numeric_scientific: parseSuffixedNumber(values.currentEnergyValue, values.currentEnergySuffix),
             };
 
             await updateDoc(userRef, dataToSave);
@@ -491,5 +491,3 @@ export default function ProfilePage() {
         </>
     );
 }
-
-    
