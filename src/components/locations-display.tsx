@@ -51,13 +51,9 @@ export function LocationsDisplay() {
 
   const handleItemClick = (item: any) => {
     if (item.videoUrl) {
+      // Use the URL directly from the data, assuming it's already the correct embeddable URL.
       let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
-      const clipIdMatch = url.match(/\/clips\/([a-zA-Z0-9_-]+)/);
-      if (clipIdMatch && clipIdMatch[1]) {
-        const clipId = clipIdMatch[1];
-        const embedUrl = `https://medal.tv/clip/${clipId}/embed`;
-        setVideoUrl(embedUrl);
-      }
+      setVideoUrl(url);
     }
   }
 
