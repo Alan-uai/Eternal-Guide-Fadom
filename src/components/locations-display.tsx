@@ -51,8 +51,11 @@ export function LocationsDisplay() {
 
   const handleItemClick = (item: any) => {
     if (item.videoUrl) {
-      // Use the URL directly from the data, assuming it's already the correct embeddable URL.
       let url = Array.isArray(item.videoUrl) ? item.videoUrl[0] : item.videoUrl;
+      // Convert standard clip URL to embeddable URL
+      if (url.includes('/clips/')) {
+        url = url.replace('/clips/', '/embed/');
+      }
       setVideoUrl(url);
     }
   }
