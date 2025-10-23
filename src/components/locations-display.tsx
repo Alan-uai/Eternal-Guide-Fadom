@@ -36,7 +36,7 @@ export function LocationsDisplay() {
     };
 
     allGameData.forEach(world => {
-      if (!world.name) return;
+      if (!world || !world.name) return;
       const worldName = world.name;
 
       if (world.powers && world.powers.length > 0) {
@@ -77,9 +77,13 @@ export function LocationsDisplay() {
         lobbyWorld20.dungeons.forEach((d:any) => lobbyRaids.push(d));
     }
     if(lobbyRaids.length > 0) {
-        data.Raids['Lobby'] = lobbyRaids;
+        if (!data.Raids['Lobby']) data.Raids['Lobby'] = [];
+        lobbyRaids.forEach(raid => {
+            if (!data.Raids['Lobby'].some(existing => existing.name === raid.name)) {
+                data.Raids['Lobby'].push(raid);
+            }
+        });
     }
-
 
     return data;
   }, [allGameData, isGameDataLoading]);

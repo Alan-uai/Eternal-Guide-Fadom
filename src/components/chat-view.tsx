@@ -369,40 +369,57 @@ export function ChatView() {
 
       const reader = stream.getReader();
       const decoder = new TextDecoder();
-      let accumulatedRawText = '';
+      let buffer = '';
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) {
-          const finalMessageContent = JSON.parse(accumulatedRawText || '{}');
+          setIsLoading(false);
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === assistantMessageId ? { ...msg, isStreaming: false, content: finalMessageContent as any } : msg
+              msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
             )
           );
-          setIsLoading(false);
-          
-          const finalMessage: Message = { id: assistantMessageId, role: 'assistant', content: finalMessageContent as any, question: prompt };
-          const newCacheItem: CachedItem = { message: finalMessage, feedback: null, dataVersion: gameDataVersion };
-          const normalizedPrompt = prompt.trim().toLowerCase();
-          const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
-          setQuestionCache(newCache);
-          window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(newCache));
-
+          // After stream is done, get the final message content from state to save to cache
+          setMessages(prevMessages => {
+            const finalMessage = prevMessages.find(msg => msg.id === assistantMessageId);
+            if (finalMessage) {
+                const newCacheItem: CachedItem = { message: finalMessage, feedback: null, dataVersion: gameDataVersion };
+                const normalizedPrompt = prompt.trim().toLowerCase();
+                const newCache = { ...questionCache, [normalizedPrompt]: newCacheItem };
+                setQuestionCache(newCache);
+                window.localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(newCache));
+            }
+            return prevMessages;
+          });
           break;
         }
         
-        accumulatedRawText += decoder.decode(value, { stream: true });
-        
-        try {
-            const parsedContent = JSON.parse(accumulatedRawText);
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === assistantMessageId ? { ...msg, content: parsedContent as any } : msg
-              )
-            );
-        } catch (e) {
-           // This is expected for incomplete JSON chunks. We'll just wait for more data.
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process buffer to find complete JSON objects
+        let boundary = buffer.lastIndexOf('}');
+        if (boundary !== -1) {
+            let processableChunk = buffer.substring(0, boundary + 1);
+            buffer = buffer.substring(boundary + 1); // Keep the rest for the next loop
+
+            try {
+                // To handle multiple JSON objects in one chunk, we wrap them in an array
+                const jsonArrayStr = `[${processableChunk.replace(/}\s*{/g, '},{')}]`;
+                const parsedObjects = JSON.parse(jsonArrayStr);
+                
+                // Assuming the last object in the array is the most complete one
+                const latestContent = parsedObjects[parsedObjects.length - 1];
+
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMessageId ? { ...msg, content: latestContent as any } : msg
+                  )
+                );
+            } catch (e) {
+               // This can happen if the chunk is still incomplete. Continue buffering.
+               console.warn("JSON parsing error during stream, buffering...", e);
+            }
         }
       }
     } catch (error) {
