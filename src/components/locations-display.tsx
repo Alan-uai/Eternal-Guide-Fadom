@@ -65,17 +65,17 @@ export function LocationsDisplay() {
       }
     });
 
-    // Special handling for lobby dungeons which might be in World 1 or 20 data
     const lobbyRaids: { name: string, videoUrl?: string }[] = [];
-    const lobbyWorld1 = allGameData.find(w => w.id === '001');
-    const lobbyWorld20 = allGameData.find(w => w.id === '020');
-
-    if (lobbyWorld1?.dungeons) {
-        lobbyWorld1.dungeons.forEach((d:any) => lobbyRaids.push(d));
-    }
-    if (lobbyWorld20?.dungeons) {
-        lobbyWorld20.dungeons.forEach((d:any) => lobbyRaids.push(d));
-    }
+    allGameData.forEach(world => {
+      if (world.dungeons) {
+        world.dungeons.forEach((d:any) => {
+          if (d.name.includes('Easy') || d.name.includes('Medium') || d.name.includes('Hard') || d.name.includes('Insane') || d.name.includes('Crazy') || d.name.includes('Nightmare') || d.name.includes('Leaf')) {
+            lobbyRaids.push(d);
+          }
+        });
+      }
+    });
+    
     if(lobbyRaids.length > 0) {
         if (!data.Raids['Lobby']) data.Raids['Lobby'] = [];
         lobbyRaids.forEach(raid => {

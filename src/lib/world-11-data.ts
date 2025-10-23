@@ -28,7 +28,7 @@ export const world11Data = {
             description: 'Evolua os Titãs. 2 de 0★ para 1★ (custo: 1k Exchange Token 1). 2 de 1★ para 2★ (custo: 2.5k Exchange Token 1). 2 de 2★ para 3★ (custo: 5k Exchange Token 1).'
         }
     ],
-    fighters: [
+    titans: [
         { id: 'jaw-titan', name: 'Jaw Titan', type: 'Titan' },
         { id: 'female-titan', name: 'Female Titan', type: 'Titan' },
         { id: 'beast-titan', name: 'Beast Titan', type: 'Titan' },
